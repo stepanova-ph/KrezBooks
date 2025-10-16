@@ -46,6 +46,11 @@ export const validationMessages = {
     required: 'Musíte vybrat alespoň Odběratele nebo Dodavatele.',
   },
   item: {
+    // ✨ added these three keys:
+    eanRequired: 'EAN je povinný.',
+    eanMaxLength: 'EAN je příliš dlouhý.',
+    categoryMaxLength: 'Kategorie je příliš dlouhá.',
+
     nameRequired: 'Název položky je povinný.',
     nameMaxLength: 'Maximální délka názvu je 200 znaků.',
     salesGroup: 'Vyberte skupinu.',

@@ -6,7 +6,7 @@ export const itemKeys = {
   lists: () => [...itemKeys.all, 'list'] as const,
   list: (filters?: any) => [...itemKeys.lists(), { filters }] as const,
   details: () => [...itemKeys.all, 'detail'] as const,
-  detail: (id: number) => [...itemKeys.details(), id] as const,
+  detail: (ean: string) => [...itemKeys.details(), ean] as const,
 };
 
 export function useItems() {
@@ -22,17 +22,17 @@ export function useItems() {
   });
 }
 
-export function useItem(id: number) {
+export function useItem(ean: string) {
   return useQuery({
-    queryKey: itemKeys.detail(id),
+    queryKey: itemKeys.detail(ean),
     queryFn: async () => {
-      const response = await window.electronAPI.items.getOne(id);
+      const response = await window.electronAPI.items.getOne(ean);
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch item');
       }
       return response.data;
     },
-    enabled: !!id,
+    enabled: !!ean,
   });
 }
 
@@ -58,15 +58,15 @@ export function useUpdateItem() {
 
   return useMutation({
     mutationFn: async (data: UpdateItemInput) => {
-      const { id, ...updateData } = data;
-      const response = await window.electronAPI.items.update(id, updateData);
+      const { ean, ...updateData } = data;
+      const response = await window.electronAPI.items.update(ean, updateData);
       if (!response.success) {
         throw new Error(response.error || 'Failed to update item');
       }
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: itemKeys.detail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: itemKeys.detail(variables.ean) });
       queryClient.invalidateQueries({ queryKey: itemKeys.lists() });
     },
   });
@@ -76,8 +76,8 @@ export function useDeleteItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
-      const response = await window.electronAPI.items.delete(id);
+    mutationFn: async (ean: string) => {
+      const response = await window.electronAPI.items.delete(ean);
       if (!response.success) {
         throw new Error(response.error || 'Failed to delete item');
       }

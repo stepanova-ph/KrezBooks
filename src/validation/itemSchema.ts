@@ -1,17 +1,22 @@
 import { validationMessages } from "../config/validationMessages";
 import { z } from "zod";
-
-export const unitOptions = ["ks", "kg", "l"] as const;
+import { UNIT_OPTIONS } from "../config/constants";
 
 export const itemSchema = z.object({
+  ean: z
+    .string()
+    .min(1, validationMessages.item.eanRequired || "EAN je povinný")
+    .max(50, validationMessages.item.eanMaxLength || "EAN je příliš dlouhý"),
+  
   name: z
     .string()
     .min(1, validationMessages.item.nameRequired)
     .max(200, validationMessages.item.nameMaxLength),
   
-  sales_group: z.enum(["1", "2", "3", "4"], { 
-    errorMap: () => ({ message: validationMessages.item.salesGroup })
-  }),
+  category: z
+    .string()
+    .max(100, validationMessages.item.categoryMaxLength || "Kategorie je příliš dlouhá")
+    .optional(),
   
   note: z
     .string()
@@ -41,9 +46,7 @@ export const itemSchema = z.object({
       .default(0),
   ),
   
-  unit_of_measure: z.enum(unitOptions, {
-    errorMap: () => ({ message: validationMessages.item.unitInvalid })
-  }),
+  unit_of_measure: z.enum(UNIT_OPTIONS, { error: validationMessages.item.unitInvalid }),
   
   sale_price_group1: z.preprocess(
     (v) => Number(v),

@@ -105,11 +105,11 @@ function registerAdminHandlers() {
       // Insert items
       const insertItem = db.prepare(`
         INSERT INTO items (
-          name, sales_group, note, vat_rate,
+          ean, name, category, note, vat_rate,
           avg_purchase_price, last_purchase_price, unit_of_measure,
           sale_price_group1, sale_price_group2, sale_price_group3, sale_price_group4
         ) VALUES (
-          @name, @sales_group, @note, @vat_rate,
+          @ean, @name, @category, @note, @vat_rate,
           @avg_purchase_price, @last_purchase_price, @unit_of_measure,
           @sale_price_group1, @sale_price_group2, @sale_price_group3, @sale_price_group4
         )
@@ -118,8 +118,9 @@ function registerAdminHandlers() {
       for (const item of testItems) {
         try {
           insertItem.run({
+            ean: item.ean,
             name: item.name,
-            sales_group: item.sales_group || null,
+            category: item.category || null,
             note: item.note || null,
             vat_rate: item.vat_rate,
             avg_purchase_price: item.avg_purchase_price,

@@ -18,23 +18,23 @@ export type PriceGroup = 1 | 2 | 3 | 4;
  * Contact - Companies and their branches
  */
 export interface Contact {
-  ico: string; // Company ID (primary key part 1)
-  modifier: number; // Branch modifier (primary key part 2)
-  dic?: string; // Tax ID
-  company_name: string; // Company name
-  representative_name?: string; // Contact person
-  street?: string; // Street address
-  city?: string; // City
-  postal_code?: string; // Postal code
-  is_supplier: boolean; // Is this a supplier?
-  is_customer: boolean; // Is this a customer?
-  price_group: PriceGroup; // Which price tier (1-4)
-  phone?: string; // Phone number
-  email?: string; // Email
-  website?: string; // Website URL
-  bank_account?: string; // Bank account number
-  created_at?: string; // Timestamp
-  updated_at?: string; // Timestamp
+  ico: string;
+  modifier: number;
+  dic?: string;
+  company_name: string;
+  representative_name?: string;
+  street?: string;
+  city?: string;
+  postal_code?: string;
+  is_supplier: boolean;
+  is_customer: boolean;
+  price_group: PriceGroup;
+  phone?: string;
+  email?: string;
+  website?: string;
+  bank_account?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export type CreateContactInput = CreateInput<
@@ -51,28 +51,29 @@ export type UpdateContactInput = UpdateInput<
  * Item - Warehouse items with multi-tier pricing
  */
 export interface Item {
-  id: number; // Auto-increment primary key
-  sales_group?: string; // Product category/group
-  name: string; // Item name
-  note?: string; // Description/notes
-  vat_rate: VatRate; // VAT category (0, 1, 2)
-  avg_purchase_price: number; // Average purchase price (in cents)
-  last_purchase_price: number; // Last purchase price (in cents)
-  unit_of_measure: string; // e.g., 'ks', 'kg', 'l'
-  sale_price_group1: number; // Price tier 1 (in cents)
-  sale_price_group2: number; // Price tier 2 (in cents)
-  sale_price_group3: number; // Price tier 3 (in cents)
-  sale_price_group4: number; // Price tier 4 (in cents)
-  created_at?: string; // Timestamp
-  updated_at?: string; // Timestamp
+  ean: string;
+  category?: string
+  name: string;
+  note?: string;
+  vat_rate: VatRate;
+  avg_purchase_price: number;
+  last_purchase_price: number;
+  unit_of_measure: string;
+  sale_price_group1: number;
+  sale_price_group2: number;
+  sale_price_group3: number;
+  sale_price_group4: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export type CreateItemInput = CreateInput<
   Item,
-  "id" | "created_at" | "updated_at"
+  "created_at" | "updated_at"
 >;
+
 export type UpdateItemInput = UpdateInput<
   Item,
   "created_at" | "updated_at",
-  "id"
+  "ean"
 >;

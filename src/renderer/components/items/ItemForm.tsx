@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, MenuItem } from "@mui/material";
+import { Box, MenuItem, Autocomplete } from "@mui/material";
 import type { CreateItemInput, Item, VatRate } from "../../../types/database";
 import { itemSchema } from "../../../validation/itemSchema";
 import { FormDialog } from "../common/FormDialog";
@@ -9,6 +9,7 @@ import { VatPriceField } from "../common/VatPriceField";
 import { FormSection } from "../common/FormSection";
 import ValidatedTextField from "../common/ValidatedTextField";
 import { UNIT_OPTIONS } from "../../../config/constants";
+import { useItems } from "../../../hooks/useItems";
 
 interface ItemFormProps {
   open: boolean;
@@ -27,8 +28,9 @@ const VAT_RATES = {
 } as const;
 
 const defaultFormData: CreateItemInput = {
+  ean: "",
   name: "",
-  sales_group: "1",
+  category: "",
   note: "",
   vat_rate: 2 as VatRate,
   avg_purchase_price: 0,
@@ -52,6 +54,16 @@ function ItemForm({
     initialData ? { ...defaultFormData, ...initialData } : defaultFormData,
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Get all items to extract unique categories for autocomplete
+  const { data: allItems } = useItems();
+  const existingCategories = React.useMemo(() => {
+    if (!allItems) return [];
+    const categories = allItems
+      .map(item => item.category)
+      .filter((cat): cat is string => !!cat && cat.trim() !== "");
+    return Array.from(new Set(categories)).sort();
+  }, [allItems]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -144,6 +156,18 @@ function ItemForm({
     >
       <FormSection title="Základní informace">
         <ValidatedTextField
+          label="EAN"
+          name="ean"
+          value={formData.ean}
+          onChange={handleChange}
+          onBlur={() => handleBlur("ean")}
+          error={errors.ean}
+          required
+          fullWidth
+          disabled={mode === "edit"}
+          inputProps={{ autoComplete: "off" }}
+        />
+        <ValidatedTextField
           label="Název položky"
           name="name"
           value={formData.name}
@@ -157,21 +181,33 @@ function ItemForm({
         <Box
           sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2 }}
         >
-          <FormTextField
-            label="Prodejní skupina"
-            name="sales_group"
-            select
-            value={formData.sales_group}
-            onChange={handleSelectChange}
-            error={!!errors.sales_group}
-            SelectProps={{ native: true }}
-            inputProps={{ autoComplete: "off" }}
-          >
-            <option value="1">Skupina 1</option>
-            <option value="2">Skupina 2</option>
-            <option value="3">Skupina 3</option>
-            <option value="4">Skupina 4</option>
-          </FormTextField>
+          <Autocomplete
+            freeSolo
+            options={existingCategories}
+            value={formData.category || ""}
+            onChange={(_, newValue) => {
+              setFormData((prev) => ({ ...prev, category: newValue || "" }));
+              if (errors.category) {
+                setErrors((prev) => ({ ...prev, category: "" }));
+              }
+            }}
+            onInputChange={(_, newInputValue) => {
+              setFormData((prev) => ({ ...prev, category: newInputValue }));
+              if (errors.category) {
+                setErrors((prev) => ({ ...prev, category: "" }));
+              }
+            }}
+            renderInput={(params) => (
+              <FormTextField
+                {...params}
+                label="Kategorie"
+                name="category"
+                error={errors.category}
+                onBlur={() => handleBlur("category")}
+                inputProps={{ ...params.inputProps, autoComplete: "off" }}
+              />
+            )}
+          />
           <FormTextField
             label="Měrná jednotka"
             name="unit_of_measure"

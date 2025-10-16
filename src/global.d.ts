@@ -11,10 +11,8 @@ declare global {
     electronAPI: {
       ipcRenderer: any;
       
-      // Test database connection
       testDatabase: () => Promise<IpcResponse<any>>;
 
-      // Contact operations
       contacts: {
         getAll: () => Promise<IpcResponse<Contact[]>>;
         getOne: (
@@ -35,10 +33,9 @@ declare global {
         ) => Promise<IpcResponse<{ changes: number }>>;
       };
 
-      // Item operations
       items: {
         getAll: () => Promise<IpcResponse<Item[]>>;
-        getOne: (id: number) => Promise<IpcResponse<Item | null>>;
+        getOne: (ean: string) => Promise<IpcResponse<Item | null>>;
         create: (
           item: CreateItemInput
         ) => Promise<IpcResponse<{ id: number; changes: number }>>;
@@ -49,7 +46,6 @@ declare global {
         delete: (id: number) => Promise<IpcResponse<{ changes: number }>>;
       };
 
-      // Admin operations
       admin: {
         getDbStats: () => Promise<IpcResponse<{ contacts: number; items: number }>>;
         clearDb: () => Promise<IpcResponse<{ changes: number }>>;

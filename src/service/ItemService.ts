@@ -10,19 +10,20 @@ export class ItemService {
     return items as Item[];
   }
 
-  async getOne(id: number): Promise<Item | undefined> {
+  async getOne(ean: string): Promise<Item | undefined> {
     const db = getDatabase();
     const statement = db.prepare(itemQueries.getOne);
-    const item = statement.get(id);
+    const item = statement.get(ean);
     return item as Item | undefined;
   }
 
-  async create(item: CreateItemInput): Promise<{ id: number; changes: number }> {
+  async create(item: CreateItemInput): Promise<{ changes: number }> {
     const db = getDatabase();
     const statement = db.prepare(itemQueries.create);
     
     const itemData = {
-      sales_group: item.sales_group || null,
+      ean: item.ean,
+      category: item.category || null,
       name: item.name,
       note: item.note || null,
       vat_rate: item.vat_rate,
@@ -38,16 +39,15 @@ export class ItemService {
     const result = statement.run(itemData);
     
     return { 
-      id: result.lastInsertRowid as number, 
       changes: result.changes 
     };
   }
 
-  async update(id: number, updates: Partial<Item>): Promise<{ changes: number }> {
+  async update(ean: string, updates: Partial<Item>): Promise<{ changes: number }> {
     const db = getDatabase();
     
     const fieldsToUpdate = Object.keys(updates).filter(
-      key => key !== 'id' && key !== 'created_at' && key !== 'updated_at'
+      key => key !== 'ean' && key !== 'created_at' && key !== 'updated_at'
     );
     
     if (fieldsToUpdate.length === 0) {
@@ -57,7 +57,7 @@ export class ItemService {
     const sql = this.buildUpdateQuery('items', fieldsToUpdate);
     const statement = db.prepare(sql);
     
-    const updateData: any = { id };
+    const updateData: any = { ean };
     for (const field of fieldsToUpdate) {
       updateData[field] = (updates as any)[field] ?? null;
     }
@@ -67,17 +67,17 @@ export class ItemService {
     return { changes: result.changes };
   }
 
-  async delete(id: number): Promise<{ changes: number }> {
+  async delete(ean: string): Promise<{ changes: number }> {
     const db = getDatabase();
     const statement = db.prepare(itemQueries.delete);
-    const result = statement.run(id);
+    const result = statement.run(ean);
     return { changes: result.changes };
   }
 
   private buildUpdateQuery(tableName: string, fields: string[]): string {
     // Whitelist allowed fields
     const allowedFields = new Set([
-      'sales_group', 'name', 'note', 'vat_rate',
+      'category', 'name', 'note', 'vat_rate',
       'avg_purchase_price', 'last_purchase_price', 'unit_of_measure',
       'sale_price_group1', 'sale_price_group2', 'sale_price_group3', 'sale_price_group4'
     ]);
@@ -92,7 +92,7 @@ export class ItemService {
     return `
       UPDATE ${tableName}
       SET ${setClause}, updated_at = CURRENT_TIMESTAMP
-      WHERE id = @id
+      WHERE ean = @ean
     `;
   }
 }

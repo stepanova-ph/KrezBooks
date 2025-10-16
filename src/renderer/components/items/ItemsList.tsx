@@ -68,7 +68,7 @@ function ItemsList({
 
   const handleDelete = async (item: Item) => {
     try {
-      await deleteItem.mutateAsync(item.id);
+      await deleteItem.mutateAsync(item.ean);
     } catch (error) {
       console.error("Chyba při mazání položky:", error);
       alert("Chyba: " + (error as Error).message);
@@ -96,8 +96,8 @@ function ItemsList({
 
   const getCellContent = (item: Item, columnId: string) => {
     switch (columnId) {
-      case "id":
-        return item.id;
+      case "ean":
+        return item.ean;
 
       case "name":
         return (
@@ -120,8 +120,8 @@ function ItemsList({
           </Box>
         );
 
-      case "sales_group":
-        return item.sales_group ? String(item.sales_group) : "-";
+      case "category":
+        return item.category ? String(item.category) : "-";
 
       case "unit":
         return item.unit_of_measure;
@@ -156,7 +156,7 @@ function ItemsList({
         data={items}
         emptyMessage='Žádné položky. Klikněte na "Přidat položku" pro vytvoření nové.'
         contextMenuActions={contextMenuActions}
-        getRowKey={(item) => String(item.id)}
+        getRowKey={(item) => String(item.ean)}
         visibleColumnIds={visibleColumnIds}
         columnOrder={columnOrder}
         onColumnOrderChange={onColumnOrderChange}

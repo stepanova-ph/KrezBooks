@@ -118,8 +118,8 @@ function createTables() {
     // Items table
     db.exec(`
       CREATE TABLE IF NOT EXISTS items (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sales_group TEXT,
+        ean TEXT PRIMARY KEY NOT NULL,
+        category TEXT,
         name TEXT NOT NULL,
         note TEXT,
         vat_rate INTEGER NOT NULL DEFAULT 1,
@@ -177,7 +177,7 @@ export function closeDatabase() {
     try {
       db.close();
       db = null;
-      logger.log('Database closed');
+      logger.info('Database closed');
     } catch (error) {
       logger.error('Error closing database:', error);
       // Still set to null even if close fails

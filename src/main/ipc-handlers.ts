@@ -60,20 +60,20 @@ export function registerIpcHandlers() {
     return handleIpcRequest(() => itemService.getAll());
   });
   
-  ipcMain.handle('db:items:getOne', async (_event, id: number) => {
-    return handleIpcRequest(() => itemService.getOne(id));
+  ipcMain.handle('db:items:getOne', async (_event, ean: string) => {
+    return handleIpcRequest(() => itemService.getOne(ean));
   });
   
   ipcMain.handle('db:items:create', async (_event, item: CreateItemInput) => {
     return handleIpcRequest(() => itemService.create(item));
   });
   
-  ipcMain.handle('db:items:update', async (_event, id: number, updates: Partial<Item>) => {
-    return handleIpcRequest(() => itemService.update(id, updates));
+  ipcMain.handle('db:items:update', async (_event, ean: string, updates: Partial<Item>) => {
+    return handleIpcRequest(() => itemService.update(ean, updates));
   });
   
-  ipcMain.handle('db:items:delete', async (_event, id: number) => {
-    return handleIpcRequest(() => itemService.delete(id));
+  ipcMain.handle('db:items:delete', async (_event, ean: string) => {
+    return handleIpcRequest(() => itemService.delete(ean));
   });
 
   logger.info('✓ IPC handlers registered');

@@ -11,7 +11,8 @@ export const itemQueries = {
   
   create: `
     INSERT INTO items (
-      sales_group, 
+      ean,
+      category, 
       name, 
       note, 
       vat_rate, 
