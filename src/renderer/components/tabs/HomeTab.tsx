@@ -34,10 +34,6 @@ function HomeTab() {
       const result = await window.electronAPI.admin.getDbStats();
       if (result.success) {
         setStats(result.data);
-        setMessage({
-          type: "info",
-          text: `Databáze obsahuje: ${result.data.contacts} kontaktů, ${result.data.items} položek`,
-        });
       } else {
         setMessage({
           type: "error",
@@ -143,7 +139,6 @@ function HomeTab() {
         <Typography variant="h5" gutterBottom color="secondary.light">
           SPRÁVA DATABÁZE (dev admin)
         </Typography>
-        Message Alert
         {message && (
           <Alert
             severity={message.type}

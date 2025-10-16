@@ -143,8 +143,8 @@ function ItemsList({
 
       case "sale_price_group4":
         return formatPrice(item.sale_price_group4);
-
       default:
+        console.log(columnId)
         return "-";
     }
   };
@@ -163,7 +163,7 @@ function ItemsList({
         onColumnOrderChange={onColumnOrderChange}
         renderRow={(item, visibleColumns) => (
           <>
-            {visibleColumns.map((column) => (
+            {visibleColumns.filter((col) => !col.hidden).map((column) => (
               <TableCell
                 key={column.id}
                 align={column.align}
