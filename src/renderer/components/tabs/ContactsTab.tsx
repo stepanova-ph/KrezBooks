@@ -12,38 +12,21 @@ import ContactsList, { contactColumns } from "../contacts/ContactsList";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useContacts } from "../../../hooks/useContacts";
 import CreateContactForm from "../contacts/CreateContactForm";
+import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
 
 function ContactTab() {
   const { data: contacts = [], isLoading } = useContacts();
+  
   const [filters, setFilters] = useState<ContactFilterState>(
     initialContactFilterState,
   );
 
-  const [visibleColumnIds, setVisibleColumnIds] = useState<Set<string>>(
-    new Set(defaultVisibleColumnsContact),
-  );
-
-  const [columnOrder, setColumnOrder] = useState<string[]>(
-    defaultVisibleColumnsContact,
-  );
-
-  // Handler that syncs both visibleColumnIds and columnOrder
-  const handleVisibleColumnsChange = (newVisibleColumnIds: Set<string>) => {
-    setVisibleColumnIds(newVisibleColumnIds);
-
-    // Update column order to match the new visible columns
-    // Keep existing order for columns that are still visible,
-    // and add newly visible columns at the end
-    const newVisibleArray = Array.from(newVisibleColumnIds);
-    const orderedVisible = columnOrder.filter((id) =>
-      newVisibleColumnIds.has(id),
-    );
-    const newColumns = newVisibleArray.filter(
-      (id) => !columnOrder.includes(id),
-    );
-
-    setColumnOrder([...orderedVisible, ...newColumns]);
-  };
+  const { 
+    visibleColumnIds, 
+    columnOrder, 
+    handleVisibleColumnsChange, 
+    setColumnOrder 
+  } = useColumnVisibility(defaultVisibleColumnsContact);
 
   const filteredContacts = useTableFilters(contacts, filters);
 

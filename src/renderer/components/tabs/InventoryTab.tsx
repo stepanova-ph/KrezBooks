@@ -13,6 +13,7 @@ import Inventory2Icon from "@mui/icons-material/Inventory2";
 import { useItems } from "../../../hooks/useItems";
 import ItemsList, { itemColumns } from "../items/ItemsList";
 import CreateItemForm from "../items/CreateItemForm";
+import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
 
 function InventoryTab() {
   const { data: items = [], isLoading } = useItems();
@@ -20,40 +21,13 @@ function InventoryTab() {
   const [filters, setFilters] = useState<ItemFilterState>(
     initialItemFilterState,
   );
-  const [visibleColumnIds, setVisibleColumnIds] = useState<Set<string>>(
-    new Set(defaultVisibleColumnsItem),
-  );
-  const [columnOrder, setColumnOrder] = useState<string[]>(
-    defaultVisibleColumnsItem,
-  );
 
-  // Handler that syncs both visibleColumnIds and columnOrder
-  const handleVisibleColumnsChange = (newVisibleColumnIds: Set<string>) => {
-    setVisibleColumnIds(newVisibleColumnIds);
-
-    // Check if we're resetting to default columns
-    const isResettingToDefault =
-      newVisibleColumnIds.size === defaultVisibleColumnsItem.length &&
-      defaultVisibleColumnsItem.every((id) => newVisibleColumnIds.has(id));
-
-    if (isResettingToDefault) {
-      // Reset to default order
-      setColumnOrder(defaultVisibleColumnsItem);
-    } else {
-      // Update column order to match the new visible columns
-      // Keep existing order for columns that are still visible,
-      // and add newly visible columns at the end
-      const newVisibleArray = Array.from(newVisibleColumnIds);
-      const orderedVisible = columnOrder.filter((id) =>
-        newVisibleColumnIds.has(id),
-      );
-      const newColumns = newVisibleArray.filter(
-        (id) => !columnOrder.includes(id),
-      );
-
-      setColumnOrder([...orderedVisible, ...newColumns]);
-    }
-  };
+  const { 
+    visibleColumnIds, 
+    columnOrder, 
+    handleVisibleColumnsChange, 
+    setColumnOrder 
+  } = useColumnVisibility(defaultVisibleColumnsItem);
 
   const filteredItems = useTableFilters(items, filters);
 
@@ -69,8 +43,8 @@ function InventoryTab() {
         onFiltersChange={setFilters}
         columns={itemColumns}
         visibleColumnIds={visibleColumnIds}
-        onVisibleColumnsChange={handleVisibleColumnsChange} // ✅ Use the handler
-        defaultColumnIds={defaultVisibleColumnsItem} // ✅ Pass the array, not the handler
+        onVisibleColumnsChange={handleVisibleColumnsChange}
+        defaultColumnIds={defaultVisibleColumnsItem}
         actions={[
           {
             id: "add-item",
