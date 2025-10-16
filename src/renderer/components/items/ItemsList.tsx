@@ -1,4 +1,4 @@
-import { Box, TableCell, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useState } from "react";
 import { useDeleteItem } from "../../../hooks/useItems";
 import { Item } from "../../../types/database";
@@ -19,12 +19,12 @@ interface ItemsListProps {
 }
 
 export const itemColumns: Column[] = [
-  { id: "id", label: "ID", minWidth: 35, align: "center" as const },
+  { id: "ean", label: "EAN", minWidth: 100, align: "center" as const },
   { id: "name", label: "Název", minWidth: 200 },
   {
-    id: "sales_group",
-    label: "Skupina",
-    minWidth: 15,
+    id: "category",
+    label: "Kategorie",
+    minWidth: 100,
     align: "center" as const,
   },
   { id: "unit", label: "Jednotka", minWidth: 0, align: "center" as const },
@@ -155,30 +155,12 @@ function ItemsList({
         columns={itemColumns}
         data={items}
         emptyMessage='Žádné položky. Klikněte na "Přidat položku" pro vytvoření nové.'
+        getRowKey={(item) => item.ean}
+        getCellContent={getCellContent}
         contextMenuActions={contextMenuActions}
-        getRowKey={(item) => String(item.ean)}
         visibleColumnIds={visibleColumnIds}
         columnOrder={columnOrder}
         onColumnOrderChange={onColumnOrderChange}
-        renderRow={(item, visibleColumns) => (
-          <>
-            {visibleColumns
-              .filter((x) => !x.hidden)
-              .map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{
-                    maxWidth: column.maxWidth,
-                    minWidth: column.minWidth,
-                    width: column.width,
-                  }}
-                >
-                  {getCellContent(item, column.id)}
-                </TableCell>
-              ))}
-          </>
-        )}
       />
       {editingItem && (
         <EditItemForm

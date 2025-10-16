@@ -80,23 +80,20 @@ export function useTableFilters<T extends Record<string, any>>(
         if (!filters.vat_rate.includes(item.vat_rate)) return false;
       }
 
-      // Unit of measure filter (multiselect)
-      if (
-        filters.unit_of_measure &&
-        Array.isArray(filters.unit_of_measure) &&
-        filters.unit_of_measure.length > 0
-      ) {
-        if (!filters.unit_of_measure.includes(item.unit_of_measure))
+      // Unit of measure filter - text search
+      if (filters.unit_of_measure && filters.unit_of_measure.trim() !== "") {
+        const unitSearchTerm = filters.unit_of_measure.toLowerCase().trim();
+        const itemUnit = String(item.unit_of_measure || "").toLowerCase();
+        if (!itemUnit.includes(unitSearchTerm)) {
           return false;
+        }
       }
 
-      // Sales group filter
-      const salesGroupFilter = filters.sales_group || [];
-      if (salesGroupFilter.length > 0) {
-        if (
-          !item.sales_group ||
-          !salesGroupFilter.includes(String(item.sales_group))
-        ) {
+      // Category filter - text search in category field
+      if (filters.category && filters.category.trim() !== "") {
+        const categorySearchTerm = filters.category.toLowerCase().trim();
+        const itemCategory = String(item.category || "").toLowerCase();
+        if (!itemCategory.includes(categorySearchTerm)) {
           return false;
         }
       }

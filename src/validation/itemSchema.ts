@@ -1,6 +1,5 @@
 import { validationMessages } from "../config/validationMessages";
 import { z } from "zod";
-import { UNIT_OPTIONS } from "../config/constants";
 
 export const itemSchema = z.object({
   ean: z
@@ -46,7 +45,10 @@ export const itemSchema = z.object({
       .default(0),
   ),
   
-  unit_of_measure: z.enum(UNIT_OPTIONS, { error: validationMessages.item.unitInvalid }),
+  unit_of_measure: z
+    .string()
+    .min(1, validationMessages.item.unitRequired || "Měrná jednotka je povinná")
+    .max(20, validationMessages.item.unitMaxLength || "Měrná jednotka je příliš dlouhá"),
   
   sale_price_group1: z.preprocess(
     (v) => Number(v),

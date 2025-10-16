@@ -6,7 +6,7 @@ export const itemQueries = {
   
   getOne: `
     SELECT * FROM items 
-    WHERE id = ?
+    WHERE ean = ?
   `,
   
   create: `
@@ -24,7 +24,8 @@ export const itemQueries = {
       sale_price_group3, 
       sale_price_group4
     ) VALUES (
-      @sales_group, 
+      @ean,
+      @category, 
       @name, 
       @note, 
       @vat_rate, 
@@ -40,6 +41,6 @@ export const itemQueries = {
   
   delete: `
     DELETE FROM items 
-    WHERE id = ?
+    WHERE ean = ?
   `,
 };

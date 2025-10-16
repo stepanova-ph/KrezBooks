@@ -145,8 +145,8 @@ function createTables() {
       CREATE INDEX IF NOT EXISTS idx_contacts_supplier 
         ON contacts(is_supplier) WHERE is_supplier = 1;
       
-      CREATE INDEX IF NOT EXISTS idx_items_sales_group 
-        ON items(sales_group);
+      CREATE INDEX IF NOT EXISTS idx_items_category 
+        ON items(category);
     `);
     logger.log('✓ Indexes created');
 
@@ -177,7 +177,7 @@ export function closeDatabase() {
     try {
       db.close();
       db = null;
-      logger.info('Database closed');
+      logger.log('Database closed');
     } catch (error) {
       logger.error('Error closing database:', error);
       // Still set to null even if close fails

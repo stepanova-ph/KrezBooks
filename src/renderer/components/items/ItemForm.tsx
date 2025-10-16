@@ -8,7 +8,6 @@ import { NumberTextField } from "../common/NumberTextField";
 import { VatPriceField } from "../common/VatPriceField";
 import { FormSection } from "../common/FormSection";
 import ValidatedTextField from "../common/ValidatedTextField";
-import { UNIT_OPTIONS } from "../../../config/constants";
 import { useItems } from "../../../hooks/useItems";
 
 interface ItemFormProps {
@@ -26,6 +25,9 @@ const VAT_RATES = {
   1: { percentage: 12, label: "12% (snížená)" },
   2: { percentage: 21, label: "21% (základní)" },
 } as const;
+
+// Common unit suggestions (not enforced)
+const COMMON_UNITS = ["ks", "kg", "l", "m", "m2", "m3", "t", "hod"];
 
 const defaultFormData: CreateItemInput = {
   ean: "",
@@ -55,14 +57,24 @@ function ItemForm({
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  // Get all items to extract unique categories for autocomplete
+  // Get all items to extract unique categories and units for autocomplete
   const { data: allItems } = useItems();
+  
   const existingCategories = React.useMemo(() => {
     if (!allItems) return [];
     const categories = allItems
       .map(item => item.category)
       .filter((cat): cat is string => !!cat && cat.trim() !== "");
     return Array.from(new Set(categories)).sort();
+  }, [allItems]);
+
+  const existingUnits = React.useMemo(() => {
+    if (!allItems) return COMMON_UNITS;
+    const units = allItems
+      .map(item => item.unit_of_measure)
+      .filter((unit): unit is string => !!unit && unit.trim() !== "");
+    const uniqueUnits = Array.from(new Set([...COMMON_UNITS, ...units])).sort();
+    return uniqueUnits;
   }, [allItems]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,27 +220,34 @@ function ItemForm({
               />
             )}
           />
-          <FormTextField
-            label="Měrná jednotka"
-            name="unit_of_measure"
-            select
-            value={formData.unit_of_measure}
-            onChange={handleSelectChange}
-            onBlur={() => handleBlur("unit_of_measure")}
-            error={!!errors.unit_of_measure}
-            SelectProps={{ native: false }}
-            inputProps={{ autoComplete: "off" }}
-            required
-          >
-            <MenuItem value="">
-              <em>Vyberte jednotku</em>
-            </MenuItem>
-            {UNIT_OPTIONS.map((u) => (
-              <MenuItem key={u} value={u}>
-                {u}
-              </MenuItem>
-            ))}
-          </FormTextField>
+          <Autocomplete
+            freeSolo
+            options={existingUnits}
+            value={formData.unit_of_measure || ""}
+            onChange={(_, newValue) => {
+              setFormData((prev) => ({ ...prev, unit_of_measure: newValue || "" }));
+              if (errors.unit_of_measure) {
+                setErrors((prev) => ({ ...prev, unit_of_measure: "" }));
+              }
+            }}
+            onInputChange={(_, newInputValue) => {
+              setFormData((prev) => ({ ...prev, unit_of_measure: newInputValue }));
+              if (errors.unit_of_measure) {
+                setErrors((prev) => ({ ...prev, unit_of_measure: "" }));
+              }
+            }}
+            renderInput={(params) => (
+              <FormTextField
+                {...params}
+                label="Měrná jednotka"
+                name="unit_of_measure"
+                error={errors.unit_of_measure}
+                onBlur={() => handleBlur("unit_of_measure")}
+                required
+                inputProps={{ ...params.inputProps, autoComplete: "off" }}
+              />
+            )}
+          />
           <FormTextField
             label="Sazba DPH"
             name="vat_rate"

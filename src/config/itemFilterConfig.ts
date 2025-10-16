@@ -30,40 +30,26 @@ export const itemFilterConfig: FilterConfig = {
       ],
     },
 
-    // Unit of measure multi-select
+    // Unit of measure text search
     {
       id: "unit_of_measure",
-      type: "multiselect",
+      type: "text-search",
       label: "Měrná jednotka",
       field: "unit_of_measure",
       columnId: "unit_of_measure",
-      placeholder: "Všechny jednotky",
-      options: [
-        { value: "ks", label: "ks (kusy)" },
-        { value: "kg", label: "kg (kilogramy)" },
-        { value: "l", label: "l (litry)" },
-        { value: "m", label: "m (metry)" },
-        { value: "m2", label: "m² (metry čtvereční)" },
-        { value: "m3", label: "m³ (metry krychlové)" },
-        { value: "t", label: "t (tuny)" },
-        { value: "hod", label: "hod (hodiny)" },
-      ],
+      placeholder: "Hledat jednotku...",
+      searchFields: ["unit_of_measure"],
     },
 
-    // Sales group text input
+    // Category text search
     {
-      id: "sales_group",
-      type: "multiselect",
-      label: "Prodejní skupina",
-      field: "sales_group",
-      columnId: "sales_group",
-      placeholder: "Všechny skupiny",
-      options: [
-        { value: "1", label: "1" },
-        { value: "2", label: "2" },
-        { value: "3", label: "3" },
-        { value: "4", label: "4" },
-      ],
+      id: "category",
+      type: "text-search",
+      label: "Kategorie",
+      field: "category",
+      columnId: "category",
+      placeholder: "Hledat kategorii...",
+      searchFields: ["category"],
     },
   ],
 };
@@ -74,14 +60,14 @@ export const itemFilterConfig: FilterConfig = {
 export const initialItemFilterState: ItemFilterState = {
   search: "",
   vat_rate: [],
-  unit_of_measure: [],
-  sales_group: "",
+  unit_of_measure: "",
+  category: "",
 };
 
 export const defaultVisibleColumnsItem = [
-  "id",
+  "ean",
   "name",
-  "sales_group",
+  "category",
   "unit",
   "vat",
   "sale_price_group1",
