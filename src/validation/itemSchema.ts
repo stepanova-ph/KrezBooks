@@ -3,7 +3,7 @@ import { z } from "zod";
 import { optionalString } from "./optionalString";
 
 export const itemSchema = z.object({
-  ean: optionalString
+  ean: z.string()
     .min(1, validationMessages.item.eanRequired || "EAN je povinný")
     .max(50, validationMessages.item.eanMaxLength || "EAN je příliš dlouhý"),
   
@@ -12,15 +12,17 @@ export const itemSchema = z.object({
     .min(1, validationMessages.item.nameRequired)
     .max(200, validationMessages.item.nameMaxLength),
   
-  category: z
-    .string()
-    .max(100, validationMessages.item.categoryMaxLength || "Kategorie je příliš dlouhá")
-    .optional(),
+  category: optionalString
+      .refine(
+        (val) => !val || val.length >= 100,
+        validationMessages.item.categoryMaxLength || "Kategorie je příliš dlouhá",
+      ),
   
-  note: z
-    .string()
-    .max(500, validationMessages.item.noteMaxLength)
-    .optional(),
+  note: optionalString
+      .refine(
+        (val) => !val || val.length <= 500,
+        validationMessages.item.noteMaxLength || "Maximální délka poznámky je 500 znaků.",
+      ),
   
   vat_rate: z.preprocess(
     (v) => Number(v),

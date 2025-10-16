@@ -17,16 +17,16 @@ export const contactSchema = z
   .object({
     ico: z
       .string()
-      .min(8, validationMessages.ico.length)
-      .max(8, validationMessages.ico.length)
+      .min(8, validationMessages.contact.ico.length)
+      .max(8, validationMessages.contact.ico.length)
       .refine(
         (val) => validateICO(val),
-        validationMessages.ico.invalid,
+        validationMessages.contact.ico.invalid,
       ),
 
     dic: optionalString.refine(
       (val) => validateDIC(val!, ""),
-      validationMessages.dic.invalid,
+      validationMessages.contact.dic.invalid,
     ),
 
     modifier: z.preprocess(
@@ -34,68 +34,68 @@ export const contactSchema = z
       z
         .number()
         .int()
-        .min(1, validationMessages.modifier.range)
-        .max(100, validationMessages.modifier.range),
+        .min(1, validationMessages.contact.modifier.range)
+        .max(100, validationMessages.contact.modifier.range),
     ),
 
-    company_name: z.string().min(1, validationMessages.companyName.required),
+    company_name: z.string().min(1, validationMessages.contact.companyName.required),
 
     representative_name: optionalString
       .refine(
         (val) => !val || val.length >= 4,
-        validationMessages.representativeName.minLength,
+        validationMessages.contact.representativeName.minLength,
       )
       .refine(
         (val) => !val || /^[\p{L}\s\-']*$/u.test(val),
-        validationMessages.representativeName.invalid,
+        validationMessages.contact.representativeName.invalid,
       )
       .refine(
         (val) => !val || val.length <= 150,
-        validationMessages.representativeName.maxLength,
+        validationMessages.contact.representativeName.maxLength,
       ),
 
     street: optionalString.refine(
       (val) => !val || val.length >= 3,
-      validationMessages.street.minLength,
+      validationMessages.contact.street.minLength,
     ),
 
     city: optionalString
       .refine(
         (val) => !val || val.length >= 2,
-        validationMessages.city.minLength,
+        validationMessages.contact.city.minLength,
       )
       .refine(
         (val) => !val || /^[\p{L}\s\-]*$/u.test(val),
-        validationMessages.city.invalid,
+        validationMessages.contact.city.invalid,
       ),
 
     postal_code: optionalString
       .refine(
         (val) => !val || validatePSC(val),
-        validationMessages.postalCode.invalid,
+        validationMessages.contact.postalCode.invalid,
       )
       .transform((val) => (val ? normalizePSC(val) : val)),
 
     phone: optionalString.refine(
       (val) => !val || validatePhone(val),
-      validationMessages.phone.invalid,
+      validationMessages.contact.phone.invalid,
     ),
 
     email: optionalString.refine(
       (val) => !val || validateEmail(val),
-      validationMessages.email.invalid,
+      validationMessages.contact.email.invalid,
     ),
 
     website: optionalString
       .refine(
         (val) => !val || validateWebsite(val),
-        validationMessages.website.invalid,
+        validationMessages.contact.website.invalid,
       )
       .transform((val) => (val ? normalizeWebsite(val) : val)),
 
     bank_account: optionalString.refine(
       (val) => !val || validateBankAccount(val),
-      validationMessages.bankAccount.invalid,
+      validationMessages.contact.bankAccount.invalid,
     ),
 
     is_supplier: z.boolean(),
@@ -106,8 +106,8 @@ export const contactSchema = z
       z
         .number()
         .int()
-        .min(1, validationMessages.priceGroup.range)
-        .max(4, validationMessages.priceGroup.range),
+        .min(1, validationMessages.contact.priceGroup.range)
+        .max(4, validationMessages.contact.priceGroup.range),
     ),
   })
   .superRefine((data, ctx) => {
@@ -115,19 +115,19 @@ export const contactSchema = z
       ctx.addIssue({
         path: ["dic"],
         code: z.ZodIssueCode.custom,
-        message: validationMessages.dic.invalid,
+        message: validationMessages.contact.dic.invalid,
       });
     }
     if (!data.is_customer && !data.is_supplier) {
       ctx.addIssue({
         path: ["is_customer"],
         code: z.ZodIssueCode.custom,
-        message: validationMessages.contactType.required,
+        message: validationMessages.contact.contactType.required,
       });
       ctx.addIssue({
         path: ["is_supplier"],
         code: z.ZodIssueCode.custom,
-        message: validationMessages.contactType.required,
+        message: validationMessages.contact.contactType.required,
       });
     }
   });

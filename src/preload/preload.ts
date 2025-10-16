@@ -4,8 +4,6 @@ import type {
   Item,
   CreateContactInput,
   CreateItemInput,
-  UpdateContactInput,
-  UpdateItemInput,
 } from "../types/database";
 
 // Expose protected methods that allow the renderer process to use
@@ -33,59 +31,25 @@ contextBridge.exposeInMainWorld("electronAPI", {
   testDatabase: () => ipcRenderer.invoke("db:test"),
 
   contacts: {
-    getAll: () =>
-      ipcRenderer.invoke("db:contacts:getAll") as Promise<Contact[]>,
-
+    getAll: () => ipcRenderer.invoke("db:contacts:getAll"),
     getOne: (ico: string, modifier: number) =>
-      ipcRenderer.invoke("db:contacts:getOne", ico, modifier) as Promise<
-        Contact | undefined
-      >,
-
+      ipcRenderer.invoke("db:contacts:getOne", ico, modifier),
     create: (contact: CreateContactInput) =>
-      ipcRenderer.invoke("db:contacts:create", contact) as Promise<{
-        success: boolean;
-        changes: number;
-      }>,
-
+      ipcRenderer.invoke("db:contacts:create", contact),
     update: (ico: string, modifier: number, updates: Partial<Contact>) =>
-      ipcRenderer.invoke(
-        "db:contacts:update",
-        ico,
-        modifier,
-        updates,
-      ) as Promise<{ success: boolean; changes: number }>,
-
+      ipcRenderer.invoke("db:contacts:update", ico, modifier, updates),
     delete: (ico: string, modifier: number) =>
-      ipcRenderer.invoke("db:contacts:delete", ico, modifier) as Promise<{
-        success: boolean;
-        changes: number;
-      }>,
+      ipcRenderer.invoke("db:contacts:delete", ico, modifier),
   },
 
   items: {
-    getAll: () => ipcRenderer.invoke("db:items:getAll") as Promise<Item[]>,
-
-    getOne: (id: number) =>
-      ipcRenderer.invoke("db:items:getOne", id) as Promise<Item | undefined>,
-
+    getAll: () => ipcRenderer.invoke("db:items:getAll"),
+    getOne: (ean: string) => ipcRenderer.invoke("db:items:getOne", ean),
     create: (item: CreateItemInput) =>
-      ipcRenderer.invoke("db:items:create", item) as Promise<{
-        success: boolean;
-        id: number;
-        changes: number;
-      }>,
-
-    update: (id: number, updates: Partial<Item>) =>
-      ipcRenderer.invoke("db:items:update", id, updates) as Promise<{
-        success: boolean;
-        changes: number;
-      }>,
-
-    delete: (id: number) =>
-      ipcRenderer.invoke("db:items:delete", id) as Promise<{
-        success: boolean;
-        changes: number;
-      }>,
+      ipcRenderer.invoke("db:items:create", item),
+    update: (ean: string, updates: Partial<Item>) =>
+      ipcRenderer.invoke("db:items:update", ean, updates),
+    delete: (ean: string) => ipcRenderer.invoke("db:items:delete", ean),
   },
 
   admin: {

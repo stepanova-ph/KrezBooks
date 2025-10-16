@@ -38,19 +38,18 @@ declare global {
         getOne: (ean: string) => Promise<IpcResponse<Item | null>>;
         create: (
           item: CreateItemInput
-        ) => Promise<IpcResponse<{ id: number; changes: number }>>;
+        ) => Promise<IpcResponse<{ changes: number }>>;
         update: (
-          id: number,
+          ean: string,
           updates: Partial<Item>
         ) => Promise<IpcResponse<{ changes: number }>>;
-        delete: (id: number) => Promise<IpcResponse<{ changes: number }>>;
+        delete: (ean: string) => Promise<IpcResponse<{ changes: number }>>;
       };
 
       admin: {
         getDbStats: () => Promise<IpcResponse<{ contacts: number; items: number }>>;
         clearDb: () => Promise<IpcResponse<{ changes: number }>>;
-        fillTestData: () => Promise<IpcResponse<{ contactsAdded: number; itemsAdded: number }>
-        >;
+        fillTestData: () => Promise<IpcResponse<{ contactsAdded: number; itemsAdded: number }>>;
       };
     };
   }
