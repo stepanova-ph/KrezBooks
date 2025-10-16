@@ -1,8 +1,14 @@
-import { useCreateItem } from '../../../hooks/useItems';
-import ItemForm from './ItemForm';
-import type { CreateItemInput } from '../../../types/database';
+import { useCreateItem } from "../../../hooks/useItems";
+import ItemForm from "./ItemForm";
+import type { CreateItemInput } from "../../../types/database";
 
-function CreateItemForm({ open, onClose }: { open: boolean; onClose: () => void }) {
+function CreateItemForm({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const createItem = useCreateItem();
 
   const handleSubmit = async (data: CreateItemInput) => {
@@ -10,7 +16,7 @@ function CreateItemForm({ open, onClose }: { open: boolean; onClose: () => void 
       await createItem.mutateAsync(data);
       onClose(); // Only close on success
     } catch (error) {
-      console.error('Chyba při vytváření položky:', error);
+      console.error("Chyba při vytváření položky:", error);
       throw error;
     }
   };

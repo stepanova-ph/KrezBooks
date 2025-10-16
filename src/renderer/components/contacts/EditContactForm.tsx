@@ -1,6 +1,6 @@
-import { useUpdateContact } from '../../../hooks/useContacts';
-import type { Contact, CreateContactInput } from '../../../types/database';
-import ContactForm from './ContactForm';
+import { useUpdateContact } from "../../../hooks/useContacts";
+import type { Contact, CreateContactInput } from "../../../types/database";
+import ContactForm from "./ContactForm";
 
 interface EditContactFormProps {
   open: boolean;
@@ -18,7 +18,7 @@ function EditContactForm({ open, onClose, contact }: EditContactFormProps) {
       });
       onClose(); // Only close on success
     } catch (error) {
-      console.error('Chyba při úpravě kontaktu:', error);
+      console.error("Chyba při úpravě kontaktu:", error);
       // Re-throw so ContactForm can handle it
       throw error;
     }

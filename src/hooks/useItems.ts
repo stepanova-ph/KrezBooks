@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Item, CreateItemInput, UpdateItemInput } from '../types/database';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Item, CreateItemInput, UpdateItemInput } from "../types/database";
 
 export const itemKeys = {
-  all: ['items'] as const,
-  lists: () => [...itemKeys.all, 'list'] as const,
+  all: ["items"] as const,
+  lists: () => [...itemKeys.all, "list"] as const,
   list: (filters?: any) => [...itemKeys.lists(), { filters }] as const,
-  details: () => [...itemKeys.all, 'detail'] as const,
+  details: () => [...itemKeys.all, "detail"] as const,
   detail: (id: number) => [...itemKeys.details(), id] as const,
 };
 
@@ -52,7 +52,9 @@ export function useUpdateItem() {
       return await window.electronAPI.items.update(id, updateData);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: itemKeys.detail(variables.id) });
+      queryClient.invalidateQueries({
+        queryKey: itemKeys.detail(variables.id),
+      });
       queryClient.invalidateQueries({ queryKey: itemKeys.lists() });
     },
   });

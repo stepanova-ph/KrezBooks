@@ -1,12 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Contact, CreateContactInput, UpdateContactInput } from '../types/database';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type {
+  Contact,
+  CreateContactInput,
+  UpdateContactInput,
+} from "../types/database";
 
 export const contactKeys = {
-  all: ['contacts'] as const,
-  lists: () => [...contactKeys.all, 'list'] as const,
+  all: ["contacts"] as const,
+  lists: () => [...contactKeys.all, "list"] as const,
   list: (filters?: any) => [...contactKeys.lists(), { filters }] as const,
-  details: () => [...contactKeys.all, 'detail'] as const,
-  detail: (ico: string, modifier: number) => 
+  details: () => [...contactKeys.all, "detail"] as const,
+  detail: (ico: string, modifier: number) =>
     [...contactKeys.details(), ico, modifier] as const,
 };
 
@@ -50,11 +54,15 @@ export function useUpdateContact() {
   return useMutation({
     mutationFn: async (data: UpdateContactInput) => {
       const { ico, modifier, ...updateData } = data;
-      return await window.electronAPI.contacts.update(ico, modifier, updateData);
+      return await window.electronAPI.contacts.update(
+        ico,
+        modifier,
+        updateData,
+      );
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: contactKeys.detail(variables.ico, variables.modifier) 
+      queryClient.invalidateQueries({
+        queryKey: contactKeys.detail(variables.ico, variables.modifier),
       });
       queryClient.invalidateQueries({ queryKey: contactKeys.lists() });
     },
@@ -65,7 +73,13 @@ export function useDeleteContact() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ ico, modifier }: { ico: string; modifier: number }) => {
+    mutationFn: async ({
+      ico,
+      modifier,
+    }: {
+      ico: string;
+      modifier: number;
+    }) => {
       return await window.electronAPI.contacts.delete(ico, modifier);
     },
     onSuccess: () => {

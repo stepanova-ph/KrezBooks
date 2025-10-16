@@ -1,7 +1,13 @@
-import { useCreateContact } from '../../../hooks/useContacts';
-import ContactForm from './ContactForm';
+import { useCreateContact } from "../../../hooks/useContacts";
+import ContactForm from "./ContactForm";
 
-function CreateContactForm({ open, onClose }: { open: boolean; onClose: () => void }) {
+function CreateContactForm({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const createContact = useCreateContact();
 
   const handleSubmit = async (data: any) => {

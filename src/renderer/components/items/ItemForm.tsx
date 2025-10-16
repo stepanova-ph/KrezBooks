@@ -1,69 +1,78 @@
-import React, { useState } from 'react';
-import { Box, MenuItem } from '@mui/material';
-import type { CreateItemInput, Item, VatRate } from '../../../types/database';
-import { itemSchema, unitOptions } from '../../../validation/itemSchema';
-import { FormDialog } from '../common/FormDialog';
-import { FormTextField } from '../common/FormTextField';
-import { NumberTextField } from '../common/NumberTextField';
-import { VatPriceField } from '../common/VatPriceField';
-import { FormSection } from '../common/FormSection';
-import TextFieldWithError from '../common/TextFieldWithError';
+import React, { useState } from "react";
+import { Box, MenuItem } from "@mui/material";
+import type { CreateItemInput, Item, VatRate } from "../../../types/database";
+import { itemSchema, unitOptions } from "../../../validation/itemSchema";
+import { FormDialog } from "../common/FormDialog";
+import { FormTextField } from "../common/FormTextField";
+import { NumberTextField } from "../common/NumberTextField";
+import { VatPriceField } from "../common/VatPriceField";
+import { FormSection } from "../common/FormSection";
+import TextFieldWithError from "../common/TextFieldWithError";
 
 interface ItemFormProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: CreateItemInput) => Promise<void>;
   initialData?: Partial<Item>;
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
   isPending?: boolean;
 }
 
 // VAT configuration - maps VAT group indices to actual percentages
 const VAT_RATES = {
-  0: { percentage: 0, label: '0% (osvobozeno)' },
-  1: { percentage: 12, label: '12% (snížená)' },
-  2: { percentage: 21, label: '21% (základní)' },
+  0: { percentage: 0, label: "0% (osvobozeno)" },
+  1: { percentage: 12, label: "12% (snížená)" },
+  2: { percentage: 21, label: "21% (základní)" },
 } as const;
 
 const defaultFormData: CreateItemInput = {
-  name: '',
-  sales_group: '1',
-  note: '',
+  name: "",
+  sales_group: "1",
+  note: "",
   vat_rate: 2 as VatRate,
   avg_purchase_price: 0,
   last_purchase_price: 0,
-  unit_of_measure: '',
+  unit_of_measure: "",
   sale_price_group1: 0,
   sale_price_group2: 0,
   sale_price_group3: 0,
   sale_price_group4: 0,
 };
 
-function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = false }: ItemFormProps) {
+function ItemForm({
+  open,
+  onClose,
+  onSubmit,
+  initialData,
+  mode,
+  isPending = false,
+}: ItemFormProps) {
   const [formData, setFormData] = useState<CreateItemInput>(
-    initialData ? { ...defaultFormData, ...initialData } : defaultFormData
+    initialData ? { ...defaultFormData, ...initialData } : defaultFormData,
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-    
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (e: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+  const handleSelectChange = (
+    e: React.ChangeEvent<{ name?: string; value: unknown }>,
+  ) => {
     const name = e.target.name as string;
-    
+
     // Clear error when user changes selection
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-    
+
     setFormData((prev) => ({ ...prev, [name]: e.target.value as string }));
   };
 
@@ -71,9 +80,11 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
     // Validate single field on blur
     const result = itemSchema.safeParse(formData);
     if (!result.success) {
-      const fieldError = result.error.issues.find(err => err.path[0] === fieldName);
+      const fieldError = result.error.issues.find(
+        (err) => err.path[0] === fieldName,
+      );
       if (fieldError) {
-        setErrors(prev => ({ ...prev, [fieldName]: fieldError.message }));
+        setErrors((prev) => ({ ...prev, [fieldName]: fieldError.message }));
       }
     }
   };
@@ -81,17 +92,18 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    
+
     const result = itemSchema.safeParse(formData);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.issues.forEach((err) => {
-        if (typeof err.path[0] === 'string') fieldErrors[err.path[0]] = err.message;
+        if (typeof err.path[0] === "string")
+          fieldErrors[err.path[0]] = err.message;
       });
       setErrors(fieldErrors);
       return;
     }
-    
+
     try {
       await onSubmit({
         ...result.data,
@@ -102,22 +114,23 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
         sale_price_group3: Number(result.data.sale_price_group3),
         sale_price_group4: Number(result.data.sale_price_group4),
       } as CreateItemInput);
-      
+
       // Only reset if successful and in create mode
-      if (mode === 'create') {
+      if (mode === "create") {
         setFormData(defaultFormData);
       }
     } catch (error) {
-      console.error('Chyba při ukládání položky:', error);
+      console.error("Chyba při ukládání položky:", error);
       alert(`Chyba při ukládání: ${(error as Error).message}`);
     }
   };
 
-  const title = mode === 'create' ? 'Přidat novou položku' : 'Upravit položku';
-  const submitLabel = mode === 'create' ? 'Přidat položku' : 'Uložit změny';
+  const title = mode === "create" ? "Přidat novou položku" : "Upravit položku";
+  const submitLabel = mode === "create" ? "Přidat položku" : "Uložit změny";
 
   // Get actual VAT percentage from the group index
-  const vatPercentage = VAT_RATES[formData.vat_rate as keyof typeof VAT_RATES]?.percentage ?? 21;
+  const vatPercentage =
+    VAT_RATES[formData.vat_rate as keyof typeof VAT_RATES]?.percentage ?? 21;
 
   return (
     <FormDialog
@@ -134,13 +147,15 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
           name="name"
           value={formData.name}
           onChange={handleChange}
-          onBlur={() => handleBlur('name')}
+          onBlur={() => handleBlur("name")}
           error={errors.name}
           required
           fullWidth
           inputProps={{ autoComplete: "off" }}
         />
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
+        <Box
+          sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2 }}
+        >
           <FormTextField
             label="Prodejní skupina"
             name="sales_group"
@@ -162,15 +177,19 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
             select
             value={formData.unit_of_measure}
             onChange={handleSelectChange}
-            onBlur={() => handleBlur('unit_of_measure')}
+            onBlur={() => handleBlur("unit_of_measure")}
             error={!!errors.unit_of_measure}
             SelectProps={{ native: false }}
             inputProps={{ autoComplete: "off" }}
             required
           >
-            <MenuItem value=""><em>Vyberte jednotku</em></MenuItem>
+            <MenuItem value="">
+              <em>Vyberte jednotku</em>
+            </MenuItem>
             {unitOptions.map((u) => (
-              <MenuItem key={u} value={u}>{u}</MenuItem>
+              <MenuItem key={u} value={u}>
+                {u}
+              </MenuItem>
             ))}
           </FormTextField>
           <FormTextField
@@ -196,7 +215,7 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
           name="note"
           value={formData.note}
           onChange={handleChange}
-          onBlur={() => handleBlur('note')}
+          onBlur={() => handleBlur("note")}
           error={errors.note}
           multiline
           rows={3}
@@ -206,7 +225,7 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
       </FormSection>
 
       <FormSection title="Nákupní ceny">
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
           <NumberTextField
             disabled
             label="Průměrná nákupní cena"
@@ -231,14 +250,14 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
       </FormSection>
 
       <FormSection title="Prodejní ceny">
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <VatPriceField
             label="Skupina 1"
             name="sale_price_group1"
             value={formData.sale_price_group1}
             vatRate={vatPercentage}
             onChange={handleChange}
-            onBlur={() => handleBlur('sale_price_group1')}
+            onBlur={() => handleBlur("sale_price_group1")}
             error={errors.sale_price_group1}
             precision={2}
             min={0}
@@ -250,7 +269,7 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
             value={formData.sale_price_group2}
             vatRate={vatPercentage}
             onChange={handleChange}
-            onBlur={() => handleBlur('sale_price_group2')}
+            onBlur={() => handleBlur("sale_price_group2")}
             error={errors.sale_price_group2}
             precision={2}
             min={0}
@@ -262,7 +281,7 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
             value={formData.sale_price_group3}
             vatRate={vatPercentage}
             onChange={handleChange}
-            onBlur={() => handleBlur('sale_price_group3')}
+            onBlur={() => handleBlur("sale_price_group3")}
             error={errors.sale_price_group3}
             precision={2}
             min={0}
@@ -274,7 +293,7 @@ function ItemForm({ open, onClose, onSubmit, initialData, mode, isPending = fals
             value={formData.sale_price_group4}
             vatRate={vatPercentage}
             onChange={handleChange}
-            onBlur={() => handleBlur('sale_price_group4')}
+            onBlur={() => handleBlur("sale_price_group4")}
             error={errors.sale_price_group4}
             precision={2}
             min={0}

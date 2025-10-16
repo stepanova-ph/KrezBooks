@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -9,10 +9,10 @@ import {
   FormControlLabel,
   Checkbox,
   Box,
-} from '@mui/material';
-import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import type { Column } from './DataTable';
+} from "@mui/material";
+import ViewColumnIcon from "@mui/icons-material/ViewColumn";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import type { Column } from "./DataTable";
 
 interface ColumnSelectorButtonProps {
   columns: Column[];
@@ -36,7 +36,7 @@ export function ColumnSelectorButton({
   };
 
   const handleSelectAll = () => {
-    onVisibleColumnsChange(new Set(columns.map(c => c.id)));
+    onVisibleColumnsChange(new Set(columns.map((c) => c.id)));
   };
 
   const handleResetToDefault = () => {
@@ -48,9 +48,9 @@ export function ColumnSelectorButton({
       <Button
         onClick={() => setDialogOpen(true)}
         variant="outlined"
-        size='large'
+        size="large"
         title="Vybrat sloupce"
-        sx={{ minWidth: 'auto', px: 1, }}
+        sx={{ minWidth: "auto", px: 1 }}
       >
         <ViewColumnIcon />
       </Button>
@@ -82,13 +82,13 @@ export function ColumnSelectorButton({
         </DialogContent>
 
         <DialogActions sx={{ px: 2 }}>
-          <Box sx={{ display: 'flex', gap: 1, mr: 'auto' }}>
+          <Box sx={{ display: "flex", gap: 1, mr: "auto" }}>
             <Button size="small" variant="outlined" onClick={handleSelectAll}>
               Vybrat vše
             </Button>
-            <Button 
-              size="small" 
-              variant="outlined" 
+            <Button
+              size="small"
+              variant="outlined"
               onClick={handleResetToDefault}
               startIcon={<RestartAltIcon />}
             >

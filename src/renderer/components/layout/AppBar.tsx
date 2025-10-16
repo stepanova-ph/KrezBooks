@@ -1,8 +1,8 @@
-import { Box, Typography } from '@mui/material';
-import { AppBarButton } from './AppBarButton';
-import { WindowControls } from './WindowControls';
+import { Box, Typography } from "@mui/material";
+import { AppBarButton } from "./AppBarButton";
+import { WindowControls } from "./WindowControls";
 
-export type AppPage = 'domu' | 'adresar' | 'sklad' | 'ucetnictvi';
+export type AppPage = "domu" | "adresar" | "sklad" | "ucetnictvi";
 
 interface AppBarProps {
   currentPage: AppPage;
@@ -13,25 +13,25 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
   return (
     <Box
       sx={{
-        width: '100%',
+        width: "100%",
         height: 48,
-        backgroundColor: '#00556B',
-        display: 'flex',
-        alignItems: 'flex-end',
-        padding: '0 0 0 16px',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-        position: 'relative',
+        backgroundColor: "#00556B",
+        display: "flex",
+        alignItems: "flex-end",
+        padding: "0 0 0 16px",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        position: "relative",
         zIndex: 100,
-        WebkitAppRegion: 'drag',
+        WebkitAppRegion: "drag",
       }}
     >
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           marginRight: 3,
-          marginBottom: '8px',
-          WebkitAppRegion: 'no-drag',
+          marginBottom: "8px",
+          WebkitAppRegion: "no-drag",
         }}
       >
         <Typography
@@ -39,8 +39,8 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
           sx={{
             color: (theme) => theme.palette.background.paper,
             fontWeight: 700,
-            fontSize: '1.1rem',
-            letterSpacing: '0.5px',
+            fontSize: "1.1rem",
+            letterSpacing: "0.5px",
           }}
         >
           KrezBooks
@@ -49,41 +49,41 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 
       <Box
         sx={{
-          display: 'flex',
+          display: "flex",
           gap: 0,
           flex: 1,
-          WebkitAppRegion: 'no-drag',
+          WebkitAppRegion: "no-drag",
         }}
       >
         <AppBarButton
           label="Domů"
-          active={currentPage === 'domu'}
-          onClick={() => onPageChange('domu')}
+          active={currentPage === "domu"}
+          onClick={() => onPageChange("domu")}
         />
         <AppBarButton
           label="Adresář"
-          active={currentPage === 'adresar'}
-          onClick={() => onPageChange('adresar')}
+          active={currentPage === "adresar"}
+          onClick={() => onPageChange("adresar")}
         />
         <AppBarButton
           label="Sklad"
-          active={currentPage === 'sklad'}
-          onClick={() => onPageChange('sklad')}
+          active={currentPage === "sklad"}
+          onClick={() => onPageChange("sklad")}
         />
         <AppBarButton
           label="Účetnictví"
-          active={currentPage === 'ucetnictvi'}
-          onClick={() => onPageChange('ucetnictvi')}
+          active={currentPage === "ucetnictvi"}
+          onClick={() => onPageChange("ucetnictvi")}
           disabled
         />
       </Box>
 
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          height: '100%',
-          WebkitAppRegion: 'no-drag',
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+          WebkitAppRegion: "no-drag",
         }}
       >
         <WindowControls />

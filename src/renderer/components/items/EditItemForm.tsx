@@ -1,6 +1,6 @@
-import { useUpdateItem } from '../../../hooks/useItems';
-import type { Item, CreateItemInput } from '../../../types/database';
-import ItemForm from './ItemForm';
+import { useUpdateItem } from "../../../hooks/useItems";
+import type { Item, CreateItemInput } from "../../../types/database";
+import ItemForm from "./ItemForm";
 
 interface EditItemFormProps {
   open: boolean;
@@ -19,7 +19,7 @@ function EditItemForm({ open, onClose, item }: EditItemFormProps) {
       });
       onClose(); // Only close on success
     } catch (error) {
-      console.error('Chyba při úpravě položky:', error);
+      console.error("Chyba při úpravě položky:", error);
       throw error;
     }
   };

@@ -1,9 +1,9 @@
 // Database module - SQLite setup and initialization
 
-import Database from 'better-sqlite3';
-import path from 'path';
-import { app } from 'electron';
-import fs from 'fs';
+import Database from "better-sqlite3";
+import path from "path";
+import { app } from "electron";
+import fs from "fs";
 
 let db: Database.Database | null = null;
 
@@ -12,14 +12,14 @@ let db: Database.Database | null = null;
  * Uses the app's userData directory (platform-specific)
  */
 function getDatabasePath(): string {
-  const userDataPath = app.getPath('userData');
-  
+  const userDataPath = app.getPath("userData");
+
   // Ensure the directory exists
   if (!fs.existsSync(userDataPath)) {
     fs.mkdirSync(userDataPath, { recursive: true });
   }
-  
-  return path.join(userDataPath, 'krezbooks.db');
+
+  return path.join(userDataPath, "krezbooks.db");
 }
 
 /**
@@ -29,18 +29,18 @@ export function initDatabase(): Database.Database {
   if (db) return db;
 
   const dbPath = getDatabasePath();
-  console.log('Database path:', dbPath);
+  console.log("Database path:", dbPath);
 
   // Open database connection
   db = new Database(dbPath);
-  
+
   // Enable foreign keys
-  db.pragma('foreign_keys = ON');
+  db.pragma("foreign_keys = ON");
 
   // Create tables
   createTables();
 
-  console.log('Database initialized successfully');
+  console.log("Database initialized successfully");
   return db;
 }
 
@@ -48,7 +48,7 @@ export function initDatabase(): Database.Database {
  * Create database tables based on the schema
  */
 function createTables() {
-  if (!db) throw new Error('Database not initialized');
+  if (!db) throw new Error("Database not initialized");
 
   // Contacts table
   db.exec(`
@@ -108,7 +108,7 @@ function createTables() {
       ON items(sales_group);
   `);
 
-  console.log('Tables created successfully');
+  console.log("Tables created successfully");
 }
 
 /**
@@ -116,7 +116,7 @@ function createTables() {
  */
 export function getDatabase(): Database.Database {
   if (!db) {
-    throw new Error('Database not initialized. Call initDatabase() first.');
+    throw new Error("Database not initialized. Call initDatabase() first.");
   }
   return db;
 }
@@ -128,6 +128,6 @@ export function closeDatabase() {
   if (db) {
     db.close();
     db = null;
-    console.log('Database closed');
+    console.log("Database closed");
   }
 }

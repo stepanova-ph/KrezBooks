@@ -8,16 +8,16 @@
  */
 export function validateICO(ico: string): boolean {
   if (!/^[0-9]{8}$/.test(ico)) return false;
-  
+
   const weights = [8, 7, 6, 5, 4, 3, 2];
   let sum = 0;
   for (let i = 0; i < 7; i++) {
     sum += parseInt(ico[i], 10) * weights[i];
   }
-  
+
   const mod = sum % 11;
   const check = mod === 0 ? 1 : mod === 1 ? 0 : 11 - mod;
-  
+
   return check === parseInt(ico[7], 10);
 }
 
@@ -27,14 +27,14 @@ export function validateICO(ico: string): boolean {
  * @param ico - Optional IČO for cross-validation
  */
 export function validateDIC(dic: string, ico?: string): boolean {
-  if (!dic.startsWith('CZ')) return false;
-  
+  if (!dic.startsWith("CZ")) return false;
+
   const digits = dic.slice(2);
   if (!/^[0-9]{8,10}$/.test(digits)) return false;
-  
+
   // If DIČ is 8 digits and IČO is provided, they should match
   if (digits.length === 8 && ico && digits !== ico) return false;
-  
+
   return true;
 }
 
@@ -43,7 +43,7 @@ export function validateDIC(dic: string, ico?: string): boolean {
  * Accepts formats: "12345" or "123 45"
  */
 export function validatePSC(psc: string): boolean {
-  const digits = psc.replace(/\D/g, '');
+  const digits = psc.replace(/\D/g, "");
   return digits.length === 5 && /^\d{5}$/.test(digits);
 }
 
@@ -51,14 +51,14 @@ export function validatePSC(psc: string): boolean {
  * Normalize PSČ to standard format "123 45"
  */
 export function normalizePSC(psc: string): string {
-  if (!psc || psc.trim() === '') return '';
-  
-  const digits = psc.replace(/\D/g, '');
-  
+  if (!psc || psc.trim() === "") return "";
+
+  const digits = psc.replace(/\D/g, "");
+
   if (digits.length === 5) {
-    return digits.slice(0, 3) + ' ' + digits.slice(3);
+    return digits.slice(0, 3) + " " + digits.slice(3);
   }
-  
+
   return psc;
 }
 
@@ -67,7 +67,7 @@ export function normalizePSC(psc: string): string {
  * Accepts formats with or without +420 prefix
  */
 export function validatePhone(phone: string): boolean {
-  const cleaned = phone.replace(/\s+/g, '');
+  const cleaned = phone.replace(/\s+/g, "");
   return /^(\+420)?[1-9][0-9]{8}$/.test(cleaned);
 }
 
@@ -82,10 +82,10 @@ export function validateEmail(email: string): boolean {
  * Validate website URL format
  */
 export function validateWebsite(url: string): boolean {
-  if (!url || url.trim() === '') return true;
-  
+  if (!url || url.trim() === "") return true;
+
   let testUrl = url.trim();
-  
+
   // Check if protocol exists
   if (/^[a-z]+:\/\//i.test(testUrl)) {
     // Only allow http/https
@@ -94,10 +94,11 @@ export function validateWebsite(url: string): boolean {
     }
   } else {
     // Add https:// for validation
-    testUrl = 'https://' + testUrl;
+    testUrl = "https://" + testUrl;
   }
-  
-  const domainPattern = /^https?:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/.*)?$/;
+
+  const domainPattern =
+    /^https?:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/.*)?$/;
   return domainPattern.test(testUrl);
 }
 
@@ -106,16 +107,16 @@ export function validateWebsite(url: string): boolean {
  * Stored format: "www.example.cz" or "example.cz"
  */
 export function normalizeWebsite(url: string): string {
-  if (!url || url.trim() === '') return '';
-  
+  if (!url || url.trim() === "") return "";
+
   let normalized = url.trim();
-  
+
   // Remove protocol
-  normalized = normalized.replace(/^https?:\/\//i, '');
-  
+  normalized = normalized.replace(/^https?:\/\//i, "");
+
   // Remove trailing slash
-  normalized = normalized.replace(/\/$/, '');
-  
+  normalized = normalized.replace(/\/$/, "");
+
   return normalized;
 }
 

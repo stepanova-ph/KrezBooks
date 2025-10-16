@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
-import { NumberTextField } from './NumberTextField';
+import React, { useState, useEffect } from "react";
+import { Box, Typography } from "@mui/material";
+import { NumberTextField } from "./NumberTextField";
 
 interface VatPriceFieldProps {
   label?: string;
@@ -26,9 +26,9 @@ export function VatPriceField({
   grayWhenZero,
 }: VatPriceFieldProps) {
   const [basePrice, setBasePrice] = useState<number>(value);
-  
+
   const numericBasePrice = Number(basePrice) || 0;
-  
+
   // Calculate raw values
   let calculatedVatAmount = numericBasePrice * (vatRate / 100);
   let calculatedPriceWithVat = numericBasePrice + calculatedVatAmount;
@@ -36,7 +36,7 @@ export function VatPriceField({
   // Smart rounding: transfer 1 cent between D and F when F is .99 or .01
   if (vatRate > 0 && numericBasePrice > 0) {
     const cents = Math.round((calculatedPriceWithVat % 1) * 100);
-    
+
     if (cents === 99) {
       // F ends in .99 -> take .01 FROM D, give TO F
       // D decreases, F increases
@@ -67,7 +67,7 @@ export function VatPriceField({
   const handleBaseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newBase = Number(parseFloat(e.target.value)) || 0;
     setBasePrice(newBase);
-    
+
     const syntheticEvent = {
       ...e,
       target: {
@@ -76,7 +76,7 @@ export function VatPriceField({
         value: String(newBase),
       },
     } as React.ChangeEvent<HTMLInputElement>;
-    
+
     onChange(syntheticEvent);
   };
 
@@ -84,7 +84,7 @@ export function VatPriceField({
     const newPriceWithVat = Number(parseFloat(e.target.value)) || 0;
     const newBase = newPriceWithVat / (1 + vatRate / 100);
     setBasePrice(newBase);
-    
+
     const syntheticEvent = {
       ...e,
       target: {
@@ -93,26 +93,26 @@ export function VatPriceField({
         value: String(newBase),
       },
     } as React.ChangeEvent<HTMLInputElement>;
-    
+
     onChange(syntheticEvent);
   };
 
   return (
     <Box>
       {label && (
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            display: 'block',
+        <Typography
+          variant="caption"
+          sx={{
+            display: "block",
             mb: 0.5,
-            color: 'text.secondary',
+            color: "text.secondary",
             fontWeight: 500,
           }}
         >
           {label}
         </Typography>
       )}
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1 }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1 }}>
         <NumberTextField
           label="Základ"
           name={`${name}_base`}
@@ -132,9 +132,9 @@ export function VatPriceField({
           disabled
           size="small"
           sx={{
-            '& .MuiInputBase-input.Mui-disabled': {
-              WebkitTextFillColor: 'rgba(0, 0, 0, 0.6)',
-              backgroundColor: '#f5f5f5',
+            "& .MuiInputBase-input.Mui-disabled": {
+              WebkitTextFillColor: "rgba(0, 0, 0, 0.6)",
+              backgroundColor: "#f5f5f5",
             },
           }}
         />
@@ -150,10 +150,10 @@ export function VatPriceField({
         />
       </Box>
       {error && (
-        <Typography 
-          variant="caption" 
-          color="error" 
-          sx={{ display: 'block', mt: 0.5, ml: 1.75 }}
+        <Typography
+          variant="caption"
+          color="error"
+          sx={{ display: "block", mt: 0.5, ml: 1.75 }}
         >
           {error}
         </Typography>

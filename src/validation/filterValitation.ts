@@ -6,14 +6,17 @@
 /**
  * Validate ICO format (8 digits with checksum)
  */
-export function validateFilterICO(ico: string): { valid: boolean; error?: string } {
-  if (!ico || ico.trim() === '') {
+export function validateFilterICO(ico: string): {
+  valid: boolean;
+  error?: string;
+} {
+  if (!ico || ico.trim() === "") {
     return { valid: true }; // Empty is valid for filters (means no filter)
   }
 
   // Must be 8 digits
   if (!/^[0-9]{8}$/.test(ico)) {
-    return { valid: false, error: 'IČO musí mít 8 číslic' };
+    return { valid: false, error: "IČO musí mít 8 číslic" };
   }
 
   // Checksum validation
@@ -24,9 +27,12 @@ export function validateFilterICO(ico: string): { valid: boolean; error?: string
   }
   const mod = sum % 11;
   const check = mod === 0 ? 1 : mod === 1 ? 0 : 11 - mod;
-  
+
   if (check !== parseInt(ico[7], 10)) {
-    return { valid: false, error: 'IČO není platné (kontrolní součet nesouhlasí)' };
+    return {
+      valid: false,
+      error: "IČO není platné (kontrolní součet nesouhlasí)",
+    };
   }
 
   return { valid: true };
@@ -36,21 +42,21 @@ export function validateFilterICO(ico: string): { valid: boolean; error?: string
  * Validate DIC format
  */
 export function validateFilterDIC(
-  prefix: string | null, 
-  value: string
+  prefix: string | null,
+  value: string,
 ): { valid: boolean; error?: string } {
   // Empty is valid (no filter applied)
-  if (!prefix || !value || value.trim() === '') {
+  if (!prefix || !value || value.trim() === "") {
     return { valid: true };
   }
 
   // For CZ and SK, validate digit count
-  if (prefix === 'CZ' || prefix === 'SK') {
-    const digits = value.replace(/\D/g, '');
+  if (prefix === "CZ" || prefix === "SK") {
+    const digits = value.replace(/\D/g, "");
     if (digits.length < 8 || digits.length > 10) {
-      return { 
-        valid: false, 
-        error: 'DIČ musí obsahovat 8–10 číslic' 
+      return {
+        valid: false,
+        error: "DIČ musí obsahovat 8–10 číslic",
       };
     }
   }
@@ -66,13 +72,13 @@ export function validateFilterDIC(
  * (autocomplete mode - partial matching allowed)
  */
 export function shouldFilterByICO(ico: string): boolean {
-  if (!ico || ico.trim() === '') return false;
-  
+  if (!ico || ico.trim() === "") return false;
+
   // In autocomplete mode, allow partial ICO (at least 3 digits)
   if (ico.length >= 3 && /^[0-9]+$/.test(ico)) {
     return true;
   }
-  
+
   return false;
 }
 
@@ -80,13 +86,16 @@ export function shouldFilterByICO(ico: string): boolean {
  * Check if DIC input should be considered for filtering
  * (autocomplete mode - partial matching allowed)
  */
-export function shouldFilterByDIC(prefix: string | null, value: string): boolean {
-  if (!prefix || !value || value.trim() === '') return false;
-  
+export function shouldFilterByDIC(
+  prefix: string | null,
+  value: string,
+): boolean {
+  if (!prefix || !value || value.trim() === "") return false;
+
   // In autocomplete mode, allow partial DIC (at least 3 characters)
   if (value.length >= 3) {
     return true;
   }
-  
+
   return false;
 }

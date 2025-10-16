@@ -1,11 +1,11 @@
 // Electron's main process - runs in Node.js
 // This creates the window and handles OS-level operations
 
-import { app, BrowserWindow, ipcMain } from 'electron';
-import path from 'path';
-import { initDatabase, closeDatabase, getDatabase } from './database';
-import { registerIpcHandlers } from './ipc-handlers';
-import { testContacts, testItems } from '../utils/testUtils';
+import { app, BrowserWindow, ipcMain } from "electron";
+import path from "path";
+import { initDatabase, closeDatabase, getDatabase } from "./database";
+import { registerIpcHandlers } from "./ipc-handlers";
+import { testContacts, testItems } from "../utils/testUtils";
 
 // Keep a global reference to prevent garbage collection
 let mainWindow: BrowserWindow | null = null;
@@ -22,7 +22,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
-      preload: path.join(__dirname, '../preload/preload.js'),
+      preload: path.join(__dirname, "../preload/preload.js"),
     },
   });
 
@@ -31,10 +31,10 @@ function createWindow() {
     // DevTools in development
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+    mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
   }
 
-  mainWindow.on('closed', () => {
+  mainWindow.on("closed", () => {
     mainWindow = null;
   });
 }
@@ -44,54 +44,58 @@ function createWindow() {
  */
 function registerAdminHandlers() {
   // Get database statistics
-  ipcMain.handle('db:getStats', async () => {
+  ipcMain.handle("db:getStats", async () => {
     try {
       const db = getDatabase();
-      
-      const contactCount = db.prepare('SELECT COUNT(*) as count FROM contacts').get() as { count: number };
-      const itemCount = db.prepare('SELECT COUNT(*) as count FROM items').get() as { count: number };
+
+      const contactCount = db
+        .prepare("SELECT COUNT(*) as count FROM contacts")
+        .get() as { count: number };
+      const itemCount = db
+        .prepare("SELECT COUNT(*) as count FROM items")
+        .get() as { count: number };
 
       return {
         success: true,
         data: {
           contacts: contactCount.count,
           items: itemCount.count,
-        }
+        },
       };
     } catch (error: any) {
-      console.error('Error getting database stats:', error);
+      console.error("Error getting database stats:", error);
       return {
         success: false,
-        error: error.message || 'Failed to get database statistics'
+        error: error.message || "Failed to get database statistics",
       };
     }
   });
 
   // Clear all data from database (but keep tables)
-  ipcMain.handle('db:clearDatabase', async () => {
+  ipcMain.handle("db:clearDatabase", async () => {
     try {
       const db = getDatabase();
-      
-      // Delete all data from tables
-      db.prepare('DELETE FROM items').run();
-      db.prepare('DELETE FROM contacts').run();
 
-      console.log('Database cleared successfully');
+      // Delete all data from tables
+      db.prepare("DELETE FROM items").run();
+      db.prepare("DELETE FROM contacts").run();
+
+      console.log("Database cleared successfully");
       return { success: true };
     } catch (error: any) {
-      console.error('Error clearing database:', error);
+      console.error("Error clearing database:", error);
       return {
         success: false,
-        error: error.message || 'Failed to clear database'
+        error: error.message || "Failed to clear database",
       };
     }
   });
 
   // Fill database with test data
-  ipcMain.handle('db:fillTestData', async () => {
+  ipcMain.handle("db:fillTestData", async () => {
     try {
       const db = getDatabase();
-      
+
       let contactsAdded = 0;
       let itemsAdded = 0;
       let errors: string[] = [];
@@ -131,7 +135,10 @@ function registerAdminHandlers() {
           contactsAdded++;
         } catch (error: any) {
           errors.push(`Contact ${contact.company_name}: ${error.message}`);
-          console.error(`Error inserting contact ${contact.company_name}:`, error);
+          console.error(
+            `Error inserting contact ${contact.company_name}:`,
+            error,
+          );
         }
       }
 
@@ -170,9 +177,11 @@ function registerAdminHandlers() {
         }
       }
 
-      console.log(`Test data inserted: ${contactsAdded} contacts, ${itemsAdded} items`);
+      console.log(
+        `Test data inserted: ${contactsAdded} contacts, ${itemsAdded} items`,
+      );
       if (errors.length > 0) {
-        console.warn('Some items failed to insert:', errors);
+        console.warn("Some items failed to insert:", errors);
       }
 
       return {
@@ -180,26 +189,26 @@ function registerAdminHandlers() {
         data: {
           contactsAdded,
           itemsAdded,
-        }
+        },
       };
     } catch (error: any) {
-      console.error('Error filling test data:', error);
+      console.error("Error filling test data:", error);
       return {
         success: false,
-        error: error.message || 'Failed to fill test data'
+        error: error.message || "Failed to fill test data",
       };
     }
   });
 
-  console.log('✓ Admin IPC handlers registered');
+  console.log("✓ Admin IPC handlers registered");
 }
 
 app.whenReady().then(() => {
   try {
     initDatabase();
-    console.log('✓ Database ready');
+    console.log("✓ Database ready");
   } catch (error) {
-    console.error('Database initialization failed:', error);
+    console.error("Database initialization failed:", error);
   }
 
   registerIpcHandlers();
@@ -208,11 +217,11 @@ app.whenReady().then(() => {
   createWindow();
 });
 
-app.on('window-all-closed', () => {
+app.on("window-all-closed", () => {
   closeDatabase();
   app.quit();
 });
 
-app.on('before-quit', () => {
+app.on("before-quit", () => {
   closeDatabase();
 });

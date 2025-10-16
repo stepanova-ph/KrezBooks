@@ -9,8 +9,14 @@ interface DraggableHeaderCellProps {
 }
 
 function DraggableHeaderCell({ column }: DraggableHeaderCellProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: column.id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -34,7 +40,7 @@ function DraggableHeaderCell({ column }: DraggableHeaderCellProps) {
       {/* Label – přidáme jen vnitřní padding/margin doprava, ne na buňku */}
       <Box
         sx={{
-          pr: column.align === "right" ? "24px" : 0,               // rezerva pro handle (neovlivní šířku sloupce)
+          pr: column.align === "right" ? "24px" : 0, // rezerva pro handle (neovlivní šířku sloupce)
           overflow: "hidden",
           whiteSpace: "nowrap",
           textOverflow: "ellipsis",

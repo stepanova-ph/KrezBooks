@@ -1,39 +1,47 @@
-import { useState } from 'react';
-import { Box, Typography } from '@mui/material';
-import { FilterBar } from '../common/FilterBar';
-import { useTableFilters } from '../../../hooks/useTableFilters';
-import { 
-  contactFilterConfig, 
+import { useState } from "react";
+import { Box, Typography } from "@mui/material";
+import { FilterBar } from "../common/FilterBar";
+import { useTableFilters } from "../../../hooks/useTableFilters";
+import {
+  contactFilterConfig,
   initialContactFilterState,
-  defaultVisibleColumnsContact
-} from '../../../config/contactFilterConfig';
-import type { ContactFilterState } from '../../../types/filter';
-import ContactsList, { contactColumns } from '../contacts/ContactsList';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { useContacts } from '../../../hooks/useContacts';
-import CreateContactForm from '../contacts/CreateContactForm';
+  defaultVisibleColumnsContact,
+} from "../../../config/contactFilterConfig";
+import type { ContactFilterState } from "../../../types/filter";
+import ContactsList, { contactColumns } from "../contacts/ContactsList";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { useContacts } from "../../../hooks/useContacts";
+import CreateContactForm from "../contacts/CreateContactForm";
 
 function ContactTab() {
   const { data: contacts = [], isLoading } = useContacts();
-  const [filters, setFilters] = useState<ContactFilterState>(initialContactFilterState);
-
-  const [visibleColumnIds, setVisibleColumnIds] = useState<Set<string>>(
-    new Set(defaultVisibleColumnsContact)
+  const [filters, setFilters] = useState<ContactFilterState>(
+    initialContactFilterState,
   );
 
-  const [columnOrder, setColumnOrder] = useState<string[]>(defaultVisibleColumnsContact);
+  const [visibleColumnIds, setVisibleColumnIds] = useState<Set<string>>(
+    new Set(defaultVisibleColumnsContact),
+  );
+
+  const [columnOrder, setColumnOrder] = useState<string[]>(
+    defaultVisibleColumnsContact,
+  );
 
   // Handler that syncs both visibleColumnIds and columnOrder
   const handleVisibleColumnsChange = (newVisibleColumnIds: Set<string>) => {
     setVisibleColumnIds(newVisibleColumnIds);
-    
+
     // Update column order to match the new visible columns
     // Keep existing order for columns that are still visible,
     // and add newly visible columns at the end
     const newVisibleArray = Array.from(newVisibleColumnIds);
-    const orderedVisible = columnOrder.filter(id => newVisibleColumnIds.has(id));
-    const newColumns = newVisibleArray.filter(id => !columnOrder.includes(id));
-    
+    const orderedVisible = columnOrder.filter((id) =>
+      newVisibleColumnIds.has(id),
+    );
+    const newColumns = newVisibleArray.filter(
+      (id) => !columnOrder.includes(id),
+    );
+
     setColumnOrder([...orderedVisible, ...newColumns]);
   };
 
@@ -55,8 +63,8 @@ function ContactTab() {
         defaultColumnIds={defaultVisibleColumnsContact}
         actions={[
           {
-            id: 'add-contact',
-            label: 'Přidat kontakt',
+            id: "add-contact",
+            label: "Přidat kontakt",
             startIcon: <PersonAddIcon />,
             renderDialog: ({ open, onClose }) => (
               <CreateContactForm open={open} onClose={onClose} />
@@ -66,7 +74,7 @@ function ContactTab() {
       />
 
       {/* Data Table */}
-      <ContactsList 
+      <ContactsList
         contacts={filteredContacts}
         visibleColumnIds={visibleColumnIds}
         columnOrder={columnOrder}

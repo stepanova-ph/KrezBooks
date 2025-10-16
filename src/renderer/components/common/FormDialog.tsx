@@ -1,5 +1,11 @@
-import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import React from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 
 interface FormDialogProps {
   open: boolean;
@@ -19,33 +25,35 @@ export function FormDialog({
   children,
   onSubmit,
   isPending = false,
-  submitLabel = 'Uložit',
-  cancelLabel = 'Zrušit',
+  submitLabel = "Uložit",
+  cancelLabel = "Zrušit",
 }: FormDialogProps) {
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="md" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
       fullWidth
       PaperProps={{
         sx: {
-          maxWidth:600,
-          width: '100%',
-        }
+          maxWidth: 600,
+          width: "100%",
+        },
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>{title}</DialogTitle>
       <form onSubmit={onSubmit} noValidate>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, p: 2 }}>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 1.5, p: 2 }}
+        >
           {children}
         </DialogContent>
-        <DialogActions sx={{ padding: '12px 20px', gap: 1 }}>
+        <DialogActions sx={{ padding: "12px 20px", gap: 1 }}>
           <Button onClick={onClose} color="inherit">
             {cancelLabel}
           </Button>
           <Button type="submit" variant="contained" disabled={isPending}>
-            {isPending ? 'Ukládám...' : submitLabel}
+            {isPending ? "Ukládám..." : submitLabel}
           </Button>
         </DialogActions>
       </form>

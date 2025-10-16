@@ -1,25 +1,31 @@
-import { useState } from 'react';
-import { 
-  Typography, 
-  Box, 
-  Button, 
-  Paper, 
+import { useState } from "react";
+import {
+  Typography,
+  Box,
+  Button,
+  Paper,
   Alert,
   CircularProgress,
-  Divider
+  Divider,
 } from "@mui/material";
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import InfoIcon from '@mui/icons-material/Info';
-import { useQueryClient } from '@tanstack/react-query';
-import { contactKeys } from '../../../hooks/useContacts';
-import { itemKeys } from '../../../hooks/useItems';
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import InfoIcon from "@mui/icons-material/Info";
+import { useQueryClient } from "@tanstack/react-query";
+import { contactKeys } from "../../../hooks/useContacts";
+import { itemKeys } from "../../../hooks/useItems";
 
 function HomeTab() {
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info', text: string } | null>(null);
-  const [stats, setStats] = useState<{ contacts: number, items: number } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error" | "info";
+    text: string;
+  } | null>(null);
+  const [stats, setStats] = useState<{
+    contacts: number;
+    items: number;
+  } | null>(null);
 
   const handleGetStats = async () => {
     setLoading(true);
@@ -28,19 +34,29 @@ function HomeTab() {
       const result = await window.electronAPI.admin.getDbStats();
       if (result.success) {
         setStats(result.data);
-        setMessage({ type: 'info', text: `Databáze obsahuje: ${result.data.contacts} kontaktů, ${result.data.items} položek` });
+        setMessage({
+          type: "info",
+          text: `Databáze obsahuje: ${result.data.contacts} kontaktů, ${result.data.items} položek`,
+        });
       } else {
-        setMessage({ type: 'error', text: result.error || 'Chyba při načítání statistik' });
+        setMessage({
+          type: "error",
+          text: result.error || "Chyba při načítání statistik",
+        });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Chyba při komunikaci s databází' });
+      setMessage({ type: "error", text: "Chyba při komunikaci s databází" });
     } finally {
       setLoading(false);
     }
   };
 
   const handleClearDatabase = async () => {
-    if (!window.confirm('Opravdu chcete smazat VŠECHNA data z databáze? Tato akce je nevratná!')) {
+    if (
+      !window.confirm(
+        "Opravdu chcete smazat VŠECHNA data z databáze? Tato akce je nevratná!",
+      )
+    ) {
       return;
     }
 
@@ -50,22 +66,29 @@ function HomeTab() {
       const result = await window.electronAPI.admin.clearDb();
       if (result.success) {
         setStats({ contacts: 0, items: 0 });
-        setMessage({ type: 'success', text: 'Databáze byla úspěšně vymazána' });
-        
+        setMessage({ type: "success", text: "Databáze byla úspěšně vymazána" });
+
         queryClient.invalidateQueries({ queryKey: contactKeys.lists() });
         queryClient.invalidateQueries({ queryKey: itemKeys.lists() });
       } else {
-        setMessage({ type: 'error', text: result.error || 'Chyba při mazání databáze' });
+        setMessage({
+          type: "error",
+          text: result.error || "Chyba při mazání databáze",
+        });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Chyba při mazání databáze' });
+      setMessage({ type: "error", text: "Chyba při mazání databáze" });
     } finally {
       setLoading(false);
     }
   };
 
   const handleFillTestData = async () => {
-    if (!window.confirm('Naplnit databázi testovacími daty? (20 kontaktů + 40 položek)')) {
+    if (
+      !window.confirm(
+        "Naplnit databázi testovacími daty? (20 kontaktů + 40 položek)",
+      )
+    ) {
       return;
     }
 
@@ -74,20 +97,23 @@ function HomeTab() {
     try {
       const result = await window.electronAPI.admin.fillTestData();
       if (result.success) {
-        setMessage({ 
-          type: 'success', 
-          text: `Úspěšně přidáno: ${result.data.contactsAdded} kontaktů, ${result.data.itemsAdded} položek` 
+        setMessage({
+          type: "success",
+          text: `Úspěšně přidáno: ${result.data.contactsAdded} kontaktů, ${result.data.itemsAdded} položek`,
         });
-        
+
         queryClient.invalidateQueries({ queryKey: contactKeys.lists() });
         queryClient.invalidateQueries({ queryKey: itemKeys.lists() });
-        
+
         await handleGetStats();
       } else {
-        setMessage({ type: 'error', text: result.error || 'Chyba při plnění databáze' });
+        setMessage({
+          type: "error",
+          text: result.error || "Chyba při plnění databáze",
+        });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Chyba při plnění databáze' });
+      setMessage({ type: "error", text: "Chyba při plnění databáze" });
     } finally {
       setLoading(false);
     }
@@ -105,29 +131,38 @@ function HomeTab() {
       <Divider sx={{ my: 3 }} />
 
       {/* Admin Panel */}
-      <Paper 
-        elevation={3} 
-        sx={{ 
-          p: 3, 
-          backgroundColor: 'background.paper',
-          border: '2px solid',
-          borderColor: 'secondary.light'
+      <Paper
+        elevation={3}
+        sx={{
+          p: 3,
+          backgroundColor: "background.paper",
+          border: "2px solid",
+          borderColor: "secondary.light",
         }}
       >
         <Typography variant="h5" gutterBottom color="secondary.light">
           SPRÁVA DATABÁZE (dev admin)
         </Typography>
-
         Message Alert
         {message && (
-          <Alert severity={message.type} sx={{ mb: 2 }} onClose={() => setMessage(null)}>
+          <Alert
+            severity={message.type}
+            sx={{ mb: 2 }}
+            onClose={() => setMessage(null)}
+          >
             {message.text}
           </Alert>
         )}
-
         {/* Stats Display */}
         {stats && (
-          <Box sx={{ mb: 3, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
+          <Box
+            sx={{
+              mb: 3,
+              p: 2,
+              backgroundColor: "action.hover",
+              borderRadius: 1,
+            }}
+          >
             <Typography variant="body1">
               <strong>Aktuální stav databáze:</strong>
             </Typography>
@@ -139,9 +174,8 @@ function HomeTab() {
             </Typography>
           </Box>
         )}
-
         {/* Action Buttons */}
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <Button
             variant="outlined"
             startIcon={loading ? <CircularProgress size={20} /> : <InfoIcon />}
@@ -154,7 +188,9 @@ function HomeTab() {
           <Button
             variant="contained"
             color="primary"
-            startIcon={loading ? <CircularProgress size={20} /> : <CloudUploadIcon />}
+            startIcon={
+              loading ? <CircularProgress size={20} /> : <CloudUploadIcon />
+            }
             onClick={handleFillTestData}
             disabled={loading}
           >
@@ -164,7 +200,9 @@ function HomeTab() {
           <Button
             variant="contained"
             color="error"
-            startIcon={loading ? <CircularProgress size={20} /> : <DeleteSweepIcon />}
+            startIcon={
+              loading ? <CircularProgress size={20} /> : <DeleteSweepIcon />
+            }
             onClick={handleClearDatabase}
             disabled={loading}
           >

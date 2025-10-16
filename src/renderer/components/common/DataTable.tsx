@@ -19,8 +19,8 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-} from '@mui/material';
-import { useState, MouseEvent } from 'react';
+} from "@mui/material";
+import { useState, MouseEvent } from "react";
 import {
   DndContext,
   closestCenter,
@@ -29,23 +29,26 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   horizontalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { restrictToHorizontalAxis, restrictToFirstScrollableAncestor } from '@dnd-kit/modifiers';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import DraggableHeaderCell from './DraggableHeaderCell';
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  restrictToHorizontalAxis,
+  restrictToFirstScrollableAncestor,
+} from "@dnd-kit/modifiers";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import DraggableHeaderCell from "./DraggableHeaderCell";
 
 export interface Column {
   id: string;
   label: string;
-  align?: 'left' | 'right' | 'center';
+  align?: "left" | "right" | "center";
   minWidth?: number;
   maxWidth?: number;
   width?: number;
@@ -79,7 +82,7 @@ export function DataTable<T>({
   columns,
   data,
   renderRow,
-  emptyMessage = 'Žádná data k zobrazení',
+  emptyMessage = "Žádná data k zobrazení",
   visibleColumnIds,
   contextMenuActions = [],
   getRowKey = (item: any) => item.id,
@@ -119,7 +122,7 @@ export function DataTable<T>({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   // Handle drag end
@@ -131,7 +134,7 @@ export function DataTable<T>({
       const newIndex = orderedColumns.findIndex((col) => col.id === over.id);
 
       const newOrder = arrayMove(orderedColumns, oldIndex, newIndex).map(
-        (col) => col.id
+        (col) => col.id,
       );
 
       if (onColumnOrderChange) {
@@ -181,13 +184,13 @@ export function DataTable<T>({
   };
 
   const getConfirmMessage = () => {
-    if (!confirmDialog.action || !confirmDialog.item) return '';
+    if (!confirmDialog.action || !confirmDialog.item) return "";
 
     const message = confirmDialog.action.confirmMessage;
-    if (typeof message === 'function') {
+    if (typeof message === "function") {
       return message(confirmDialog.item);
     }
-    return message || 'Opravdu chcete provést tuto akci?';
+    return message || "Opravdu chcete provést tuto akci?";
   };
 
   return (
@@ -195,49 +198,54 @@ export function DataTable<T>({
       <TableContainer
         component={Paper}
         sx={{
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
           border: (theme) => `1px solid ${theme.palette.divider}`,
-          overflow: 'auto',
-          position: 'relative',
+          overflow: "auto",
+          position: "relative",
         }}
       >
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
-          modifiers={[restrictToHorizontalAxis, restrictToFirstScrollableAncestor]}
+          modifiers={[
+            restrictToHorizontalAxis,
+            restrictToFirstScrollableAncestor,
+          ]}
         >
           <Table
             size="small"
             sx={{
-              '& .MuiTableCell-root': {
+              "& .MuiTableCell-root": {
                 borderRight: (theme) => `1px solid ${theme.palette.divider}`,
                 borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-                padding: '4px 8px',
-                fontSize: '0.8125rem',
+                padding: "4px 8px",
+                fontSize: "0.8125rem",
                 lineHeight: 1.3,
-                '&:last-child': {
-                  borderRight: 'none',
+                "&:last-child": {
+                  borderRight: "none",
                 },
               },
             }}
           >
-            <TableHead sx={{ backgroundColor: 'palette.grey.100' }}>
+            <TableHead sx={{ backgroundColor: "palette.grey.100" }}>
               <TableRow
                 sx={(theme) => ({
-                  backgroundColor: 'palette.primary.main',
-                  '& .MuiTableCell-head': {
-                    padding: '5px 5px',
+                  backgroundColor: "palette.primary.main",
+                  "& .MuiTableCell-head": {
+                    padding: "5px 5px",
                     fontWeight: 600,
-                    color: 'palette.common.black',
+                    color: "palette.common.black",
                     borderBottom: `2px solid ${theme.palette.primary.light}`,
-                    textTransform: 'none',
-                    letterSpacing: '0',
+                    textTransform: "none",
+                    letterSpacing: "0",
                   },
                 })}
               >
                 <SortableContext
-                  items={orderedColumns.filter((x) => !x.hidden).map((col) => col.id)}
+                  items={orderedColumns
+                    .filter((x) => !x.hidden)
+                    .map((col) => col.id)}
                   strategy={horizontalListSortingStrategy}
                 >
                   {orderedColumns
@@ -254,7 +262,7 @@ export function DataTable<T>({
                   <TableCell
                     colSpan={orderedColumns.length}
                     align="center"
-                    sx={{ border: 'none !important' }}
+                    sx={{ border: "none !important" }}
                   >
                     <Typography color="text.secondary" py={4}>
                       {emptyMessage}
@@ -268,8 +276,10 @@ export function DataTable<T>({
                     onContextMenu={(e) => handleContextMenu(e, item)}
                     sx={{
                       cursor:
-                        contextMenuActions.length > 0 ? 'context-menu' : 'default',
-                      '&:hover': {
+                        contextMenuActions.length > 0
+                          ? "context-menu"
+                          : "default",
+                      "&:hover": {
                         backgroundColor: (theme) =>
                           `${theme.palette.primary.main}15`,
                       },
