@@ -1,9 +1,9 @@
 import { validationMessages } from "../config/validationMessages";
 import { z } from "zod";
+import { optionalString } from "./optionalString";
 
 export const itemSchema = z.object({
-  ean: z
-    .string()
+  ean: optionalString
     .min(1, validationMessages.item.eanRequired || "EAN je povinný")
     .max(50, validationMessages.item.eanMaxLength || "EAN je příliš dlouhý"),
   

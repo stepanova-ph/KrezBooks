@@ -50,6 +50,7 @@ export const validationMessages = {
     eanRequired: 'EAN je povinný.',
     eanMaxLength: 'EAN je příliš dlouhý.',
     categoryMaxLength: 'Kategorie je příliš dlouhá.',
+    
 
     nameRequired: 'Název položky je povinný.',
     nameMaxLength: 'Maximální délka názvu je 200 znaků.',

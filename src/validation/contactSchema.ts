@@ -11,12 +11,7 @@ import {
 } from "../utils/validationUtils";
 import { validationMessages } from "../config/validationMessages";
 import { z } from "zod";
-
-// Helper for optional string fields
-const optionalString = z.preprocess(
-  (val) => (val === "" || val === null ? undefined : val),
-  z.string().optional(),
-);
+import { optionalString } from "./optionalString";
 
 export const contactSchema = z
   .object({
