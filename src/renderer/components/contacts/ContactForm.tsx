@@ -9,6 +9,7 @@ import {
   FormControl,
   InputLabel,
   InputAdornment,
+  Grid
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import LockIcon from "@mui/icons-material/Lock";
@@ -28,6 +29,7 @@ import {
 } from "../../../utils/formUtils";
 import { DIC_PREFIXES } from "../../../config/contactFilterConfig";
 import ValidatedTextField from "../common/ValidatedTextField";
+import ContactTypeSelector from "./ContactsTypeSelector";
 
 interface ContactFormProps {
   open: boolean;
@@ -264,116 +266,117 @@ function ContactForm({
       isPending={isPending}
       submitLabel={submitLabel}
     >
-      <FormSection title="Základní údaje">
-        {/* ICO and Modifier on same row */}
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 100px", gap: 2 }}>
-          <ValidatedTextField
-            label="IČO"
-            name="ico"
-            value={formData.ico}
-            onChange={handleChange}
-            onBlur={() => handleBlur("ico")}
-            error={errors.ico}
-            grayWhenEmpty
-            required
-            disabled={mode === "edit" && !isUnlocked}
-            fullWidth
-          />
-          <ValidatedTextField
-            label="Modifikátor"
-            name="modifier"
-            type="number"
-            value={formData.modifier}
-            onChange={handleChange}
-            onBlur={() => handleBlur("modifier")}
-            error={errors.modifier}
-            grayWhenZero
-            inputProps={{ step: "1" }}
-            fullWidth
-          />
-        </Box>
+      <FormSection title="Základní údaje" spacing={mode == "edit" ? 1 : undefined}>
+        {/* Row 1: ICO + Modifier + DIC prefix + DIC value (or custom DIČ) */}
+        <Grid container spacing={2} alignItems="flex-start">
+          <Grid item xs={12} md={4}>
+            <ValidatedTextField
+              label="IČO"
+              name="ico"
+              value={formData.ico}
+              onChange={handleChange}
+              onBlur={() => handleBlur("ico")}
+              error={errors.ico}
+              grayWhenEmpty
+              required
+              disabled={mode === "edit" && !isUnlocked}
+              fullWidth
+            />
+          </Grid>
 
-        {/* DIC with country code selector */}
-        <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}>
+          <Grid item xs={12} sm={6} md={2}>
+            <ValidatedTextField
+              label="Modifikátor"
+              name="modifier"
+              type="number"
+              value={formData.modifier}
+              onChange={handleChange}
+              onBlur={() => handleBlur("modifier")}
+              error={errors.modifier}
+              grayWhenZero
+              inputProps={{ step: "1" }}
+              fullWidth
+            />
+          </Grid>
+
           {!isCustomDIC ? (
             <>
-              <FormControl
-                size="small"
-                sx={{ minWidth: 80 }}
-                error={!!errors.dic}
-              >
-                <InputLabel>DIČ</InputLabel>
-                <Select
-                  value={dicParts.prefix || ""}
-                  label="DIČ"
-                  onChange={(e) => handleDICChange("prefix")(e as any)}
-                  disabled={mode === "edit" && !isUnlocked}
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl
+                  size="small"
+                  fullWidth
+                  error={!!errors.dic}
                 >
-                  <MenuItem value="">
-                    <em>Vybrat...</em>
-                  </MenuItem>
-                  {DIC_PREFIXES.map((prefix) => (
-                    <MenuItem key={prefix} value={prefix}>
-                      {prefix}
+                  <InputLabel>DIČ</InputLabel>
+                  <Select
+                    value={dicParts.prefix || ""}
+                    label="DIČ"
+                    onChange={(e) => handleDICChange("prefix")(e as any)}
+                    disabled={mode === "edit" && !isUnlocked}
+                  >
+                    <MenuItem value="">
+                      <em>Vybrat...</em>
                     </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <ValidatedTextField
-                placeholder="Zadejte DIČ bez předpony..."
-                value={dicParts.value}
-                disabled={!dicParts.prefix || (mode === "edit" && !isUnlocked)}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleDICChange("value")(e)
-                }
-                onBlur={() => handleBlur("dic")}
-                error={errors.dic}
-                sx={{ flex: 1 }}
-                fullWidth
-              />
+                    {DIC_PREFIXES.map((prefix) => (
+                      <MenuItem key={prefix} value={prefix}>
+                        {prefix}
+                      </MenuItem>
+                    ))}
+                    <MenuItem value="vlastní">vlastní</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} md={4} padding={0}>
+                <ValidatedTextField
+                  label="DIČ bez prefixu"
+                  value={dicParts.value}
+                  disabled={!dicParts.prefix || (mode === "edit" && !isUnlocked)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleDICChange("value")(e)
+                  }
+                  onBlur={() => handleBlur("dic")}
+                  error={errors.dic}
+                  fullWidth
+                />
+              </Grid>
             </>
           ) : (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 0.5,
-                flex: 1,
-              }}
-            >
-              <ValidatedTextField
-                label="DIČ"
-                placeholder="Vlastní formát DIČ..."
-                value={dicParts.value}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleDICChange("value")(e)
-                }
-                onBlur={() => handleBlur("dic")}
-                error={errors.dic}
-                disabled={mode === "edit" && !isUnlocked}
-                sx={{ flex: 1 }}
-                fullWidth
-              />
-              <IconButton
-                size="small"
-                onClick={() => setDicParts({ prefix: null, value: "" })}
-                title="Zrušit vlastní DIČ"
-                disabled={mode === "edit" && !isUnlocked}
-                sx={{ mt: "8px" }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </Box>
+            <>
+              <Grid item xs={12} md={5}>
+                <ValidatedTextField
+                  label="DIČ"
+                  placeholder="Vlastní formát DIČ..."
+                  value={dicParts.value}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleDICChange("value")(e)
+                  }
+                  onBlur={() => handleBlur("dic")}
+                  error={errors.dic}
+                  disabled={mode === "edit" && !isUnlocked}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs="auto">
+                <IconButton
+                  size="small"
+                  onClick={() => setDicParts({ prefix: null, value: "" })}
+                  title="Zrušit vlastní DIČ"
+                  disabled={mode === "edit" && !isUnlocked}
+                  sx={{ mt: { xs: 0, md: "8px" } }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Grid>
+            </>
           )}
-        </Box>
+        </Grid>
 
         {mode === "edit" && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: -1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Tooltip
               title={
-                isUnlocked
-                  ? "Zamknout IČO a DIČ"
-                  : "Odemknout IČO a DIČ pro úpravu"
+                isUnlocked ? "Zamknout IČO a DIČ" : "Odemknout IČO a DIČ pro úpravu"
               }
             >
               <IconButton
@@ -381,77 +384,45 @@ function ContactForm({
                 onClick={() => setIsUnlocked(!isUnlocked)}
                 color={isUnlocked ? "error" : "default"}
               >
-                {isUnlocked ? (
-                  <LockOpenIcon fontSize="small" />
-                ) : (
-                  <LockIcon fontSize="small" />
-                )}
+                {isUnlocked ? <LockOpenIcon fontSize="small" /> : <LockIcon fontSize="small" />}
               </IconButton>
             </Tooltip>
-            <Box
-              component="span"
-              sx={{ fontSize: "0.875rem", color: "text.secondary" }}
-            >
-              {isUnlocked
-                ? "IČO a DIČ jsou odemčeny"
-                : "Klikněte pro odemčení IČO a DIČ"}
+            <Box component="span" sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
+              {isUnlocked ? "IČO a DIČ jsou odemčeny" : "Klikněte pro odemčení IČO a DIČ"}
             </Box>
           </Box>
         )}
 
-        <ValidatedTextField
-          label="Název firmy"
-          name="company_name"
-          value={formData.company_name}
-          onChange={handleChange}
-          onBlur={() => handleBlur("company_name")}
-          error={errors.company_name}
-          grayWhenEmpty
-          required
-          fullWidth
-        />
+        {/* Row 2: Název firmy + Odběratel + Dodavatel */}
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={8}>
+            <ValidatedTextField
+              label="Název firmy"
+              name="company_name"
+              value={formData.company_name}
+              onChange={handleChange}
+              onBlur={() => handleBlur("company_name")}
+              error={errors.company_name}
+              grayWhenEmpty
+              required
+              fullWidth
+            />
+          </Grid>
 
-        {/* Contact Type */}
-        <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formData.is_customer}
-                onChange={handleChange}
-                name="is_customer"
-                color="primary"
-              />
-            }
-            label="Odběratel"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formData.is_supplier}
-                onChange={handleChange}
-                name="is_supplier"
-                color="secondary"
-              />
-            }
-            label="Dodavatel"
-          />
-          {(errors.is_customer || errors.is_supplier) && (
-            <Tooltip
-              title={errors.is_customer || errors.is_supplier || ""}
-              arrow
-            >
-              <ErrorOutlineIcon
-                sx={{
-                  color: "error.main",
-                  fontSize: 20,
-                  cursor: "help",
-                  ml: 1,
-                }}
-              />
-            </Tooltip>
-          )}
-        </Box>
+          <Grid item xs={12} md={4} alignItems={"center"}>
+            <ContactTypeSelector
+              small={false}
+              isCustomer={!!formData.is_customer}
+              isSupplier={!!formData.is_supplier}
+              errorText={errors.is_customer || errors.is_supplier}
+              onChange={({ is_customer, is_supplier }) =>
+                setFormData((prev) => ({ ...prev, is_customer, is_supplier }))
+              }
+            />
+          </Grid>
+        </Grid>
       </FormSection>
+
 
       <FormSection title="Adresa">
         <ValidatedTextField

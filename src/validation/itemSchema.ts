@@ -14,7 +14,7 @@ export const itemSchema = z.object({
   
   category: optionalString
       .refine(
-        (val) => !val || val.length >= 100,
+        (val) => !val || val.length <= 100,
         validationMessages.item.categoryMaxLength || "Kategorie je příliš dlouhá",
       ),
   

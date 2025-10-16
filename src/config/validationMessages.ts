@@ -12,6 +12,8 @@ export const validationMessages = {
     },
     companyName: {
       required: 'Název firmy je povinný.',
+      minLength: 'Název firmy musí mít alespoň 2 znaky.',
+      maxLength: 'Název firmy je příliš dlouhý.',
     },
     representativeName: {
       minLength: 'Jméno zástupce musí mít alespoň 4 znaky.',

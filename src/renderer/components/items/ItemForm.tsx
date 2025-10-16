@@ -9,6 +9,7 @@ import { VatPriceField } from "../common/VatPriceField";
 import { FormSection } from "../common/FormSection";
 import ValidatedTextField from "../common/ValidatedTextField";
 import { useItems } from "../../../hooks/useItems";
+import { ValidatedAutocomplete } from "../common/ValidatedAutocomplete";
 
 interface ItemFormProps {
   open: boolean;
@@ -193,61 +194,44 @@ function ItemForm({
         <Box
           sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2 }}
         >
-          <Autocomplete
-            freeSolo
-            options={existingCategories}
-            value={formData.category || ""}
-            onChange={(_, newValue) => {
-              setFormData((prev) => ({ ...prev, category: newValue || "" }));
-              if (errors.category) {
-                setErrors((prev) => ({ ...prev, category: "" }));
-              }
-            }}
-            onInputChange={(_, newInputValue) => {
-              setFormData((prev) => ({ ...prev, category: newInputValue }));
-              if (errors.category) {
-                setErrors((prev) => ({ ...prev, category: "" }));
-              }
-            }}
-            renderInput={(params) => (
-              <FormTextField
-                {...params}
-                label="Kategorie"
-                name="category"
-                error={errors.category}
-                onBlur={() => handleBlur("category")}
-                inputProps={{ ...params.inputProps, autoComplete: "off" }}
-              />
-            )}
-          />
-          <Autocomplete
+
+        <ValidatedAutocomplete
+          freeSolo
+          options={existingCategories}
+          value={formData.category || ""}
+          onChange={(_, newValue) => {
+            setFormData((p) => ({ ...p, category: newValue || "" }));
+            if (errors.category) setErrors((p) => ({ ...p, category: "" }));
+          }}
+          onInputChange={(_, newInputValue) => {
+            setFormData((p) => ({ ...p, category: newInputValue }));
+            if (errors.category) setErrors((p) => ({ ...p, category: "" }));
+          }}
+          label="Kategorie"
+          name="category"
+          error={errors.category}
+          onBlur={() => handleBlur("category")}
+        />
+
+          <ValidatedAutocomplete
             freeSolo
             options={existingUnits}
             value={formData.unit_of_measure || ""}
             onChange={(_, newValue) => {
-              setFormData((prev) => ({ ...prev, unit_of_measure: newValue || "" }));
-              if (errors.unit_of_measure) {
-                setErrors((prev) => ({ ...prev, unit_of_measure: "" }));
-              }
+              setFormData((p) => ({ ...p, unit_of_measure: newValue || "" }));
+              if (errors.unit_of_measure) setErrors((p) => ({ ...p, unit_of_measure: "" }));
             }}
             onInputChange={(_, newInputValue) => {
-              setFormData((prev) => ({ ...prev, unit_of_measure: newInputValue }));
-              if (errors.unit_of_measure) {
-                setErrors((prev) => ({ ...prev, unit_of_measure: "" }));
-              }
+              setFormData((p) => ({ ...p, unit_of_measure: newInputValue }));
+              if (errors.unit_of_measure) setErrors((p) => ({ ...p, unit_of_measure: "" }));
             }}
-            renderInput={(params) => (
-              <FormTextField
-                {...params}
-                label="Měrná jednotka"
-                name="unit_of_measure"
-                error={errors.unit_of_measure}
-                onBlur={() => handleBlur("unit_of_measure")}
-                required
-                inputProps={{ ...params.inputProps, autoComplete: "off" }}
-              />
-            )}
+            label="Měrná jednotka"
+            name="unit_of_measure"
+            error={errors.unit_of_measure}
+            onBlur={() => handleBlur("unit_of_measure")}
+            required
           />
+
           <FormTextField
             label="Sazba DPH"
             name="vat_rate"

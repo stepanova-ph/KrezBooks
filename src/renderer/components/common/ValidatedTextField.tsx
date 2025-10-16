@@ -11,22 +11,26 @@ const ValidatedTextField = ({ error, showToolTip = true, ...props }: any) => {
       error={hasError}
       InputProps={{
         ...props.InputProps,
-        endAdornment: hasError ? (
-          <InputAdornment position="end">
-            {!!showToolTip && (
-              <Tooltip title={error} arrow placement="top">
-                <ErrorOutlineIcon
-                  sx={{
-                    color: "error.main",
-                    fontSize: 20,
-                    cursor: "help",
-                  }}
-                />
-              </Tooltip>
+        endAdornment: (
+          <>
+            {hasError && (
+              <InputAdornment position="end">
+                {!!showToolTip ? (
+                  <Tooltip title={error} arrow placement="top">
+                    <ErrorOutlineIcon
+                      sx={{ color: "error.main", fontSize: 20, cursor: "help" }}
+                    />
+                  </Tooltip>
+                ) : (
+                  <ErrorOutlineIcon
+                    sx={{ color: "error.main", fontSize: 20 }}
+                  />
+                )}
+              </InputAdornment>
             )}
-          </InputAdornment>
-        ) : (
-          props.InputProps?.endAdornment
+            {/* keep Autocomplete's built-in adornments (clear, popup) */}
+            {props.InputProps?.endAdornment}
+          </>
         ),
       }}
     />

@@ -32,13 +32,16 @@ export const contactSchema = z
     modifier: z.preprocess(
       (v) => Number(v),
       z
-        .number()
-        .int()
-        .min(1, validationMessages.contact.modifier.range)
-        .max(100, validationMessages.contact.modifier.range),
+      .number()
+      .int()
+      .min(1, validationMessages.contact.modifier.range)
+      .max(100, validationMessages.contact.modifier.range),
     ),
 
-    company_name: z.string().min(1, validationMessages.contact.companyName.required),
+    company_name: z
+                  .string()
+                  .min(2, validationMessages.contact.companyName.required)
+                  .max(40, validationMessages.contact.companyName.maxLength),
 
     representative_name: optionalString
       .refine(

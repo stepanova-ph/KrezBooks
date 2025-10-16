@@ -1,226 +1,303 @@
 import {
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TableSortLabel,
-  Paper,
-  Checkbox,
+  Typography,
+  Box,
   Menu,
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Box,
-  CircularProgress,
-} from '@mui/material';
-import { useState, MouseEvent } from 'react';
+  Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+} from "@mui/material";
+import { useState, MouseEvent } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  restrictToHorizontalAxis,
+  restrictToFirstScrollableAncestor,
+} from "@dnd-kit/modifiers";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import DraggableHeaderCell from "./DraggableHeaderCell";
 
-export interface Column<TData = any> {
+export interface Column {
   id: string;
   label: string;
+  align?: "left" | "right" | "center";
   minWidth?: number;
-  align?: 'left' | 'right' | 'center';
-  format?: (value: any, row: TData) => React.ReactNode;
-  sortable?: boolean;
+  maxWidth?: number;
+  width?: number;
+  hidden?: true;
+  hide_label?: true;
 }
 
-export interface ContextMenuAction<TData = any> {
+export type ContextMenuAction<T = any> = {
   id: string;
   label: string;
   icon?: React.ReactNode;
-  onClick: (row: TData) => void;
+  onClick: (item: T) => void | Promise<void>;
+  requireConfirm?: boolean;
+  confirmMessage?: string | ((item: T) => string);
   divider?: boolean;
-  disabled?: (row: TData) => boolean;
-}
+};
 
-export interface DataTableProps<TData = any> {
-  columns: Column<TData>[];
-  data: TData[];
-  onRowClick?: (row: TData) => void;
-  selectable?: boolean;
-  selectedRows?: Set<any>;
-  onSelectionChange?: (selected: Set<any>) => void;
-  getRowId?: (row: TData) => any;
-  contextMenuActions?: ContextMenuAction<TData>[];
-  sortColumn?: string;
-  sortDirection?: 'asc' | 'desc';
-  onSort?: (column: string) => void;
-  loading?: boolean;
+interface DataTableProps<T> {
+  columns: Column[];
+  data: T[];
+  renderRow: (item: T, visibleColumns: Column[]) => React.ReactNode;
   emptyMessage?: string;
+  visibleColumnIds: Set<string>;
+  contextMenuActions?: ContextMenuAction<T>[];
+  getRowKey?: (item: T) => string | number;
+  columnOrder?: string[];
+  onColumnOrderChange?: (newOrder: string[]) => void;
 }
 
-export function DataTable<TData = any>({
+export function DataTable<T>({
   columns,
   data,
-  onRowClick,
-  selectable = false,
-  selectedRows = new Set(),
-  onSelectionChange,
-  getRowId = (row: any) => row.id,
+  renderRow,
+  emptyMessage = "Žádná data k zobrazení",
+  visibleColumnIds,
   contextMenuActions = [],
-  sortColumn,
-  sortDirection = 'asc',
-  onSort,
-  loading = false,
-  emptyMessage = 'Žádná data',
-}: DataTableProps<TData>) {
+  getRowKey = (item: any) => item.id,
+  columnOrder,
+  onColumnOrderChange,
+}: DataTableProps<T>) {
+  // Filter visible columns
+  const visibleColumns = columns.filter((col) => visibleColumnIds.has(col.id));
+
+  // Order columns based on columnOrder prop, or use original order
+  const orderedColumns = columnOrder
+    ? columnOrder
+        .map((id) => visibleColumns.find((col) => col.id === id))
+        .filter((col): col is Column => col !== undefined)
+    : visibleColumns;
+
+  // Context menu state
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
     mouseY: number;
-    row: TData;
+    item: T | null;
   } | null>(null);
 
-  const handleContextMenu = (event: MouseEvent<HTMLTableRowElement>, row: TData) => {
-    if (contextMenuActions.length === 0) return;
-    
-    event.preventDefault();
-    setContextMenu(
-      contextMenu === null
-        ? {
-            mouseX: event.clientX + 2,
-            mouseY: event.clientY - 6,
-            row,
-          }
-        : null
-    );
+  // Confirmation dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    action: ContextMenuAction<T> | null;
+    item: T | null;
+  }>({
+    open: false,
+    action: null,
+    item: null,
+  });
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  // Handle drag end
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = orderedColumns.findIndex((col) => col.id === active.id);
+      const newIndex = orderedColumns.findIndex((col) => col.id === over.id);
+
+      const newOrder = arrayMove(orderedColumns, oldIndex, newIndex).map(
+        (col) => col.id,
+      );
+
+      if (onColumnOrderChange) {
+        onColumnOrderChange(newOrder);
+      }
+    }
   };
 
-  const handleContextMenuClose = () => {
+  const handleContextMenu = (event: MouseEvent, item: T) => {
+    event.preventDefault();
+    setContextMenu({
+      mouseX: event.clientX + 2,
+      mouseY: event.clientY - 6,
+      item,
+    });
+  };
+
+  const handleCloseContextMenu = () => {
     setContextMenu(null);
   };
 
-  const handleContextMenuAction = (action: ContextMenuAction<TData>) => {
-    if (contextMenu) {
-      action.onClick(contextMenu.row);
-      handleContextMenuClose();
-    }
-  };
+  const handleActionClick = async (action: ContextMenuAction<T>) => {
+    if (!contextMenu?.item) return;
 
-  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = new Set(data.map((row) => getRowId(row)));
-      onSelectionChange?.(newSelected);
+    handleCloseContextMenu();
+
+    if (action.requireConfirm) {
+      setConfirmDialog({
+        open: true,
+        action,
+        item: contextMenu.item,
+      });
     } else {
-      onSelectionChange?.(new Set());
+      await action.onClick(contextMenu.item);
     }
   };
 
-  const handleSelectRow = (event: React.MouseEvent, rowId: any) => {
-    event.stopPropagation();
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(rowId)) {
-      newSelected.delete(rowId);
-    } else {
-      newSelected.add(rowId);
+  const handleConfirmAction = async () => {
+    if (confirmDialog.action && confirmDialog.item) {
+      await confirmDialog.action.onClick(confirmDialog.item);
     }
-    onSelectionChange?.(newSelected);
+    setConfirmDialog({ open: false, action: null, item: null });
   };
 
-  const handleSortClick = (columnId: string) => {
-    if (onSort) {
-      onSort(columnId);
-    }
+  const handleCancelConfirm = () => {
+    setConfirmDialog({ open: false, action: null, item: null });
   };
 
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={400}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  const getConfirmMessage = () => {
+    if (!confirmDialog.action || !confirmDialog.item) return "";
 
-  if (data.length === 0) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={400}>
-        <Box color="text.secondary">{emptyMessage}</Box>
-      </Box>
-    );
-  }
+    const message = confirmDialog.action.confirmMessage;
+    if (typeof message === "function") {
+      return message(confirmDialog.item);
+    }
+    return message || "Opravdu chcete provést tuto akci?";
+  };
 
   return (
-    <>
-      <TableContainer component={Paper}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              {selectable && (
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    indeterminate={
-                      selectedRows.size > 0 && selectedRows.size < data.length
-                    }
-                    checked={data.length > 0 && selectedRows.size === data.length}
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
-              )}
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
+    <Box>
+      <TableContainer
+        component={Paper}
+        sx={{
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+          border: (theme) => `1px solid ${theme.palette.divider}`,
+          overflow: "auto",
+          position: "relative",
+        }}
+      >
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          modifiers={[
+            restrictToHorizontalAxis,
+            restrictToFirstScrollableAncestor,
+          ]}
+        >
+          <Table
+            size="small"
+            sx={{
+              "& .MuiTableCell-root": {
+                borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+                borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+                padding: "4px 8px",
+                fontSize: "0.8125rem",
+                lineHeight: 1.3,
+                "&:last-child": {
+                  borderRight: "none",
+                },
+              },
+            }}
+          >
+            <TableHead sx={{ backgroundColor: "palette.grey.100" }}>
+              <TableRow
+                sx={(theme) => ({
+                  backgroundColor: "palette.primary.main",
+                  "& .MuiTableCell-head": {
+                    padding: "5px 5px",
+                    fontWeight: 600,
+                    color: "palette.common.black",
+                    borderBottom: `2px solid ${theme.palette.primary.light}`,
+                    textTransform: "none",
+                    letterSpacing: "0",
+                  },
+                })}
+              >
+                <SortableContext
+                  items={orderedColumns
+                    .filter((x) => !x.hidden)
+                    .map((col) => col.id)}
+                  strategy={horizontalListSortingStrategy}
                 >
-                  {column.sortable !== false && onSort ? (
-                    <TableSortLabel
-                      active={sortColumn === column.id}
-                      direction={sortColumn === column.id ? sortDirection : 'asc'}
-                      onClick={() => handleSortClick(column.id)}
-                    >
-                      {column.label}
-                    </TableSortLabel>
-                  ) : (
-                    column.label
-                  )}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row) => {
-              const rowId = getRowId(row);
-              const isSelected = selectedRows.has(rowId);
-
-              return (
-                <TableRow
-                  hover
-                  key={rowId}
-                  selected={isSelected}
-                  onClick={() => onRowClick?.(row)}
-                  onContextMenu={(e) => handleContextMenu(e, row)}
-                  sx={{
-                    cursor: onRowClick || contextMenuActions.length > 0 ? 'pointer' : 'default',
-                  }}
-                >
-                  {selectable && (
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={isSelected}
-                        onClick={(e) => handleSelectRow(e, rowId)}
-                      />
-                    </TableCell>
-                  )}
-                  {columns.map((column) => {
-                    const value = (row as any)[column.id];
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        {column.format ? column.format(value, row) : value}
-                      </TableCell>
-                    );
-                  })}
+                  {orderedColumns
+                    .filter((x) => !x.hidden)
+                    .map((column) => (
+                      <DraggableHeaderCell key={column.id} column={column} />
+                    ))}
+                </SortableContext>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={orderedColumns.length}
+                    align="center"
+                    sx={{ border: "none !important" }}
+                  >
+                    <Typography color="text.secondary" py={4}>
+                      {emptyMessage}
+                    </Typography>
+                  </TableCell>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              ) : (
+                data.map((item) => (
+                  <TableRow
+                    key={getRowKey(item)}
+                    onContextMenu={(e) => handleContextMenu(e, item)}
+                    sx={{
+                      cursor:
+                        contextMenuActions.length > 0
+                          ? "context-menu"
+                          : "default",
+                      "&:hover": {
+                        backgroundColor: (theme) =>
+                          `${theme.palette.primary.main}15`,
+                      },
+                    }}
+                  >
+                    {renderRow(item, orderedColumns)}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </DndContext>
       </TableContainer>
 
       {/* Context Menu */}
       <Menu
         open={contextMenu !== null}
-        onClose={handleContextMenuClose}
+        onClose={handleCloseContextMenu}
         anchorReference="anchorPosition"
         anchorPosition={
           contextMenu !== null
@@ -228,24 +305,34 @@ export function DataTable<TData = any>({
             : undefined
         }
       >
-        {contextMenuActions.map((action, index) => {
-          const isDisabled = contextMenu && action.disabled
-            ? action.disabled(contextMenu.row)
-            : false;
-
-          return (
-            <MenuItem
-              key={action.id}
-              onClick={() => handleContextMenuAction(action)}
-              disabled={isDisabled}
-              divider={action.divider}
-            >
+        {contextMenuActions.map((action, index) => (
+          <Box key={action.id}>
+            <MenuItem onClick={() => handleActionClick(action)}>
               {action.icon && <ListItemIcon>{action.icon}</ListItemIcon>}
               <ListItemText>{action.label}</ListItemText>
             </MenuItem>
-          );
-        })}
+            {action.divider && index < contextMenuActions.length - 1 && (
+              <Divider />
+            )}
+          </Box>
+        ))}
       </Menu>
-    </>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmDialog.open} onClose={handleCancelConfirm}>
+        <DialogTitle>Potvrzení akce</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{getConfirmMessage()}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelConfirm} color="primary">
+            Zrušit
+          </Button>
+          <Button onClick={handleConfirmAction} color="error" autoFocus>
+            Potvrdit
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }

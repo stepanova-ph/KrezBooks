@@ -7,3 +7,8 @@ export const VAT_RATES = {
 export const PRICE_GROUPS = [1, 2, 3, 4] as const;
 
 export const UNIT_OPTIONS = ['ks', 'kg', 'l'] as const;
+
+export const CONTACT_TYPE = {
+  supplier: 'Dodavatel',
+  customer: 'Odběratel',
+}

@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, TableCell, Typography } from "@mui/material";
 import { useState } from "react";
 import { useDeleteItem } from "../../../hooks/useItems";
 import { Item } from "../../../types/database";
@@ -161,6 +161,23 @@ function ItemsList({
         visibleColumnIds={visibleColumnIds}
         columnOrder={columnOrder}
         onColumnOrderChange={onColumnOrderChange}
+        renderRow={(item, visibleColumns) => (
+          <>
+            {visibleColumns.map((column) => (
+              <TableCell
+                key={column.id}
+                align={column.align}
+                style={{
+                  maxWidth: column.maxWidth,
+                  minWidth: column.minWidth,
+                  width: column.width,
+                }}
+              >
+                {getCellContent(item, column.id)}
+              </TableCell>
+            ))}
+          </>
+        )}
       />
       {editingItem && (
         <EditItemForm
