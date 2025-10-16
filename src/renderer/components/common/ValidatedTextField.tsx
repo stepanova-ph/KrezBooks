@@ -28,7 +28,6 @@ const ValidatedTextField = ({ error, showToolTip = true, ...props }: any) => {
                 )}
               </InputAdornment>
             )}
-            {/* keep Autocomplete's built-in adornments (clear, popup) */}
             {props.InputProps?.endAdornment}
           </>
         ),

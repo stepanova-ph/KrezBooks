@@ -17,17 +17,20 @@ export const contactSchema = z
   .object({
     ico: z
       .string()
-      .min(8, validationMessages.contact.ico.length)
-      .max(8, validationMessages.contact.ico.length)
-      .refine(
-        (val) => validateICO(val),
-        validationMessages.contact.ico.invalid,
-      ),
+      // .min(8, validationMessages.contact.ico.length)
+      // .max(8, validationMessages.contact.ico.length)
+      // .refine(
+      //   (val) => validateICO(val),
+      //   validationMessages.contact.ico.invalid,
+      // )
+      ,
 
-    dic: optionalString.refine(
-      (val) => validateDIC(val!, ""),
-      validationMessages.contact.dic.invalid,
-    ),
+    dic: optionalString
+    // .refine(
+      // (val) => validateDIC(val!, ""),
+      // validationMessages.contact.dic.invalid,
+    // )
+    ,
 
     modifier: z.preprocess(
       (v) => Number(v),

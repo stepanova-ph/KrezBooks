@@ -194,7 +194,6 @@ function ItemForm({
         <Box
           sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2 }}
         >
-
         <ValidatedAutocomplete
           freeSolo
           options={existingCategories}

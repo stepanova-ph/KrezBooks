@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, Chip, Tooltip } from "@mui/material";
+import { Box, Chip, Grid, Tooltip } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useTheme, alpha } from "@mui/material/styles";
 import { CONTACT_TYPE } from "../../../config/constants";
@@ -12,6 +12,8 @@ type Props = {
   errorText?: string;
   small?: boolean;
 };
+
+const inactiveAlpha = 0.15
 
 export function ContactTypeSelector({
   isCustomer,
@@ -45,9 +47,15 @@ export function ContactTypeSelector({
     color: theme.palette.secondary.contrastText,
   };
 
-  const inactiveSx = {
-    backgroundColor: alpha(theme.palette.background.paper, 0.0),
-    border: `1px solid ${theme.palette.divider}`,
+  const primaryInactiveSx = {
+    backgroundColor: alpha(theme.palette.primary.light, inactiveAlpha),
+    border: `1px solid ${alpha(theme.palette.primary.main, inactiveAlpha + 0.15)}`,
+    color: theme.palette.text.secondary,
+  };
+
+  const secondaryInactiveSx = {
+    backgroundColor: alpha(theme.palette.secondary.light, inactiveAlpha),
+    border: `1px solid ${alpha(theme.palette.secondary.main, inactiveAlpha + 0.15)}`,
     color: theme.palette.text.secondary,
   };
 
@@ -58,7 +66,8 @@ export function ContactTypeSelector({
     onChange({ is_customer: isCustomer, is_supplier: !isSupplier });
 
   return (
-    <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+    <Grid item sx={{ display: "flex", justifyContent: "center", gap: 2, mr: -5 }}>
+    {/* <> */}
       <Chip
         label={CONTACT_TYPE.customer}
         size={small ? "small" : "medium"}
@@ -70,7 +79,7 @@ export function ContactTypeSelector({
             ? disabledChipSx
             : isCustomer
             ? primaryActiveSx
-            : inactiveSx),
+            : primaryInactiveSx),
         }}
       />
 
@@ -85,7 +94,7 @@ export function ContactTypeSelector({
             ? disabledChipSx
             : isSupplier
             ? secondaryActiveSx
-            : inactiveSx),
+            : secondaryInactiveSx),
         }}
       />
 
@@ -96,7 +105,8 @@ export function ContactTypeSelector({
           />
         </Tooltip>
       )}
-    </Box>
+    {/* </> */}
+    </Grid>
   );
 }
 
