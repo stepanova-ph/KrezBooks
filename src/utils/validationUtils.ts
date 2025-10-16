@@ -5,6 +5,21 @@
 
 /**
  * Validate Czech IČO (8-digit business ID with checksum)
+ * 
+ * Algorithm:
+ * 1. Multiply first 7 digits by weights [8,7,6,5,4,3,2]
+ * 2. Sum the products
+ * 3. Calculate: remainder = sum % 11
+ * 4. Calculate checksum:
+ *    - If remainder = 0, checksum = 1
+ *    - If remainder = 1, checksum = 0
+ *    - Otherwise, checksum = 11 - remainder
+ * 5. Compare checksum with 8th digit
+ * 
+ * Valid examples: '25596641', '12345678'
+ * Invalid examples: '12345679' (wrong checksum), '1234567' (too short)
+ * 
+ * Reference: https://www.abclinuxu.cz/blog/programovani/2008/9/overeni-ic
  */
 export function validateICO(ico: string): boolean {
   if (!/^[0-9]{8}$/.test(ico)) return false;
@@ -27,6 +42,7 @@ export function validateICO(ico: string): boolean {
  * @param ico - Optional IČO for cross-validation
  */
 export function validateDIC(dic: string, ico?: string): boolean {
+  if (!dic || dic.trim() === "") return true;
   if (!dic.startsWith("CZ")) return false;
 
   const digits = dic.slice(2);

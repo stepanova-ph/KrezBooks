@@ -27,7 +27,7 @@ import {
   combineDIC,
 } from "../../../utils/formUtils";
 import { DIC_PREFIXES } from "../../../config/contactFilterConfig";
-import TextFieldWithError from "../common/TextFieldWithError";
+import ValidatedTextField from "../common/ValidatedTextField";
 
 interface ContactFormProps {
   open: boolean;
@@ -267,7 +267,7 @@ function ContactForm({
       <FormSection title="Základní údaje">
         {/* ICO and Modifier on same row */}
         <Box sx={{ display: "grid", gridTemplateColumns: "1fr 100px", gap: 2 }}>
-          <TextFieldWithError
+          <ValidatedTextField
             label="IČO"
             name="ico"
             value={formData.ico}
@@ -279,7 +279,7 @@ function ContactForm({
             disabled={mode === "edit" && !isUnlocked}
             fullWidth
           />
-          <TextFieldWithError
+          <ValidatedTextField
             label="Modifikátor"
             name="modifier"
             type="number"
@@ -319,7 +319,7 @@ function ContactForm({
                   ))}
                 </Select>
               </FormControl>
-              <TextFieldWithError
+              <ValidatedTextField
                 placeholder="Zadejte DIČ bez předpony..."
                 value={dicParts.value}
                 disabled={!dicParts.prefix || (mode === "edit" && !isUnlocked)}
@@ -341,7 +341,7 @@ function ContactForm({
                 flex: 1,
               }}
             >
-              <TextFieldWithError
+              <ValidatedTextField
                 label="DIČ"
                 placeholder="Vlastní formát DIČ..."
                 value={dicParts.value}
@@ -399,7 +399,7 @@ function ContactForm({
           </Box>
         )}
 
-        <TextFieldWithError
+        <ValidatedTextField
           label="Název firmy"
           name="company_name"
           value={formData.company_name}
@@ -454,7 +454,7 @@ function ContactForm({
       </FormSection>
 
       <FormSection title="Adresa">
-        <TextFieldWithError
+        <ValidatedTextField
           label="Ulice a číslo popisné"
           name="street"
           value={formData.street ?? ""}
@@ -465,7 +465,7 @@ function ContactForm({
           fullWidth
         />
         <Box sx={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 2 }}>
-          <TextFieldWithError
+          <ValidatedTextField
             label="Město"
             name="city"
             value={formData.city ?? ""}
@@ -474,7 +474,7 @@ function ContactForm({
             error={errors.city}
             grayWhenEmpty
           />
-          <TextFieldWithError
+          <ValidatedTextField
             label="PSČ"
             name="postal_code"
             value={formData.postal_code ?? ""}
@@ -488,7 +488,7 @@ function ContactForm({
 
       <FormSection title="Kontaktní údaje">
         <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-          <TextFieldWithError
+          <ValidatedTextField
             label="Telefon"
             name="phone"
             value={formData.phone ?? ""}
@@ -496,7 +496,7 @@ function ContactForm({
             onBlur={() => handleBlur("phone")}
             error={errors.phone}
           />
-          <TextFieldWithError
+          <ValidatedTextField
             label="E-mail"
             name="email"
             type="email"
@@ -507,7 +507,7 @@ function ContactForm({
           />
         </Box>
         <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-          <TextFieldWithError
+          <ValidatedTextField
             label="Kontaktní osoba"
             name="representative_name"
             value={formData.representative_name ?? ""}
@@ -516,7 +516,7 @@ function ContactForm({
             error={errors.representative_name}
             fullWidth
           />
-          <TextFieldWithError
+          <ValidatedTextField
             label="Webové stránky"
             name="website"
             value={formData.website ?? ""}
@@ -530,7 +530,7 @@ function ContactForm({
 
       <FormSection title="Finanční údaje">
         <Box sx={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 2 }}>
-          <TextFieldWithError
+          <ValidatedTextField
             label="Číslo účtu"
             type="number"
             name="accountNumber"
@@ -541,7 +541,7 @@ function ContactForm({
             placeholder="123456789"
             fullWidth
           />
-          <TextFieldWithError
+          <ValidatedTextField
             type="number"
             label="Kód banky"
             name="bankCode"

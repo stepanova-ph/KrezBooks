@@ -7,7 +7,7 @@ import { FormTextField } from "../common/FormTextField";
 import { NumberTextField } from "../common/NumberTextField";
 import { VatPriceField } from "../common/VatPriceField";
 import { FormSection } from "../common/FormSection";
-import TextFieldWithError from "../common/TextFieldWithError";
+import ValidatedTextField from "../common/ValidatedTextField";
 
 interface ItemFormProps {
   open: boolean;
@@ -142,7 +142,7 @@ function ItemForm({
       submitLabel={submitLabel}
     >
       <FormSection title="Základní informace">
-        <TextFieldWithError
+        <ValidatedTextField
           label="Název položky"
           name="name"
           value={formData.name}
@@ -210,7 +210,7 @@ function ItemForm({
             ))}
           </FormTextField>
         </Box>
-        <TextFieldWithError
+        <ValidatedTextField
           label="Poznámka"
           name="note"
           value={formData.note}

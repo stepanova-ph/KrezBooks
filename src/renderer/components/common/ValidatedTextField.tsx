@@ -2,7 +2,7 @@ import { InputAdornment, Tooltip } from "@mui/material";
 import { FormTextField } from "./FormTextField";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
-const TextFieldWithError = ({ error, showToolTip = true, ...props }: any) => {
+const ValidatedTextField = ({ error, showToolTip = true, ...props }: any) => {
   const hasError = !!error;
 
   return (
@@ -33,4 +33,4 @@ const TextFieldWithError = ({ error, showToolTip = true, ...props }: any) => {
   );
 };
 
-export default TextFieldWithError;
+export default ValidatedTextField;
