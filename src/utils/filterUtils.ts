@@ -1,0 +1,111 @@
+/**
+ * Filter-specific validation utilities
+ * Wrappers around core validators that return validation objects
+ */
+
+import { validateICO, validateDIC } from './validationUtils';
+
+/**
+ * Validation result object for filter inputs
+ */
+export interface FilterValidationResult {
+  valid: boolean;
+  error?: string;
+}
+
+/**
+ * Validate ICO for filter input
+ * Empty values are considered valid (no filter applied)
+ */
+export function validateFilterICO(ico: string): FilterValidationResult {
+  if (!ico || ico.trim() === '') {
+    return { valid: true }; // Empty = no filter
+  }
+
+  // Must be 8 digits
+  if (ico.length > 8) {
+    return { valid: false, error: 'IČO musí mít 8 číslic' };
+  }
+
+
+  return { valid: true };
+}
+
+/**
+ * Validate DIČ for filter input
+ * Empty values are considered valid (no filter applied)
+ */
+export function validateFilterDIC(
+  prefix: string | null,
+  value: string
+): FilterValidationResult {
+  // Empty is valid (no filter applied)
+  if (!prefix || !value || value.trim() === '') {
+    return { valid: true };
+  }
+
+  // For CZ and SK, validate digit count
+  if (prefix === 'CZ' || prefix === 'SK') {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length < 8 || digits.length > 10) {
+      return {
+        valid: false,
+        error: 'DIČ musí obsahovat 8–10 číslic',
+      };
+    }
+  }
+
+  // For "vlastní" (custom), allow any format
+  // Users might filter by partial/foreign DICs
+
+  return { valid: true };
+}
+
+/**
+ * Check if ICO input should be used for filtering
+ * Allows partial matching for autocomplete (min 3 digits)
+ */
+export function shouldFilterByICO(ico: string): boolean {
+  if (!ico || ico.trim() === '') return false;
+
+  // Allow partial ICO in autocomplete mode (at least 3 digits)
+  if (ico.length >= 3 && /^[0-9]+$/.test(ico)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Check if DIČ input should be used for filtering
+ * Allows partial matching for autocomplete (min 3 characters)
+ */
+export function shouldFilterByDIC(prefix: string | null, value: string): boolean {
+  if (!prefix || !value || value.trim() === '') return false;
+
+  // Allow partial DIČ in autocomplete mode (at least 3 characters)
+  if (value.length >= 3) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Normalize filter string value
+ * Trims whitespace and returns undefined for empty strings
+ */
+export function normalizeFilterString(value: string): string | undefined {
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
+}
+
+/**
+ * Check if filter value is empty
+ */
+export function isFilterEmpty(value: any): boolean {
+  if (value === null || value === undefined) return true;
+  if (typeof value === 'string') return value.trim() === '';
+  if (Array.isArray(value)) return value.length === 0;
+  return false;
+}
