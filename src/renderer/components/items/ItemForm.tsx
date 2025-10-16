@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Box, MenuItem } from "@mui/material";
 import type { CreateItemInput, Item, VatRate } from "../../../types/database";
-import { itemSchema, unitOptions } from "../../../validation/itemSchema";
+import { itemSchema } from "../../../validation/itemSchema";
 import { FormDialog } from "../common/FormDialog";
 import { FormTextField } from "../common/FormTextField";
 import { NumberTextField } from "../common/NumberTextField";
 import { VatPriceField } from "../common/VatPriceField";
 import { FormSection } from "../common/FormSection";
 import ValidatedTextField from "../common/ValidatedTextField";
+import { UNIT_OPTIONS } from "../../../config/constants";
 
 interface ItemFormProps {
   open: boolean;
@@ -186,7 +187,7 @@ function ItemForm({
             <MenuItem value="">
               <em>Vyberte jednotku</em>
             </MenuItem>
-            {unitOptions.map((u) => (
+            {UNIT_OPTIONS.map((u) => (
               <MenuItem key={u} value={u}>
                 {u}
               </MenuItem>

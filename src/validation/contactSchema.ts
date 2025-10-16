@@ -9,29 +9,29 @@ import {
   validatePSC,
   validateWebsite,
 } from "../utils/validationUtils";
+import { validationMessages } from "../config/validationMessages";
 import { z } from "zod";
 
-// At the top of your schema file, add this helper
+// Helper for optional string fields
 const optionalString = z.preprocess(
   (val) => (val === "" || val === null ? undefined : val),
   z.string().optional(),
 );
 
-// Then use it like this:
 export const contactSchema = z
   .object({
     ico: z
       .string()
-      .min(8, "IČO musí mít 8 číslic.")
-      .max(8, "IČO musí mít 8 číslic.")
+      .min(8, validationMessages.ico.length)
+      .max(8, validationMessages.ico.length)
       .refine(
         (val) => validateICO(val),
-        "IČO není platné (kontrolní součet nesouhlasí).",
+        validationMessages.ico.invalid,
       ),
 
     dic: optionalString.refine(
       (val) => validateDIC(val!, ""),
-      "DIČ musí začínat kódem země a obsahovat 8–10 číslic.",
+      validationMessages.dic.invalid,
     ),
 
     modifier: z.preprocess(
@@ -39,68 +39,68 @@ export const contactSchema = z
       z
         .number()
         .int()
-        .min(1, "Modifikátor musí být mezi 1 a 100.")
-        .max(100, "Modifikátor musí být mezi 1 a 100."),
+        .min(1, validationMessages.modifier.range)
+        .max(100, validationMessages.modifier.range),
     ),
 
-    company_name: z.string().min(1, "Název firmy je povinný."),
+    company_name: z.string().min(1, validationMessages.companyName.required),
 
     representative_name: optionalString
       .refine(
         (val) => !val || val.length >= 4,
-        "Jméno zástupce musí mít alespoň 4 znaky.",
+        validationMessages.representativeName.minLength,
       )
       .refine(
         (val) => !val || /^[\p{L}\s\-']*$/u.test(val),
-        "Jméno zástupce neplatné.",
+        validationMessages.representativeName.invalid,
       )
       .refine(
         (val) => !val || val.length <= 150,
-        "Jméno zástupce je příliš dlouhé.",
+        validationMessages.representativeName.maxLength,
       ),
 
     street: optionalString.refine(
       (val) => !val || val.length >= 3,
-      "Ulice musí mít alespoň 3 znaky.",
+      validationMessages.street.minLength,
     ),
 
     city: optionalString
       .refine(
         (val) => !val || val.length >= 2,
-        "Město musí mít alespoň 2 znaky.",
+        validationMessages.city.minLength,
       )
       .refine(
         (val) => !val || /^[\p{L}\s\-]*$/u.test(val),
-        "Město nemá správný tvar.",
+        validationMessages.city.invalid,
       ),
 
     postal_code: optionalString
       .refine(
         (val) => !val || validatePSC(val),
-        "PSČ musí mít tvar 12345 nebo 123 45.",
+        validationMessages.postalCode.invalid,
       )
       .transform((val) => (val ? normalizePSC(val) : val)),
 
     phone: optionalString.refine(
       (val) => !val || validatePhone(val),
-      "Telefon musí být platné české číslo.",
+      validationMessages.phone.invalid,
     ),
 
     email: optionalString.refine(
       (val) => !val || validateEmail(val),
-      "E-mail nemá platný formát.",
+      validationMessages.email.invalid,
     ),
 
     website: optionalString
       .refine(
         (val) => !val || validateWebsite(val),
-        "Webová adresa nemá platný formát (použijte např. www.example.cz nebo https://www.example.cz).",
+        validationMessages.website.invalid,
       )
       .transform((val) => (val ? normalizeWebsite(val) : val)),
 
     bank_account: optionalString.refine(
       (val) => !val || validateBankAccount(val),
-      "Číslo účtu nemá platný formát.",
+      validationMessages.bankAccount.invalid,
     ),
 
     is_supplier: z.boolean(),
@@ -111,8 +111,8 @@ export const contactSchema = z
       z
         .number()
         .int()
-        .min(1, "Cenová skupina musí být mezi 1 a 4.")
-        .max(4, "Cenová skupina musí být mezi 1 a 4."),
+        .min(1, validationMessages.priceGroup.range)
+        .max(4, validationMessages.priceGroup.range),
     ),
   })
   .superRefine((data, ctx) => {
@@ -120,19 +120,19 @@ export const contactSchema = z
       ctx.addIssue({
         path: ["dic"],
         code: z.ZodIssueCode.custom,
-        message: "DIČ musí začínat 'CZ' a obsahovat 8–10 číslic.",
+        message: validationMessages.dic.invalid,
       });
     }
     if (!data.is_customer && !data.is_supplier) {
       ctx.addIssue({
         path: ["is_customer"],
         code: z.ZodIssueCode.custom,
-        message: "Musíte vybrat alespoň Odběratele nebo Dodavatele.",
+        message: validationMessages.contactType.required,
       });
       ctx.addIssue({
         path: ["is_supplier"],
         code: z.ZodIssueCode.custom,
-        message: "Musíte vybrat alespoň Odběratele nebo Dodavatele.",
+        message: validationMessages.contactType.required,
       });
     }
   });
