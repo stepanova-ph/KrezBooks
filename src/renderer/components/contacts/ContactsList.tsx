@@ -34,7 +34,6 @@ export const contactColumns: Column[] = [
   { id: "phone", label: "Telefon", minWidth: 135 },
   { id: "email", label: "E-mail", minWidth: 180 },
   { id: "website", label: "Web", minWidth: 150 },
-  { id: "type", label: "Typ", minWidth: 85 },
   {
     id: "price_group",
     label: "Cenová skupina",
