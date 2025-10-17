@@ -9,9 +9,13 @@ import { AppPage } from "./components/layout/AppBar";
 import ContactsTab from "./components/tabs/ContactsTab";
 import InventoryTab from "./components/tabs/InventoryTab";
 import HomeTab from "./components/tabs/HomeTab";
+import { useGlobalShortcuts } from "../hooks/keyboard/useGlobalShortcuts";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<AppPage>("domu");
+
+  // enable f1-f5 keyboard shortcuts for tab navigation
+  useGlobalShortcuts(setCurrentPage);
 
   const renderPage = () => {
     switch (currentPage) {

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Box, Typography } from "@mui/material";
-import { FilterBar } from "../common/FilterBar";
+import { FilterBar, FilterBarRef } from "../common/FilterBar";
 import { useTableFilters } from "../../../hooks/useTableFilters";
 import {
   itemFilterConfig,
@@ -14,6 +14,7 @@ import { useItems } from "../../../hooks/useItems";
 import ItemsList, { itemColumns } from "../items/ItemsList";
 import CreateItemForm from "../items/CreateItemForm";
 import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
+import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
 
 function InventoryTab() {
   const { data: items = [], isLoading } = useItems();
@@ -29,6 +30,14 @@ function InventoryTab() {
     setColumnOrder 
   } = useColumnVisibility(defaultVisibleColumnsItem);
 
+  const filterBarRef = useRef<FilterBarRef>(null);
+
+  // enable auto-focus on search when typing
+  useAutoSearchFocus({
+    searchInputRef: filterBarRef.current?.searchInputRef || { current: null },
+    disabled: false,
+  });
+
   const filteredItems = useTableFilters(items, filters);
 
   if (isLoading) {
@@ -38,6 +47,7 @@ function InventoryTab() {
   return (
     <Box sx={{ p: 3 }}>
       <FilterBar
+        ref={filterBarRef}
         config={itemFilterConfig}
         filters={filters}
         onFiltersChange={setFilters}

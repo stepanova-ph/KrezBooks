@@ -44,6 +44,7 @@ import {
 } from "@dnd-kit/modifiers";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import DraggableHeaderCell from "./DraggableHeaderCell";
+import { useTableNavigation } from "../../../hooks/keyboard/useTableNavigation";
 
 export interface Column {
   id: string;
@@ -98,6 +99,12 @@ export function DataTable<T>({
         .map((id) => visibleColumns.find((col) => col.id === id))
         .filter((col): col is Column => col !== undefined)
     : visibleColumns;
+
+  // keyboard navigation for table rows
+  const { focusedRowIndex, setRowRef } = useTableNavigation({
+    disabled: data.length === 0,
+    dataLength: data.length,
+  });
 
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{
@@ -270,18 +277,25 @@ export function DataTable<T>({
                   </TableCell>
                 </TableRow>
               ) : (
-                data.map((item) => (
+                data.map((item, index) => (
                   <TableRow
                     key={getRowKey(item)}
+                    ref={setRowRef(index)}
                     onContextMenu={(e) => handleContextMenu(e, item)}
                     sx={{
                       cursor:
                         contextMenuActions.length > 0
                           ? "context-menu"
                           : "default",
+                      backgroundColor: (theme) =>
+                        index === focusedRowIndex
+                          ? `${theme.palette.primary.main}25`
+                          : "transparent",
                       "&:hover": {
                         backgroundColor: (theme) =>
-                          `${theme.palette.primary.main}15`,
+                          index === focusedRowIndex
+                            ? `${theme.palette.primary.main}35`
+                            : `${theme.palette.primary.main}15`,
                       },
                     }}
                   >

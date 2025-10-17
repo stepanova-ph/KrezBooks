@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Box, Typography } from "@mui/material";
-import { FilterBar } from "../common/FilterBar";
+import { FilterBar, FilterBarRef } from "../common/FilterBar";
 import { useTableFilters } from "../../../hooks/useTableFilters";
 import {
   contactFilterConfig,
@@ -13,6 +13,7 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useContacts } from "../../../hooks/useContacts";
 import CreateContactForm from "../contacts/CreateContactForm";
 import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
+import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
 
 function ContactTab() {
   const { data: contacts = [], isLoading } = useContacts();
@@ -28,6 +29,14 @@ function ContactTab() {
     setColumnOrder 
   } = useColumnVisibility(defaultVisibleColumnsContact);
 
+  const filterBarRef = useRef<FilterBarRef>(null);
+
+  // enable auto-focus on search when typing
+  useAutoSearchFocus({
+    searchInputRef: filterBarRef.current?.searchInputRef || { current: null },
+    disabled: false,
+  });
+
   const filteredContacts = useTableFilters(contacts, filters);
 
   if (isLoading) {
@@ -37,6 +46,7 @@ function ContactTab() {
   return (
     <Box sx={{ p: 3 }}>
       <FilterBar
+        ref={filterBarRef}
         config={contactFilterConfig}
         filters={filters}
         onFiltersChange={setFilters}
