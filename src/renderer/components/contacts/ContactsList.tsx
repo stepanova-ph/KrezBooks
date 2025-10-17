@@ -34,7 +34,7 @@ export const contactColumns: Column[] = [
   { id: "phone", label: "Telefon", minWidth: 135 },
   { id: "email", label: "E-mail", minWidth: 180 },
   { id: "website", label: "Web", minWidth: 150 },
-  { id: "type", label: "Typ", minWidth: 85 },
+  { id: "type", label: "Typ", minWidth: 53, maxWidth: 106, align: "center" as const   },
   {
     id: "price_group",
     label: "Cenová skupina",
@@ -143,9 +143,6 @@ function ContactsList({
       case "website":
         return contact.website ? (
           <Link
-            href={contact.website}
-            target="_blank"
-            rel="noopener noreferrer"
             sx={{
               textDecoration: "none",
               fontSize: "0.875rem",
