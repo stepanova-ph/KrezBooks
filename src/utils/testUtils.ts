@@ -366,15 +366,18 @@ export const testContacts = [
     price_group: 1,
   },
 ];
-
 /**
- * Test items - Water pumps and related equipment
+ * Test items - Water pumps and related equipment (fixed)
+ * Changes:
+ * - replaced `sales_group` with `category`
+ * - added `ean` (string) for each item
  */
 export const testItems = [
   // Ponorná čerpadla (Submersible pumps)
   {
+    ean: "8590000000001",
     name: 'Ponorné čerpadlo 4" 0,5 HP',
-    sales_group: "1",
+    category: "Ponorná čerpadla",
     note: "Určeno pro domácí studny, max. hloubka 40m",
     vat_rate: 2,
     avg_purchase_price: 2800,
@@ -386,8 +389,9 @@ export const testItems = [
     sale_price_group4: 3500,
   },
   {
+    ean: "8590000000002",
     name: 'Ponorné čerpadlo 4" 0,75 HP',
-    sales_group: "1",
+    category: "Ponorná čerpadla",
     note: "Pro hlubší studny až 60m, vyšší výkon",
     vat_rate: 2,
     avg_purchase_price: 3500,
@@ -399,8 +403,9 @@ export const testItems = [
     sale_price_group4: 4500,
   },
   {
+    ean: "8590000000003",
     name: 'Ponorné čerpadlo 4" 1 HP nerez',
-    sales_group: "1",
+    category: "Ponorná čerpadla",
     note: "Nerezové provedení, odolné proti korozi",
     vat_rate: 2,
     avg_purchase_price: 4800,
@@ -412,8 +417,9 @@ export const testItems = [
     sale_price_group4: 6200,
   },
   {
+    ean: "8590000000004",
     name: 'Ponorné čerpadlo 6" 1,5 HP',
-    sales_group: "1",
+    category: "Ponorná čerpadla",
     note: "Pro vrty s větším průměrem, vysoký výkon",
     vat_rate: 2,
     avg_purchase_price: 6200,
@@ -425,8 +431,9 @@ export const testItems = [
     sale_price_group4: 8000,
   },
   {
+    ean: "8590000000005",
     name: 'Ponorné čerpadlo 6" 2 HP průmyslové',
-    sales_group: "1",
+    category: "Ponorná čerpadla",
     note: "Průmyslové provedení pro náročné podmínky",
     vat_rate: 2,
     avg_purchase_price: 8500,
@@ -440,8 +447,9 @@ export const testItems = [
 
   // Kalová čerpadla (Sewage pumps)
   {
+    ean: "8590000000006",
     name: "Kalové čerpadlo 400W plastové",
-    sales_group: "1",
+    category: "Kalová čerpadla",
     note: "Pro čerpání znečištěné vody, průchod 35mm",
     vat_rate: 2,
     avg_purchase_price: 1800,
@@ -453,8 +461,9 @@ export const testItems = [
     sale_price_group4: 2300,
   },
   {
+    ean: "8590000000007",
     name: "Kalové čerpadlo 750W s řezacím zařízením",
-    sales_group: "1",
+    category: "Kalová čerpadla",
     note: "Se sekacím zařízením, průchod 50mm",
     vat_rate: 2,
     avg_purchase_price: 3200,
@@ -466,8 +475,9 @@ export const testItems = [
     sale_price_group4: 4100,
   },
   {
+    ean: "8590000000008",
     name: "Kalové čerpadlo 1100W nerez",
-    sales_group: "1",
+    category: "Kalová čerpadla",
     note: "Nerezové provedení, pro agresivní prostředí",
     vat_rate: 2,
     avg_purchase_price: 4500,
@@ -479,8 +489,9 @@ export const testItems = [
     sale_price_group4: 5700,
   },
   {
+    ean: "8590000000009",
     name: "Kalové čerpadlo 1500W průmyslové",
-    sales_group: "1",
+    category: "Kalová čerpadla",
     note: "Těžký průmysl, čerpání směsí s pevnými částicemi",
     vat_rate: 2,
     avg_purchase_price: 6800,
@@ -492,8 +503,9 @@ export const testItems = [
     sale_price_group4: 8800,
   },
   {
-    name: "Kalové čerpadlo 2200W s plovákový spínačem",
-    sales_group: "1",
+    ean: "8590000000010",
+    name: "Kalové čerpadlo 2200W s plovákovým spínačem",
+    category: "Kalová čerpadla",
     note: "Automatický provoz, průchod 80mm",
     vat_rate: 2,
     avg_purchase_price: 8200,
@@ -507,8 +519,9 @@ export const testItems = [
 
   // Zahradní čerpadla (Garden pumps)
   {
+    ean: "8590000000011",
     name: "Zahradní čerpadlo 600W samosací",
-    sales_group: "2",
+    category: "Zahradní čerpadla",
     note: "Pro závlahu zahrad, výkon 3000 l/hod",
     vat_rate: 2,
     avg_purchase_price: 1500,
@@ -520,8 +533,9 @@ export const testItems = [
     sale_price_group4: 1900,
   },
   {
+    ean: "8590000000012",
     name: "Zahradní čerpadlo 800W nerez hlava",
-    sales_group: "2",
+    category: "Zahradní čerpadla",
     note: "Vyšší tlak, vhodné pro postřik",
     vat_rate: 2,
     avg_purchase_price: 2200,
@@ -533,8 +547,9 @@ export const testItems = [
     sale_price_group4: 2800,
   },
   {
+    ean: "8590000000013",
     name: "Zahradní čerpadlo 1000W s automatem",
-    sales_group: "2",
+    category: "Zahradní čerpadla",
     note: "S elektronickým tlakovým spínačem",
     vat_rate: 2,
     avg_purchase_price: 2800,
@@ -546,8 +561,9 @@ export const testItems = [
     sale_price_group4: 3600,
   },
   {
+    ean: "8590000000014",
     name: "Zahradní čerpadlo 1200W zahradní automat",
-    sales_group: "2",
+    category: "Zahradní čerpadla",
     note: "Kompletní zahradní vodárna s 24l nádobou",
     vat_rate: 2,
     avg_purchase_price: 3500,
@@ -559,8 +575,9 @@ export const testItems = [
     sale_price_group4: 4500,
   },
   {
+    ean: "8590000000015",
     name: "Zahradní čerpadlo 1500W s filtrem",
-    sales_group: "2",
+    category: "Zahradní čerpadla",
     note: "Pro čerpání vody z nádrží a rybníků",
     vat_rate: 2,
     avg_purchase_price: 4200,
@@ -574,8 +591,9 @@ export const testItems = [
 
   // Tlaková čerpadla (Pressure pumps)
   {
+    ean: "8590000000016",
     name: "Tlakové čerpadlo 600W domácí vodárna",
-    sales_group: "2",
+    category: "Tlaková čerpadla",
     note: "Pro rodinné domy, se 24l tlakovou nádobou",
     vat_rate: 2,
     avg_purchase_price: 2500,
@@ -587,8 +605,9 @@ export const testItems = [
     sale_price_group4: 3200,
   },
   {
+    ean: "8590000000017",
     name: "Tlakové čerpadlo 800W s 50l nádobou",
-    sales_group: "2",
+    category: "Tlaková čerpadla",
     note: "Větší zásobní objem, tišší provoz",
     vat_rate: 2,
     avg_purchase_price: 3800,
@@ -600,8 +619,9 @@ export const testItems = [
     sale_price_group4: 4850,
   },
   {
+    ean: "8590000000018",
     name: "Tlakové čerpadlo 1000W s 80l nádobou",
-    sales_group: "2",
+    category: "Tlaková čerpadla",
     note: "Pro větší odběry, elektronické řízení",
     vat_rate: 2,
     avg_purchase_price: 5200,
@@ -613,8 +633,9 @@ export const testItems = [
     sale_price_group4: 6700,
   },
   {
+    ean: "8590000000019",
     name: "Tlakové čerpadlo 1200W se 100l nádobou",
-    sales_group: "2",
+    category: "Tlaková čerpadla",
     note: "Pro větší objekty, hotel, penzion",
     vat_rate: 2,
     avg_purchase_price: 6500,
@@ -626,8 +647,9 @@ export const testItems = [
     sale_price_group4: 8400,
   },
   {
+    ean: "8590000000020",
     name: "Tlakové čerpadlo 1500W frekvenční měnič",
-    sales_group: "2",
+    category: "Tlaková čerpadla",
     note: "S plynulou regulací výkonu, úspora energie",
     vat_rate: 2,
     avg_purchase_price: 8500,
@@ -641,8 +663,9 @@ export const testItems = [
 
   // Cirkulační čerpadla (Circulation pumps)
   {
+    ean: "8590000000021",
     name: "Cirkulační čerpadlo 25-40 180mm",
-    sales_group: "3",
+    category: "Cirkulační čerpadla",
     note: "Pro rodinné domy, topení a TUV",
     vat_rate: 2,
     avg_purchase_price: 1200,
@@ -654,8 +677,9 @@ export const testItems = [
     sale_price_group4: 1500,
   },
   {
+    ean: "8590000000022",
     name: "Cirkulační čerpadlo 25-60 180mm třístupňové",
-    sales_group: "3",
+    category: "Cirkulační čerpadla",
     note: "Větší výkon, 3 rychlosti",
     vat_rate: 2,
     avg_purchase_price: 1800,
@@ -667,8 +691,9 @@ export const testItems = [
     sale_price_group4: 2300,
   },
   {
+    ean: "8590000000023",
     name: "Cirkulační čerpadlo 25-80 180mm vysokotlaké",
-    sales_group: "3",
+    category: "Cirkulační čerpadla",
     note: "Pro vyšší budovy, větší průtok",
     vat_rate: 2,
     avg_purchase_price: 2500,
@@ -680,8 +705,9 @@ export const testItems = [
     sale_price_group4: 3200,
   },
   {
+    ean: "8590000000024",
     name: "Cirkulační čerpadlo 32-60 250mm",
-    sales_group: "3",
+    category: "Cirkulační čerpadla",
     note: "Pro průmyslové aplikace, větší průměr",
     vat_rate: 2,
     avg_purchase_price: 3200,
@@ -693,8 +719,9 @@ export const testItems = [
     sale_price_group4: 4100,
   },
   {
+    ean: "8590000000025",
     name: "Cirkulační čerpadlo EEI ≤0,23 elektronické",
-    sales_group: "3",
+    category: "Cirkulační čerpadla",
     note: "Energeticky úsporné, s elektronickou regulací",
     vat_rate: 2,
     avg_purchase_price: 4500,
@@ -708,8 +735,9 @@ export const testItems = [
 
   // Příslušenství (Accessories)
   {
+    ean: "8590000000026",
     name: 'Hadice PVC 1" průhledná',
-    sales_group: "4",
+    category: "Příslušenství - hadice",
     note: "Pro čerpání čisté vody",
     vat_rate: 2,
     avg_purchase_price: 35,
@@ -721,8 +749,9 @@ export const testItems = [
     sale_price_group4: 48,
   },
   {
+    ean: "8590000000027",
     name: 'Hadice PVC 1,5" spirálová',
-    sales_group: "4",
+    category: "Příslušenství - hadice",
     note: "Armovaná, odolná proti podtlaku",
     vat_rate: 2,
     avg_purchase_price: 55,
@@ -734,8 +763,9 @@ export const testItems = [
     sale_price_group4: 74,
   },
   {
+    ean: "8590000000028",
     name: 'Hadice PVC 2" plochá',
-    sales_group: "4",
+    category: "Příslušenství - hadice",
     note: "Pro kalová čerpadla",
     vat_rate: 2,
     avg_purchase_price: 42,
@@ -747,8 +777,9 @@ export const testItems = [
     sale_price_group4: 56,
   },
   {
+    ean: "8590000000029",
     name: 'Zpětná klapka 1" mosazná',
-    sales_group: "4",
+    category: "Příslušenství - armatura",
     note: "Zabraňuje zpětnému toku",
     vat_rate: 2,
     avg_purchase_price: 150,
@@ -760,8 +791,9 @@ export const testItems = [
     sale_price_group4: 205,
   },
   {
+    ean: "8590000000030",
     name: 'Zpětná klapka 1,5" nerezová',
-    sales_group: "4",
+    category: "Příslušenství - armatura",
     note: "Pro agresivní prostředí",
     vat_rate: 2,
     avg_purchase_price: 280,
@@ -773,8 +805,9 @@ export const testItems = [
     sale_price_group4: 375,
   },
   {
+    ean: "8590000000031",
     name: 'Filtr na vodu 10" s patronou',
-    sales_group: "4",
+    category: "Příslušenství - filtrace",
     note: "Pro mechanické filtrace, 5 mikronů",
     vat_rate: 2,
     avg_purchase_price: 320,
@@ -786,8 +819,9 @@ export const testItems = [
     sale_price_group4: 435,
   },
   {
+    ean: "8590000000032",
     name: 'Náhradní patrona do filtru 10"',
-    sales_group: "4",
+    category: "Příslušenství - filtrace",
     note: "Výměnná vložka, 5 mikronů",
     vat_rate: 2,
     avg_purchase_price: 45,
@@ -799,8 +833,9 @@ export const testItems = [
     sale_price_group4: 62,
   },
   {
+    ean: "8590000000033",
     name: "Plovákový spínač 3m kabel",
-    sales_group: "4",
+    category: "Příslušenství - spínače",
     note: "Pro automatické spínání čerpadel",
     vat_rate: 2,
     avg_purchase_price: 180,
@@ -812,8 +847,9 @@ export const testItems = [
     sale_price_group4: 245,
   },
   {
+    ean: "8590000000034",
     name: "Plovákový spínač 10m kabel",
-    sales_group: "4",
+    category: "Příslušenství - spínače",
     note: "Pro hlubší nádrže a studny",
     vat_rate: 2,
     avg_purchase_price: 280,
@@ -825,8 +861,9 @@ export const testItems = [
     sale_price_group4: 375,
   },
   {
+    ean: "8590000000035",
     name: "Tlakový spínač PM/5 230V",
-    sales_group: "4",
+    category: "Příslušenství - spínače",
     note: "Pro automatické řízení vodáren",
     vat_rate: 2,
     avg_purchase_price: 220,
@@ -838,8 +875,9 @@ export const testItems = [
     sale_price_group4: 300,
   },
   {
+    ean: "8590000000036",
     name: "Elektronický tlakový spínač",
-    sales_group: "4",
+    category: "Příslušenství - elektronika",
     note: "Ochrana proti běhu nasucho",
     vat_rate: 2,
     avg_purchase_price: 650,
@@ -851,8 +889,9 @@ export const testItems = [
     sale_price_group4: 875,
   },
   {
+    ean: "8590000000037",
     name: "Tlaková nádoba 24l horizontální",
-    sales_group: "4",
+    category: "Příslušenství - nádoby",
     note: "Pro domácí vodárny",
     vat_rate: 2,
     avg_purchase_price: 420,
@@ -864,8 +903,9 @@ export const testItems = [
     sale_price_group4: 565,
   },
   {
+    ean: "8590000000038",
     name: "Tlaková nádoba 50l vertikální",
-    sales_group: "4",
+    category: "Příslušenství - nádoby",
     note: "Větší objem, šetří místo",
     vat_rate: 2,
     avg_purchase_price: 780,
@@ -877,8 +917,9 @@ export const testItems = [
     sale_price_group4: 1055,
   },
   {
+    ean: "8590000000039",
     name: "Tlaková nádoba 100l horizontální",
-    sales_group: "4",
+    category: "Příslušenství - nádoby",
     note: "Pro větší systémy",
     vat_rate: 2,
     avg_purchase_price: 1450,
@@ -890,8 +931,9 @@ export const testItems = [
     sale_price_group4: 1960,
   },
   {
+    ean: "8590000000040",
     name: 'Manometr 0-6 bar 1/4"',
-    sales_group: "4",
+    category: "Příslušenství - měřidla",
     note: "Pro kontrolu tlaku v systému",
     vat_rate: 2,
     avg_purchase_price: 65,
@@ -903,8 +945,9 @@ export const testItems = [
     sale_price_group4: 90,
   },
   {
+    ean: "8590000000041",
     name: 'Pojistný ventil 6 bar 1/2"',
-    sales_group: "4",
+    category: "Příslušenství - armatura",
     note: "Ochrana proti přetlaku",
     vat_rate: 2,
     avg_purchase_price: 120,

@@ -19,12 +19,12 @@ interface ItemsListProps {
 }
 
 export const itemColumns: Column[] = [
-  { id: "id", label: "ID", minWidth: 35, align: "center" as const },
+  { id: "ean", label: "EAN", minWidth: 100, align: "center" as const },
   { id: "name", label: "Název", minWidth: 200 },
   {
-    id: "sales_group",
-    label: "Skupina",
-    minWidth: 15,
+    id: "category",
+    label: "Kategorie",
+    minWidth: 100,
     align: "center" as const,
   },
   { id: "unit", label: "Jednotka", minWidth: 0, align: "center" as const },
@@ -68,7 +68,7 @@ function ItemsList({
 
   const handleDelete = async (item: Item) => {
     try {
-      await deleteItem.mutateAsync(item.id);
+      await deleteItem.mutateAsync(item.ean);
     } catch (error) {
       console.error("Chyba při mazání položky:", error);
       alert("Chyba: " + (error as Error).message);
@@ -96,8 +96,8 @@ function ItemsList({
 
   const getCellContent = (item: Item, columnId: string) => {
     switch (columnId) {
-      case "id":
-        return item.id;
+      case "ean":
+        return item.ean;
 
       case "name":
         return (
@@ -120,8 +120,8 @@ function ItemsList({
           </Box>
         );
 
-      case "sales_group":
-        return item.sales_group ? String(item.sales_group) : "-";
+      case "category":
+        return item.category ? String(item.category) : "-";
 
       case "unit":
         return item.unit_of_measure;
@@ -143,8 +143,8 @@ function ItemsList({
 
       case "sale_price_group4":
         return formatPrice(item.sale_price_group4);
-
       default:
+        console.log(columnId)
         return "-";
     }
   };
@@ -155,28 +155,27 @@ function ItemsList({
         columns={itemColumns}
         data={items}
         emptyMessage='Žádné položky. Klikněte na "Přidat položku" pro vytvoření nové.'
+        getRowKey={(item) => item.ean}
+        getCellContent={getCellContent}
         contextMenuActions={contextMenuActions}
-        getRowKey={(item) => String(item.id)}
         visibleColumnIds={visibleColumnIds}
         columnOrder={columnOrder}
         onColumnOrderChange={onColumnOrderChange}
         renderRow={(item, visibleColumns) => (
           <>
-            {visibleColumns
-              .filter((x) => !x.hidden)
-              .map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{
-                    maxWidth: column.maxWidth,
-                    minWidth: column.minWidth,
-                    width: column.width,
-                  }}
-                >
-                  {getCellContent(item, column.id)}
-                </TableCell>
-              ))}
+            {visibleColumns.filter((col) => !col.hidden).map((column) => (
+              <TableCell
+                key={column.id}
+                align={column.align}
+                style={{
+                  maxWidth: column.maxWidth,
+                  minWidth: column.minWidth,
+                  width: column.width,
+                }}
+              >
+                {getCellContent(item, column.id)}
+              </TableCell>
+            ))}
           </>
         )}
       />

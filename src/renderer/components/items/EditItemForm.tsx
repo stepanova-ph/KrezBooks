@@ -14,7 +14,7 @@ function EditItemForm({ open, onClose, item }: EditItemFormProps) {
   const handleSubmit = async (data: CreateItemInput) => {
     try {
       await updateItem.mutateAsync({
-        id: item.id,
+        ean: item.ean,
         ...data,
       });
       onClose(); // Only close on success

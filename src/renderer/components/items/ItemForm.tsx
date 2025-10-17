@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import { Box, MenuItem } from "@mui/material";
+import { Box, MenuItem, Autocomplete } from "@mui/material";
 import type { CreateItemInput, Item, VatRate } from "../../../types/database";
-import { itemSchema, unitOptions } from "../../../validation/itemSchema";
+import { itemSchema } from "../../../validation/itemSchema";
 import { FormDialog } from "../common/FormDialog";
 import { FormTextField } from "../common/FormTextField";
 import { NumberTextField } from "../common/NumberTextField";
 import { VatPriceField } from "../common/VatPriceField";
 import { FormSection } from "../common/FormSection";
-import TextFieldWithError from "../common/TextFieldWithError";
+import ValidatedTextField from "../common/ValidatedTextField";
+import { useItems } from "../../../hooks/useItems";
+import { ValidatedAutocomplete } from "../common/ValidatedAutocomplete";
 
 interface ItemFormProps {
   open: boolean;
@@ -25,9 +27,13 @@ const VAT_RATES = {
   2: { percentage: 21, label: "21% (základní)" },
 } as const;
 
+// Common unit suggestions (not enforced)
+const COMMON_UNITS = ["ks", "kg", "l", "m", "m2", "m3", "t", "hod"];
+
 const defaultFormData: CreateItemInput = {
+  ean: "",
   name: "",
-  sales_group: "1",
+  category: "",
   note: "",
   vat_rate: 2 as VatRate,
   avg_purchase_price: 0,
@@ -51,6 +57,26 @@ function ItemForm({
     initialData ? { ...defaultFormData, ...initialData } : defaultFormData,
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Get all items to extract unique categories and units for autocomplete
+  const { data: allItems } = useItems();
+  
+  const existingCategories = React.useMemo(() => {
+    if (!allItems) return [];
+    const categories = allItems
+      .map(item => item.category)
+      .filter((cat): cat is string => !!cat && cat.trim() !== "");
+    return Array.from(new Set(categories)).sort();
+  }, [allItems]);
+
+  const existingUnits = React.useMemo(() => {
+    if (!allItems) return COMMON_UNITS;
+    const units = allItems
+      .map(item => item.unit_of_measure)
+      .filter((unit): unit is string => !!unit && unit.trim() !== "");
+    const uniqueUnits = Array.from(new Set([...COMMON_UNITS, ...units])).sort();
+    return uniqueUnits;
+  }, [allItems]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -142,7 +168,19 @@ function ItemForm({
       submitLabel={submitLabel}
     >
       <FormSection title="Základní informace">
-        <TextFieldWithError
+        <ValidatedTextField
+          label="EAN"
+          name="ean"
+          value={formData.ean}
+          onChange={handleChange}
+          onBlur={() => handleBlur("ean")}
+          error={errors.ean}
+          required
+          fullWidth
+          disabled={mode === "edit"}
+          inputProps={{ autoComplete: "off" }}
+        />
+        <ValidatedTextField
           label="Název položky"
           name="name"
           value={formData.name}
@@ -156,42 +194,43 @@ function ItemForm({
         <Box
           sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2 }}
         >
-          <FormTextField
-            label="Prodejní skupina"
-            name="sales_group"
-            select
-            value={formData.sales_group}
-            onChange={handleSelectChange}
-            error={!!errors.sales_group}
-            SelectProps={{ native: true }}
-            inputProps={{ autoComplete: "off" }}
-          >
-            <option value="1">Skupina 1</option>
-            <option value="2">Skupina 2</option>
-            <option value="3">Skupina 3</option>
-            <option value="4">Skupina 4</option>
-          </FormTextField>
-          <FormTextField
+        <ValidatedAutocomplete
+          freeSolo
+          options={existingCategories}
+          value={formData.category || ""}
+          onChange={(_, newValue) => {
+            setFormData((p) => ({ ...p, category: newValue || "" }));
+            if (errors.category) setErrors((p) => ({ ...p, category: "" }));
+          }}
+          onInputChange={(_, newInputValue) => {
+            setFormData((p) => ({ ...p, category: newInputValue }));
+            if (errors.category) setErrors((p) => ({ ...p, category: "" }));
+          }}
+          label="Kategorie"
+          name="category"
+          error={errors.category}
+          onBlur={() => handleBlur("category")}
+        />
+
+          <ValidatedAutocomplete
+            freeSolo
+            options={existingUnits}
+            value={formData.unit_of_measure || ""}
+            onChange={(_, newValue) => {
+              setFormData((p) => ({ ...p, unit_of_measure: newValue || "" }));
+              if (errors.unit_of_measure) setErrors((p) => ({ ...p, unit_of_measure: "" }));
+            }}
+            onInputChange={(_, newInputValue) => {
+              setFormData((p) => ({ ...p, unit_of_measure: newInputValue }));
+              if (errors.unit_of_measure) setErrors((p) => ({ ...p, unit_of_measure: "" }));
+            }}
             label="Měrná jednotka"
             name="unit_of_measure"
-            select
-            value={formData.unit_of_measure}
-            onChange={handleSelectChange}
+            error={errors.unit_of_measure}
             onBlur={() => handleBlur("unit_of_measure")}
-            error={!!errors.unit_of_measure}
-            SelectProps={{ native: false }}
-            inputProps={{ autoComplete: "off" }}
             required
-          >
-            <MenuItem value="">
-              <em>Vyberte jednotku</em>
-            </MenuItem>
-            {unitOptions.map((u) => (
-              <MenuItem key={u} value={u}>
-                {u}
-              </MenuItem>
-            ))}
-          </FormTextField>
+          />
+
           <FormTextField
             label="Sazba DPH"
             name="vat_rate"
@@ -210,7 +249,7 @@ function ItemForm({
             ))}
           </FormTextField>
         </Box>
-        <TextFieldWithError
+        <ValidatedTextField
           label="Poznámka"
           name="note"
           value={formData.note}

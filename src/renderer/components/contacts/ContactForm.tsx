@@ -9,6 +9,8 @@ import {
   FormControl,
   InputLabel,
   InputAdornment,
+  Grid,
+  Typography
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import LockIcon from "@mui/icons-material/Lock";
@@ -27,7 +29,9 @@ import {
   combineDIC,
 } from "../../../utils/formUtils";
 import { DIC_PREFIXES } from "../../../config/contactFilterConfig";
-import TextFieldWithError from "../common/TextFieldWithError";
+import ValidatedTextField from "../common/ValidatedTextField";
+import ContactTypeSelector from "./ContactsTypeSelector";
+import { ValidatedAutocomplete } from "../common/ValidatedAutocomplete";
 
 interface ContactFormProps {
   open: boolean;
@@ -41,7 +45,7 @@ interface ContactFormProps {
 const defaultFormData: CreateContactInput = {
   ico: "",
   dic: "",
-  modifier: 0,
+  modifier: 1,
   company_name: "",
   representative_name: "",
   street: "",
@@ -264,316 +268,325 @@ function ContactForm({
       isPending={isPending}
       submitLabel={submitLabel}
     >
-      <FormSection title="Základní údaje">
-        {/* ICO and Modifier on same row */}
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 100px", gap: 2 }}>
-          <TextFieldWithError
-            label="IČO"
-            name="ico"
-            value={formData.ico}
-            onChange={handleChange}
-            onBlur={() => handleBlur("ico")}
-            error={errors.ico}
-            grayWhenEmpty
-            required
-            disabled={mode === "edit" && !isUnlocked}
-            fullWidth
-          />
-          <TextFieldWithError
-            label="Modifikátor"
-            name="modifier"
-            type="number"
-            value={formData.modifier}
-            onChange={handleChange}
-            onBlur={() => handleBlur("modifier")}
-            error={errors.modifier}
-            grayWhenZero
-            inputProps={{ step: "1" }}
-            fullWidth
-          />
-        </Box>
+      <FormSection
+        title="Základní údaje"
+        spacing={mode === "edit" ? 1 : undefined}
+        actions={
+          mode === "edit" ? (
+            <>
+              <Tooltip
+                title={
+                  isUnlocked
+                    ? "Zamknout IČO a DIČ"
+                    : "Odemknout IČO a DIČ pro úpravu"
+                }
+              >
+                <IconButton
+                  size="small"
+                  onClick={() => setIsUnlocked(!isUnlocked)}
+                  color={isUnlocked ? "error" : "default"}
+                >
+                  {isUnlocked ? (
+                    <LockOpenIcon sx={{height: '16px', width: '16px'}} />
+                  ) : (
+                    <LockIcon sx={{height: '16px', width: '16px'}} />
+                  )}
+                </IconButton>
+              </Tooltip>
+              <Typography
+                sx={{ fontSize: "0.875rem", color: "text.secondary" }}
+              >
+                {isUnlocked
+                  ? "IČO a DIČ jsou odemčeny"
+                  : "Odemčení IČO a DIČ"}
+              </Typography>
+            </>
+          ) : null
+        }
+      >
+        {/* Row 1: ICO + Modifier + DIC prefix + DIC value (or custom DIČ) */}
+        <Grid container spacing={2} alignItems="center">
+          <Grid item md={4.8}mr = {-0.5}>
+            <ValidatedTextField
+              label="IČO"
+              name="ico"
+              value={formData.ico}
+              onChange={handleChange}
+              onBlur={() => handleBlur("ico")}
+              error={errors.ico}
+              grayWhenEmpty
+              required
+              disabled={mode === "edit" && !isUnlocked}
+              fullWidth
+            />
+          </Grid>
 
-        {/* DIC with country code selector */}
-        <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}>
+{/* 1.5 + 4.7 + 1.3 */}
+          <Grid item md={1.3}>
+            <ValidatedTextField
+              label="Mod"
+              name="modifier"
+              type="number"
+              value={formData.modifier}
+              onChange={handleChange}
+              onBlur={() => handleBlur("modifier")}
+              error={errors.modifier}
+              grayWhenZero
+              inputProps={{ step: "1" }}
+              fullWidth
+            />
+          </Grid>
+
           {!isCustomDIC ? (
             <>
-              <FormControl
-                size="small"
-                sx={{ minWidth: 80 }}
-                error={!!errors.dic}
-              >
-                <InputLabel>DIČ</InputLabel>
-                <Select
-                  value={dicParts.prefix || ""}
+              <Grid item md={1.33} mr={-0.5}>
+                <ValidatedAutocomplete<string>
+                  freeSolo
+                  options={[...DIC_PREFIXES]}
+                  value={dicParts.prefix ?? null}
+                  onBlur={() => {}}
+                  onChange={(_, newValue) => {
+                    const prefix = (newValue ?? null) as string | null;
+                    
+                    setDicParts(prev => {
+                      const updated = { ...prev, prefix };
+                      if (!prefix) updated.value = "";
+                      setFormData(prevForm => ({
+                        ...prevForm,
+                        dic: combineDIC(updated.prefix, updated.value),
+                      }));
+                      return updated;
+                    });
+                    
+                    if (errors.dic) setErrors(prev => ({ ...prev, dic: "" }));
+                  }}
                   label="DIČ"
-                  onChange={(e) => handleDICChange("prefix")(e as any)}
+                  error={errors.dic}
+                  name="dic"
                   disabled={mode === "edit" && !isUnlocked}
-                >
-                  <MenuItem value="">
-                    <em>Vybrat...</em>
-                  </MenuItem>
-                  {DIC_PREFIXES.map((prefix) => (
-                    <MenuItem key={prefix} value={prefix}>
-                      {prefix}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <TextFieldWithError
-                placeholder="Zadejte DIČ bez předpony..."
-                value={dicParts.value}
-                disabled={!dicParts.prefix || (mode === "edit" && !isUnlocked)}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleDICChange("value")(e)
-                }
-                onBlur={() => handleBlur("dic")}
-                error={errors.dic}
-                sx={{ flex: 1 }}
-                fullWidth
-              />
+                  getOptionLabel={(opt) => opt ?? ""}
+                  isOptionEqualToValue={(o, v) => o === v}
+                  required={false}
+                />
+              </Grid>
+
+              <Grid item md={4.7}>
+                <ValidatedTextField
+                  label="DIČ bez prefixu"
+                  value={dicParts.value}
+                  disabled={!dicParts.prefix || (mode === "edit" && !isUnlocked)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleDICChange("value")(e)
+                  }
+                  onBlur={() => handleBlur("dic")}
+                  error={errors.dic}
+                  fullWidth
+                />
+              </Grid>
             </>
           ) : (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 0.5,
-                flex: 1,
-              }}
-            >
-              <TextFieldWithError
-                label="DIČ"
-                placeholder="Vlastní formát DIČ..."
-                value={dicParts.value}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleDICChange("value")(e)
-                }
-                onBlur={() => handleBlur("dic")}
-                error={errors.dic}
-                disabled={mode === "edit" && !isUnlocked}
-                sx={{ flex: 1 }}
-                fullWidth
-              />
-              <IconButton
-                size="small"
-                onClick={() => setDicParts({ prefix: null, value: "" })}
-                title="Zrušit vlastní DIČ"
-                disabled={mode === "edit" && !isUnlocked}
-                sx={{ mt: "8px" }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </Box>
+            <>
+              <Grid item xs={12} md={5.5}>
+                <ValidatedTextField
+                  label="DIČ"
+                  placeholder="Vlastní formát DIČ..."
+                  value={dicParts.value}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleDICChange("value")(e)
+                  }
+                  onBlur={() => handleBlur("dic")}
+                  error={errors.dic}
+                  disabled={mode === "edit" && !isUnlocked}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs="auto">
+                <IconButton
+                  size="small"
+                  onClick={() => setDicParts({ prefix: null, value: "" })}
+                  title="Zrušit vlastní DIČ"
+                  disabled={mode === "edit" && !isUnlocked}
+                  sx={{ mt: { xs: 0, md: "8px" } }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Grid>
+            </>
           )}
-        </Box>
+        </Grid>
 
-        {mode === "edit" && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: -1 }}>
-            <Tooltip
-              title={
-                isUnlocked
-                  ? "Zamknout IČO a DIČ"
-                  : "Odemknout IČO a DIČ pro úpravu"
+        {/* Row 2: Název firmy + Odběratel + Dodavatel */}
+        <Grid container spacing={2} alignItems="center">
+          <Grid item md={6}>
+            <ValidatedTextField
+              label="Název firmy"
+              name="company_name"
+              value={formData.company_name}
+              onChange={handleChange}
+              onBlur={() => handleBlur("company_name")}
+              error={errors.company_name}
+              grayWhenEmpty
+              required
+              fullWidth
+            />
+          </Grid>
+
+          <Grid item md={5.96} alignItems={"center"} gap={2}>
+            <ContactTypeSelector
+              small={false}
+              isCustomer={!!formData.is_customer}
+              isSupplier={!!formData.is_supplier}
+              errorText={errors.is_customer || errors.is_supplier}
+              onChange={({ is_customer, is_supplier }) =>
+                setFormData((prev) => ({ ...prev, is_customer, is_supplier }))
               }
-            >
-              <IconButton
-                size="small"
-                onClick={() => setIsUnlocked(!isUnlocked)}
-                color={isUnlocked ? "error" : "default"}
-              >
-                {isUnlocked ? (
-                  <LockOpenIcon fontSize="small" />
-                ) : (
-                  <LockIcon fontSize="small" />
-                )}
-              </IconButton>
-            </Tooltip>
-            <Box
-              component="span"
-              sx={{ fontSize: "0.875rem", color: "text.secondary" }}
-            >
-              {isUnlocked
-                ? "IČO a DIČ jsou odemčeny"
-                : "Klikněte pro odemčení IČO a DIČ"}
-            </Box>
-          </Box>
-        )}
-
-        <TextFieldWithError
-          label="Název firmy"
-          name="company_name"
-          value={formData.company_name}
-          onChange={handleChange}
-          onBlur={() => handleBlur("company_name")}
-          error={errors.company_name}
-          grayWhenEmpty
-          required
-          fullWidth
-        />
-
-        {/* Contact Type */}
-        <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formData.is_customer}
-                onChange={handleChange}
-                name="is_customer"
-                color="primary"
-              />
-            }
-            label="Odběratel"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formData.is_supplier}
-                onChange={handleChange}
-                name="is_supplier"
-                color="secondary"
-              />
-            }
-            label="Dodavatel"
-          />
-          {(errors.is_customer || errors.is_supplier) && (
-            <Tooltip
-              title={errors.is_customer || errors.is_supplier || ""}
-              arrow
-            >
-              <ErrorOutlineIcon
-                sx={{
-                  color: "error.main",
-                  fontSize: 20,
-                  cursor: "help",
-                  ml: 1,
-                }}
-              />
-            </Tooltip>
-          )}
-        </Box>
+            />
+          </Grid>
+        </Grid>
       </FormSection>
 
+
       <FormSection title="Adresa">
-        <TextFieldWithError
-          label="Ulice a číslo popisné"
-          name="street"
-          value={formData.street ?? ""}
-          onChange={handleChange}
-          onBlur={() => handleBlur("street")}
-          error={errors.street}
-          grayWhenEmpty
-          fullWidth
-        />
-        <Box sx={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 2 }}>
-          <TextFieldWithError
-            label="Město"
-            name="city"
-            value={formData.city ?? ""}
-            onChange={handleChange}
-            onBlur={() => handleBlur("city")}
-            error={errors.city}
-            grayWhenEmpty
-          />
-          <TextFieldWithError
-            label="PSČ"
-            name="postal_code"
-            value={formData.postal_code ?? ""}
-            onChange={handleChange}
-            onBlur={() => handleBlur("postal_code")}
-            error={errors.postal_code}
-            grayWhenEmpty
-          />
-        </Box>
+        <Grid container spacing={2}>
+          <Grid item md={6}>
+            <ValidatedTextField
+              label="Ulice a číslo popisné"
+              name="street"
+              value={formData.street ?? ""}
+              onChange={handleChange}
+              onBlur={() => handleBlur("street")}
+              error={errors.street}
+              grayWhenEmpty
+              fullWidth
+            />
+          </Grid>
+          <Grid item md={4}>
+            <ValidatedTextField
+              label="Město"
+              name="city"
+              value={formData.city ?? ""}
+              onChange={handleChange}
+              onBlur={() => handleBlur("city")}
+              error={errors.city}
+              grayWhenEmpty
+            />
+          </Grid>
+          <Grid item md={2}>
+            <ValidatedTextField
+              label="PSČ"
+              name="postal_code"
+              value={formData.postal_code ?? ""}
+              onChange={handleChange}
+              onBlur={() => handleBlur("postal_code")}
+              error={errors.postal_code}
+              grayWhenEmpty
+            />
+          </Grid>
+        </Grid>
       </FormSection>
 
       <FormSection title="Kontaktní údaje">
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-          <TextFieldWithError
-            label="Telefon"
-            name="phone"
-            value={formData.phone ?? ""}
-            onChange={handleChange}
-            onBlur={() => handleBlur("phone")}
-            error={errors.phone}
-          />
-          <TextFieldWithError
-            label="E-mail"
-            name="email"
-            type="email"
-            value={formData.email ?? ""}
-            onChange={handleChange}
-            onBlur={() => handleBlur("email")}
-            error={errors.email}
-          />
-        </Box>
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-          <TextFieldWithError
-            label="Kontaktní osoba"
-            name="representative_name"
-            value={formData.representative_name ?? ""}
-            onChange={handleChange}
-            onBlur={() => handleBlur("representative_name")}
-            error={errors.representative_name}
-            fullWidth
-          />
-          <TextFieldWithError
-            label="Webové stránky"
-            name="website"
-            value={formData.website ?? ""}
-            onChange={handleChange}
-            onBlur={() => handleBlur("website")}
-            error={errors.website}
-            fullWidth
-          />
-        </Box>
+        <Grid container spacing={2}>
+          <Grid item md={6}>
+            <ValidatedTextField
+              label="Telefon"
+              name="phone"
+              value={formData.phone ?? ""}
+              onChange={handleChange}
+              onBlur={() => handleBlur("phone")}
+              error={errors.phone}
+            />
+          </Grid>
+
+          <Grid item md={6}>
+            <ValidatedTextField
+              label="E-mail"
+              name="email"
+              type="email"
+              value={formData.email ?? ""}
+              onChange={handleChange}
+              onBlur={() => handleBlur("email")}
+              error={errors.email}
+            />
+          </Grid>
+          
+          <Grid item md={6}>
+            <ValidatedTextField
+              label="Kontaktní osoba"
+              name="representative_name"
+              value={formData.representative_name ?? ""}
+              onChange={handleChange}
+              onBlur={() => handleBlur("representative_name")}
+              error={errors.representative_name}
+              fullWidth
+            />
+          </Grid>
+
+          <Grid item md={6}>
+            <ValidatedTextField
+              label="Webové stránky"
+              name="website"
+              value={formData.website ?? ""}
+              onChange={handleChange}
+              onBlur={() => handleBlur("website")}
+              error={errors.website}
+              fullWidth
+            />
+          </Grid>
+        </Grid>
       </FormSection>
 
-      <FormSection title="Finanční údaje">
-        <Box sx={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 2 }}>
-          <TextFieldWithError
-            label="Číslo účtu"
-            type="number"
-            name="accountNumber"
-            value={bankAccountParts.accountNumber}
-            onChange={handleBankAccountChange("accountNumber")}
-            onBlur={() => handleBlur("bank_account")}
-            error={errors.bank_account}
-            placeholder="123456789"
-            fullWidth
-          />
-          <TextFieldWithError
-            type="number"
-            label="Kód banky"
-            name="bankCode"
-            value={bankAccountParts.bankCode}
-            onChange={handleBankAccountChange("bankCode")}
-            onBlur={() => handleBlur("bank_account")}
-            error={errors.bank_account}
-            placeholder="0100"
-            fullWidth
-            showToolTip={false}
-          />
-        </Box>
+      <FormSection title="Finanční údaje" hideDivider>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={6}>
+            <ValidatedTextField
+              label="Číslo účtu"
+              type="number"
+              name="accountNumber"
+              value={bankAccountParts.accountNumber}
+              onChange={handleBankAccountChange("accountNumber")}
+              onBlur={() => handleBlur("bank_account")}
+              error={errors.bank_account}
+              placeholder="123456789"
+              fullWidth
+            />
+          </Grid>
 
-        <FormControl size="small" fullWidth>
-          <InputLabel>Cenová skupina</InputLabel>
-          <Select
-            value={formData.price_group}
-            label="Cenová skupina"
-            onChange={(e) => {
-              setFormData((prev) => ({
-                ...prev,
-                price_group: Number(e.target.value),
-              }));
-            }}
-          >
-            <MenuItem value={1}>Skupina 1</MenuItem>
-            <MenuItem value={2}>Skupina 2</MenuItem>
-            <MenuItem value={3}>Skupina 3</MenuItem>
-            <MenuItem value={4}>Skupina 4</MenuItem>
-          </Select>
-        </FormControl>
+          <Grid item xs={12} md={3}>
+            <ValidatedTextField
+              type="number"
+              label="Kód banky"
+              name="bankCode"
+              value={bankAccountParts.bankCode}
+              onChange={handleBankAccountChange("bankCode")}
+              onBlur={() => handleBlur("bank_account")}
+              error={errors.bank_account}
+              placeholder="0100"
+              fullWidth
+              showToolTip={false}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <FormControl size="small" fullWidth>
+              <InputLabel>Cenová skupina</InputLabel>
+              <Select
+                value={formData.price_group}
+                label="Cenová skupina"
+                onChange={(e) =>
+                  setFormData(prev => ({ ...prev, price_group: Number(e.target.value) }))
+                }
+              >
+                <MenuItem value={1}>Skupina 1</MenuItem>
+                <MenuItem value={2}>Skupina 2</MenuItem>
+                <MenuItem value={3}>Skupina 3</MenuItem>
+                <MenuItem value={4}>Skupina 4</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
       </FormSection>
+
     </FormDialog>
   );
 }

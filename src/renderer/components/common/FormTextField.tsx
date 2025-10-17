@@ -1,38 +1,29 @@
-import React from "react";
-import { TextField, TextFieldProps } from "@mui/material";
+import { TextField, TextFieldProps } from '@mui/material';
+import { forwardRef } from 'react';
 
-interface FormTextFieldProps
-  extends Omit<TextFieldProps, "error" | "helperText"> {
-  error?: string;
-  grayWhenEmpty?: boolean;
-  grayWhenZero?: boolean;
+export interface FormTextFieldProps extends Omit<TextFieldProps, 'error'> {
+  error?: string | boolean;
 }
 
-export function FormTextField({
-  error,
-  grayWhenEmpty,
-  grayWhenZero,
-  value,
-  InputProps,
-  ...props
-}: FormTextFieldProps) {
-  const shouldGray =
-    (grayWhenEmpty && (!value || value === "")) ||
-    (grayWhenZero && (value === 0 || value === "0"));
+/**
+ * FormTextField component - wrapper around MUI TextField
+ * Accepts error as string (message) or boolean and converts it properly
+ */
+export const FormTextField = forwardRef<HTMLDivElement, FormTextFieldProps>(
+  ({ error, helperText, ...props }, ref) => {
+    const hasError = typeof error === 'string' ? !!error : !!error;
+    const errorMessage = typeof error === 'string' ? error : undefined;
+    
+    return (
+      <TextField
+        ref={ref}
+        {...props}
+        error={hasError}
+        helperText={errorMessage || helperText}
+        fullWidth
+      />
+    );
+  }
+);
 
-  return (
-    <TextField
-      value={value}
-      error={!!error}
-      helperText={error}
-      InputProps={{
-        ...InputProps,
-        style: {
-          ...InputProps?.style,
-          color: shouldGray ? "#999" : undefined,
-        },
-      }}
-      {...props}
-    />
-  );
-}
+FormTextField.displayName = 'FormTextField';

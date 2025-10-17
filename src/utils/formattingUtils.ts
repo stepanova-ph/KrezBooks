@@ -1,19 +1,17 @@
+import { VAT_RATES } from "../config/constants";
+
 export function formatPrice(amount: number): string {
   return `${amount.toFixed(2)} Kč`;
 }
 
 export function formatVatRate(rate: number): string {
-  if (rate === 0) return "0% (osvobozeno)";
-  if (rate === 1) return "12% (snížená)";
-  if (rate === 2) return "21% (základní)";
-  return `${rate}%`;
+  const vat = VAT_RATES[rate as keyof typeof VAT_RATES];
+  return vat ? vat.label : `${rate}%`;
 }
 
 export function formatVatRateShort(rate: number): string {
-  if (rate === 0) return "0%";
-  if (rate === 1) return "12%";
-  if (rate === 2) return "21%";
-  return `${rate}%`;
+  const vat = VAT_RATES[rate as keyof typeof VAT_RATES];
+  return vat ? `${vat.percentage}%` : `${rate}%`;
 }
 
 export function formatNumber(

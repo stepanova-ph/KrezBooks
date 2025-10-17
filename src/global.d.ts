@@ -4,63 +4,52 @@ import type {
   CreateContactInput,
   CreateItemInput,
 } from "./types/database";
+import type { IpcResponse } from "./main/ipcWrapper";
 
 declare global {
   interface Window {
     electronAPI: {
-      ipcRenderer;
-      testDatabase: () => Promise<{
-        success: boolean;
-        result?: any;
-        error?: string;
-      }>;
+      ipcRenderer: any;
+      
+      testDatabase: () => Promise<IpcResponse<any>>;
 
       contacts: {
-        getAll: () => Promise<Contact[]>;
-        getOne: (ico: string, modifier: number) => Promise<Contact | undefined>;
+        getAll: () => Promise<IpcResponse<Contact[]>>;
+        getOne: (
+          ico: string,
+          modifier: number
+        ) => Promise<IpcResponse<Contact | null>>;
         create: (
-          contact: CreateContactInput,
-        ) => Promise<{ success: boolean; changes: number }>;
+          contact: CreateContactInput
+        ) => Promise<IpcResponse<{ changes: number }>>;
         update: (
           ico: string,
           modifier: number,
-          updates: Partial<Contact>,
-        ) => Promise<{ success: boolean; changes: number }>;
+          updates: Partial<Contact>
+        ) => Promise<IpcResponse<{ changes: number }>>;
         delete: (
           ico: string,
-          modifier: number,
-        ) => Promise<{ success: boolean; changes: number }>;
+          modifier: number
+        ) => Promise<IpcResponse<{ changes: number }>>;
       };
 
       items: {
-        getAll: () => Promise<Item[]>;
-        getOne: (id: number) => Promise<Item | undefined>;
+        getAll: () => Promise<IpcResponse<Item[]>>;
+        getOne: (ean: string) => Promise<IpcResponse<Item | null>>;
         create: (
-          item: CreateItemInput,
-        ) => Promise<{ success: boolean; id: number; changes: number }>;
+          item: CreateItemInput
+        ) => Promise<IpcResponse<{ changes: number }>>;
         update: (
-          id: number,
-          updates: Partial<Item>,
-        ) => Promise<{ success: boolean; changes: number }>;
-        delete: (id: number) => Promise<{ success: boolean; changes: number }>;
+          ean: string,
+          updates: Partial<Item>
+        ) => Promise<IpcResponse<{ changes: number }>>;
+        delete: (ean: string) => Promise<IpcResponse<{ changes: number }>>;
       };
 
       admin: {
-        getDbStats: () => Promise<{
-          success: boolean;
-          data: { contacts: number; items: number };
-          error?: string;
-        }>;
-        clearDb: () => Promise<{
-          success: boolean;
-          changes: number;
-          error?: string;
-        }>;
-        fillTestData: () => Promise<{
-          success: boolean;
-          data: { contactsAdded: number; itemsAdded: number };
-          error?: string;
-        }>;
+        getDbStats: () => Promise<IpcResponse<{ contacts: number; items: number }>>;
+        clearDb: () => Promise<IpcResponse<{ changes: number }>>;
+        fillTestData: () => Promise<IpcResponse<{ contactsAdded: number; itemsAdded: number }>>;
       };
     };
   }
