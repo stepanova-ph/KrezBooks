@@ -83,7 +83,7 @@ export function useTableNavigation(options: UseTableNavigationOptions) {
 
   return {
     focusedRowIndex,
-    setFocusedRowIndex,
+    setFocusedRowIndex, // expose this for mouse interactions
     setRowRef,
   };
 }

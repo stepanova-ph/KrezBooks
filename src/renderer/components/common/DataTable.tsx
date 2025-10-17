@@ -34,15 +34,12 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  useSortable,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import {
   restrictToHorizontalAxis,
   restrictToFirstScrollableAncestor,
 } from "@dnd-kit/modifiers";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import DraggableHeaderCell from "./DraggableHeaderCell";
 import { useTableNavigation } from "../../../hooks/keyboard/useTableNavigation";
 
@@ -100,8 +97,8 @@ export function DataTable<T>({
         .filter((col): col is Column => col !== undefined)
     : visibleColumns;
 
-  // keyboard navigation for table rows
-  const { focusedRowIndex, setRowRef } = useTableNavigation({
+  // unified focus system - keyboard AND mouse both use this
+  const { focusedRowIndex, setFocusedRowIndex, setRowRef } = useTableNavigation({
     disabled: data.length === 0,
     dataLength: data.length,
   });
@@ -150,8 +147,18 @@ export function DataTable<T>({
     }
   };
 
-  const handleContextMenu = (event: MouseEvent, item: T) => {
+  // handle mouse hover - update focus
+  const handleRowMouseEnter = (index: number) => {
+    setFocusedRowIndex(index);
+  };
+
+  // handle context menu - update focus and open menu
+  const handleContextMenu = (event: MouseEvent, item: T, index: number) => {
     event.preventDefault();
+    
+    // set focus to the right-clicked row
+    setFocusedRowIndex(index);
+    
     setContextMenu({
       mouseX: event.clientX + 2,
       mouseY: event.clientY - 6,
@@ -277,31 +284,33 @@ export function DataTable<T>({
                   </TableCell>
                 </TableRow>
               ) : (
-                data.map((item, index) => (
-                  <TableRow
-                    key={getRowKey(item)}
-                    ref={setRowRef(index)}
-                    onContextMenu={(e) => handleContextMenu(e, item)}
-                    sx={{
-                      cursor:
-                        contextMenuActions.length > 0
-                          ? "context-menu"
-                          : "default",
-                      backgroundColor: (theme) =>
-                        index === focusedRowIndex
-                          ? `${theme.palette.primary.main}25`
+                data.map((item, index) => {
+                  const isFocused = index === focusedRowIndex;
+                  
+                  return (
+                    <TableRow
+                      key={getRowKey(item)}
+                      ref={setRowRef(index)}
+                      onMouseEnter={() => handleRowMouseEnter(index)}
+                      onContextMenu={(e) => handleContextMenu(e, item, index)}
+                      sx={{
+                        cursor:
+                          contextMenuActions.length > 0
+                            ? "context-menu"
+                            : "default",
+                        backgroundColor: isFocused
+                          ? "rgba(20, 184, 166, 0.15)"
                           : "transparent",
-                      "&:hover": {
-                        backgroundColor: (theme) =>
-                          index === focusedRowIndex
-                            ? `${theme.palette.primary.main}35`
-                            : `${theme.palette.primary.main}15`,
-                      },
-                    }}
-                  >
-                    {renderRow(item, orderedColumns)}
-                  </TableRow>
-                ))
+                        transition: "background-color 0.15s ease",
+                        "&:hover": {
+                          backgroundColor: isFocused && "rgba(20, 184, 166, 0.15)",
+                        },
+                      }}
+                    >
+                      {renderRow(item, orderedColumns)}
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
