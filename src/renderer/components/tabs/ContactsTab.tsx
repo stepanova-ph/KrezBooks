@@ -31,9 +31,9 @@ function ContactTab() {
 
   const filterBarRef = useRef<FilterBarRef>(null);
 
-  // enable auto-focus on search when typing
+  // FIXED: pass the parent ref directly, access searchInputRef inside the hook
   useAutoSearchFocus({
-    searchInputRef: filterBarRef.current?.searchInputRef || { current: null },
+    filterBarRef: filterBarRef,
     disabled: false,
   });
 

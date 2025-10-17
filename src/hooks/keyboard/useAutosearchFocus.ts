@@ -1,16 +1,19 @@
 import { useEffect, RefObject } from 'react';
+import { FilterBarRef } from '../../renderer/components/common/FilterBar';
 
 export interface UseAutoSearchFocusOptions {
-  searchInputRef: RefObject<HTMLInputElement>;
+  filterBarRef: RefObject<FilterBarRef>;
   disabled?: boolean;
 }
 
 /**
  * hook for auto-focusing search bar when user types
  * triggers on alphanumeric keys and +
+ * 
+ * FIXED: accepts the parent ref and accesses searchInputRef inside the effect
  */
 export function useAutoSearchFocus(options: UseAutoSearchFocusOptions) {
-  const { searchInputRef, disabled = false } = options;
+  const { filterBarRef, disabled = false } = options;
 
   useEffect(() => {
     if (disabled) return;
@@ -31,8 +34,9 @@ export function useAutoSearchFocus(options: UseAutoSearchFocusOptions) {
       // check if it's alphanumeric or +
       const isAlphanumeric = /^[a-zA-Z0-9+]$/.test(event.key);
 
-      if (isAlphanumeric && searchInputRef.current) {
-        searchInputRef.current.focus();
+      // FIXED: access the nested ref inside the effect
+      if (isAlphanumeric && filterBarRef.current?.searchInputRef.current) {
+        filterBarRef.current.searchInputRef.current.focus();
         
         // let the character appear in the input
         // by not preventing default
@@ -41,5 +45,5 @@ export function useAutoSearchFocus(options: UseAutoSearchFocusOptions) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [searchInputRef, disabled]);
+  }, [filterBarRef, disabled]);
 }
