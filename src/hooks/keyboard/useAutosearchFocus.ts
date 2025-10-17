@@ -7,10 +7,10 @@ export interface UseAutoSearchFocusOptions {
 }
 
 /**
- * hook for auto-focusing search bar when user types
+ * hook for auto-focusing the main search bar when user types
  * triggers on alphanumeric keys and +
  * 
- * FIXED: accepts the parent ref and accesses searchInputRef inside the effect
+ * only focuses the main "search" filter (id: "search"), not other text filters
  */
 export function useAutoSearchFocus(options: UseAutoSearchFocusOptions) {
   const { filterBarRef, disabled = false } = options;
@@ -34,7 +34,8 @@ export function useAutoSearchFocus(options: UseAutoSearchFocusOptions) {
       // check if it's alphanumeric or +
       const isAlphanumeric = /^[a-zA-Z0-9+]$/.test(event.key);
 
-      // FIXED: access the nested ref inside the effect
+      // focus the main search input (the one with id="search")
+      // this is always the first input in FilterBar
       if (isAlphanumeric && filterBarRef.current?.searchInputRef.current) {
         filterBarRef.current.searchInputRef.current.focus();
         

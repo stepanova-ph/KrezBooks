@@ -31,7 +31,6 @@ function ContactTab() {
 
   const filterBarRef = useRef<FilterBarRef>(null);
 
-  // FIXED: pass the parent ref directly, access searchInputRef inside the hook
   useAutoSearchFocus({
     filterBarRef: filterBarRef,
     disabled: false,

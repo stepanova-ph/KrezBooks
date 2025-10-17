@@ -21,6 +21,7 @@ import { FilterConfig, FilterState } from "src/types/filter";
 import { ColumnSelectorButton } from "./ColumnSelectorButton";
 import type { Column } from "./DataTable";
 import type { FilterAction } from "src/types/filter";
+import { KeyboardCheckbox } from "./KeyboardCheckbox";
 
 interface FilterBarProps {
   config: FilterConfig;
@@ -125,7 +126,7 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
               label={filter.label}
               value={filters[filter.id] || ""}
               onChange={(e) => updateFilter(filter.id, e.target.value)}
-              inputRef={searchInputRef} // attach ref for auto-focus
+              inputRef={filter.id === "search" ? searchInputRef : undefined}
               sx={{ minWidth: filter.width || 250 }}
             />
           );
@@ -136,7 +137,7 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
             <FormControlLabel
               key={filter.id}
               control={
-                <Checkbox
+                <KeyboardCheckbox  // changed from Checkbox
                   checked={!!filters[filter.id]}
                   onChange={(e) => {
                     if (!e.target.checked && !canUncheck) return;

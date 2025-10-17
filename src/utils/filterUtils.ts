@@ -62,13 +62,15 @@ export function validateFilterDIC(
 
 /**
  * Check if ICO input should be used for filtering
- * Allows partial matching for autocomplete (min 3 digits)
+ * Allows filtering from the first character (no minimum length)
+ * 
+ * FIXED: removed 3-char minimum, now works from char 1
  */
 export function shouldFilterByICO(ico: string): boolean {
   if (!ico || ico.trim() === "") return false;
 
-  // Allow partial ICO in autocomplete mode (at least 3 digits)
-  if (ico.length >= 3 && /^[0-9]+$/.test(ico)) {
+  // Allow filtering with any number of digits (1-8)
+  if (ico.length >= 1 && /^[0-9]+$/.test(ico)) {
     return true;
   }
 
@@ -86,7 +88,7 @@ export function shouldFilterByDIC(
   if (!prefix || !value || value.trim() === "") return false;
 
   // Allow partial DIČ in autocomplete mode (at least 3 characters)
-  if (value.length >= 3) {
+  if (value.length >= 2) {
     return true;
   }
 
