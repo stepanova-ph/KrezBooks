@@ -36,6 +36,7 @@ class DatabaseManager {
 
   public initDatabase(): Database.Database {
     try {
+      logger.info("database init happening!!!!");
       if (this.db) return this.db;
 
       const dbPath = this.getDatabasePath();
