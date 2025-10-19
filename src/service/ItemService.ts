@@ -27,8 +27,6 @@ export class ItemService {
       name: item.name,
       note: item.note || null,
       vat_rate: item.vat_rate,
-      avg_purchase_price: item.avg_purchase_price,
-      last_purchase_price: item.last_purchase_price,
       unit_of_measure: item.unit_of_measure,
       sale_price_group1: item.sale_price_group1,
       sale_price_group2: item.sale_price_group2,
@@ -77,8 +75,7 @@ export class ItemService {
   private buildUpdateQuery(tableName: string, fields: string[]): string {
     // Whitelist allowed fields
     const allowedFields = new Set([
-      'category', 'name', 'note', 'vat_rate',
-      'avg_purchase_price', 'last_purchase_price', 'unit_of_measure',
+      'category', 'name', 'note', 'vat_rate', 'unit_of_measure',
       'sale_price_group1', 'sale_price_group2', 'sale_price_group3', 'sale_price_group4'
     ]);
     

@@ -28,8 +28,6 @@ const defaultFormData: CreateItemInput = {
   category: "",
   note: "",
   vat_rate: 2 as VatRate,
-  avg_purchase_price: 0,
-  last_purchase_price: 0,
   unit_of_measure: "",
   sale_price_group1: 0,
   sale_price_group2: 0,
@@ -107,8 +105,6 @@ function ItemForm({
     try {
       await onSubmit({
         ...result.data,
-        avg_purchase_price: Number(result.data.avg_purchase_price),
-        last_purchase_price: Number(result.data.last_purchase_price),
         sale_price_group1: Number(result.data.sale_price_group1),
         sale_price_group2: Number(result.data.sale_price_group2),
         sale_price_group3: Number(result.data.sale_price_group3),
@@ -139,7 +135,7 @@ function ItemForm({
     >
       <FormSection title="Základní informace">
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={3.5}>
             <ValidatedTextField
               size="small"
               label="EAN"
@@ -154,7 +150,7 @@ function ItemForm({
               inputProps={{ autoComplete: "off" }}
             />
           </Grid>
-          <Grid item xs={12} md={9}>
+          <Grid item xs={12} md={8.5}>
             <ValidatedTextField
               size="small"
               label="Název položky"
@@ -262,7 +258,8 @@ function ItemForm({
               disabled
               label="Průměrná nákupní cena"
               name="avg_purchase_price"
-              value={formData.avg_purchase_price}
+              // value={formData.avg_purchase_price}
+              value={0.0}
               onChange={handleChange}
               precision={2}
               min={0}
@@ -276,7 +273,8 @@ function ItemForm({
               disabled
               label="Poslední nákupní cena"
               name="last_purchase_price"
-              value={formData.last_purchase_price}
+              // value={formData.last_purchase_price}
+              value={0.0}
               onChange={handleChange}
               precision={2}
               min={0}

@@ -102,15 +102,12 @@ function registerAdminHandlers() {
         }
       }
 
-      // Insert items
       const insertItem = db.prepare(`
         INSERT INTO items (
-          ean, name, category, note, vat_rate,
-          avg_purchase_price, last_purchase_price, unit_of_measure,
+          ean, name, category, note, vat_rate, unit_of_measure,
           sale_price_group1, sale_price_group2, sale_price_group3, sale_price_group4
         ) VALUES (
-          @ean, @name, @category, @note, @vat_rate,
-          @avg_purchase_price, @last_purchase_price, @unit_of_measure,
+          @ean, @name, @category, @note, @vat_rate, @unit_of_measure,
           @sale_price_group1, @sale_price_group2, @sale_price_group3, @sale_price_group4
         )
       `);
@@ -123,8 +120,6 @@ function registerAdminHandlers() {
             category: item.category || null,
             note: item.note || null,
             vat_rate: item.vat_rate,
-            avg_purchase_price: item.avg_purchase_price,
-            last_purchase_price: item.last_purchase_price,
             unit_of_measure: item.unit_of_measure,
             sale_price_group1: item.sale_price_group1,
             sale_price_group2: item.sale_price_group2,

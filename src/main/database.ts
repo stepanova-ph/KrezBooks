@@ -123,8 +123,6 @@ function createTables() {
         name TEXT NOT NULL,
         note TEXT,
         vat_rate INTEGER NOT NULL DEFAULT 1,
-        avg_purchase_price INTEGER NOT NULL DEFAULT 0,
-        last_purchase_price INTEGER NOT NULL DEFAULT 0,
         unit_of_measure TEXT NOT NULL DEFAULT 'ks',
         sale_price_group1 INTEGER NOT NULL DEFAULT 0,
         sale_price_group2 INTEGER NOT NULL DEFAULT 0,

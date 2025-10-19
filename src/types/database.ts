@@ -56,8 +56,6 @@ export interface Item {
   name: string;
   note?: string;
   vat_rate: VatRate;
-  avg_purchase_price: number;
-  last_purchase_price: number;
   unit_of_measure: string;
   sale_price_group1: number;
   sale_price_group2: number;

@@ -29,7 +29,6 @@ export const itemColumns: Column[] = [
   },
   { id: "unit", label: "Jednotka", minWidth: 0, align: "center" as const },
   { id: "vat", label: "DPH", minWidth: 15, align: "center" as const },
-  { id: "last_purchase", label: "Poslední nákup", minWidth: 120 },
   {
     id: "sale_price_group1",
     label: "Cena (Sk. 1)",
@@ -128,9 +127,6 @@ function ItemsList({
 
       case "vat":
         return formatVatRateShort(item.vat_rate);
-
-      case "last_purchase":
-        return formatPrice(item.last_purchase_price);
 
       case "sale_price_group1":
         return formatPrice(item.sale_price_group1);
