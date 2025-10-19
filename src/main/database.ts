@@ -149,9 +149,9 @@ class DatabaseManager {
     logger.log('✓ Items table ready');
 
     // Create indexes separately without WHERE clause
-    this.db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_customer ON contacts(is_customer)');
-    this.db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_supplier ON contacts(is_supplier)');
-    this.db.exec('CREATE INDEX IF NOT EXISTS idx_items_category ON items(category)');
+    // this.db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_customer ON contacts(is_customer)');
+    // this.db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_supplier ON contacts(is_supplier)');
+    // this.db.exec('CREATE INDEX IF NOT EXISTS idx_items_category ON items(category)');
     
     logger.log('✓ Indexes created');
 
