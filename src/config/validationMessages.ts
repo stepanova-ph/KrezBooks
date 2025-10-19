@@ -50,25 +50,19 @@ export const validationMessages = {
     },
   },
   item: {
-    // EAN validation
     eanRequired: 'EAN je povinný.',
     eanMaxLength: 'EAN je příliš dlouhý (max. 50 znaků).',
     
-    // Name validation
     nameRequired: 'Název položky je povinný.',
     nameMaxLength: 'Maximální délka názvu je 200 znaků.',
     
-    // Category validation (optional field)
     categoryMaxLength: 'Kategorie je příliš dlouhá (max. 100 znaků).',
     
-    // Unit of measure validation
     unitRequired: 'Měrná jednotka je povinná.',
     unitMaxLength: 'Měrná jednotka je příliš dlouhá (max. 20 znaků).',
     
-    // Note validation
     noteMaxLength: 'Maximální délka poznámky je 500 znaků.',
     
-    // VAT and price validation
     vatRate: 'Zadejte platnou sazbu DPH.',
     priceMin: 'Cena musí být číslo větší nebo rovno nule.',
   },

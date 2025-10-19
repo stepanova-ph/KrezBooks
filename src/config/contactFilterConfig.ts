@@ -74,8 +74,8 @@ export const contactFilterConfig: FilterConfig = {
       customPlaceholder: "Zadejte DIČ...",
       autocomplete: true,
       validate: validateFilterDIC,
-      prefixWidth: 65, // Compact prefix dropdown
-      width: 100, // Enough for 10 digits
+      prefixWidth: 65,
+      width: 100,
     },
 
     {
