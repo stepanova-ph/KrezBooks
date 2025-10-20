@@ -26,7 +26,7 @@ function HomeTab() {
     contacts: number;
     items: number;
     stockMovements: number;
-    // invoices: number;
+    invoices: number;
   } | null>(null);
 
   const handleGetStats = async () => {
@@ -171,6 +171,9 @@ function HomeTab() {
             </Typography>
             <Typography variant="body2">
               POHYBY: <strong>{stats.stockMovements}</strong>
+            </Typography>
+            <Typography variant="body2">
+              DOKLADY: <strong>{stats.invoices}</strong>
             </Typography>
           </Box>
         )}

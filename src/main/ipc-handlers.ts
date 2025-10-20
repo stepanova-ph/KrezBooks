@@ -7,10 +7,12 @@ import type {
   CreateContactInput, 
   CreateItemInput, 
   CreateStockMovementInput,
-  StockMovement
+  StockMovement,
+  CreateInvoiceInput,
+  Invoice
 } from '../types/database';
 import { logger } from './logger';
-import { contactService, itemService, stockMovementService } from '../service';
+import { contactService, invoiceService, itemService, stockMovementService } from '../service';
 
 // ============================================================================
 // IPC HANDLER REGISTRATION
@@ -112,8 +114,34 @@ export function registerIpcHandlers() {
     return handleIpcRequest(() => stockMovementService.deleteByInvoice(invoiceNumber));
   });
 
+  // --------------------------------------------------------------------------
+  // INVOICES HANDLERS
+  // --------------------------------------------------------------------------
+  
+  ipcMain.handle('db:invoices:getAll', async () => {
+    return handleIpcRequest(() => invoiceService.getAll());
+  });
+  
+  ipcMain.handle('db:invoices:getOne', async (_event, number: string) => {
+    return handleIpcRequest(() => invoiceService.getOne(number));
+  });
+  
+  ipcMain.handle('db:invoices:create', async (_event, invoice: CreateInvoiceInput) => {
+    return handleIpcRequest(() => invoiceService.create(invoice));
+  });
+  
+  ipcMain.handle('db:invoices:update', async (_event, number: string, updates: Partial<Invoice>) => {
+    return handleIpcRequest(() => invoiceService.update(number, updates));
+  });
+  
+  ipcMain.handle('db:invoices:delete', async (_event, number: string) => {
+    return handleIpcRequest(() => invoiceService.delete(number));
+  });
+
   logger.info('✓ IPC handlers registered');
 }
+
+
 
 // ============================================================================
 // WINDOW CONTROL HANDLERS

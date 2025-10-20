@@ -18,9 +18,9 @@ function registerAdminHandlers() {
       const stockMovementCount = db
         .prepare("SELECT COUNT(*) as count FROM stock_movements")
         .get() as { count: number };
-      // const invoiceCount = db
-      //   .prepare("SELECT COUNT(*) as count FROM invoices")
-      //   .get() as { count: number };
+      const invoiceCount = db
+        .prepare("SELECT COUNT(*) as count FROM invoices")
+        .get() as { count: number };
 
       return {
         success: true,
@@ -28,7 +28,7 @@ function registerAdminHandlers() {
           contacts: contactCount.count,
           items: itemCount.count,
           stockMovements: stockMovementCount.count,
-          // invoices: invoiceCount.count,
+          invoices: invoiceCount.count,
         },
       };
     } catch (error: any) {
@@ -40,16 +40,14 @@ function registerAdminHandlers() {
     }
   });
 
-  // Clear all data from database (but keep tables)
   ipcMain.handle("db:clearDatabase", async () => {
     try {
       const db = getDatabase();
 
-      // Delete all data from tables
       db.prepare("DELETE FROM items").run();
       db.prepare("DELETE FROM contacts").run();
       db.prepare("DELETE FROM stock_movements").run();
-      // db.prepare("DELETE FROM invoices").run();
+      db.prepare("DELETE FROM invoices").run();
 
       logger.info("Database cleared successfully");
       return { success: true };
@@ -62,7 +60,6 @@ function registerAdminHandlers() {
     }
   });
 
-  // Fill database with test data
   ipcMain.handle("db:fillTestData", async () => {
     try {
       const db = getDatabase();
@@ -71,7 +68,6 @@ function registerAdminHandlers() {
       let itemsAdded = 0;
       let errors: string[] = [];
 
-      // Insert contacts
       const insertContact = db.prepare(`
         INSERT INTO contacts (
           ico, modifier, dic, company_name, representative_name,

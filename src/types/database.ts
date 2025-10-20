@@ -1,11 +1,13 @@
 import { CreateInput, UpdateInput } from "./generic";
-import { VAT_RATES, PRICE_GROUPS, INVOICE_TYPES } from "src/config/constants";
+import { VAT_RATES, PRICE_GROUPS, INVOICE_TYPES, PAYMENT_METHOD_TYPES } from "src/config/constants";
 
 export type VatRate = keyof typeof VAT_RATES;
 
 export type PriceGroup = (typeof PRICE_GROUPS)[number];
 
 export type InvoiceType = keyof typeof INVOICE_TYPES;
+
+export type PaymentMethodType = keyof typeof PAYMENT_METHOD_TYPES;
 
 /**
  * Contact
@@ -92,22 +94,25 @@ export type UpdateStockMovementInput = UpdateInput<
 >;
 
 /**
- * Invoice - with frozen contact snapshot
+ * Invoice
+ * 
+ * IMPORTANT: for real invoices (type 1-4), ico, modifier and company name is required
+ * 
  */
 export interface Invoice {
   number: string;
   type: InvoiceType;
+  payment_method: PaymentMethodType;
   date_issue: string;
   date_tax: string;
   date_due: string;
   variable_symbol: string;
   note?: string;
 
-  ico: string;
-  modifier: number;
+  ico?: string;
+  modifier?: number;
   dic?: string;
-  company_name: string;
-  price_group: PriceGroup;
+  company_name?: string;
   bank_account?: string;
   street?: string;
   city?: string;

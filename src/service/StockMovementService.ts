@@ -1,4 +1,4 @@
-import { stockMovementQueries } from "../main/queries/stockMovement";
+import { stockMovementQueries } from "../main/queries/stockMovements";
 import { getDatabase } from "../main/database";
 import { StockMovement, CreateStockMovementInput } from "../types/database";
 

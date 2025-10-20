@@ -3,8 +3,8 @@ import path from 'path';
 import { app } from 'electron';
 import fs from 'fs';
 import { logger } from './logger';
-import { contactQueries, itemQueries } from './queries';
-import { stockMovementQueries } from './queries/stockMovement';
+import { contactQueries, invoiceQueries, itemQueries } from './queries';
+import { stockMovementQueries } from './queries/stockMovements';
 
 class DatabaseManager {
   private static instance: DatabaseManager;
@@ -115,7 +115,7 @@ class DatabaseManager {
     this.db.exec(stockMovementQueries.createTable);
     logger.log('✓ Stock Movements table ready');
 
-    // this.db.exec(invoiceQueries.createTable);
+    this.db.exec(invoiceQueries.createTable);
     // logger.log('✓ Invoice table ready');
 
 
