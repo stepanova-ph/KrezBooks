@@ -15,6 +15,7 @@ import ItemsList, { itemColumns } from "../items/ItemsList";
 import CreateItemForm from "../items/CreateItemForm";
 import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
 import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
+import { Loading } from "../layout/Loading";
 
 function InventoryTab() {
   const { data: items = [], isLoading } = useItems();
@@ -41,7 +42,19 @@ function InventoryTab() {
   const filteredItems = useTableFilters(items, filters);
 
   if (isLoading) {
-    return <Typography>Načítání...</Typography>;
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          minHeight: '100%',
+          height: '100%'
+        }}
+      >
+        <Loading size="large" text="Načítám sklad..." />
+      </Box>
+    );
   }
 
   return (

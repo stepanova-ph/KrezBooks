@@ -14,6 +14,7 @@ import { useContacts } from "../../../hooks/useContacts";
 import CreateContactForm from "../contacts/CreateContactForm";
 import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
 import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
+import { Loading } from "../layout/Loading";
 
 function ContactTab() {
   const { data: contacts = [], isLoading } = useContacts();
@@ -39,7 +40,19 @@ function ContactTab() {
   const filteredContacts = useTableFilters(contacts, filters);
 
   if (isLoading) {
-    return <Typography>Načítání...</Typography>;
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          minHeight: '100%',
+          height: '100%'
+        }}
+      >
+        <Loading size="large" text="Načítám adresář..." />
+      </Box>
+    );
   }
 
   return (
