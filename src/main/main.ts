@@ -22,7 +22,7 @@ function createWindow() {
     },
   });
 
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
@@ -37,9 +37,9 @@ function createWindow() {
 }
 
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   try {
-    initDatabase();
+    await initDatabase();
     logger.info("✓ Database ready");
   } catch (error) {
     logger.error("Database initialization failed:", error);

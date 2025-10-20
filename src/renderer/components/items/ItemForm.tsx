@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, MenuItem } from "@mui/material";
+import { Box, Grid, MenuItem, Typography } from "@mui/material";
 import type { CreateItemInput, Item, VatRate } from "../../../types/database";
 import { itemSchema } from "../../../validation/itemSchema";
 import { FormDialog } from "../common/FormDialog";
@@ -250,104 +250,130 @@ function ItemForm({
         </Grid>
       </FormSection>
 
-      <FormSection title="Nákupní ceny">
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <NumberTextField
-              size="small"
-              disabled
-              label="Průměrná nákupní cena"
-              name="avg_purchase_price"
-              // value={formData.avg_purchase_price}
-              value={0.0}
-              onChange={handleChange}
-              precision={2}
-              min={0}
-              grayWhenZero
-              fullWidth
-            />
+      <FormSection direction="row">
+        {/* Purchase Prices - Smaller column */}
+        <Box sx={{ width: 130, mr: 4 }}>
+          <Typography 
+            variant="caption" 
+            color="text.secondary" 
+            sx={{ 
+              mb: 1, 
+              display: 'block',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              fontSize: '0.7rem',
+            }}
+          >
+            Nákupní ceny
+          </Typography>
+          <Grid container spacing={1.5}>
+            <Grid item xs={12}>
+              <NumberTextField
+                size="small"
+                disabled
+                label="Průměrná"
+                name="recommended_price"
+                value={0.0}
+                onChange={handleChange}
+                precision={2}
+                min={0}
+                grayWhenZero
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <NumberTextField
+                size="small"
+                disabled
+                label="Poslední"
+                name="last_purchase_price"
+                value={0.0}
+                onChange={handleChange}
+                precision={2}
+                min={0}
+                grayWhenZero
+                fullWidth
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <NumberTextField
-              size="small"
-              disabled
-              label="Poslední nákupní cena"
-              name="last_purchase_price"
-              // value={formData.last_purchase_price}
-              value={0.0}
-              onChange={handleChange}
-              precision={2}
-              min={0}
-              grayWhenZero
-              fullWidth
-            />
-          </Grid>
-        </Grid>
-      </FormSection>
+        </Box>
 
-      <FormSection title="Prodejní ceny">
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <VatPriceField
-              size="small"
-              label="Skupina 1"
-              name="sale_price_group1"
-              value={formData.sale_price_group1}
-              vatRate={vatPercentage}
-              onChange={handleChange}
-              onBlur={() => handleBlur("sale_price_group1")}
-              error={errors.sale_price_group1}
-              precision={2}
-              min={0}
-              grayWhenZero
-            />
+        {/* Sales Prices - Larger column */}
+        <Box sx={{ flex: 1 }}>
+          <Typography 
+            variant="caption" 
+            color="text.secondary" 
+            sx={{ 
+              mb: 1, 
+              display: 'block',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              paddingLeft: 8,
+            }}
+          >
+            Prodejní ceny dle skupiny
+          </Typography>
+          <Grid container spacing={1.5}>
+            <Grid item xs={12}>
+              <VatPriceField
+                size="small"
+                label="Skupina 1"
+                name="sale_price_group1"
+                value={formData.sale_price_group1}
+                vatRate={vatPercentage}
+                onChange={handleChange}
+                onBlur={() => handleBlur("sale_price_group1")}
+                error={errors.sale_price_group1}
+                precision={2}
+                min={0}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <VatPriceField
+                size="small"
+                label="Skupina 2"
+                name="sale_price_group2"
+                value={formData.sale_price_group2}
+                vatRate={vatPercentage}
+                onChange={handleChange}
+                onBlur={() => handleBlur("sale_price_group2")}
+                error={errors.sale_price_group2}
+                precision={2}
+                min={0}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <VatPriceField
+                size="small"
+                label="Skupina 3"
+                name="sale_price_group3"
+                value={formData.sale_price_group3}
+                vatRate={vatPercentage}
+                onChange={handleChange}
+                onBlur={() => handleBlur("sale_price_group3")}
+                error={errors.sale_price_group3}
+                precision={2}
+                min={0}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <VatPriceField
+                size="small"
+                label="Skupina 4"
+                name="sale_price_group4"
+                value={formData.sale_price_group4}
+                vatRate={vatPercentage}
+                onChange={handleChange}
+                onBlur={() => handleBlur("sale_price_group4")}
+                error={errors.sale_price_group4}
+                precision={2}
+                min={0}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <VatPriceField
-              size="small"
-              label="Skupina 2"
-              name="sale_price_group2"
-              value={formData.sale_price_group2}
-              vatRate={vatPercentage}
-              onChange={handleChange}
-              onBlur={() => handleBlur("sale_price_group2")}
-              error={errors.sale_price_group2}
-              precision={2}
-              min={0}
-              grayWhenZero
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <VatPriceField
-              size="small"
-              label="Skupina 3"
-              name="sale_price_group3"
-              value={formData.sale_price_group3}
-              vatRate={vatPercentage}
-              onChange={handleChange}
-              onBlur={() => handleBlur("sale_price_group3")}
-              error={errors.sale_price_group3}
-              precision={2}
-              min={0}
-              grayWhenZero
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <VatPriceField
-              size="small"
-              label="Skupina 4"
-              name="sale_price_group4"
-              value={formData.sale_price_group4}
-              vatRate={vatPercentage}
-              onChange={handleChange}
-              onBlur={() => handleBlur("sale_price_group4")}
-              error={errors.sale_price_group4}
-              precision={2}
-              min={0}
-              grayWhenZero
-            />
-          </Grid>
-        </Grid>
+        </Box>
       </FormSection>
     </FormDialog>
   );

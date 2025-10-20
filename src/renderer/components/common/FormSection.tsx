@@ -5,8 +5,9 @@ interface FormSectionProps {
   title?: string;
   children: React.ReactNode;
   spacing?: number;
-  actions?: React.ReactNode;            // ⬅️ new: things on the same row as the title
-  hideDivider?: boolean;                // optional: allow hiding the divider if needed
+  actions?: React.ReactNode;
+  hideDivider?: boolean;
+  direction?: "row" | "column";
 }
 
 export function FormSection({
@@ -15,6 +16,7 @@ export function FormSection({
   spacing = 2,
   actions,
   hideDivider = false,
+  direction = "column",
 }: FormSectionProps) {
   const showHeader = !!title || !!actions;
 
@@ -30,7 +32,7 @@ export function FormSection({
               gap: 1,
               mb: 1.5,
               minWidth: 0,
-              flexWrap: "wrap",              // wraps nicely on smaller widths
+              flexWrap: "wrap",
             }}
           >
             {title && (
@@ -55,7 +57,7 @@ export function FormSection({
           </Box>
         )}
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: spacing, mx: -2 }}>
+        <Box sx={{ display: "flex", flexDirection: direction, gap: spacing, mx: -2 }}>
           {children}
         </Box>
       </Box>

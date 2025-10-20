@@ -1,3 +1,4 @@
+import { logger } from "src/main/logger";
 import { getDatabase } from "../main/database";
 import { itemQueries } from "../main/queries";
 import { Item, CreateItemInput } from "../types/database";
@@ -14,6 +15,7 @@ export class ItemService {
     const db = getDatabase();
     const statement = db.prepare(itemQueries.getOne);
     const item = statement.get(ean);
+    logger.info(item)
     return item as Item | undefined;
   }
 
