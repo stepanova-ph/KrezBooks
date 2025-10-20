@@ -25,6 +25,8 @@ function HomeTab() {
   const [stats, setStats] = useState<{
     contacts: number;
     items: number;
+    stockMovements: number;
+    // invoices: number;
   } | null>(null);
 
   const handleGetStats = async () => {
@@ -61,7 +63,7 @@ function HomeTab() {
     try {
       const result = await window.electronAPI.admin.clearDb();
       if (result.success) {
-        setStats({ contacts: 0, items: 0 });
+        setStats({ contacts: 0, items: 0, stockMovements: 0 });
         setMessage({ type: "success", text: "Databáze byla úspěšně vymazána" });
 
         queryClient.invalidateQueries({ queryKey: contactKeys.lists() });
@@ -166,6 +168,9 @@ function HomeTab() {
             </Typography>
             <Typography variant="body2">
               POLOŽKY: <strong>{stats.items}</strong>
+            </Typography>
+            <Typography variant="body2">
+              POHYBY: <strong>{stats.stockMovements}</strong>
             </Typography>
           </Box>
         )}

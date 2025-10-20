@@ -66,4 +66,16 @@ export const validationMessages = {
     vatRate: 'Zadejte platnou sazbu DPH.',
     priceMin: 'Cena musí být číslo větší nebo rovno nule.',
   },
+  stockMovement: {
+    invoiceNumberRequired: 'Číslo faktury je povinné.',
+    invoiceNumberMaxLength: 'Číslo faktury je příliš dlouhé.',
+    
+    eanRequired: 'EAN položky je povinný.',
+    eanMaxLength: 'EAN položky je příliš dlouhý.',
+    
+    amountRequired: 'Množství je povinné.',
+    
+    pricePerUnitRequired: 'Cena je povinná.',
+    pricePerUnitInvalid: 'Cena musí bít kladné číslo.',
+  }
 };

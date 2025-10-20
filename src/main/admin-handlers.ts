@@ -15,11 +15,20 @@ function registerAdminHandlers() {
         .prepare("SELECT COUNT(*) as count FROM items")
         .get() as { count: number };
 
+      const stockMovementCount = db
+        .prepare("SELECT COUNT(*) as count FROM stock_movements")
+        .get() as { count: number };
+      // const invoiceCount = db
+      //   .prepare("SELECT COUNT(*) as count FROM invoices")
+      //   .get() as { count: number };
+
       return {
         success: true,
         data: {
           contacts: contactCount.count,
           items: itemCount.count,
+          stockMovements: stockMovementCount.count,
+          // invoices: invoiceCount.count,
         },
       };
     } catch (error: any) {
@@ -39,6 +48,8 @@ function registerAdminHandlers() {
       // Delete all data from tables
       db.prepare("DELETE FROM items").run();
       db.prepare("DELETE FROM contacts").run();
+      db.prepare("DELETE FROM stock_movements").run();
+      // db.prepare("DELETE FROM invoices").run();
 
       logger.info("Database cleared successfully");
       return { success: true };

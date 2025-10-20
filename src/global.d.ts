@@ -47,7 +47,7 @@ declare global {
       };
 
       admin: {
-        getDbStats: () => Promise<IpcResponse<{ contacts: number; items: number }>>;
+        getDbStats: () => Promise<IpcResponse<{ contacts: number; items: number, stockMovements: number }>>;
         clearDb: () => Promise<IpcResponse<{ changes: number }>>;
         fillTestData: () => Promise<IpcResponse<{ contactsAdded: number; itemsAdded: number }>>;
       };

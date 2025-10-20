@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Box, Chip, Grid, Tooltip } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
-import { CONTACT_TYPE } from "../../../config/constants";
+import { CONTACT_TYPES } from "../../../config/constants";
 
 type Props = {
   isCustomer: boolean;
@@ -81,7 +81,7 @@ export function ContactTypeSelector({
   return (
     <Grid item sx={{ display: "flex", justifyContent: "center", gap: 2, mr: -5 }}>
       <Chip
-        label={CONTACT_TYPE.customer}
+        label={CONTACT_TYPES.customer.label}
         size={small ? "small" : "medium"}
         clickable={!disabled}
         onClick={disabled ? undefined : handleToggleCustomer}
@@ -98,7 +98,7 @@ export function ContactTypeSelector({
       />
 
       <Chip
-        label={CONTACT_TYPE.supplier}
+        label={CONTACT_TYPES.supplier.label}
         size={small ? "small" : "medium"}
         clickable={!disabled}
         onClick={disabled ? undefined : handleToggleSupplier}

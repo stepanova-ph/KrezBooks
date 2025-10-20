@@ -5,10 +5,12 @@ import type {
   Contact, 
   Item, 
   CreateContactInput, 
-  CreateItemInput 
+  CreateItemInput, 
+  CreateStockMovementInput,
+  StockMovement
 } from '../types/database';
 import { logger } from './logger';
-import { contactService, itemService } from '../service';
+import { contactService, itemService, stockMovementService } from '../service';
 
 // ============================================================================
 // IPC HANDLER REGISTRATION
@@ -76,6 +78,40 @@ export function registerIpcHandlers() {
     return handleIpcRequest(() => itemService.delete(ean));
   });
 
+  
+  
+  // --------------------------------------------------------------------------
+  // STOCK MOVEMENTS HANDLERS
+  // --------------------------------------------------------------------------
+  
+  ipcMain.handle('db:stockMovements:getAll', async () => {
+    return handleIpcRequest(() => stockMovementService.getAll());
+  });
+  
+  ipcMain.handle('db:stockMovements:getOne', async (_event, invoiceNumber: string, itemEan: string) => {
+    return handleIpcRequest(() => stockMovementService.getOne(invoiceNumber, itemEan));
+  });
+  
+  ipcMain.handle('db:stockMovements:getByInvoice', async (_event, invoiceNumber: string) => {
+    return handleIpcRequest(() => stockMovementService.getByInvoice(invoiceNumber));
+  });
+  
+  ipcMain.handle('db:stockMovements:create', async (_event, movement: CreateStockMovementInput) => {
+    return handleIpcRequest(() => stockMovementService.create(movement));
+  });
+  
+  ipcMain.handle('db:stockMovements:update', async (_event, invoiceNumber: string, itemEan: string, updates: Partial<StockMovement>) => {
+    return handleIpcRequest(() => stockMovementService.update(invoiceNumber, itemEan, updates));
+  });
+  
+  ipcMain.handle('db:stockMovements:delete', async (_event, invoiceNumber: string, itemEan: string) => {
+    return handleIpcRequest(() => stockMovementService.delete(invoiceNumber, itemEan));
+  });
+  
+  ipcMain.handle('db:stockMovements:deleteByInvoice', async (_event, invoiceNumber: string) => {
+    return handleIpcRequest(() => stockMovementService.deleteByInvoice(invoiceNumber));
+  });
+
   logger.info('✓ IPC handlers registered');
 }
 
@@ -103,3 +139,4 @@ ipcMain.on('window-close', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (win) win.close();
 });
+
