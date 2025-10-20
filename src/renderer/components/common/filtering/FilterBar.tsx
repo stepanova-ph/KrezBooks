@@ -19,9 +19,9 @@ import type { ReactNode } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import { FilterConfig, FilterState } from "src/types/filter";
 import { ColumnSelectorButton } from "./ColumnSelectorButton";
-import type { Column } from "./DataTable";
+import type { Column } from "../table/DataTable";
 import type { FilterAction } from "src/types/filter";
-import { KeyboardCheckbox } from "./KeyboardCheckbox";
+import { KeyboardCheckbox } from "../inputs/KeyboardCheckbox";
 
 interface FilterBarProps {
   config: FilterConfig;

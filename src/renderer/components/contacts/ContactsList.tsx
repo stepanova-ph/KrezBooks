@@ -4,7 +4,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useState } from "react";
 import { useDeleteContact } from "../../../hooks/useContacts";
 import type { Contact } from "../../../types/database";
-import { DataTable, Column, ContextMenuAction } from "../common/DataTable";
+import { DataTable, Column, ContextMenuAction } from "../common/table/DataTable";
 import EditContactForm from "./EditContactForm";
 
 interface ContactsListProps {

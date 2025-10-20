@@ -6,7 +6,7 @@ import {
   formatPrice,
   formatVatRateShort,
 } from "../../../utils/formattingUtils";
-import { Column, DataTable, ContextMenuAction } from "../common/DataTable";
+import { Column, DataTable, ContextMenuAction } from "../common/table/DataTable";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import EditItemForm from "./EditItemForm";

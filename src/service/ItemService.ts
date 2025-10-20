@@ -1,4 +1,4 @@
-import { logger } from "src/main/logger";
+import { logger } from "../main/logger";
 import { getDatabase } from "../main/database";
 import { itemQueries } from "../main/queries";
 import { Item, CreateItemInput } from "../types/database";

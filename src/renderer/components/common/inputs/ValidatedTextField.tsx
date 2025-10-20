@@ -1,5 +1,5 @@
 import { InputAdornment, Tooltip } from "@mui/material";
-import { FormTextField } from "./FormTextField";
+import { FormTextField } from "../form/FormTextField";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 const ValidatedTextField = ({ error, showToolTip = true, ...props }: any) => {

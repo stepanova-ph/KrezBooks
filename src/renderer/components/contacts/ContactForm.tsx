@@ -19,9 +19,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import type { CreateContactInput, Contact } from "../../../types/database";
 import { contactSchema } from "../../../validation/contactSchema";
-import { FormDialog } from "../common/FormDialog";
-import { FormTextField } from "../common/FormTextField";
-import { FormSection } from "../common/FormSection";
+import { FormDialog } from "../common/form/FormDialog";
+import { FormTextField } from "../common/form/FormTextField";
+import { FormSection } from "../common/form/FormSection";
 import {
   splitBankAccount,
   combineBankAccount,
@@ -29,9 +29,9 @@ import {
   combineDIC,
 } from "../../../utils/formUtils";
 import { DIC_PREFIXES } from "../../../config/contactFilterConfig";
-import ValidatedTextField from "../common/ValidatedTextField";
+import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import ContactTypeSelector from "./ContactsTypeSelector";
-import { ValidatedAutocomplete } from "../common/ValidatedAutocomplete";
+import { ValidatedAutocomplete } from "../common/inputs/ValidatedAutocomplete";
 
 interface ContactFormProps {
   open: boolean;

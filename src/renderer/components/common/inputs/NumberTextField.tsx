@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { FormTextField } from "./FormTextField";
+import { FormTextField } from "../form/FormTextField";
 import type { TextFieldProps } from "@mui/material";
 import {
   formatNumber,
   parseNumericInput,
   clampNumber,
-} from "../../../utils/formattingUtils";
+} from "../../../../utils/formattingUtils";
 
 interface NumberTextFieldProps
   extends Omit<TextFieldProps, "type" | "value" | "onChange"> {

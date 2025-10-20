@@ -12,8 +12,8 @@ import {
 } from "@mui/material";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import type { Column } from "./DataTable";
-import { KeyboardCheckbox } from "./KeyboardCheckbox";
+import type { Column } from "../table/DataTable";
+import { KeyboardCheckbox } from "../inputs/KeyboardCheckbox";
 
 interface ColumnSelectorButtonProps {
   columns: Column[];

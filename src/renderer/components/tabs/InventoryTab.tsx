@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Box, Typography } from "@mui/material";
-import { FilterBar, FilterBarRef } from "../common/FilterBar";
+import { FilterBar, FilterBarRef } from "../common/filtering/FilterBar";
 import { useTableFilters } from "../../../hooks/useTableFilters";
 import {
   itemFilterConfig,

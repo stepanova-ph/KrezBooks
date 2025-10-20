@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { Box, Grid, MenuItem, Typography } from "@mui/material";
 import type { CreateItemInput, Item, VatRate } from "../../../types/database";
 import { itemSchema } from "../../../validation/itemSchema";
-import { FormDialog } from "../common/FormDialog";
-import { FormTextField } from "../common/FormTextField";
-import { NumberTextField } from "../common/NumberTextField";
-import { VatPriceField } from "../common/VatPriceField";
-import { FormSection } from "../common/FormSection";
-import ValidatedTextField from "../common/ValidatedTextField";
+import { FormDialog } from "../common/form/FormDialog";
+import { FormTextField } from "../common/form/FormTextField";
+import { NumberTextField } from "../common/inputs/NumberTextField";
+import { VatPriceField } from "../common/inputs/VatPriceField";
+import { FormSection } from "../common/form/FormSection";
+import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import { useItems } from "../../../hooks/useItems";
-import { ValidatedAutocomplete } from "../common/ValidatedAutocomplete";
+import { ValidatedAutocomplete } from "../common/inputs/ValidatedAutocomplete";
 import { VAT_RATES, UNIT_OPTIONS } from "../../../config/constants";
 
 interface ItemFormProps {

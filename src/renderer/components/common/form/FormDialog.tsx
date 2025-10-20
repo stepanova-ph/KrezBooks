@@ -10,7 +10,7 @@ import {
   useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { WindowButton } from "../layout/WindowControls";
+import { WindowButton } from "../../layout/WindowControls";
 
 interface FormDialogProps {
   open: boolean;

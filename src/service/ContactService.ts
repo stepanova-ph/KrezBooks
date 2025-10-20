@@ -1,7 +1,7 @@
+import { deserializeContact, serializeContact } from "../utils/typeConverterUtils";
 import { getDatabase } from "../main/database";
 import { contactQueries } from "../main/queries";
 import { Contact, CreateContactInput } from "../types/database";
-import { deserializeContact, serializeContact } from "../utils/typeConverters";
 
 export class ContactService {
   async getAll(): Promise<Contact[]> {

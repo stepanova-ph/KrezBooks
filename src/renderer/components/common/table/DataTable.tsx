@@ -41,7 +41,7 @@ import {
   restrictToFirstScrollableAncestor,
 } from "@dnd-kit/modifiers";
 import DraggableHeaderCell from "./DraggableHeaderCell";
-import { useTableNavigation } from "../../../hooks/keyboard/useTableNavigation";
+import { useTableNavigation } from "../../../../hooks/keyboard/useTableNavigation";
 
 export interface Column {
   id: string;

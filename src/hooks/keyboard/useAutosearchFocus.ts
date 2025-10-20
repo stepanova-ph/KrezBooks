@@ -1,5 +1,5 @@
 import { useEffect, RefObject } from 'react';
-import { FilterBarRef } from '../../renderer/components/common/FilterBar';
+import { FilterBarRef } from '../../renderer/components/common/filtering/FilterBar';
 
 export interface UseAutoSearchFocusOptions {
   filterBarRef: RefObject<FilterBarRef>;
