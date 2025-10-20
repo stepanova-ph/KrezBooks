@@ -3,6 +3,7 @@ import path from 'path';
 import { app } from 'electron';
 import fs from 'fs';
 import { logger } from './logger';
+import { contactQueries, itemQueries } from './queries';
 
 class DatabaseManager {
   private static instance: DatabaseManager;
@@ -104,51 +105,12 @@ class DatabaseManager {
   if (!this.db) throw new Error('Database not initialized');
 
   try {
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS contacts (
-        ico TEXT NOT NULL,
-        modifier INTEGER NOT NULL DEFAULT 1,
-        dic TEXT,
-        company_name TEXT NOT NULL,
-        representative_name TEXT,
-        street TEXT,
-        city TEXT,
-        postal_code TEXT,
-        is_supplier INTEGER NOT NULL DEFAULT 0,
-        is_customer INTEGER NOT NULL DEFAULT 0,
-        price_group INTEGER NOT NULL DEFAULT 1,
-        phone TEXT,
-        email TEXT,
-        website TEXT,
-        bank_account TEXT,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (ico, modifier),
-        CONSTRAINT check_price_group CHECK (price_group BETWEEN 1 AND 4)
-      )
-    `);
+    this.db.exec(contactQueries.createTable);
     logger.log('✓ Contacts table ready');
 
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS items (
-        ean TEXT PRIMARY KEY NOT NULL,
-        category TEXT,
-        name TEXT NOT NULL,
-        note TEXT,
-        vat_rate INTEGER NOT NULL DEFAULT 1,
-        unit_of_measure TEXT NOT NULL DEFAULT 'ks',
-        sale_price_group1 INTEGER NOT NULL DEFAULT 0,
-        sale_price_group2 INTEGER NOT NULL DEFAULT 0,
-        sale_price_group3 INTEGER NOT NULL DEFAULT 0,
-        sale_price_group4 INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        CONSTRAINT check_vat_rate CHECK (vat_rate IN (0, 1, 2))
-      )
-    `);
+    this.db.exec(itemQueries.createTable);
     logger.log('✓ Items table ready');
 
-    // Create indexes separately without WHERE clause
     // this.db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_customer ON contacts(is_customer)');
     // this.db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_supplier ON contacts(is_supplier)');
     // this.db.exec('CREATE INDEX IF NOT EXISTS idx_items_category ON items(category)');

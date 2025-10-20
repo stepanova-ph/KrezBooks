@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ main, keyboard-controls ]
+    branches: [ main, database-update ]
   workflow_dispatch:
 
 jobs:
