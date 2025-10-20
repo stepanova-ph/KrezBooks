@@ -32,6 +32,7 @@ export function AppBarButton({
       onClick={handleClick}
       disabled={disabled}
       disableRipple // Disable default ripple
+        tabIndex={-1}
       sx={{
         minWidth: 100,
         height: 32,
@@ -117,12 +118,12 @@ export function AppBarButton({
           "0%": {
             bottom: "-100%",
             height: "0%",
-            opacity: 0.8,
+            opacity: 0.4,
           },
           "50%": {
             bottom: 0,
             height: "100%",
-            opacity: 0.6,
+            opacity: 0.4,
           },
           "100%": {
             bottom: 0,

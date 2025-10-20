@@ -22,8 +22,6 @@ export function useTableFilters<T extends Record<string, any>>(
       if (filters.search && filters.search.trim() !== "") {
         const searchTerm = filters.search.toLowerCase().trim();
 
-        // Determine which fields to search based on the data structure
-        // This is a generic approach - searches common string fields
         const searchableFields = Object.keys(item).filter(
           (key) => typeof item[key] === "string",
         );
@@ -43,15 +41,15 @@ export function useTableFilters<T extends Record<string, any>>(
         if (filters.is_customer && !item.is_customer) return false;
       }
 
-      if (filters.ico && shouldFilterByICO(filters.ico)) {
+      if (filters.ico) {
         const itemICO = String(item.ico || "");
-        if (!itemICO.includes(filters.ico)) return false;
+        if (!itemICO.startsWith(filters.ico)) return false;
       }
 
       if (filters.dic && typeof filters.dic === "object") {
         const { prefix, value } = filters.dic;
 
-        if (prefix && value && shouldFilterByDIC(prefix, value)) {
+        if (prefix && value) {
           const itemDIC = String(item.dic || "");
 
           if (prefix !== "vlastní") {
@@ -63,39 +61,26 @@ export function useTableFilters<T extends Record<string, any>>(
         }
       }
 
-      // Price group multiselect - empty = all, otherwise OR logic
       const priceGroupFilter = filters.price_group || [];
       if (priceGroupFilter.length > 0) {
-        if (!priceGroupFilter.includes(String(item.price_group))) {
-          return false;
-        }
+        if (!priceGroupFilter.includes(item.price_group)) return false;
       }
 
-      // VAT rate filter (multiselect)
-      if (
-        filters.vat_rate &&
-        Array.isArray(filters.vat_rate) &&
-        filters.vat_rate.length > 0
-      ) {
-        if (!filters.vat_rate.includes(item.vat_rate)) return false;
+      const vatRateFilter = filters.vat_rate || [];
+      if (vatRateFilter.length > 0) {
+        if (!vatRateFilter.includes(item.vat_rate)) return false;
       }
 
-      // Unit of measure filter - text search
       if (filters.unit_of_measure && filters.unit_of_measure.trim() !== "") {
-        const unitSearchTerm = filters.unit_of_measure.toLowerCase().trim();
-        const itemUnit = String(item.unit_of_measure || "").toLowerCase();
-        if (!itemUnit.includes(unitSearchTerm)) {
-          return false;
-        }
+        const searchTerm = filters.unit_of_measure.toLowerCase().trim();
+        const unitValue = String(item.unit_of_measure || "").toLowerCase();
+        if (!unitValue.includes(searchTerm)) return false;
       }
 
-      // Category filter - text search in category field
       if (filters.category && filters.category.trim() !== "") {
-        const categorySearchTerm = filters.category.toLowerCase().trim();
-        const itemCategory = String(item.category || "").toLowerCase();
-        if (!itemCategory.includes(categorySearchTerm)) {
-          return false;
-        }
+        const searchTerm = filters.category.toLowerCase().trim();
+        const categoryValue = String(item.category || "").toLowerCase();
+        if (!categoryValue.includes(searchTerm)) return false;
       }
 
       return true;

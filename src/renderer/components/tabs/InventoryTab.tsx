@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Box, Typography } from "@mui/material";
-import { FilterBar } from "../common/FilterBar";
+import { FilterBar, FilterBarRef } from "../common/FilterBar";
 import { useTableFilters } from "../../../hooks/useTableFilters";
 import {
   itemFilterConfig,
@@ -14,6 +14,8 @@ import { useItems } from "../../../hooks/useItems";
 import ItemsList, { itemColumns } from "../items/ItemsList";
 import CreateItemForm from "../items/CreateItemForm";
 import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
+import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
+import { Loading } from "../layout/Loading";
 
 function InventoryTab() {
   const { data: items = [], isLoading } = useItems();
@@ -29,15 +31,36 @@ function InventoryTab() {
     setColumnOrder 
   } = useColumnVisibility(defaultVisibleColumnsItem);
 
+  const filterBarRef = useRef<FilterBarRef>(null);
+
+  // FIXED: pass the parent ref directly, access searchInputRef inside the hook
+  useAutoSearchFocus({
+    filterBarRef: filterBarRef,
+    disabled: false,
+  });
+
   const filteredItems = useTableFilters(items, filters);
 
   if (isLoading) {
-    return <Typography>Načítání...</Typography>;
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          minHeight: '100%',
+          height: '100%'
+        }}
+      >
+        <Loading size="large" text="Načítám sklad..." />
+      </Box>
+    );
   }
 
   return (
     <Box sx={{ p: 3 }}>
       <FilterBar
+        ref={filterBarRef}
         config={itemFilterConfig}
         filters={filters}
         onFiltersChange={setFilters}

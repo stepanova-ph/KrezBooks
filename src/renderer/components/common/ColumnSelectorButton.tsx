@@ -13,6 +13,7 @@ import {
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import type { Column } from "./DataTable";
+import { KeyboardCheckbox } from "./KeyboardCheckbox";
 
 interface ColumnSelectorButtonProps {
   columns: Column[];
@@ -69,7 +70,7 @@ export function ColumnSelectorButton({
               <FormControlLabel
                 key={column.id}
                 control={
-                  <Checkbox
+                  <KeyboardCheckbox  // changed here
                     size="small"
                     checked={visibleColumnIds.has(column.id)}
                     onChange={() => handleToggleColumn(column.id)}

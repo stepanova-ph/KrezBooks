@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, MenuItem, Autocomplete } from "@mui/material";
+import { Box, Grid, MenuItem, Typography } from "@mui/material";
 import type { CreateItemInput, Item, VatRate } from "../../../types/database";
 import { itemSchema } from "../../../validation/itemSchema";
 import { FormDialog } from "../common/FormDialog";
@@ -10,6 +10,7 @@ import { FormSection } from "../common/FormSection";
 import ValidatedTextField from "../common/ValidatedTextField";
 import { useItems } from "../../../hooks/useItems";
 import { ValidatedAutocomplete } from "../common/ValidatedAutocomplete";
+import { VAT_RATES, UNIT_OPTIONS } from "../../../config/constants";
 
 interface ItemFormProps {
   open: boolean;
@@ -20,15 +21,6 @@ interface ItemFormProps {
   isPending?: boolean;
 }
 
-// VAT configuration - maps VAT group indices to actual percentages
-const VAT_RATES = {
-  0: { percentage: 0, label: "0% (osvobozeno)" },
-  1: { percentage: 12, label: "12% (snížená)" },
-  2: { percentage: 21, label: "21% (základní)" },
-} as const;
-
-// Common unit suggestions (not enforced)
-const COMMON_UNITS = ["ks", "kg", "l", "m", "m2", "m3", "t", "hod"];
 
 const defaultFormData: CreateItemInput = {
   ean: "",
@@ -36,8 +28,6 @@ const defaultFormData: CreateItemInput = {
   category: "",
   note: "",
   vat_rate: 2 as VatRate,
-  avg_purchase_price: 0,
-  last_purchase_price: 0,
   unit_of_measure: "",
   sale_price_group1: 0,
   sale_price_group2: 0,
@@ -57,61 +47,44 @@ function ItemForm({
     initialData ? { ...defaultFormData, ...initialData } : defaultFormData,
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  // Get all items to extract unique categories and units for autocomplete
+
   const { data: allItems } = useItems();
-  
+
   const existingCategories = React.useMemo(() => {
     if (!allItems) return [];
     const categories = allItems
-      .map(item => item.category)
+      .map((item) => item.category)
       .filter((cat): cat is string => !!cat && cat.trim() !== "");
     return Array.from(new Set(categories)).sort();
   }, [allItems]);
 
   const existingUnits = React.useMemo(() => {
-    if (!allItems) return COMMON_UNITS;
+    if (!allItems) return UNIT_OPTIONS;
     const units = allItems
-      .map(item => item.unit_of_measure)
-      .filter((unit): unit is string => !!unit && unit.trim() !== "");
-    const uniqueUnits = Array.from(new Set([...COMMON_UNITS, ...units])).sort();
-    return uniqueUnits;
+      .map((item) => item.unit_of_measure)
+      .filter((u): u is string => !!u && u.trim() !== "");
+    return Array.from(new Set([...UNIT_OPTIONS, ...units])).sort();
   }, [allItems]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((p) => ({ ...p, [name]: "" }));
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
   const handleSelectChange = (
     e: React.ChangeEvent<{ name?: string; value: unknown }>,
   ) => {
     const name = e.target.name as string;
-
-    // Clear error when user changes selection
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-
-    setFormData((prev) => ({ ...prev, [name]: e.target.value as string }));
+    if (errors[name]) setErrors((p) => ({ ...p, [name]: "" }));
+    setFormData((p) => ({ ...p, [name]: e.target.value as string }));
   };
 
   const handleBlur = (fieldName: string) => {
-    // Validate single field on blur
     const result = itemSchema.safeParse(formData);
     if (!result.success) {
-      const fieldError = result.error.issues.find(
-        (err) => err.path[0] === fieldName,
-      );
-      if (fieldError) {
-        setErrors((prev) => ({ ...prev, [fieldName]: fieldError.message }));
-      }
+      const fieldError = result.error.issues.find((err) => err.path[0] === fieldName);
+      if (fieldError) setErrors((p) => ({ ...p, [fieldName]: fieldError.message }));
     }
   };
 
@@ -123,8 +96,7 @@ function ItemForm({
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.issues.forEach((err) => {
-        if (typeof err.path[0] === "string")
-          fieldErrors[err.path[0]] = err.message;
+        if (typeof err.path[0] === "string") fieldErrors[err.path[0]] = err.message;
       });
       setErrors(fieldErrors);
       return;
@@ -133,18 +105,13 @@ function ItemForm({
     try {
       await onSubmit({
         ...result.data,
-        avg_purchase_price: Number(result.data.avg_purchase_price),
-        last_purchase_price: Number(result.data.last_purchase_price),
         sale_price_group1: Number(result.data.sale_price_group1),
         sale_price_group2: Number(result.data.sale_price_group2),
         sale_price_group3: Number(result.data.sale_price_group3),
         sale_price_group4: Number(result.data.sale_price_group4),
       } as CreateItemInput);
 
-      // Only reset if successful and in create mode
-      if (mode === "create") {
-        setFormData(defaultFormData);
-      }
+      if (mode === "create") setFormData(defaultFormData);
     } catch (error) {
       console.error("Chyba při ukládání položky:", error);
       alert(`Chyba při ukládání: ${(error as Error).message}`);
@@ -154,7 +121,6 @@ function ItemForm({
   const title = mode === "create" ? "Přidat novou položku" : "Upravit položku";
   const submitLabel = mode === "create" ? "Přidat položku" : "Uložit změny";
 
-  // Get actual VAT percentage from the group index
   const vatPercentage =
     VAT_RATES[formData.vat_rate as keyof typeof VAT_RATES]?.percentage ?? 21;
 
@@ -168,176 +134,245 @@ function ItemForm({
       submitLabel={submitLabel}
     >
       <FormSection title="Základní informace">
-        <ValidatedTextField
-          label="EAN"
-          name="ean"
-          value={formData.ean}
-          onChange={handleChange}
-          onBlur={() => handleBlur("ean")}
-          error={errors.ean}
-          required
-          fullWidth
-          disabled={mode === "edit"}
-          inputProps={{ autoComplete: "off" }}
-        />
-        <ValidatedTextField
-          label="Název položky"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          onBlur={() => handleBlur("name")}
-          error={errors.name}
-          required
-          fullWidth
-          inputProps={{ autoComplete: "off" }}
-        />
-        <Box
-          sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2 }}
-        >
-        <ValidatedAutocomplete
-          freeSolo
-          options={existingCategories}
-          value={formData.category || ""}
-          onChange={(_, newValue) => {
-            setFormData((p) => ({ ...p, category: newValue || "" }));
-            if (errors.category) setErrors((p) => ({ ...p, category: "" }));
-          }}
-          onInputChange={(_, newInputValue) => {
-            setFormData((p) => ({ ...p, category: newInputValue }));
-            if (errors.category) setErrors((p) => ({ ...p, category: "" }));
-          }}
-          label="Kategorie"
-          name="category"
-          error={errors.category}
-          onBlur={() => handleBlur("category")}
-        />
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={3.5}>
+            <ValidatedTextField
+              size="small"
+              label="EAN"
+              name="ean"
+              value={formData.ean}
+              onChange={handleChange}
+              onBlur={() => handleBlur("ean")}
+              error={errors.ean}
+              required
+              fullWidth
+              disabled={mode === "edit"}
+              inputProps={{ autoComplete: "off" }}
+            />
+          </Grid>
+          <Grid item xs={12} md={8.5}>
+            <ValidatedTextField
+              size="small"
+              label="Název položky"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              onBlur={() => handleBlur("name")}
+              error={errors.name}
+              required
+              fullWidth
+              inputProps={{ autoComplete: "off" }}
+            />
+          </Grid>
 
-          <ValidatedAutocomplete
-            freeSolo
-            options={existingUnits}
-            value={formData.unit_of_measure || ""}
-            onChange={(_, newValue) => {
-              setFormData((p) => ({ ...p, unit_of_measure: newValue || "" }));
-              if (errors.unit_of_measure) setErrors((p) => ({ ...p, unit_of_measure: "" }));
-            }}
-            onInputChange={(_, newInputValue) => {
-              setFormData((p) => ({ ...p, unit_of_measure: newInputValue }));
-              if (errors.unit_of_measure) setErrors((p) => ({ ...p, unit_of_measure: "" }));
-            }}
-            label="Měrná jednotka"
-            name="unit_of_measure"
-            error={errors.unit_of_measure}
-            onBlur={() => handleBlur("unit_of_measure")}
-            required
-          />
+          <Grid item xs={12} md={4.95}>
+            <ValidatedAutocomplete
+              size="small"
+              freeSolo
+              options={existingCategories}
+              value={formData.category || ""}
+              onChange={(_, newValue) => {
+                setFormData((p) => ({ ...p, category: newValue || "" }));
+                if (errors.category) setErrors((p) => ({ ...p, category: "" }));
+              }}
+              onInputChange={(_, newInputValue) => {
+                setFormData((p) => ({ ...p, category: newInputValue }));
+                if (errors.category) setErrors((p) => ({ ...p, category: "" }));
+              }}
+              label="Kategorie"
+              name="category"
+              error={errors.category}
+              onBlur={() => handleBlur("category")}
+            />
+          </Grid>
 
-          <FormTextField
-            label="Sazba DPH"
-            name="vat_rate"
-            select
-            value={formData.vat_rate}
-            onChange={handleSelectChange}
-            error={!!errors.vat_rate}
-            SelectProps={{ native: false }}
-            inputProps={{ autoComplete: "off" }}
-            required
+          <Grid item xs={12} md={3.25}>
+            <ValidatedAutocomplete
+              size="small"
+              freeSolo
+              options={existingUnits}
+              value={formData.unit_of_measure || ""}
+              onChange={(_, newValue) => {
+                setFormData((p) => ({ ...p, unit_of_measure: newValue || "" }));
+                if (errors.unit_of_measure)
+                  setErrors((p) => ({ ...p, unit_of_measure: "" }));
+              }}
+              onInputChange={(_, newInputValue) => {
+                setFormData((p) => ({ ...p, unit_of_measure: newInputValue }));
+                if (errors.unit_of_measure)
+                  setErrors((p) => ({ ...p, unit_of_measure: "" }));
+              }}
+              label="Měrná jednotka"
+              name="unit_of_measure"
+              error={errors.unit_of_measure}
+              onBlur={() => handleBlur("unit_of_measure")}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3.8}>
+            <FormTextField
+              size="small"
+              label="Sazba DPH"
+              name="vat_rate"
+              select
+              value={formData.vat_rate}
+              onChange={handleSelectChange}
+              error={!!errors.vat_rate}
+              SelectProps={{ native: false }}
+              inputProps={{ autoComplete: "off" }}
+              required
+              fullWidth
+            >
+              {Object.entries(VAT_RATES).map(([key, rate]) => (
+                <MenuItem key={key} value={Number(key)}>
+                  {rate.label}
+                </MenuItem>
+              ))}
+            </FormTextField>
+          </Grid>
+
+          <Grid item xs={12}>
+            <ValidatedTextField
+              size="small"
+              label="Poznámka"
+              name="note"
+              value={formData.note}
+              onChange={handleChange}
+              onBlur={() => handleBlur("note")}
+              error={errors.note}
+              multiline
+              rows={3}
+              fullWidth
+              inputProps={{ autoComplete: "off" }}
+            />
+          </Grid>
+        </Grid>
+      </FormSection>
+
+      <FormSection direction="row">
+        {/* Purchase Prices - Smaller column */}
+        <Box sx={{ width: 130, mr: 4 }}>
+          <Typography 
+            variant="caption" 
+            color="text.secondary" 
+            sx={{ 
+              mb: 1, 
+              display: 'block',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              fontSize: '0.7rem',
+            }}
           >
-            {Object.entries(VAT_RATES).map(([key, rate]) => (
-              <MenuItem key={key} value={Number(key)}>
-                {rate.label}
-              </MenuItem>
-            ))}
-          </FormTextField>
+            Nákupní ceny
+          </Typography>
+          <Grid container spacing={1.5}>
+            <Grid item xs={12}>
+              <NumberTextField
+                size="small"
+                disabled
+                label="Průměrná"
+                name="recommended_price"
+                value={0.0}
+                onChange={handleChange}
+                precision={2}
+                min={0}
+                grayWhenZero
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <NumberTextField
+                size="small"
+                disabled
+                label="Poslední"
+                name="last_purchase_price"
+                value={0.0}
+                onChange={handleChange}
+                precision={2}
+                min={0}
+                grayWhenZero
+                fullWidth
+              />
+            </Grid>
+          </Grid>
         </Box>
-        <ValidatedTextField
-          label="Poznámka"
-          name="note"
-          value={formData.note}
-          onChange={handleChange}
-          onBlur={() => handleBlur("note")}
-          error={errors.note}
-          multiline
-          rows={3}
-          fullWidth
-          inputProps={{ autoComplete: "off" }}
-        />
-      </FormSection>
 
-      <FormSection title="Nákupní ceny">
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-          <NumberTextField
-            disabled
-            label="Průměrná nákupní cena"
-            name="avg_purchase_price"
-            value={formData.avg_purchase_price}
-            onChange={handleChange}
-            precision={2}
-            min={0}
-            grayWhenZero
-          />
-          <NumberTextField
-            disabled
-            label="Poslední nákupní cena"
-            name="last_purchase_price"
-            value={formData.last_purchase_price}
-            onChange={handleChange}
-            precision={2}
-            min={0}
-            grayWhenZero
-          />
-        </Box>
-      </FormSection>
-
-      <FormSection title="Prodejní ceny">
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <VatPriceField
-            label="Skupina 1"
-            name="sale_price_group1"
-            value={formData.sale_price_group1}
-            vatRate={vatPercentage}
-            onChange={handleChange}
-            onBlur={() => handleBlur("sale_price_group1")}
-            error={errors.sale_price_group1}
-            precision={2}
-            min={0}
-            grayWhenZero
-          />
-          <VatPriceField
-            label="Skupina 2"
-            name="sale_price_group2"
-            value={formData.sale_price_group2}
-            vatRate={vatPercentage}
-            onChange={handleChange}
-            onBlur={() => handleBlur("sale_price_group2")}
-            error={errors.sale_price_group2}
-            precision={2}
-            min={0}
-            grayWhenZero
-          />
-          <VatPriceField
-            label="Skupina 3"
-            name="sale_price_group3"
-            value={formData.sale_price_group3}
-            vatRate={vatPercentage}
-            onChange={handleChange}
-            onBlur={() => handleBlur("sale_price_group3")}
-            error={errors.sale_price_group3}
-            precision={2}
-            min={0}
-            grayWhenZero
-          />
-          <VatPriceField
-            label="Skupina 4"
-            name="sale_price_group4"
-            value={formData.sale_price_group4}
-            vatRate={vatPercentage}
-            onChange={handleChange}
-            onBlur={() => handleBlur("sale_price_group4")}
-            error={errors.sale_price_group4}
-            precision={2}
-            min={0}
-            grayWhenZero
-          />
+        {/* Sales Prices - Larger column */}
+        <Box sx={{ flex: 1 }}>
+          <Typography 
+            variant="caption" 
+            color="text.secondary" 
+            sx={{ 
+              mb: 1, 
+              display: 'block',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              paddingLeft: 8,
+            }}
+          >
+            Prodejní ceny dle skupiny
+          </Typography>
+          <Grid container spacing={1.5}>
+            <Grid item xs={12}>
+              <VatPriceField
+                size="small"
+                label="Skupina 1"
+                name="sale_price_group1"
+                value={formData.sale_price_group1}
+                vatRate={vatPercentage}
+                onChange={handleChange}
+                onBlur={() => handleBlur("sale_price_group1")}
+                error={errors.sale_price_group1}
+                precision={2}
+                min={0}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <VatPriceField
+                size="small"
+                label="Skupina 2"
+                name="sale_price_group2"
+                value={formData.sale_price_group2}
+                vatRate={vatPercentage}
+                onChange={handleChange}
+                onBlur={() => handleBlur("sale_price_group2")}
+                error={errors.sale_price_group2}
+                precision={2}
+                min={0}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <VatPriceField
+                size="small"
+                label="Skupina 3"
+                name="sale_price_group3"
+                value={formData.sale_price_group3}
+                vatRate={vatPercentage}
+                onChange={handleChange}
+                onBlur={() => handleBlur("sale_price_group3")}
+                error={errors.sale_price_group3}
+                precision={2}
+                min={0}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <VatPriceField
+                size="small"
+                label="Skupina 4"
+                name="sale_price_group4"
+                value={formData.sale_price_group4}
+                vatRate={vatPercentage}
+                onChange={handleChange}
+                onBlur={() => handleBlur("sale_price_group4")}
+                error={errors.sale_price_group4}
+                precision={2}
+                min={0}
+              />
+            </Grid>
+          </Grid>
         </Box>
       </FormSection>
     </FormDialog>

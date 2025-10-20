@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Box, Typography } from "@mui/material";
-import { FilterBar } from "../common/FilterBar";
+import { FilterBar, FilterBarRef } from "../common/FilterBar";
 import { useTableFilters } from "../../../hooks/useTableFilters";
 import {
   contactFilterConfig,
@@ -13,6 +13,8 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useContacts } from "../../../hooks/useContacts";
 import CreateContactForm from "../contacts/CreateContactForm";
 import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
+import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
+import { Loading } from "../layout/Loading";
 
 function ContactTab() {
   const { data: contacts = [], isLoading } = useContacts();
@@ -28,15 +30,35 @@ function ContactTab() {
     setColumnOrder 
   } = useColumnVisibility(defaultVisibleColumnsContact);
 
+  const filterBarRef = useRef<FilterBarRef>(null);
+
+  useAutoSearchFocus({
+    filterBarRef: filterBarRef,
+    disabled: false,
+  });
+
   const filteredContacts = useTableFilters(contacts, filters);
 
   if (isLoading) {
-    return <Typography>Načítání...</Typography>;
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          minHeight: '100%',
+          height: '100%'
+        }}
+      >
+        <Loading size="large" text="Načítám adresář..." />
+      </Box>
+    );
   }
 
   return (
     <Box sx={{ p: 3 }}>
       <FilterBar
+        ref={filterBarRef}
         config={contactFilterConfig}
         filters={filters}
         onFiltersChange={setFilters}

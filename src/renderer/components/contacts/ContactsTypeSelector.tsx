@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Box, Chip, Grid, Tooltip } from "@mui/material";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useTheme, alpha } from "@mui/material/styles";
 import { CONTACT_TYPE } from "../../../config/constants";
 
@@ -65,14 +64,29 @@ export function ContactTypeSelector({
   const handleToggleSupplier = () =>
     onChange({ is_customer: isCustomer, is_supplier: !isSupplier });
 
+  const handleKeyDown = (
+    e: React.KeyboardEvent,
+    type: 'customer' | 'supplier'
+  ) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (type === 'customer') {
+        handleToggleCustomer();
+      } else {
+        handleToggleSupplier();
+      }
+    }
+  };
+
   return (
     <Grid item sx={{ display: "flex", justifyContent: "center", gap: 2, mr: -5 }}>
-    {/* <> */}
       <Chip
         label={CONTACT_TYPE.customer}
         size={small ? "small" : "medium"}
         clickable={!disabled}
         onClick={disabled ? undefined : handleToggleCustomer}
+        onKeyDown={(e) => !disabled && handleKeyDown(e, 'customer')}
+        tabIndex={disabled ? -1 : 0}  // make it keyboard-focusable
         sx={{
           ...commonChipSx,
           ...(disabled
@@ -88,6 +102,8 @@ export function ContactTypeSelector({
         size={small ? "small" : "medium"}
         clickable={!disabled}
         onClick={disabled ? undefined : handleToggleSupplier}
+        onKeyDown={(e) => !disabled && handleKeyDown(e, 'supplier')}
+        tabIndex={disabled ? -1 : 0}  // make it keyboard-focusable
         sx={{
           ...commonChipSx,
           ...(disabled
@@ -97,15 +113,6 @@ export function ContactTypeSelector({
             : secondaryInactiveSx),
         }}
       />
-
-      {errorText && (
-        <Tooltip title={errorText} arrow>
-          <ErrorOutlineIcon
-            sx={{ color: "error.main", fontSize: 20, cursor: "help", ml: 0.5 }}
-          />
-        </Tooltip>
-      )}
-    {/* </> */}
     </Grid>
   );
 }

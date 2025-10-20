@@ -31,22 +31,6 @@ export const itemSchema = z.object({
     }),
   ),
   
-  avg_purchase_price: z.preprocess(
-    (v) => Number(v),
-    z
-      .number()
-      .min(0, validationMessages.item.priceMin)
-      .default(0),
-  ),
-  
-  last_purchase_price: z.preprocess(
-    (v) => Number(v),
-    z
-      .number()
-      .min(0, validationMessages.item.priceMin)
-      .default(0),
-  ),
-  
   unit_of_measure: z
     .string()
     .min(1, validationMessages.item.unitRequired || "Měrná jednotka je povinná")

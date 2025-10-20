@@ -10,6 +10,7 @@ import {
   useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { WindowButton } from "../layout/WindowControls";
 
 interface FormDialogProps {
   open: boolean;
@@ -57,28 +58,18 @@ export function FormDialog({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          px: 2,
+          pl: 2,
           bgcolor: theme.palette.primary.main,
           color: theme.palette.primary.contrastText,
         }}
       >
         <Box sx={{ fontWeight: 600, fontSize: "1rem" }}>{title}</Box>
 
-        <IconButton
-          size="small"
+        <WindowButton
+          type="close"
           onClick={onClose}
-          sx={{
-            color: theme.palette.primary.contrastText,
-            borderRadius: 0,
-            height: 32,
-            width: 32,
-            "&:hover": {
-              bgcolor: theme.palette.error.main,
-            },
-          }}
-        >
-          <CloseIcon fontSize="small" />
-        </IconButton>
+          hoverBackgroundColor={theme.palette.error.main}
+        />
       </Box>
 
       <Divider sx={{ borderColor: theme.palette.divider }} />
