@@ -79,8 +79,6 @@ export const validationMessages = {
     pricePerUnitInvalid: 'Cena musí bít kladné číslo.',
   },
 
-// Add this to the existing validationMessages object:
-
   invoice: {
     number: {
       required: "Číslo faktury je povinné",
@@ -96,13 +94,13 @@ export const validationMessages = {
       required: "Datum vystavení je povinné",
     },
     dateTax: {
-      required: "Datum zdanitelného plnění je povinné",
+      required: "Datum zdanitelného plnění je povinné pro tento typ faktury",
     },
     dateDue: {
-      required: "Datum splatnosti je povinné",
+      required: "Datum splatnosti je povinné pro tento typ faktury",
     },
     variableSymbol: {
-      required: "Variabilní symbol je povinný",
+      required: "Variabilní symbol je povinný pro tento typ faktury",
       maxLength: "Variabilní symbol je příliš dlouhý (max 50 znaků)",
     },
     note: {
@@ -110,17 +108,9 @@ export const validationMessages = {
     },
     ico: {
       required: "IČO je povinné pro tento typ faktury",
-      length: "IČO musí mít 8 znaků",
     },
     modifier: {
       required: "Modifikátor je povinný pro tento typ faktury",
-      range: "Modifikátor musí být mezi 1-100",
     },
-    companyName: {
-      required: "Název firmy je povinný pro tento typ faktury",
-      minLength: "Název firmy musí mít alespoň 2 znaky",
-      maxLength: "Název firmy je příliš dlouhý (max 40 znaků)",
-    },
-    contactRequired: "Údaje o kontaktu jsou povinné pro nákup a prodej",
   },
 };

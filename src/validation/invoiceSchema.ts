@@ -2,6 +2,10 @@ import { z } from "zod";
 import { optionalString } from "./optionalString";
 import { validationMessages } from "../config/validationMessages";
 
+const requiresDateTax = (type: number) => type === 1 || type === 3;
+
+const requiresContactInfo = (type: number) => type === 2 || type === 4;
+
 export const invoiceSchema = z
   .object({
     number: z
@@ -19,39 +23,29 @@ export const invoiceSchema = z
         .refine((n) => [1, 2, 3, 4, 5].includes(n), validationMessages.invoice.type.invalid)
     ),
 
+    date_issue: z.string().min(1, validationMessages.invoice.dateIssue.required),
+
     payment_method: z.preprocess(
       (v) => Number(v),
       z.number().refine((n) => n === 0 || n === 1, validationMessages.invoice.paymentMethod.invalid)
     ),
-
-    date_issue: z.string().min(1, validationMessages.invoice.dateIssue.required),
-
-    date_tax: z.string().min(1, validationMessages.invoice.dateTax.required),
-
-    date_due: z.string().min(1, validationMessages.invoice.dateDue.required),
-
-    variable_symbol: z
-      .string()
-      .min(1, validationMessages.invoice.variableSymbol.required)
-      .max(50, validationMessages.invoice.variableSymbol.maxLength),
 
     note: optionalString.refine(
       (val) => !val || val.length <= 500,
       validationMessages.invoice.note.maxLength
     ),
 
-    // Contact fields - required for types 1-4, optional for type 5
-    ico: optionalString,
+    date_tax: optionalString,
+    date_due: optionalString,
+    variable_symbol: optionalString,
 
+    ico: optionalString,
     modifier: z.preprocess(
       (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
       z.number().int().min(1).max(100).optional()
     ),
-
     dic: optionalString,
-
     company_name: optionalString,
-
     bank_account: optionalString,
     street: optionalString,
     city: optionalString,
@@ -60,8 +54,19 @@ export const invoiceSchema = z
     email: optionalString,
   })
   .superRefine((data, ctx) => {
-    // For types 1-4 (purchases and sales), contact info is required
-    if (data.type >= 1 && data.type <= 4) {
+    // Types 1, 3 (cash)
+    if (requiresDateTax(data.type)) {
+      if (!data.date_tax) {
+        ctx.addIssue({
+          path: ["date_tax"],
+          code: z.ZodIssueCode.custom,
+          message: validationMessages.invoice.dateTax.required,
+        });
+      }
+    }
+
+    // Types 2, 4 (invoice)
+    if (requiresContactInfo(data.type)) {
       if (!data.ico || data.ico.length !== 8) {
         ctx.addIssue({
           path: ["ico"],
@@ -78,14 +83,20 @@ export const invoiceSchema = z
         });
       }
 
-      if (!data.company_name || data.company_name.length < 2) {
+      if (!data.date_due) {
         ctx.addIssue({
-          path: ["company_name"],
+          path: ["date_due"],
           code: z.ZodIssueCode.custom,
-          message: validationMessages.invoice.companyName.required,
+          message: validationMessages.invoice.dateDue.required,
+        });
+      }
+
+      if (!data.variable_symbol) {
+        ctx.addIssue({
+          path: ["variable_symbol"],
+          code: z.ZodIssueCode.custom,
+          message: validationMessages.invoice.variableSymbol.required,
         });
       }
     }
-
-    // For type 5 (correction), contact info is optional - no validation needed
   });

@@ -116,7 +116,7 @@ class DatabaseManager {
     logger.log('✓ Stock Movements table ready');
 
     this.db.exec(invoiceQueries.createTable);
-    // logger.log('✓ Invoice table ready');
+    logger.log('✓ Invoice table ready');
 
 
 
