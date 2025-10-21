@@ -1,4 +1,4 @@
-import { DIC_PREFIXES } from "../config/contactFilterConfig";
+import { DIC_PREFIXES } from "../config/constants";
 
 /**
  * Split bank account string into account number and bank code

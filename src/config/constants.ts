@@ -1,3 +1,5 @@
+export const DIC_PREFIXES = ["CZ", "SK", "vlastní"];
+
 export const VAT_RATES = [
   { percentage: 0, label: '0% (osvobozeno)' },
   { percentage: 12, label: '12% (snížená)' },
@@ -24,5 +26,7 @@ export const INVOICE_TYPES = [
   { value: 0, label: "Hotovost"},
   { value: 1, label: "Bankovní převod"},
 ] as const;
+
+
 
 

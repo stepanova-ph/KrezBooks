@@ -1,7 +1,6 @@
 import { validateFilterDIC, validateFilterICO } from "../utils/filterUtils";
 import { ContactFilterState, FilterConfig } from "../types/filter";
-
-export const DIC_PREFIXES = ["CZ", "SK", "vlastní"];
+import { DIC_PREFIXES } from "./constants";
 
 /**
  * Filter configuration for Contacts table
@@ -59,10 +58,9 @@ export const contactFilterConfig: FilterConfig = {
       maxLength: 8,
       autocomplete: true,
       validate: validateFilterICO,
-      width: 110, // Just enough for 8 digits + label
+      width: 110,
     },
 
-    // DIC filter with prefix selector
     {
       id: "dic",
       type: "number-with-prefix",

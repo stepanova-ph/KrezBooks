@@ -92,12 +92,19 @@ export function useDeleteItem() {
 export function useItemCategories() {
   return useQuery({
     queryKey: [...itemKeys.all, 'categories'],
-    queryFn: async () => {
-      const response = await window.electronAPI.items.getCategories();
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to fetch categories');
-      }
-      return response.data || [];
-    },
+queryFn: async () => {
+  console.log("haha")
+  try {
+    const response = await window.electronAPI.items.getCategories();
+    console.log("Response data:", JSON.stringify(response.data));
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch categories');
+    }
+    return response.data || [];
+  } catch (err) {
+    console.error("ERROR in useItemCategories:", err);
+    throw err;
+  }
+},
   });
 }

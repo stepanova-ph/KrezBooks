@@ -28,7 +28,7 @@ import {
   splitDIC,
   combineDIC,
 } from "../../../utils/formUtils";
-import { DIC_PREFIXES } from "../../../config/contactFilterConfig";
+import { DIC_PREFIXES } from "../../../config/constants";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import ContactTypeSelector from "./ContactsTypeSelector";
 import { ValidatedAutocomplete } from "../common/inputs/ValidatedAutocomplete";

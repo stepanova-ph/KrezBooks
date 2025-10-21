@@ -2,7 +2,7 @@ import { Grid, IconButton, Tooltip, MenuItem } from "@mui/material";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import { FormSection } from "../common/form/FormSection";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
-import { DIC_PREFIXES } from "../../../config/contactFilterConfig";
+import { DIC_PREFIXES } from "../../../config/constants";
 import type { InvoiceType } from "../../../types/database";
 
 interface InvoiceContactInfoProps {

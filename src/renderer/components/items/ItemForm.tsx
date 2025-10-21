@@ -48,8 +48,6 @@ function ItemForm({
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { data: allItems } = useItems();
-
   const { data: existingCategories = [] } = useItemCategories();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

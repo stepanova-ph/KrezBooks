@@ -34,6 +34,7 @@ declare global {
       };
 
       items: {
+        getCategories: () => Promise<IpcResponse<string[]>>;
         getAll: () => Promise<IpcResponse<Item[]>>;
         getOne: (ean: string) => Promise<IpcResponse<Item | null>>;
         create: (
