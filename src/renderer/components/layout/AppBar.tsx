@@ -74,7 +74,6 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
           label="Účetnictví"
           active={currentPage === "ucetnictvi"}
           onClick={() => onPageChange("ucetnictvi")}
-          disabled
         />
       </Box>
 
