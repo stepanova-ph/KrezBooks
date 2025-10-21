@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, IconButton, Tooltip } from "@mui/material";
 import { InvoiceHeader } from "../invoice/InvoiceHeader";
 import { InvoiceContactInfo } from "../invoice/InvoiceContactInfo";
+import { InvoiceItemsList } from "../invoice/InvoiceItemsList";
 import { splitDIC, combineDIC } from "../../../utils/formUtils";
 import type { CreateInvoiceInput } from "../../../types/database";
+import { FormSection } from "../common/form/FormSection";
+import InventoryIcon from '@mui/icons-material/Inventory';
 
 const defaultFormData: CreateInvoiceInput = {
   number: "",
@@ -56,7 +59,7 @@ function InvoiceTab() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box >
       <Grid container spacing={3}>
         <Grid item xs={12} md={isType5 ? 12 : 3} marginX={isType5 ? '55vh' : '0vh'} marginRight={isType5 ? undefined : '5vh'}>
           <Grid container spacing={3}>
@@ -103,9 +106,19 @@ function InvoiceTab() {
         </Grid>
 
         <Grid item xs={12} md={isType5 ? 12 : 8} marginX={isType5 ? '10vh' : 0} minHeight={'100%'}>
-          <Box sx={{ p: 2, border: '1px dashed #ccc' }}>
-            Item Table
-          </Box>
+          <FormSection
+            hideDivider
+            title="Položky dokladu"
+            actions={
+              <Tooltip title="Přidat položku ze skladu">
+                <IconButton size="small" color="primary">
+                  <InventoryIcon sx={{ width: 24 }} />
+                </IconButton>
+              </Tooltip>  
+            }
+            >
+            <InvoiceItemsList items={[]} />
+          </FormSection>
         </Grid>
       </Grid>
     </Box>

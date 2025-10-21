@@ -77,6 +77,7 @@ export function InvoiceContactInfo({
   return (
     <>
       <FormSection
+        hideDivider
         title="Kontaktní informace"
         actions={
           <Tooltip title="Vybrat z adresáře">
