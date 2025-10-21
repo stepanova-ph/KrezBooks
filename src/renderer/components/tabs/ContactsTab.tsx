@@ -37,7 +37,7 @@ function ContactTab() {
     disabled: false,
   });
 
-  const filteredContacts = useTableFilters(contacts, filters);
+  const filteredContacts = useTableFilters(contacts, filters, contactFilterConfig);
 
   if (isLoading) {
     return (

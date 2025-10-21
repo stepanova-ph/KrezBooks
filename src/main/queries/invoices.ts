@@ -3,11 +3,11 @@ export const invoiceQueries = {
     CREATE TABLE IF NOT EXISTS invoices (
       number TEXT PRIMARY KEY NOT NULL,
       type INTEGER NOT NULL,
-      payment_method INTEGER NOT NULL,
+      payment_method INTEGER,
       date_issue TEXT NOT NULL,
-      date_tax TEXT NOT NULL,
-      date_due TEXT NOT NULL,
-      variable_symbol TEXT NOT NULL,
+      date_tax TEXT,
+      date_due TEXT,
+      variable_symbol TEXT,
       note TEXT,
       ico TEXT,
       modifier INTEGER,
@@ -22,7 +22,7 @@ export const invoiceQueries = {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
       CONSTRAINT check_type CHECK (type BETWEEN 1 AND 5),
-      CONSTRAINT check_payment_method CHECK (payment_method IN (0, 1))
+      CONSTRAINT check_payment_method CHECK (payment_method IN (0, 1) OR payment_method IS NULL)
     )
   `,
 

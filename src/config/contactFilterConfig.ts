@@ -1,30 +1,30 @@
 import { validateFilterDIC, validateFilterICO } from "../utils/filterUtils";
 import { ContactFilterState, FilterConfig } from "../types/filter";
 import { DIC_PREFIXES } from "./constants";
+import { matchPhone } from "../utils/matchUtils";
 
 /**
  * Filter configuration for Contacts table
  */
 export const contactFilterConfig: FilterConfig = {
   filters: [
-    // Global text search
     {
       id: "search",
       type: "text-search",
       label: "Hledat",
       placeholder: "Název, město, telefon, email...",
       searchFields: [
-        "company_name",
-        "representative_name",
-        "city",
-        "street",
-        "postal_code",
-        "phone",
-        "email",
-        "website",
+        { field: "company_name"},
+        { field: "representative_name"},
+        { field: "city"},
+        { field: "street"},
+        { field: "postal_code"},
+        { field: "phone", match: matchPhone},
+        { field: "email"},
+        { field: "website"},
       ],
-      columnId: null, // Always visible
-      width: 200, // Compact search field
+      columnId: null,
+      width: 200,
     },
 
     // Supplier/Customer checkboxes (required group)

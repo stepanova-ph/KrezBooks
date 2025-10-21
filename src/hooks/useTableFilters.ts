@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { FilterState } from "src/types/filter";
+import { FilterConfig, FilterState, TextSearchFilterDef } from "src/types/filter";
 import {
   shouldFilterByDIC,
   shouldFilterByICO,
@@ -15,20 +15,41 @@ import {
 export function useTableFilters<T extends Record<string, any>>(
   data: T[],
   filters: FilterState,
+  config: FilterConfig
 ): T[] {
   return useMemo(() => {
     return data.filter((item) => {
       if (filters.search && filters.search.trim() !== "") {
         const searchTerm = filters.search.toLowerCase().trim();
 
-        const searchableFields = Object.keys(item).filter(
-          (key) => typeof item[key] === "string",
-        );
+        const searchableFieldsWithMatchFunctions = config.filters
+          .filter((filter): filter is TextSearchFilterDef => filter.type === "text-search")
+          .flatMap(filter =>
+            filter.searchFields.map(({ field, match }) => ({ field, match }))
+          );
 
-        const matches = searchableFields.some((field) => {
-          const value = item[field];
-          return value && String(value).toLowerCase().includes(searchTerm);
-        });
+
+        const matches = searchableFieldsWithMatchFunctions.some(({ field, match }) => {
+        const value = item[field];
+        console.log(`Value for ${field}:`, value);
+
+        if (match) {
+          try {
+            return match(value, searchTerm);
+          } catch (err) {
+            console.warn(`Match function for field "${field}" threw an error:`, err);
+            return false;
+          }
+        } else if (typeof value === "string") {
+          return value.toLowerCase().includes(searchTerm);
+        }
+
+        return (
+          value != null &&
+          String(value).toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
+
 
         if (!matches) return false;
       }

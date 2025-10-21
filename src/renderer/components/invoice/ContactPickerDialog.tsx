@@ -38,18 +38,16 @@ export function ContactPickerDialog({
   const [searchTerm, setSearchTerm] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   
-  // Filter contacts based on search
   const filteredContacts = allContacts.filter((contact) => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     return (
-      contact.ico.includes(term) ||
+      contact.ico.startsWith(term) ||
       contact.company_name.toLowerCase().includes(term) ||
-      (contact.dic && contact.dic.toLowerCase().includes(term))
+      (contact.dic && contact.dic.toUpperCase().startsWith(term.toUpperCase()))
     );
   });
 
-  // ESC to close
   useKeyboardShortcuts(
     {
       Escape: onClose,
@@ -65,7 +63,6 @@ export function ContactPickerDialog({
     disabled: !open
   })
 
-  // Handle selection
   const handleSelect = (contact: Contact) => {
     onSelect(contact);
   };

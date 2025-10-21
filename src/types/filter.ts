@@ -28,8 +28,12 @@ export interface BaseFilterDef {
 export interface TextSearchFilterDef extends BaseFilterDef {
   type: "text-search";
   placeholder?: string;
-  searchFields: string[]; // Fields to search in the data
+  searchFields: {
+    field: string;
+    match?: (...args: any[]) => boolean;
+  }[];
 }
+
 
 /**
  * Checkbox filter
@@ -117,10 +121,10 @@ export interface ContactFilterState {
   is_customer: boolean;
   ico: string;
   dic: {
-    prefix: string | null; // null = not selected
+    prefix: string | null;
     value: string;
   };
-  price_group: string | null; // null = all groups
+  price_group: string | null;
 }
 
 /**
