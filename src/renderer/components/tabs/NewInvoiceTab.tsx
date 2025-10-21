@@ -4,9 +4,10 @@ import { InvoiceHeader } from "../invoice/InvoiceHeader";
 import { InvoiceContactInfo } from "../invoice/InvoiceContactInfo";
 import { InvoiceItemsList } from "../invoice/InvoiceItemsList";
 import { splitDIC, combineDIC } from "../../../utils/formUtils";
-import type { CreateInvoiceInput } from "../../../types/database";
+import type { CreateInvoiceInput, Item } from "../../../types/database";
 import { FormSection } from "../common/form/FormSection";
-import InventoryIcon from '@mui/icons-material/Inventory';
+import InventoryIcon from "@mui/icons-material/Inventory";
+import { ItemPickerDialog } from "../invoice/ItemPickerDialog";
 
 const defaultFormData: CreateInvoiceInput = {
   number: "",
@@ -29,12 +30,14 @@ const defaultFormData: CreateInvoiceInput = {
   email: "",
 };
 
-function InvoiceTab() {
+function NewInvoiceTab() {
   const [formData, setFormData] = useState<CreateInvoiceInput>(defaultFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [dicParts, setDicParts] = useState<{ prefix: string | null; value: string }>(
-    splitDIC(formData.dic)
-  );
+  const [dicParts, setDicParts] = useState<{
+    prefix: string | null;
+    value: string;
+  }>(splitDIC(formData.dic));
+  const [itemPickerOpen, setItemPickerOpen] = useState(false);
 
   const isType5 = formData.type === 5;
 
@@ -46,22 +49,41 @@ function InvoiceTab() {
   const handleDicChange = (field: "prefix" | "value", value: string | null) => {
     if (errors.dic) setErrors((prev) => ({ ...prev, dic: "" }));
     setDicParts((prev) => {
-      const updated = { ...prev, [field]: field === "prefix" ? value || null : value };
+      const updated = {
+        ...prev,
+        [field]: field === "prefix" ? value || null : value,
+      };
       if (field === "prefix") updated.value = value ? prev.value : "";
-      setFormData((p) => ({ ...p, dic: combineDIC(updated.prefix, updated.value) }));
+      setFormData((p) => ({
+        ...p,
+        dic: combineDIC(updated.prefix, updated.value),
+      }));
       return updated;
     });
   };
 
   const handleBlur = (_field: string) => {};
+
   const handleSelectContact = () => {
     console.log("Vybrat kontakt z adresáře - funkce bude doplněna později");
   };
 
+  const handleSelectItem = (item: Item) => {
+    console.log("Vybraná položka:", item);
+    // TODO: Add item to invoice items list
+    setItemPickerOpen(false);
+  };
+
   return (
-    <Box >
+    <Box>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={isType5 ? 12 : 3} marginX={isType5 ? '55vh' : '0vh'} marginRight={isType5 ? undefined : '5vh'}>
+        <Grid
+          item
+          xs={12}
+          md={isType5 ? 12 : 3}
+          marginX={isType5 ? "55vh" : "0vh"}
+          marginRight={isType5 ? undefined : "5vh"}
+        >
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <InvoiceHeader
@@ -105,24 +127,40 @@ function InvoiceTab() {
           </Grid>
         </Grid>
 
-        <Grid item xs={12} md={isType5 ? 12 : 8} marginX={isType5 ? '10vh' : 0} minHeight={'100%'}>
+        <Grid
+          item
+          xs={12}
+          md={isType5 ? 12 : 8}
+          marginX={isType5 ? "10vh" : 0}
+          minHeight={"100%"}
+        >
           <FormSection
             hideDivider
             title="Položky dokladu"
             actions={
               <Tooltip title="Přidat položku ze skladu">
-                <IconButton size="small" color="primary">
+                <IconButton
+                  size="small"
+                  color="primary"
+                  onClick={() => setItemPickerOpen(true)}
+                >
                   <InventoryIcon sx={{ width: 24 }} />
                 </IconButton>
-              </Tooltip>  
+              </Tooltip>
             }
-            >
+          >
             <InvoiceItemsList items={[]} />
           </FormSection>
         </Grid>
       </Grid>
+
+      <ItemPickerDialog
+        open={itemPickerOpen}
+        onClose={() => setItemPickerOpen(false)}
+        onSelect={handleSelectItem}
+      />
     </Box>
   );
 }
 
-export default InvoiceTab;
+export default NewInvoiceTab;

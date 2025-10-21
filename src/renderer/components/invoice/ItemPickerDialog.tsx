@@ -4,52 +4,49 @@ import {
   useTheme,
   Divider,
   TableCell,
-  TextField,
 } from "@mui/material";
 import { useState, useRef } from "react";
-import { useContacts } from "../../../hooks/useContacts";
-import { Contact } from "../../../types/database";
+import { useItems } from "../../../hooks/useItems";
+import { Item } from "../../../types/database";
 import { DataTable, Column } from "../common/table/DataTable";
+import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import { useKeyboardShortcuts } from "../../../hooks/keyboard/useKeyboardShortcuts";
 import { WindowButton } from "../layout/WindowControls";
 import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
+import { formatVatRateShort } from "../../../utils/formattingUtils";
 import { useTableFilters } from "../../../hooks/useTableFilters";
-import { 
-  contactPickerFilterConfig,
-  initialPickerFilterState 
-} from "../../../config/pickerFilterConfig";
-import type { FilterState } from "../../../types/filter";
+import { initialPickerFilterState, itemPickerFilterConfig } from "../../../config/pickerFilterConfig";
 
-interface ContactPickerDialogProps {
+interface ItemPickerDialogProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (contact: Contact) => void;
+  onSelect: (item: Item) => void;
 }
 
 const pickerColumns: Column[] = [
-  { id: "ico", label: "IČO", minWidth: 75 },
-  { id: "modifier", label: "Mod", minWidth: 40, align: "center" },
-  { id: "company_name", label: "Název", minWidth: 200 },
-  { id: "dic", label: "DIČ", minWidth: 95 },
-  { id: "price_group", label: "Skupina", minWidth: 70, align: "center" },
+  { id: "ean", label: "EAN", minWidth: 100 },
+  { id: "name", label: "Název", minWidth: 200 },
+  { id: "category", label: "Kategorie", minWidth: 100 },
+  { id: "unit_of_measure", label: "Jednotka", minWidth: 80, align: "center" },
+  { id: "vat_rate", label: "DPH", minWidth: 60, align: "center" },
 ];
 
-export function ContactPickerDialog({
+export function ItemPickerDialog({
   open,
   onClose,
   onSelect,
-}: ContactPickerDialogProps) {
+}: ItemPickerDialogProps) {
   const theme = useTheme();
-  const { data: allContacts = [] } = useContacts();
+  const { data: allItems = [] } = useItems();
   const [filters, setFilters] = useState<{search: string}>(
     initialPickerFilterState
   );
   const searchInputRef = useRef<HTMLInputElement>(null);
-  
-  const filteredContacts = useTableFilters(
-    allContacts, 
-    filters, 
-    contactPickerFilterConfig
+
+  const filteredItems = useTableFilters(
+    allItems,
+    filters,
+    itemPickerFilterConfig
   );
 
   useKeyboardShortcuts(
@@ -64,31 +61,31 @@ export function ContactPickerDialog({
 
   useAutoSearchFocus({
     inputRef: searchInputRef,
-    disabled: !open
+    disabled: !open,
   });
 
-  const handleSelect = (contact: Contact) => {
-    onSelect(contact);
+  const handleSelect = (item: Item) => {
+    onSelect(item);
   };
 
-  const renderRow = (contact: Contact, visibleColumns: Column[]) => {
+  const renderRow = (item: Item, visibleColumns: Column[]) => {
     return visibleColumns.map((col) => {
       let content;
       switch (col.id) {
-        case "ico":
-          content = contact.ico;
+        case "ean":
+          content = item.ean;
           break;
-        case "modifier":
-          content = contact.modifier;
+        case "name":
+          content = item.name;
           break;
-        case "company_name":
-          content = contact.company_name;
+        case "category":
+          content = item.category || "-";
           break;
-        case "dic":
-          content = contact.dic || "-";
+        case "unit_of_measure":
+          content = item.unit_of_measure;
           break;
-        case "price_group":
-          content = `Skupina ${contact.price_group}`;
+        case "vat_rate":
+          content = formatVatRateShort(item.vat_rate);
           break;
         default:
           content = "-";
@@ -112,8 +109,6 @@ export function ContactPickerDialog({
         sx: {
           borderRadius: 0,
           boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          minHeight: "80vh",
-          maxHeight: "80vh",
         },
       }}
     >
@@ -130,7 +125,7 @@ export function ContactPickerDialog({
           color: theme.palette.primary.contrastText,
         }}
       >
-        <Box sx={{ fontWeight: 600, fontSize: "1rem" }}>Vybrat kontakt</Box>
+        <Box sx={{ fontWeight: 600, fontSize: "1rem" }}>Vybrat položku</Box>
 
         <WindowButton
           type="close"
@@ -141,43 +136,32 @@ export function ContactPickerDialog({
 
       <Divider sx={{ borderColor: theme.palette.divider }} />
 
-      {/* Content */}
       <Box
         sx={{
           p: 2,
           bgcolor: theme.palette.background.paper,
         }}
       >
-        {/* Simple filter box matching FilterBar style */}
-        <Box
-          sx={{
-            p: 2,
-            bgcolor: theme.palette.background.default,
-            borderRadius: 1,
-            border: (theme) => `1px solid ${theme.palette.divider}`,
-            mb: 2,
-          }}
-        >
-          <TextField
-            size="small"
+        <Box sx={{ mb: 2 }}>
+          <ValidatedTextField
+            inputRef={searchInputRef}
             label="Hledat"
-            placeholder="IČO, název, DIČ..."
+            placeholder="EAN, název, kategorie..."
             value={filters.search || ""}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            inputRef={searchInputRef}
             fullWidth
+            autoFocus
           />
         </Box>
 
-        {/* Table */}
         <Box sx={{ maxHeight: "60vh", overflow: "auto" }}>
           <DataTable
             columns={pickerColumns}
-            data={filteredContacts}
+            data={filteredItems}
             visibleColumnIds={new Set(pickerColumns.map((c) => c.id))}
             renderRow={renderRow}
-            getRowKey={(contact) => `${contact.ico}-${contact.modifier}`}
-            emptyMessage="Žádné kontakty nenalezeny"
+            getRowKey={(item) => item.ean}
+            emptyMessage="Žádné položky nenalezeny"
             onEnterAction={handleSelect}
           />
         </Box>
