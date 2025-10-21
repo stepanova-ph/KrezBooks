@@ -42,14 +42,14 @@ export const itemFilterConfig: FilterConfig = {
     },
 
     // Category text search
-    {
+ {
       id: "category",
-      type: "text-search",
-      label: "Kategorie",
+      type: "multiselect", // Changed from text-search
       field: "category",
+      label: "Kategorie",
       columnId: "category",
-      placeholder: "Hledat kategorii...",
-      searchFields: ["category"],
+      placeholder: "Všechny kategorie",
+      options: [], // Empty by default, will be populated dynamically
     },
   ],
 };
@@ -61,7 +61,7 @@ export const initialItemFilterState: ItemFilterState = {
   search: "",
   vat_rate: [],
   unit_of_measure: "",
-  category: "",
+  category: [],
 };
 
 export const defaultVisibleColumnsItem = [

@@ -75,11 +75,10 @@ export function useTableFilters<T extends Record<string, any>>(
         const unitValue = String(item.unit_of_measure || "").toLowerCase();
         if (!unitValue.includes(searchTerm)) return false;
       }
-
-      if (filters.category && filters.category.trim() !== "") {
-        const searchTerm = filters.category.toLowerCase().trim();
-        const categoryValue = String(item.category || "").toLowerCase();
-        if (!categoryValue.includes(searchTerm)) return false;
+        
+      if (filters.category && Array.isArray(filters.category) && filters.category.length > 0) {
+        const categoryValue = String(item.category || "");
+        if (!filters.category.includes(categoryValue)) return false;
       }
 
       return true;

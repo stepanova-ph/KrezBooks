@@ -34,7 +34,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getAll: () => ipcRenderer.invoke("db:contacts:getAll"),
     getOne: (ico: string, modifier: number) =>
       ipcRenderer.invoke("db:contacts:getOne", ico, modifier),
-    getCategories: () => ipcRenderer.invoke("db:items:getCategories"),
     create: (contact: CreateContactInput) =>
       ipcRenderer.invoke("db:contacts:create", contact),
     update: (ico: string, modifier: number, updates: Partial<Contact>) =>
@@ -46,6 +45,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   items: {
     getAll: () => ipcRenderer.invoke("db:items:getAll"),
     getOne: (ean: string) => ipcRenderer.invoke("db:items:getOne", ean),
+    getCategories: () => ipcRenderer.invoke("db:items:getCategories"),
     create: (item: CreateItemInput) =>
       ipcRenderer.invoke("db:items:create", item),
     update: (ean: string, updates: Partial<Item>) =>

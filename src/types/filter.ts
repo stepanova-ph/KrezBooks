@@ -130,7 +130,7 @@ export interface ItemFilterState {
   search: string;
   vat_rate: number[]; // Multiple selection
   unit_of_measure: string; // Text search
-  category: string; // Text search
+  category: string[]; // Text search
 }
 
 /**
