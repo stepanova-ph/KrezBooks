@@ -94,7 +94,7 @@ export function AppBarButton({
           right: 0,
           height: active ? 2 : "100%",
           backgroundColor: active
-            ? theme.palette.primary.light
+            ? theme.palette.primary.main
             : `${theme.palette.primary.main}40`,
           transition: active ? "height 0.3s ease" : "none",
           zIndex: 0,

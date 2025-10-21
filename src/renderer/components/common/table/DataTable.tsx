@@ -299,7 +299,7 @@ export function DataTable<T>({
                   items={orderedColumns.map((col) => col.id)}
                   strategy={horizontalListSortingStrategy}
                 >
-                  {orderedColumns.map((column) => (
+                  {orderedColumns.filter((col) => !col.hidden).map((column) => (
                     <DraggableHeaderCell
                       key={column.id}
                       column={column}

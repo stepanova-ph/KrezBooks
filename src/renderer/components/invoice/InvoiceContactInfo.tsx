@@ -1,9 +1,8 @@
-import { Grid, IconButton, Tooltip, MenuItem } from "@mui/material";
+import { Grid, IconButton, Tooltip } from "@mui/material";
 import { useState } from "react";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import { FormSection } from "../common/form/FormSection";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
-import { DIC_PREFIXES } from "../../../config/constants";
 import { splitDIC } from "../../../utils/formUtils";
 import type { InvoiceType, Contact } from "../../../types/database";
 import { ContactPickerDialog } from "./ContactPickerDialog";
@@ -51,7 +50,6 @@ export function InvoiceContactInfo({
 }: InvoiceContactInfoProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const requiresContactInfo = type === 2 || type === 4;
-  const isCustomDIC = dicPrefix === "vlastní";
 
   const handleContactSelect = (contact: Contact) => {
     onChange("ico", contact.ico);
@@ -64,10 +62,8 @@ export function InvoiceContactInfo({
     onChange("email", contact.email || "");
     onChange("bank_account", contact.bank_account || "");
 
-    // Update DIC
     if (contact.dic) {
       const parts = splitDIC(contact.dic);
-      console.log(`DIC parts: ${JSON.stringify(parts)}`);
       onDicChange("prefix", parts.prefix);
       onDicChange("value", parts.value);
     } else {
@@ -95,7 +91,7 @@ export function InvoiceContactInfo({
         }
       >
         <Grid container spacing={2}>
-          <Grid item md={2.5}>
+          <Grid item xs={8}>
             <ValidatedTextField
               label="IČO"
               name="ico"
@@ -108,7 +104,7 @@ export function InvoiceContactInfo({
             />
           </Grid>
 
-          <Grid item md={1.3}>
+          <Grid item xs={4}>
             <ValidatedTextField
               label="Mod"
               name="modifier"
@@ -127,38 +123,7 @@ export function InvoiceContactInfo({
             />
           </Grid>
 
-          <Grid item md={2.5}>
-            {/* <ValidatedTextField
-              name="dic_prefix"
-              value={dicPrefix ?? ""}
-              onChange={(e) => onDicChange("prefix", e.target.value || null)}
-              onBlur={() => onBlur("dic")}
-              error={errors.dic}
-              select
-              fullWidth
-            >
-              {DIC_PREFIXES.map((prefix) => (
-                <MenuItem key={prefix} value={prefix}>
-                  {prefix}
-                </MenuItem>
-              ))}
-            </ValidatedTextField>
-          </Grid>
-
-          <Grid item md={2.5}>
-            <ValidatedTextField
-              label={isCustomDIC ? "DIČ" : "Číselná část DIČ"}
-              name="dic_value"
-              value={dicValue}
-              onChange={(e) => onDicChange("value", e.target.value)}
-              onBlur={() => onBlur("dic")}
-              error={errors.dic}
-              disabled={!dicPrefix}
-              placeholder={
-                isCustomDIC ? "Zadejte celé DIČ" : "Zadejte číselnou část"
-              }
-              fullWidth
-            /> */}
+          <Grid item xs={12}>
             <ValidatedTextField
               label="DIČ"
               name="dic"
@@ -166,12 +131,11 @@ export function InvoiceContactInfo({
               onChange={(e) => onChange("dic", e.target.value)}
               onBlur={() => onBlur("dic")}
               error={errors.dic}
-              required={requiresContactInfo}
               fullWidth
             />
           </Grid>
 
-          <Grid item md={5.7}>
+          <Grid item xs={12}>
             <ValidatedTextField
               label="Název firmy"
               name="company_name"
@@ -184,7 +148,7 @@ export function InvoiceContactInfo({
             />
           </Grid>
 
-          <Grid item md={6}>
+          <Grid item xs={12}>
             <ValidatedTextField
               label="Ulice"
               name="street"
@@ -196,7 +160,7 @@ export function InvoiceContactInfo({
             />
           </Grid>
 
-          <Grid item md={3}>
+          <Grid item xs={8}>
             <ValidatedTextField
               label="Město"
               name="city"
@@ -208,7 +172,7 @@ export function InvoiceContactInfo({
             />
           </Grid>
 
-          <Grid item md={3}>
+          <Grid item xs={4}>
             <ValidatedTextField
               label="PSČ"
               name="postal_code"
@@ -220,7 +184,7 @@ export function InvoiceContactInfo({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12}>
             <ValidatedTextField
               label="Telefon"
               name="phone"
@@ -232,7 +196,7 @@ export function InvoiceContactInfo({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12}>
             <ValidatedTextField
               label="Email"
               name="email"
@@ -244,7 +208,7 @@ export function InvoiceContactInfo({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12}>
             <ValidatedTextField
               label="Bankovní účet"
               name="bank_account"

@@ -7,7 +7,7 @@ import type { InvoiceType, PaymentMethodType } from "../../../types/database";
 interface InvoiceHeaderProps {
   number: string;
   type: InvoiceType;
-  paymentMethod: PaymentMethodType;
+  paymentMethod?: PaymentMethodType;
   dateIssue: string;
   dateTax: string;
   dateDue: string;
@@ -31,11 +31,12 @@ export function InvoiceHeader({
 }: InvoiceHeaderProps) {
   const requiresDateTax = type === 1 || type === 3;
   const requiresInvoiceFields = type === 2 || type === 4;
+  const isType5 = type === 5;
 
   return (
     <FormSection title="Hlavička">
       <Grid container spacing={2}>
-        <Grid item md={3}>
+        <Grid item xs={isType5 ? 4 : requiresDateTax ? 5 : 5.5}>
           <ValidatedTextField
             label="Typ dokladu"
             name="type"
@@ -46,6 +47,9 @@ export function InvoiceHeader({
             select
             required
             fullWidth
+            sx={{
+              '.MuiInputBase-input': { fontSize: requiresDateTax? '0.78rem' : undefined },
+            }}
           >
             {INVOICE_TYPES.map((option) => (
               <MenuItem key={option.value} value={option.value}>
@@ -55,7 +59,7 @@ export function InvoiceHeader({
           </ValidatedTextField>
         </Grid>
 
-        <Grid item md={3}>
+        <Grid item xs={isType5 ? 5 : requiresDateTax ? 3.5 : 6.5}>
           <ValidatedTextField
             label="Číslo dokladu"
             name="number"
@@ -68,27 +72,7 @@ export function InvoiceHeader({
           />
         </Grid>
 
-        <Grid item md={3}>
-          <ValidatedTextField
-            label="Způsob platby"
-            name="payment_method"
-            value={paymentMethod}
-            onChange={(e) => onChange("payment_method", Number(e.target.value))}
-            onBlur={() => onBlur("payment_method")}
-            error={errors.payment_method}
-            select
-            required
-            fullWidth
-          >
-            {PAYMENT_METHOD_TYPES.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </ValidatedTextField>
-        </Grid>
-
-        <Grid item md={3}>
+        <Grid item xs={isType5 ? 3 : requiresDateTax ? 3.5 : 4}>
           <ValidatedTextField
             label="Datum vystavení"
             name="date_issue"
@@ -100,51 +84,88 @@ export function InvoiceHeader({
             required
             fullWidth
             InputLabelProps={{ shrink: true }}
+            sx={{
+              '.MuiInputBase-input': { fontSize: requiresDateTax? '0.74rem' : undefined },
+            }}
           />
         </Grid>
 
-        <Grid item md={3}>
-          <ValidatedTextField
-            label="Datum zdanitelného plnění"
-            name="date_tax"
-            type="date"
-            value={dateTax}
-            onChange={(e) => onChange("date_tax", e.target.value)}
-            onBlur={() => onBlur("date_tax")}
-            error={errors.date_tax}
-            required={requiresDateTax}
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
+        {!isType5 && (
+          <>
+            {requiresDateTax || requiresInvoiceFields && (
+              <Grid item xs={requiresInvoiceFields ? 4 : 3}>
+                <ValidatedTextField
+                  label="Datum zdanitelného plnění"
+                  name="date_tax"
+                  type="date"
+                  value={dateTax}
+                  onChange={(e) => onChange("date_tax", e.target.value)}
+                  onBlur={() => onBlur("date_tax")}
+                  error={errors.date_tax}
+                  required={requiresDateTax}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+            )}
 
-        <Grid item md={3}>
-          <ValidatedTextField
-            label="Datum splatnosti"
-            name="date_due"
-            type="date"
-            value={dateDue}
-            onChange={(e) => onChange("date_due", e.target.value)}
-            onBlur={() => onBlur("date_due")}
-            error={errors.date_due}
-            required={requiresInvoiceFields}
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
+            {requiresInvoiceFields && (
+              <Grid item xs={4}>
+                <ValidatedTextField
+                  label="Datum splatnosti"
+                  name="date_due"
+                  type="date"
+                  value={dateDue}
+                  onChange={(e) => onChange("date_due", e.target.value)}
+                  onBlur={() => onBlur("date_due")}
+                  error={errors.date_due}
+                  required={requiresInvoiceFields}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+            )}
 
-        <Grid item md={3}>
-          <ValidatedTextField
-            label="Variabilní symbol"
-            name="variable_symbol"
-            value={variableSymbol}
-            onChange={(e) => onChange("variable_symbol", e.target.value)}
-            onBlur={() => onBlur("variable_symbol")}
-            error={errors.variable_symbol}
-            required={requiresInvoiceFields}
-            fullWidth
-          />
-        </Grid>
+            {requiresInvoiceFields && (
+              <Grid item xs={requiresInvoiceFields ? 6 : 4}>
+              <ValidatedTextField
+                label="Způsob platby"
+                name="payment_method"
+                value={paymentMethod ?? ""}
+                onChange={(e) => onChange("payment_method", Number(e.target.value))}
+                onBlur={() => onBlur("payment_method")}
+                error={errors.payment_method}
+                select
+                fullWidth
+              >
+                <MenuItem value="">
+                  <em>Žádný</em>
+                </MenuItem>
+                {PAYMENT_METHOD_TYPES.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </ValidatedTextField>
+            </Grid>
+            )}
+
+            {requiresInvoiceFields && (
+              <Grid item xs={6}>
+                <ValidatedTextField
+                  label="Variabilní symbol"
+                  name="variable_symbol"
+                  value={variableSymbol}
+                  onChange={(e) => onChange("variable_symbol", e.target.value)}
+                  onBlur={() => onBlur("variable_symbol")}
+                  error={errors.variable_symbol}
+                  required={requiresInvoiceFields}
+                  fullWidth
+                />
+              </Grid>
+            )}
+          </>
+        )}
       </Grid>
     </FormSection>
   );

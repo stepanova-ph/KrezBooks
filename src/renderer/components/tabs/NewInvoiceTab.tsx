@@ -8,7 +8,7 @@ import type { CreateInvoiceInput } from "../../../types/database";
 const defaultFormData: CreateInvoiceInput = {
   number: "",
   type: 3,
-  payment_method: 0,
+  payment_method: undefined,
   date_issue: new Date().toISOString().split("T")[0],
   date_tax: new Date().toISOString().split("T")[0],
   date_due: "",
@@ -58,45 +58,55 @@ function InvoiceTab() {
   return (
     <Box sx={{ p: 3 }}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={isType5 ? 12 : 6}>
-          <InvoiceHeader
-            number={formData.number}
-            type={formData.type}
-            paymentMethod={formData.payment_method}
-            dateIssue={formData.date_issue}
-            dateTax={formData.date_tax ?? ""}
-            dateDue={formData.date_due ?? ""}
-            variableSymbol={formData.variable_symbol ?? ""}
-            errors={errors}
-            onChange={handleChange}
-            onBlur={handleBlur}
-          />
+        <Grid item xs={12} md={isType5 ? 12 : 3} marginX={isType5 ? '55vh' : '0vh'} marginRight={isType5 ? undefined : '5vh'}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <InvoiceHeader
+                number={formData.number}
+                type={formData.type}
+                paymentMethod={formData.payment_method}
+                dateIssue={formData.date_issue}
+                dateTax={formData.date_tax ?? ""}
+                dateDue={formData.date_due ?? ""}
+                variableSymbol={formData.variable_symbol ?? ""}
+                errors={errors}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            </Grid>
+
+            {!isType5 && (
+              <Grid item xs={12}>
+                <InvoiceContactInfo
+                  type={formData.type}
+                  ico={formData.ico ?? ""}
+                  modifier={formData.modifier}
+                  dic={formData.dic ?? ""}
+                  companyName={formData.company_name ?? ""}
+                  street={formData.street ?? ""}
+                  city={formData.city ?? ""}
+                  postalCode={formData.postal_code ?? ""}
+                  phone={formData.phone ?? ""}
+                  email={formData.email ?? ""}
+                  bankAccount={formData.bank_account ?? ""}
+                  dicPrefix={dicParts.prefix}
+                  dicValue={dicParts.value}
+                  errors={errors}
+                  onChange={handleChange}
+                  onDicChange={handleDicChange}
+                  onBlur={handleBlur}
+                  onSelectContact={handleSelectContact}
+                />
+              </Grid>
+            )}
+          </Grid>
         </Grid>
 
-        {!isType5 && (
-          <Grid item xs={12} md={6}>
-            <InvoiceContactInfo
-              type={formData.type}
-              ico={formData.ico ?? ""}
-              modifier={formData.modifier}
-              dic={formData.dic ?? ""}
-              companyName={formData.company_name ?? ""}
-              street={formData.street ?? ""}
-              city={formData.city ?? ""}
-              postalCode={formData.postal_code ?? ""}
-              phone={formData.phone ?? ""}
-              email={formData.email ?? ""}
-              bankAccount={formData.bank_account ?? ""}
-              dicPrefix={dicParts.prefix}
-              dicValue={dicParts.value}
-              errors={errors}
-              onChange={handleChange}
-              onDicChange={handleDicChange}
-              onBlur={handleBlur}
-              onSelectContact={handleSelectContact}
-            />
-          </Grid>
-        )}
+        <Grid item xs={12} md={isType5 ? 12 : 8} marginX={isType5 ? '10vh' : 0} minHeight={'100%'}>
+          <Box sx={{ p: 2, border: '1px dashed #ccc' }}>
+            Item Table
+          </Box>
+        </Grid>
       </Grid>
     </Box>
   );

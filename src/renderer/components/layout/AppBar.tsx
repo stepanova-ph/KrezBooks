@@ -15,7 +15,7 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
       sx={{
         width: "100%",
         height: 48,
-        backgroundColor: "#00556B",
+        backgroundColor: "primary.main",
         display: "flex",
         alignItems: "flex-end",
         padding: "0 0 0 16px",

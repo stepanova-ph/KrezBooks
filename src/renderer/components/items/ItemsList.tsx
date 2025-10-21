@@ -19,7 +19,7 @@ interface ItemsListProps {
 }
 
 export const itemColumns: Column[] = [
-  { id: "ean", label: "EAN", minWidth: 100, align: "center" as const },
+  { id: "ean", label: "EAN", minWidth: 100 },
   { id: "name", label: "Název", minWidth: 200 },
   {
     id: "category",
@@ -74,7 +74,6 @@ function ItemsList({
     }
   };
 
-  // Define context menu actions
   const contextMenuActions: ContextMenuAction<Item>[] = [
     {
       id: "edit",

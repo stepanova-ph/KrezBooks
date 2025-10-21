@@ -3,7 +3,6 @@ import { optionalString } from "./optionalString";
 import { validationMessages } from "../config/validationMessages";
 
 const requiresDateTax = (type: number) => type === 1 || type === 3;
-
 const requiresContactInfo = (type: number) => type === 2 || type === 4;
 
 export const invoiceSchema = z
@@ -26,8 +25,8 @@ export const invoiceSchema = z
     date_issue: z.string().min(1, validationMessages.invoice.dateIssue.required),
 
     payment_method: z.preprocess(
-      (v) => Number(v),
-      z.number().refine((n) => n === 0 || n === 1, validationMessages.invoice.paymentMethod.invalid)
+      (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+      z.number().refine((n) => n === 0 || n === 1, validationMessages.invoice.paymentMethod.invalid).optional()
     ),
 
     note: optionalString.refine(
