@@ -37,19 +37,6 @@ export function InvoiceHeader({
       <Grid container spacing={2}>
         <Grid item md={3}>
           <ValidatedTextField
-            label="Číslo dokladu"
-            name="number"
-            value={number}
-            onChange={(e) => onChange("number", e.target.value)}
-            onBlur={() => onBlur("number")}
-            error={errors.number}
-            required
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item md={3}>
-          <ValidatedTextField
             label="Typ dokladu"
             name="type"
             value={type}
@@ -66,6 +53,19 @@ export function InvoiceHeader({
               </MenuItem>
             ))}
           </ValidatedTextField>
+        </Grid>
+
+        <Grid item md={3}>
+          <ValidatedTextField
+            label="Číslo dokladu"
+            name="number"
+            value={number}
+            onChange={(e) => onChange("number", e.target.value)}
+            onBlur={() => onBlur("number")}
+            error={errors.number}
+            required
+            fullWidth
+          />
         </Grid>
 
         <Grid item md={3}>

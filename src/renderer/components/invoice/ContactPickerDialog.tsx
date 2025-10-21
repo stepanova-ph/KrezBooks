@@ -4,15 +4,21 @@ import {
   useTheme,
   Divider,
   TableCell,
+  TextField,
 } from "@mui/material";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useContacts } from "../../../hooks/useContacts";
 import { Contact } from "../../../types/database";
 import { DataTable, Column } from "../common/table/DataTable";
-import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import { useKeyboardShortcuts } from "../../../hooks/keyboard/useKeyboardShortcuts";
 import { WindowButton } from "../layout/WindowControls";
 import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
+import { useTableFilters } from "../../../hooks/useTableFilters";
+import { 
+  contactPickerFilterConfig,
+  initialContactPickerFilterState 
+} from "../../../config/contactPickerFilterConfig";
+import type { FilterState } from "../../../types/filter";
 
 interface ContactPickerDialogProps {
   open: boolean;
@@ -35,18 +41,16 @@ export function ContactPickerDialog({
 }: ContactPickerDialogProps) {
   const theme = useTheme();
   const { data: allContacts = [] } = useContacts();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<{search: string}>(
+    initialContactPickerFilterState
+  );
   const searchInputRef = useRef<HTMLInputElement>(null);
   
-  const filteredContacts = allContacts.filter((contact) => {
-    if (!searchTerm) return true;
-    const term = searchTerm.toLowerCase();
-    return (
-      contact.ico.startsWith(term) ||
-      contact.company_name.toLowerCase().includes(term) ||
-      (contact.dic && contact.dic.toUpperCase().startsWith(term.toUpperCase()))
-    );
-  });
+  const filteredContacts = useTableFilters(
+    allContacts, 
+    filters, 
+    contactPickerFilterConfig
+  );
 
   useKeyboardShortcuts(
     {
@@ -61,7 +65,7 @@ export function ContactPickerDialog({
   useAutoSearchFocus({
     inputRef: searchInputRef,
     disabled: !open
-  })
+  });
 
   const handleSelect = (contact: Contact) => {
     onSelect(contact);
@@ -144,16 +148,24 @@ export function ContactPickerDialog({
           bgcolor: theme.palette.background.paper,
         }}
       >
-        {/* Search field */}
-        <Box sx={{ mb: 2 }}>
-          <ValidatedTextField
-            inputRef={searchInputRef}
+        {/* Simple filter box matching FilterBar style */}
+        <Box
+          sx={{
+            p: 2,
+            bgcolor: theme.palette.background.default,
+            borderRadius: 1,
+            border: (theme) => `1px solid ${theme.palette.divider}`,
+            mb: 2,
+          }}
+        >
+          <TextField
+            size="small"
             label="Hledat"
             placeholder="IČO, název, DIČ..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={filters.search || ""}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            inputRef={searchInputRef}
             fullWidth
-            autoFocus
           />
         </Box>
 
