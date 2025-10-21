@@ -18,7 +18,6 @@ export function useTableFilters<T extends Record<string, any>>(
 ): T[] {
   return useMemo(() => {
     return data.filter((item) => {
-      // Text search filter
       if (filters.search && filters.search.trim() !== "") {
         const searchTerm = filters.search.toLowerCase().trim();
 

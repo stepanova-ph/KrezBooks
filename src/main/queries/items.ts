@@ -57,4 +57,12 @@ export const itemQueries = {
     DELETE FROM items 
     WHERE ean = ?
   `,
+
+  getCategories: `
+    SELECT DISTINCT category 
+    FROM items 
+    WHERE category IS NOT NULL 
+      AND category != '' 
+    ORDER BY category
+  `,
 };

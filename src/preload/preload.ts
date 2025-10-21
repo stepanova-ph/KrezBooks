@@ -34,6 +34,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getAll: () => ipcRenderer.invoke("db:contacts:getAll"),
     getOne: (ico: string, modifier: number) =>
       ipcRenderer.invoke("db:contacts:getOne", ico, modifier),
+    getCategories: () => ipcRenderer.invoke("db:items:getCategories"),
     create: (contact: CreateContactInput) =>
       ipcRenderer.invoke("db:contacts:create", contact),
     update: (ico: string, modifier: number, updates: Partial<Contact>) =>

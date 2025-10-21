@@ -8,7 +8,7 @@ import { NumberTextField } from "../common/inputs/NumberTextField";
 import { VatPriceField } from "../common/inputs/VatPriceField";
 import { FormSection } from "../common/form/FormSection";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
-import { useItems } from "../../../hooks/useItems";
+import { useItemCategories, useItems } from "../../../hooks/useItems";
 import { ValidatedAutocomplete } from "../common/inputs/ValidatedAutocomplete";
 import { VAT_RATES, UNIT_OPTIONS } from "../../../config/constants";
 
@@ -50,21 +50,7 @@ function ItemForm({
 
   const { data: allItems } = useItems();
 
-  const existingCategories = React.useMemo(() => {
-    if (!allItems) return [];
-    const categories = allItems
-      .map((item) => item.category)
-      .filter((cat): cat is string => !!cat && cat.trim() !== "");
-    return Array.from(new Set(categories)).sort();
-  }, [allItems]);
-
-  const existingUnits = React.useMemo(() => {
-    if (!allItems) return UNIT_OPTIONS;
-    const units = allItems
-      .map((item) => item.unit_of_measure)
-      .filter((u): u is string => !!u && u.trim() !== "");
-    return Array.from(new Set([...UNIT_OPTIONS, ...units])).sort();
-  }, [allItems]);
+  const { data: existingCategories = [] } = useItemCategories();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -190,7 +176,7 @@ function ItemForm({
             <ValidatedAutocomplete
               size="small"
               freeSolo
-              options={existingUnits}
+              options={UNIT_OPTIONS}
               value={formData.unit_of_measure || ""}
               onChange={(_, newValue) => {
                 setFormData((p) => ({ ...p, unit_of_measure: newValue || "" }));

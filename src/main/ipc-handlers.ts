@@ -80,6 +80,9 @@ export function registerIpcHandlers() {
     return handleIpcRequest(() => itemService.delete(ean));
   });
 
+  ipcMain.handle('db:items:getCategories', async () => {
+    return handleIpcRequest(() => itemService.getCategories());
+  });
   
   
   // --------------------------------------------------------------------------

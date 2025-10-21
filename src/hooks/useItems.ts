@@ -88,3 +88,16 @@ export function useDeleteItem() {
     },
   });
 }
+
+export function useItemCategories() {
+  return useQuery({
+    queryKey: [...itemKeys.all, 'categories'],
+    queryFn: async () => {
+      const response = await window.electronAPI.items.getCategories();
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to fetch categories');
+      }
+      return response.data || [];
+    },
+  });
+}

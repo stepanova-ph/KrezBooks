@@ -75,7 +75,6 @@ export class ItemService {
   }
 
   private buildUpdateQuery(tableName: string, fields: string[]): string {
-    // Whitelist allowed fields
     const allowedFields = new Set([
       'category', 'name', 'note', 'vat_rate', 'unit_of_measure',
       'sale_price_group1', 'sale_price_group2', 'sale_price_group3', 'sale_price_group4'
@@ -94,4 +93,11 @@ export class ItemService {
       WHERE ean = @ean
     `;
   }
+
+  async getCategories(): Promise<string[]> {
+  const db = getDatabase();
+  const statement = db.prepare(itemQueries.getCategories);
+  const results = statement.all() as { category: string }[];
+  return results.map(r => r.category);
+}
 }
