@@ -1,9 +1,12 @@
 import { Grid, IconButton, Tooltip, MenuItem } from "@mui/material";
+import { useState } from "react";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import { FormSection } from "../common/form/FormSection";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import { DIC_PREFIXES } from "../../../config/constants";
-import type { InvoiceType } from "../../../types/database";
+import { splitDIC } from "../../../utils/formUtils";
+import type { InvoiceType, Contact } from "../../../types/database";
+import { ContactPickerDialog } from "./ContactPickerDialog";
 
 interface InvoiceContactInfoProps {
   type: InvoiceType;
@@ -46,166 +49,220 @@ export function InvoiceContactInfo({
   onBlur,
   onSelectContact,
 }: InvoiceContactInfoProps) {
+  const [pickerOpen, setPickerOpen] = useState(false);
   const requiresContactInfo = type === 2 || type === 4;
   const isCustomDIC = dicPrefix === "vlastní";
 
+  const handleContactSelect = (contact: Contact) => {
+    onChange("ico", contact.ico);
+    onChange("modifier", contact.modifier);
+    onChange("company_name", contact.company_name);
+    onChange("street", contact.street || "");
+    onChange("city", contact.city || "");
+    onChange("postal_code", contact.postal_code || "");
+    onChange("phone", contact.phone || "");
+    onChange("email", contact.email || "");
+    onChange("bank_account", contact.bank_account || "");
+
+    // Update DIC
+    if (contact.dic) {
+      const parts = splitDIC(contact.dic);
+      console.log(`DIC parts: ${JSON.stringify(parts)}`);
+      onDicChange("prefix", parts.prefix);
+      onDicChange("value", parts.value);
+    } else {
+      onDicChange("prefix", null);
+      onDicChange("value", "");
+    }
+
+    setPickerOpen(false);
+  };
+
   return (
-    <FormSection
-      title="Informace o obchodním partnerovi"
-      actions={
-        <Tooltip title="Vybrat z adresáře">
-          <IconButton size="small" onClick={onSelectContact} color="primary">
-            <PersonSearchIcon />
-          </IconButton>
-        </Tooltip>
-      }
-    >
-      <Grid container spacing={2}>
-        <Grid item md={2.5}>
-          <ValidatedTextField
-            label="IČO"
-            name="ico"
-            value={ico}
-            onChange={(e) => onChange("ico", e.target.value)}
-            onBlur={() => onBlur("ico")}
-            error={errors.ico}
-            required={requiresContactInfo}
-            fullWidth
-          />
-        </Grid>
+    <>
+      <FormSection
+        title="Kontaktní informace"
+        actions={
+          <Tooltip title="Vybrat z adresáře">
+            <IconButton
+              size="small"
+              onClick={() => setPickerOpen(true)}
+              color="primary"
+            >
+              <PersonSearchIcon />
+            </IconButton>
+          </Tooltip>
+        }
+      >
+        <Grid container spacing={2}>
+          <Grid item md={2.5}>
+            <ValidatedTextField
+              label="IČO"
+              name="ico"
+              value={ico}
+              onChange={(e) => onChange("ico", e.target.value)}
+              onBlur={() => onBlur("ico")}
+              error={errors.ico}
+              required={requiresContactInfo}
+              fullWidth
+            />
+          </Grid>
 
-        <Grid item md={1.5}>
-          <ValidatedTextField
-            label="Mod"
-            name="modifier"
-            type="number"
-            value={modifier ?? ""}
-            onChange={(e) => onChange("modifier", e.target.value ? Number(e.target.value) : "")}
-            onBlur={() => onBlur("modifier")}
-            error={errors.modifier}
-            required={requiresContactInfo}
-            fullWidth
-          />
-        </Grid>
+          <Grid item md={1.3}>
+            <ValidatedTextField
+              label="Mod"
+              name="modifier"
+              type="number"
+              value={modifier ?? ""}
+              onChange={(e) =>
+                onChange(
+                  "modifier",
+                  e.target.value ? Number(e.target.value) : ""
+                )
+              }
+              onBlur={() => onBlur("modifier")}
+              error={errors.modifier}
+              required={requiresContactInfo}
+              fullWidth
+            />
+          </Grid>
 
-        <Grid item md={1.3}>
-          <ValidatedTextField
-            name="dic_prefix"
-            value={dicPrefix ?? ""}
-            onChange={(e) => onDicChange("prefix", e.target.value || null)}
-            onBlur={() => onBlur("dic")}
-            error={errors.dic}
-            select
-            fullWidth
-          >
-            <MenuItem value="">Bez DIČ</MenuItem>
-            {DIC_PREFIXES.map((prefix) => (
-              <MenuItem key={prefix.value} value={prefix.value}>
-                {prefix.label}
-              </MenuItem>
-            ))}
-          </ValidatedTextField>
-        </Grid>
+          <Grid item md={2.5}>
+            {/* <ValidatedTextField
+              name="dic_prefix"
+              value={dicPrefix ?? ""}
+              onChange={(e) => onDicChange("prefix", e.target.value || null)}
+              onBlur={() => onBlur("dic")}
+              error={errors.dic}
+              select
+              fullWidth
+            >
+              {DIC_PREFIXES.map((prefix) => (
+                <MenuItem key={prefix} value={prefix}>
+                  {prefix}
+                </MenuItem>
+              ))}
+            </ValidatedTextField>
+          </Grid>
 
-        <Grid item md={2.5}>
-          <ValidatedTextField
-            label={isCustomDIC ? "DIČ" : "Číselná část DIČ"}
-            name="dic_value"
-            value={dicValue}
-            onChange={(e) => onDicChange("value", e.target.value)}
-            onBlur={() => onBlur("dic")}
-            error={errors.dic}
-            disabled={!dicPrefix}
-            placeholder={isCustomDIC ? "Zadejte celé DIČ" : "Zadejte číselnou část"}
-            fullWidth
-          />
-        </Grid>
+          <Grid item md={2.5}>
+            <ValidatedTextField
+              label={isCustomDIC ? "DIČ" : "Číselná část DIČ"}
+              name="dic_value"
+              value={dicValue}
+              onChange={(e) => onDicChange("value", e.target.value)}
+              onBlur={() => onBlur("dic")}
+              error={errors.dic}
+              disabled={!dicPrefix}
+              placeholder={
+                isCustomDIC ? "Zadejte celé DIČ" : "Zadejte číselnou část"
+              }
+              fullWidth
+            /> */}
+            <ValidatedTextField
+              label="DIČ"
+              name="dic"
+              value={dic}
+              onChange={(e) => onChange("dic", e.target.value)}
+              onBlur={() => onBlur("dic")}
+              error={errors.dic}
+              required={requiresContactInfo}
+              fullWidth
+            />
+          </Grid>
 
-        <Grid item md={4}>
-          <ValidatedTextField
-            label="Název firmy"
-            name="company_name"
-            value={companyName}
-            onChange={(e) => onChange("company_name", e.target.value)}
-            onBlur={() => onBlur("company_name")}
-            error={errors.company_name}
-            fullWidth
-          />
-        </Grid>
+          <Grid item md={5.7}>
+            <ValidatedTextField
+              label="Název firmy"
+              name="company_name"
+              value={companyName}
+              onChange={(e) => onChange("company_name", e.target.value)}
+              onBlur={() => onBlur("company_name")}
+              error={errors.company_name}
+              required={requiresContactInfo}
+              fullWidth
+            />
+          </Grid>
 
-        <Grid item md={6}>
-          <ValidatedTextField
-            label="Ulice a číslo popisné"
-            name="street"
-            value={street}
-            onChange={(e) => onChange("street", e.target.value)}
-            onBlur={() => onBlur("street")}
-            error={errors.street}
-            fullWidth
-          />
-        </Grid>
+          <Grid item md={6}>
+            <ValidatedTextField
+              label="Ulice"
+              name="street"
+              value={street}
+              onChange={(e) => onChange("street", e.target.value)}
+              onBlur={() => onBlur("street")}
+              error={errors.street}
+              fullWidth
+            />
+          </Grid>
 
-        <Grid item md={4}>
-          <ValidatedTextField
-            label="Město"
-            name="city"
-            value={city}
-            onChange={(e) => onChange("city", e.target.value)}
-            onBlur={() => onBlur("city")}
-            error={errors.city}
-            fullWidth
-          />
-        </Grid>
+          <Grid item md={3}>
+            <ValidatedTextField
+              label="Město"
+              name="city"
+              value={city}
+              onChange={(e) => onChange("city", e.target.value)}
+              onBlur={() => onBlur("city")}
+              error={errors.city}
+              fullWidth
+            />
+          </Grid>
 
-        <Grid item md={2}>
-          <ValidatedTextField
-            label="PSČ"
-            name="postal_code"
-            value={postalCode}
-            onChange={(e) => onChange("postal_code", e.target.value)}
-            onBlur={() => onBlur("postal_code")}
-            error={errors.postal_code}
-            fullWidth
-          />
-        </Grid>
+          <Grid item md={3}>
+            <ValidatedTextField
+              label="PSČ"
+              name="postal_code"
+              value={postalCode}
+              onChange={(e) => onChange("postal_code", e.target.value)}
+              onBlur={() => onBlur("postal_code")}
+              error={errors.postal_code}
+              fullWidth
+            />
+          </Grid>
 
-        <Grid item md={4}>
-          <ValidatedTextField
-            label="Telefon"
-            name="phone"
-            value={phone}
-            onChange={(e) => onChange("phone", e.target.value)}
-            onBlur={() => onBlur("phone")}
-            error={errors.phone}
-            fullWidth
-          />
-        </Grid>
+          <Grid item md={4}>
+            <ValidatedTextField
+              label="Telefon"
+              name="phone"
+              value={phone}
+              onChange={(e) => onChange("phone", e.target.value)}
+              onBlur={() => onBlur("phone")}
+              error={errors.phone}
+              fullWidth
+            />
+          </Grid>
 
-        <Grid item md={4}>
-          <ValidatedTextField
-            label="E-mail"
-            name="email"
-            type="email"
-            value={email}
-            onChange={(e) => onChange("email", e.target.value)}
-            onBlur={() => onBlur("email")}
-            error={errors.email}
-            fullWidth
-          />
-        </Grid>
+          <Grid item md={4}>
+            <ValidatedTextField
+              label="Email"
+              name="email"
+              value={email}
+              onChange={(e) => onChange("email", e.target.value)}
+              onBlur={() => onBlur("email")}
+              error={errors.email}
+              fullWidth
+            />
+          </Grid>
 
-        <Grid item md={4}>
-          <ValidatedTextField
-            label="Číslo účtu"
-            name="bank_account"
-            value={bankAccount}
-            onChange={(e) => onChange("bank_account", e.target.value)}
-            onBlur={() => onBlur("bank_account")}
-            error={errors.bank_account}
-            fullWidth
-          />
+          <Grid item md={4}>
+            <ValidatedTextField
+              label="Bankovní účet"
+              name="bank_account"
+              value={bankAccount}
+              onChange={(e) => onChange("bank_account", e.target.value)}
+              onBlur={() => onBlur("bank_account")}
+              error={errors.bank_account}
+              fullWidth
+            />
+          </Grid>
         </Grid>
-      </Grid>
-    </FormSection>
+      </FormSection>
+
+      <ContactPickerDialog
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onSelect={handleContactSelect}
+      />
+    </>
   );
 }

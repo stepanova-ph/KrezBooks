@@ -7,9 +7,9 @@ import { AppPage } from '../../renderer/components/layout/AppBar';
 export function useGlobalShortcuts(onPageChange: (page: AppPage) => void) {
   useKeyboardShortcuts({
     'F1': () => onPageChange('domu'),
-    'F2': () => onPageChange('adresar'),
-    'F3': () => onPageChange('sklad'),
-    'F4': () => onPageChange('ucetnictvi'),
+    'F2': () => onPageChange('ucetnictvi'),
+    'F3': () => onPageChange('adresar'),
+    'F4': () => onPageChange('sklad'),
     // 'F5': () => onPageChange(''),
     // 'F6': () => onPageChange(''),
   }, {

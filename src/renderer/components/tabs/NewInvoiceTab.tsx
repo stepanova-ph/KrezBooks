@@ -33,40 +33,24 @@ function InvoiceTab() {
     splitDIC(formData.dic)
   );
 
+  const isType5 = formData.type === 5;
+
   const handleChange = (field: string, value: string | number) => {
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleDicChange = (field: "prefix" | "value", value: string | null) => {
-    if (errors.dic) {
-      setErrors((prev) => ({ ...prev, dic: "" }));
-    }
-
+    if (errors.dic) setErrors((prev) => ({ ...prev, dic: "" }));
     setDicParts((prev) => {
-      const updated = {
-        ...prev,
-        [field]: field === "prefix" ? value || null : value,
-      };
-
-      if (field === "prefix") {
-        updated.value = value ? prev.value : "";
-      }
-
-      setFormData((prevForm) => ({
-        ...prevForm,
-        dic: combineDIC(updated.prefix, updated.value),
-      }));
+      const updated = { ...prev, [field]: field === "prefix" ? value || null : value };
+      if (field === "prefix") updated.value = value ? prev.value : "";
+      setFormData((p) => ({ ...p, dic: combineDIC(updated.prefix, updated.value) }));
       return updated;
     });
   };
 
-  const handleBlur = (field: string) => {
-    // Validation can be added here
-  };
-
+  const handleBlur = (_field: string) => {};
   const handleSelectContact = () => {
     console.log("Vybrat kontakt z adresáře - funkce bude doplněna později");
   };
@@ -74,7 +58,7 @@ function InvoiceTab() {
   return (
     <Box sx={{ p: 3 }}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={isType5 ? 12 : 6}>
           <InvoiceHeader
             number={formData.number}
             type={formData.type}
@@ -89,28 +73,30 @@ function InvoiceTab() {
           />
         </Grid>
 
-        <Grid item xs={12} md={6}>
-          <InvoiceContactInfo
-            type={formData.type}
-            ico={formData.ico ?? ""}
-            modifier={formData.modifier}
-            dic={formData.dic ?? ""}
-            companyName={formData.company_name ?? ""}
-            street={formData.street ?? ""}
-            city={formData.city ?? ""}
-            postalCode={formData.postal_code ?? ""}
-            phone={formData.phone ?? ""}
-            email={formData.email ?? ""}
-            bankAccount={formData.bank_account ?? ""}
-            dicPrefix={dicParts.prefix}
-            dicValue={dicParts.value}
-            errors={errors}
-            onChange={handleChange}
-            onDicChange={handleDicChange}
-            onBlur={handleBlur}
-            onSelectContact={handleSelectContact}
-          />
-        </Grid>
+        {!isType5 && (
+          <Grid item xs={12} md={6}>
+            <InvoiceContactInfo
+              type={formData.type}
+              ico={formData.ico ?? ""}
+              modifier={formData.modifier}
+              dic={formData.dic ?? ""}
+              companyName={formData.company_name ?? ""}
+              street={formData.street ?? ""}
+              city={formData.city ?? ""}
+              postalCode={formData.postal_code ?? ""}
+              phone={formData.phone ?? ""}
+              email={formData.email ?? ""}
+              bankAccount={formData.bank_account ?? ""}
+              dicPrefix={dicParts.prefix}
+              dicValue={dicParts.value}
+              errors={errors}
+              onChange={handleChange}
+              onDicChange={handleDicChange}
+              onBlur={handleBlur}
+              onSelectContact={handleSelectContact}
+            />
+          </Grid>
+        )}
       </Grid>
     </Box>
   );

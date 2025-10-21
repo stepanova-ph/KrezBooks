@@ -33,7 +33,7 @@ export function InvoiceHeader({
   const requiresInvoiceFields = type === 2 || type === 4;
 
   return (
-    <FormSection title="Základní údaje">
+    <FormSection title="Hlavička">
       <Grid container spacing={2}>
         <Grid item md={3}>
           <ValidatedTextField

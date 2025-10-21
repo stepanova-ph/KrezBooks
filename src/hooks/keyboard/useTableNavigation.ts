@@ -5,6 +5,7 @@ export interface UseTableNavigationOptions {
   disabled?: boolean;
   dataLength: number;
   onFocusChange?: (index: number) => void;
+  onEnterPress?: () => void;
 }
 
 /**
@@ -12,7 +13,7 @@ export interface UseTableNavigationOptions {
  * manages focused row index and provides auto-scroll
  */
 export function useTableNavigation(options: UseTableNavigationOptions) {
-  const { disabled = false, dataLength, onFocusChange } = options;
+  const { disabled = false, dataLength, onFocusChange, onEnterPress } = options;
   
   const [focusedRowIndex, setFocusedRowIndex] = useState(0);
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
@@ -63,6 +64,12 @@ export function useTableNavigation(options: UseTableNavigationOptions) {
     setFocusedRowIndex(dataLength - 1);
   }, [dataLength]);
 
+  const handleEnter = useCallback(() => {
+    if (onEnterPress) {
+      onEnterPress();
+    }
+  }, [onEnterPress]);
+
   useKeyboardShortcuts({
     'ArrowUp': moveUp,
     'ArrowDown': moveDown,
@@ -70,6 +77,7 @@ export function useTableNavigation(options: UseTableNavigationOptions) {
     'PageDown': movePageDown,
     'Home': moveToTop,
     'End': moveToBottom,
+    'Enter': handleEnter,
   }, {
     disabled: disabled || dataLength === 0,
     preventInInputs: true,

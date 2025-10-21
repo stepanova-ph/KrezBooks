@@ -10,7 +10,7 @@ import ContactsTab from "./components/tabs/ContactsTab";
 import InventoryTab from "./components/tabs/InventoryTab";
 import HomeTab from "./components/tabs/HomeTab";
 import { useGlobalShortcuts } from "../hooks/keyboard/useGlobalShortcuts";
-import InvoiceTab from "./components/tabs/InvoiceTab";
+import InvoiceTab from "./components/tabs/NewInvoiceTab";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<AppPage>("domu");
@@ -26,7 +26,7 @@ function App() {
         return <ContactsTab />;
       case "sklad":
         return <InventoryTab />;
-      case "ucetnictvi":
+      case "novy_doklad":
         return <InvoiceTab />
       default:
         return null;

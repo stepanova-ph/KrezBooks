@@ -2,18 +2,21 @@ import { useEffect, RefObject } from 'react';
 import { FilterBarRef } from '../../renderer/components/common/filtering/FilterBar';
 
 export interface UseAutoSearchFocusOptions {
-  filterBarRef: RefObject<FilterBarRef>;
+  filterBarRef?: RefObject<FilterBarRef>;
+  inputRef?: RefObject<HTMLInputElement>;
   disabled?: boolean;
 }
 
 /**
- * hook for auto-focusing the main search bar when user types
+ * hook for auto-focusing a search input when user types
  * triggers on alphanumeric keys and +
  * 
- * only focuses the main "search" filter (id: "search"), not other text filters
+ * Supports two modes:
+ * 1. filterBarRef - for use with FilterBar component
+ * 2. inputRef - for direct input ref (like in dialogs)
  */
 export function useAutoSearchFocus(options: UseAutoSearchFocusOptions) {
-  const { filterBarRef, disabled = false } = options;
+  const { filterBarRef, inputRef, disabled = false } = options;
 
   useEffect(() => {
     if (disabled) return;
@@ -34,17 +37,19 @@ export function useAutoSearchFocus(options: UseAutoSearchFocusOptions) {
       // check if it's alphanumeric or +
       const isAlphanumeric = /^[a-zA-Z0-9+]$/.test(event.key);
 
-      // focus the main search input (the one with id="search")
-      // this is always the first input in FilterBar
-      if (isAlphanumeric && filterBarRef.current?.searchInputRef.current) {
-        filterBarRef.current.searchInputRef.current.focus();
-        
-        // let the character appear in the input
-        // by not preventing default
+      if (isAlphanumeric) {
+        // Try direct input ref first
+        if (inputRef?.current) {
+          inputRef.current.focus();
+        } 
+        // Fall back to FilterBar ref
+        else if (filterBarRef?.current?.searchInputRef.current) {
+          filterBarRef.current.searchInputRef.current.focus();
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [filterBarRef, disabled]);
+  }, [filterBarRef, inputRef, disabled]);
 }

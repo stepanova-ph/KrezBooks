@@ -20,7 +20,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import { useState, MouseEvent } from "react";
+import { useState, MouseEvent, useCallback, useRef } from "react";
 import {
   DndContext,
   closestCenter,
@@ -74,6 +74,7 @@ interface DataTableProps<T> {
   getRowKey?: (item: T) => string | number;
   columnOrder?: string[];
   onColumnOrderChange?: (newOrder: string[]) => void;
+  onEnterAction?: (item: T, index: number) => void;
 }
 
 export function DataTable<T>({
@@ -86,7 +87,10 @@ export function DataTable<T>({
   getRowKey = (item: any) => item.id,
   columnOrder,
   onColumnOrderChange,
+  onEnterAction,
 }: DataTableProps<T>) {
+  const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+
   // Filter visible columns
   const visibleColumns = columns.filter((col) => visibleColumnIds.has(col.id));
 
@@ -96,12 +100,6 @@ export function DataTable<T>({
         .map((id) => visibleColumns.find((col) => col.id === id))
         .filter((col): col is Column => col !== undefined)
     : visibleColumns;
-
-  // unified focus system - keyboard AND mouse both use this
-  const { focusedRowIndex, setFocusedRowIndex, setRowRef } = useTableNavigation({
-    disabled: data.length === 0,
-    dataLength: data.length,
-  });
 
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{
@@ -121,12 +119,44 @@ export function DataTable<T>({
     item: null,
   });
 
+  // Default: Enter opens context menu (simulates right-click on focused row)
+  const handleEnterPress = useCallback(() => {
+    if (data.length === 0) return;
+
+    const focusedItem = data[focusedRowIndex];
+
+    if (onEnterAction) {
+      // Custom action provided
+      onEnterAction(focusedItem, focusedRowIndex);
+    } else if (contextMenuActions.length > 0) {
+      // Default: open context menu for focused row
+      const rowElement = rowRefs.current[focusedRowIndex];
+      if (rowElement) {
+        const rect = rowElement.getBoundingClientRect();
+        setContextMenu({
+          mouseX: rect.left + 100,
+          mouseY: rect.top + 20,
+          item: focusedItem,
+        });
+      }
+    }
+  }, [data, onEnterAction, contextMenuActions.length]);
+
+  // unified focus system - keyboard AND mouse both use this
+  const { focusedRowIndex, setFocusedRowIndex, setRowRef } = useTableNavigation(
+    {
+      disabled: data.length === 0,
+      dataLength: data.length,
+      onEnterPress: handleEnterPress,
+    }
+  );
+
   // Drag and drop sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   // Handle drag end
@@ -138,7 +168,7 @@ export function DataTable<T>({
       const newIndex = orderedColumns.findIndex((col) => col.id === over.id);
 
       const newOrder = arrayMove(orderedColumns, oldIndex, newIndex).map(
-        (col) => col.id,
+        (col) => col.id
       );
 
       if (onColumnOrderChange) {
@@ -155,10 +185,10 @@ export function DataTable<T>({
   // handle context menu - update focus and open menu
   const handleContextMenu = (event: MouseEvent, item: T, index: number) => {
     event.preventDefault();
-    
+
     // set focus to the right-clicked row
     setFocusedRowIndex(index);
-    
+
     setContextMenu({
       mouseX: event.clientX + 2,
       mouseY: event.clientY - 6,
@@ -207,6 +237,17 @@ export function DataTable<T>({
     return message || "Opravdu chcete provést tuto akci?";
   };
 
+  // Store row refs for Enter key positioning
+  const setRowRefWithStorage = useCallback(
+    (index: number) => {
+      return (el: HTMLTableRowElement | null) => {
+        rowRefs.current[index] = el;
+        setRowRef(index)(el);
+      };
+    },
+    [setRowRef]
+  );
+
   return (
     <Box>
       <TableContainer
@@ -222,12 +263,10 @@ export function DataTable<T>({
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
-          modifiers={[
-            restrictToHorizontalAxis,
-            restrictToFirstScrollableAncestor,
-          ]}
+          modifiers={[restrictToHorizontalAxis, restrictToFirstScrollableAncestor]}
         >
-          <Table
+          <Table 
+            stickyHeader
             size="small"
             sx={{
               "& .MuiTableCell-root": {
@@ -242,14 +281,14 @@ export function DataTable<T>({
               },
             }}
           >
-            <TableHead sx={{ backgroundColor: "palette.grey.100" }}>
+            <TableHead >
               <TableRow
                 sx={(theme) => ({
-                  backgroundColor: "palette.primary.main",
+                  backgroundColor: theme.palette.grey[100],
                   "& .MuiTableCell-head": {
                     padding: "5px 5px",
                     fontWeight: 600,
-                    color: "palette.common.black",
+                    color: theme.palette.common.black,
                     borderBottom: `2px solid ${theme.palette.primary.light}`,
                     textTransform: "none",
                     letterSpacing: "0",
@@ -257,19 +296,20 @@ export function DataTable<T>({
                 })}
               >
                 <SortableContext
-                  items={orderedColumns
-                    .filter((x) => !x.hidden)
-                    .map((col) => col.id)}
+                  items={orderedColumns.map((col) => col.id)}
                   strategy={horizontalListSortingStrategy}
                 >
-                  {orderedColumns
-                    .filter((x) => !x.hidden)
-                    .map((column) => (
-                      <DraggableHeaderCell key={column.id} column={column} />
-                    ))}
+                  {orderedColumns.map((column) => (
+                    <DraggableHeaderCell
+                      key={column.id}
+                      column={column}
+                      isDragDisabled={!onColumnOrderChange}
+                    />
+                  ))}
                 </SortableContext>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {data.length === 0 ? (
                 <TableRow>
@@ -286,11 +326,11 @@ export function DataTable<T>({
               ) : (
                 data.map((item, index) => {
                   const isFocused = index === focusedRowIndex;
-                  
+
                   return (
                     <TableRow
                       key={getRowKey(item)}
-                      ref={setRowRef(index)}
+                      ref={setRowRefWithStorage(index)}
                       onMouseEnter={() => handleRowMouseEnter(index)}
                       onContextMenu={(e) => handleContextMenu(e, item, index)}
                       sx={{
@@ -303,7 +343,8 @@ export function DataTable<T>({
                           : "transparent",
                         transition: "background-color 0.15s ease",
                         "&:hover": {
-                          backgroundColor: isFocused && "rgba(20, 184, 166, 0.15)",
+                          backgroundColor:
+                            isFocused && "rgba(20, 184, 166, 0.15)",
                         },
                       }}
                     >
