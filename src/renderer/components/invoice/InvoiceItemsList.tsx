@@ -1,6 +1,7 @@
 import { TableCell } from "@mui/material";
 import { DataTable, Column } from "../common/table/DataTable";
 import type { Item } from "../../../types/database";
+import { formatVatRateShort } from "../../../utils/formattingUtils";
 
 interface InvoiceItem extends Item {
   sale_price: number;
@@ -33,7 +34,7 @@ export function InvoiceItemsList({ items }: InvoiceItemsListProps) {
       case "unit_of_measure":
         return item.unit_of_measure;
       case "vat_rate":
-        return `${item.vat_rate}%`;
+        return formatVatRateShort(item.vat_rate);
       case "sale_price":
         return `${item.sale_price.toFixed(2)} Kč`;
       case "total":

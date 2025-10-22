@@ -172,6 +172,7 @@ function ItemForm({
 
           <Grid item xs={12} md={3.25}>
             <ValidatedAutocomplete
+              disableClearable
               size="small"
               freeSolo
               options={UNIT_OPTIONS}

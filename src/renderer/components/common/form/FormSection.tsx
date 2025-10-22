@@ -7,7 +7,9 @@ interface FormSectionProps {
   spacing?: number;
   actions?: React.ReactNode;
   hideDivider?: boolean;
-  direction?: "row" | "column";
+  direction?: "row" | "column"
+  mb?: number;
+  my?: number;
 }
 
 export function FormSection({
@@ -17,6 +19,7 @@ export function FormSection({
   actions,
   hideDivider = false,
   direction = "column",
+  my = undefined,
 }: FormSectionProps) {
   const showHeader = !!title || !!actions;
 
@@ -30,6 +33,7 @@ export function FormSection({
               alignItems: "center",
               justifyContent: "space-between",
               gap: 1,
+              my: my,
               mb: 1.5,
               minWidth: 0,
               flexWrap: "wrap",

@@ -34,7 +34,7 @@ export function InvoiceHeader({
   const isType5 = type === 5;
 
   return (
-    <FormSection title="Hlavička">
+    <FormSection title="Hlavička" my={2}>
       <Grid container spacing={2}>
         <Grid item xs={isType5 ? 4 : requiresDateTax ? 5 : 5.5}>
           <ValidatedTextField

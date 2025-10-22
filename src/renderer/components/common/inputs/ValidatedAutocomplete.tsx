@@ -1,4 +1,3 @@
-// ValidatedAutocomplete.tsx
 import { Autocomplete, AutocompleteProps } from "@mui/material";
 import ValidatedTextField from "./ValidatedTextField";
 import type { FormTextFieldProps } from "../form/FormTextField";

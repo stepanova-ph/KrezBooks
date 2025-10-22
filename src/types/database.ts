@@ -1,7 +1,7 @@
 import { CreateInput, UpdateInput } from "./generic";
 import { VAT_RATES, PRICE_GROUPS, INVOICE_TYPES, PAYMENT_METHOD_TYPES } from "src/config/constants";
 
-export type VatRate = keyof typeof VAT_RATES;
+export type VatRate = typeof VAT_RATES;
 
 export type PriceGroup = (typeof PRICE_GROUPS)[number];
 

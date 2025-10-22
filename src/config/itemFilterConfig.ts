@@ -5,17 +5,15 @@ import { FilterConfig, ItemFilterState } from "../types/filter";
  */
 export const itemFilterConfig: FilterConfig = {
   filters: [
-    // Global text search
     {
       id: "search",
       type: "text-search",
       label: "Hledat",
       placeholder: "Název, poznámka...",
-      searchFields: ["name", "note"],
+      searchFields: [{field: "name"}, {field: "note"}],
       columnId: null, // Always visible
     },
 
-    // VAT rate multi-select
     {
       id: "vat_rate",
       type: "multiselect",
@@ -29,27 +27,22 @@ export const itemFilterConfig: FilterConfig = {
         { value: 2, label: "12% (snížená sazba)" },
       ],
     },
-
-    // Unit of measure text search
     {
       id: "unit_of_measure",
       type: "text-search",
       label: "Měrná jednotka",
-      field: "unit_of_measure",
       columnId: "unit_of_measure",
       placeholder: "Hledat jednotku...",
-      searchFields: ["unit_of_measure"],
+      searchFields: [{field:"unit_of_measure"}],
     },
-
-    // Category text search
- {
-      id: "category",
-      type: "multiselect", // Changed from text-search
-      field: "category",
-      label: "Kategorie",
-      columnId: "category",
-      placeholder: "Všechny kategorie",
-      options: [], // Empty by default, will be populated dynamically
+    {
+          id: "category",
+          type: "multiselect",
+          field: "category",
+          label: "Kategorie",
+          columnId: "category",
+          placeholder: "Všechny kategorie",
+          options: [],
     },
   ],
 };
