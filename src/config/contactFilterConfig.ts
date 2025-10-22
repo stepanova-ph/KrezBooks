@@ -63,17 +63,15 @@ export const contactFilterConfig: FilterConfig = {
 
     {
       id: "dic",
-      type: "number-with-prefix",
+      type: "number-input",
       label: "DIČ",
       field: "dic",
       columnId: "dic",
-      prefixes: DIC_PREFIXES,
-      placeholder: "12345678",
-      customPlaceholder: "Zadejte DIČ...",
+      placeholder: "CZ12345678",
+      maxLength: 12,
       autocomplete: true,
       validate: validateFilterDIC,
-      prefixWidth: 65,
-      width: 100,
+      width: 150,
     },
 
     {

@@ -3,7 +3,6 @@ import { useState } from "react";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import { FormSection } from "../common/form/FormSection";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
-import { splitDIC } from "../../../utils/formUtils";
 import type { InvoiceType, Contact } from "../../../types/database";
 import { ContactPickerDialog } from "./ContactPickerDialog";
 
@@ -19,8 +18,6 @@ interface InvoiceContactInfoProps {
   phone: string;
   email: string;
   bankAccount: string;
-  dicPrefix: string | null;
-  dicValue: string;
   errors: Record<string, string>;
   onChange: (field: string, value: string | number) => void;
   onDicChange: (field: "prefix" | "value", value: string | null) => void;
@@ -40,13 +37,9 @@ export function InvoiceContactInfo({
   phone,
   email,
   bankAccount,
-  dicPrefix,
-  dicValue,
   errors,
   onChange,
-  onDicChange,
   onBlur,
-  onSelectContact,
 }: InvoiceContactInfoProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const requiresContactInfo = type === 2 || type === 4;
@@ -54,6 +47,7 @@ export function InvoiceContactInfo({
   const handleContactSelect = (contact: Contact) => {
     onChange("ico", contact.ico);
     onChange("modifier", contact.modifier);
+    onChange("dic", contact.dic || "");
     onChange("company_name", contact.company_name);
     onChange("street", contact.street || "");
     onChange("city", contact.city || "");
@@ -61,15 +55,6 @@ export function InvoiceContactInfo({
     onChange("phone", contact.phone || "");
     onChange("email", contact.email || "");
     onChange("bank_account", contact.bank_account || "");
-
-    if (contact.dic) {
-      const parts = splitDIC(contact.dic);
-      onDicChange("prefix", parts.prefix);
-      onDicChange("value", parts.value);
-    } else {
-      onDicChange("prefix", null);
-      onDicChange("value", "");
-    }
 
     setPickerOpen(false);
   };

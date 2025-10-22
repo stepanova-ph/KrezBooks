@@ -5,7 +5,7 @@ export const validationMessages = {
       invalid: 'IČO není platné (kontrolní součet nesouhlasí).',
     },
     dic: {
-      invalid: "DIČ musí začínat 'CZ' a obsahovat 8–10 číslic.",
+      invalid: "DIČ musí začínat 'CZ' nebo 'SK' a obsahovat 8–10 číslic.",
     },
     modifier: {
       range: 'Modifikátor musí být mezi 1 a 100.',

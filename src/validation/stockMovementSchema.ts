@@ -25,4 +25,6 @@ export const stockMovementSchema = z.object({
       const num = parseFloat(val);
       return !isNaN(num) && num >= 0;
     }, "Cena musí být kladné číslo"),
+  
+  vat_rate: z.number(),
 });

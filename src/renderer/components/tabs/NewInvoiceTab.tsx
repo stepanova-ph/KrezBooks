@@ -3,7 +3,6 @@ import { Box, Grid, IconButton, Tooltip } from "@mui/material";
 import { InvoiceHeader } from "../invoice/InvoiceHeader";
 import { InvoiceContactInfo } from "../invoice/InvoiceContactInfo";
 import { InvoiceItemsList } from "../invoice/InvoiceItemsList";
-import { splitDIC, combineDIC } from "../../../utils/formUtils";
 import type { CreateInvoiceInput, Item } from "../../../types/database";
 import { FormSection } from "../common/form/FormSection";
 import InventoryIcon from "@mui/icons-material/Inventory";
@@ -33,10 +32,6 @@ const defaultFormData: CreateInvoiceInput = {
 function NewInvoiceTab() {
   const [formData, setFormData] = useState<CreateInvoiceInput>(defaultFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [dicParts, setDicParts] = useState<{
-    prefix: string | null;
-    value: string;
-  }>(splitDIC(formData.dic));
   const [itemPickerOpen, setItemPickerOpen] = useState(false);
 
   const isType5 = formData.type === 5;
@@ -44,22 +39,6 @@ function NewInvoiceTab() {
   const handleChange = (field: string, value: string | number) => {
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
     setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleDicChange = (field: "prefix" | "value", value: string | null) => {
-    if (errors.dic) setErrors((prev) => ({ ...prev, dic: "" }));
-    setDicParts((prev) => {
-      const updated = {
-        ...prev,
-        [field]: field === "prefix" ? value || null : value,
-      };
-      if (field === "prefix") updated.value = value ? prev.value : "";
-      setFormData((p) => ({
-        ...p,
-        dic: combineDIC(updated.prefix, updated.value),
-      }));
-      return updated;
-    });
   };
 
   const handleBlur = (_field: string) => {};
@@ -114,11 +93,8 @@ function NewInvoiceTab() {
                   phone={formData.phone ?? ""}
                   email={formData.email ?? ""}
                   bankAccount={formData.bank_account ?? ""}
-                  dicPrefix={dicParts.prefix}
-                  dicValue={dicParts.value}
                   errors={errors}
                   onChange={handleChange}
-                  onDicChange={handleDicChange}
                   onBlur={handleBlur}
                   onSelectContact={handleSelectContact}
                 />

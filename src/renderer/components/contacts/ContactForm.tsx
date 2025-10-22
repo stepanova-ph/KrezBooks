@@ -1,37 +1,26 @@
 import {
-  FormControlLabel,
-  Checkbox,
-  Box,
   IconButton,
   Tooltip,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
-  InputAdornment,
   Grid,
   Typography
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
-import CloseIcon from "@mui/icons-material/Close";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import type { CreateContactInput, Contact } from "../../../types/database";
 import { contactSchema } from "../../../validation/contactSchema";
 import { FormDialog } from "../common/form/FormDialog";
-import { FormTextField } from "../common/form/FormTextField";
 import { FormSection } from "../common/form/FormSection";
 import {
   splitBankAccount,
   combineBankAccount,
-  splitDIC,
-  combineDIC,
 } from "../../../utils/formUtils";
-import { DIC_PREFIXES } from "../../../config/constants";
-import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import ContactTypeSelector from "./ContactsTypeSelector";
-import { ValidatedAutocomplete } from "../common/inputs/ValidatedAutocomplete";
+import ValidatedTextField from "../common/inputs/ValidatedTextField";
 
 interface ContactFormProps {
   open: boolean;
@@ -69,7 +58,6 @@ function ContactForm({
   isPending = false,
 }: ContactFormProps) {
   const initialBankAccount = splitBankAccount(initialData?.bank_account);
-  const initialDIC = splitDIC(initialData?.dic);
 
   const [formData, setFormData] = useState<CreateContactInput>(
     initialData
@@ -89,7 +77,6 @@ function ContactForm({
   );
 
   const [bankAccountParts, setBankAccountParts] = useState(initialBankAccount);
-  const [dicParts, setDicParts] = useState(initialDIC);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isUnlocked, setIsUnlocked] = useState(false);
 
@@ -111,12 +98,10 @@ function ContactForm({
               : !!initialData.is_supplier,
         });
         setBankAccountParts(splitBankAccount(initialData.bank_account));
-        setDicParts(splitDIC(initialData.dic));
       } else {
         // Create mode - reset to defaults
         setFormData(defaultFormData);
         setBankAccountParts({ accountNumber: "", bankCode: "" });
-        setDicParts({ prefix: null, value: "" });
       }
       // Always clear errors when dialog opens
       setErrors({});
@@ -138,14 +123,12 @@ function ContactForm({
   };
 
   const handleBlur = (fieldName: string) => {
-    // Validate single field on blur
     const dataToValidate = {
       ...formData,
       bank_account: combineBankAccount(
         bankAccountParts.accountNumber,
         bankAccountParts.bankCode,
       ),
-      dic: combineDIC(dicParts.prefix, dicParts.value),
     };
 
     const result = contactSchema.safeParse(dataToValidate);
@@ -164,7 +147,6 @@ function ContactForm({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
 
-      // Clear error when typing
       if (errors.bank_account) {
         setErrors((prev) => ({ ...prev, bank_account: "" }));
       }
@@ -182,38 +164,6 @@ function ContactForm({
       });
     };
 
-  const handleDICChange =
-    (field: "prefix" | "value") =>
-    (e: React.ChangeEvent<HTMLInputElement | { value: unknown }>) => {
-      const newValue =
-        field === "prefix"
-          ? (e.target.value as string)
-          : (e.target as HTMLInputElement).value;
-
-      // Clear error when typing
-      if (errors.dic) {
-        setErrors((prev) => ({ ...prev, dic: "" }));
-      }
-
-      setDicParts((prev) => {
-        const updated = {
-          ...prev,
-          [field]: field === "prefix" ? newValue || null : newValue,
-        };
-
-        // Reset value if switching to/from custom
-        if (field === "prefix") {
-          updated.value = newValue ? prev.value : "";
-        }
-
-        setFormData((prevForm) => ({
-          ...prevForm,
-          dic: combineDIC(updated.prefix, updated.value),
-        }));
-        return updated;
-      });
-    };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -224,7 +174,6 @@ function ContactForm({
         bankAccountParts.accountNumber,
         bankAccountParts.bankCode,
       ),
-      dic: combineDIC(dicParts.prefix, dicParts.value),
     };
 
     const result = contactSchema.safeParse(dataToValidate);
@@ -240,24 +189,18 @@ function ContactForm({
 
     try {
       await onSubmit(result.data as CreateContactInput);
-      // Only reset and close if onSubmit succeeds
       if (mode === "create") {
         setFormData(defaultFormData);
         setBankAccountParts({ accountNumber: "", bankCode: "" });
-        setDicParts({ prefix: null, value: "" });
       }
-      // Don't call onClose here - let the parent component handle it
     } catch (error) {
       console.error("Chyba při ukládání kontaktu:", error);
-      // Show error to user
       alert(`Chyba při ukládání: ${(error as Error).message}`);
     }
   };
 
   const title = mode === "create" ? "Přidat nový kontakt" : "Upravit kontakt";
   const submitLabel = mode === "create" ? "Přidat kontakt" : "Uložit změny";
-
-  const isCustomDIC = dicParts.prefix === "vlastní";
 
   return (
     <FormDialog
@@ -337,82 +280,19 @@ function ContactForm({
             />
           </Grid>
 
-          {!isCustomDIC ? (
-            <>
-              <Grid item md={1.33} mr={-0.5}>
-                <ValidatedAutocomplete<string>
-                  freeSolo
-                  options={[...DIC_PREFIXES]}
-                  value={dicParts.prefix ?? null}
-                  onBlur={() => {}}
-                  onChange={(_, newValue) => {
-                    const prefix = (newValue ?? null) as string | null;
-                    
-                    setDicParts(prev => {
-                      const updated = { ...prev, prefix };
-                      if (!prefix) updated.value = "";
-                      setFormData(prevForm => ({
-                        ...prevForm,
-                        dic: combineDIC(updated.prefix, updated.value),
-                      }));
-                      return updated;
-                    });
-                    
-                    if (errors.dic) setErrors(prev => ({ ...prev, dic: "" }));
-                  }}
-                  label="DIČ"
-                  error={errors.dic}
-                  name="dic"
-                  disabled={mode === "edit" && !isUnlocked}
-                  getOptionLabel={(opt) => opt ?? ""}
-                  isOptionEqualToValue={(o, v) => o === v}
-                  required={false}
-                />
-              </Grid>
-
-              <Grid item md={4.7}>
-                <ValidatedTextField
-                  label="DIČ bez prefixu"
-                  value={dicParts.value}
-                  disabled={!dicParts.prefix || (mode === "edit" && !isUnlocked)}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleDICChange("value")(e)
-                  }
-                  onBlur={() => handleBlur("dic")}
-                  error={errors.dic}
-                  fullWidth
-                />
-              </Grid>
-            </>
-          ) : (
-            <>
-              <Grid item xs={12} md={5.5}>
-                <ValidatedTextField
-                  label="DIČ"
-                  placeholder="Vlastní formát DIČ..."
-                  value={dicParts.value}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleDICChange("value")(e)
-                  }
-                  onBlur={() => handleBlur("dic")}
-                  error={errors.dic}
-                  disabled={mode === "edit" && !isUnlocked}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs="auto">
-                <IconButton
-                  size="small"
-                  onClick={() => setDicParts({ prefix: null, value: "" })}
-                  title="Zrušit vlastní DIČ"
-                  disabled={mode === "edit" && !isUnlocked}
-                  sx={{ mt: { xs: 0, md: "8px" } }}
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </Grid>
-            </>
-          )}
+          <Grid item md={5.9}>
+            <ValidatedTextField
+              label="DIČ"
+              name="dic"
+              value={formData.dic}
+              onChange={handleChange}
+              onBlur={() => handleBlur("dic")}
+              error={errors.dic}
+              placeholder="CZ12345678"
+              disabled={mode === "edit" && !isUnlocked}
+              fullWidth
+            />
+          </Grid>
         </Grid>
 
         {/* Row 2: Název firmy + Odběratel + Dodavatel */}

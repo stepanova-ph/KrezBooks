@@ -5,6 +5,7 @@ export const stockMovementQueries = {
       item_ean TEXT NOT NULL,
       amount TEXT NOT NULL,
       price_per_unit TEXT NOT NULL,
+      vat_rate INTEGER NOT NULL,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (invoice_number, item_ean),
       FOREIGN KEY (invoice_number) REFERENCES invoices(number) ON DELETE CASCADE,
@@ -33,12 +34,14 @@ export const stockMovementQueries = {
       invoice_number,
       item_ean,
       amount,
-      price_per_unit
+      price_per_unit,
+      vat_rate
     ) VALUES (
       @invoice_number,
       @item_ean,
       @amount,
-      @price_per_unit
+      @price_per_unit,
+      @vat_rate
     )
   `,
   

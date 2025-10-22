@@ -28,37 +28,3 @@ export function combineBankAccount(
   if (!bankCode) return accountNumber;
   return `${accountNumber}/${bankCode}`;
 }
-
-/**
- * Split DIC into prefix and value
- * Format: "CZ12345678" -> { prefix: "CZ", value: "12345678" }
- */
-export function splitDIC(dic: string | null | undefined): {
-  prefix: string | null;
-  value: string;
-} {
-  if (!dic) return { prefix: null, value: "" };
-
-  // Check if starts with known prefix
-  for (const prefix of DIC_PREFIXES) {
-    if (prefix !== "vlastní" && dic.startsWith(prefix)) {
-      return {
-        prefix,
-        value: dic.substring(prefix.length),
-      };
-    }
-  }
-
-  // If no known prefix, it's custom
-  return { prefix: "vlastní", value: dic };
-}
-
-/**
- * Combine DIC prefix and value
- * Format: "CZ" + "12345678" -> "CZ12345678"
- */
-export function combineDIC(prefix: string | null, value: string): string {
-  if (!value) return "";
-  if (!prefix || prefix === "vlastní") return value;
-  return `${prefix}${value}`;
-}

@@ -34,30 +34,25 @@ export function validateFilterICO(ico: string): FilterValidationResult {
  * Validate DIČ for filter input
  * Empty values are considered valid (no filter applied)
  */
-export function validateFilterDIC(
-  prefix: string | null,
-  value: string,
-): FilterValidationResult {
-  // Empty is valid (no filter applied)
-  if (!prefix || !value || value.trim() === "") {
+export function validateFilterDIC(value: string): FilterValidationResult {
+  if (!value || value.trim() === "") {
     return { valid: true };
   }
 
-  // For CZ and SK, validate digit count
-  if (prefix === "CZ" || prefix === "SK") {
-    const digits = value.replace(/\D/g, "");
-    if (digits.length < 8 || digits.length > 10) {
-      return {
-        valid: false,
-        error: "DIČ musí obsahovat 8–10 číslic",
-      };
-    }
+  // Just check basic format - starts with 2 letters
+  if (value.length < 10 || !/^[A-Z]{2}/.test(value)) {
+    return {
+      valid: false,
+      error: "DIČ musí začínat 2 písmeny (např. CZ)",
+    };
   }
 
-  // For "vlastní" (custom), allow any format
-  // Users might filter by partial/foreign DICs
-
   return { valid: true };
+}
+
+export function shouldFilterByDIC(value: string): boolean {
+  if (!value || value.trim() === "") return false;
+  return value.length >= 2;
 }
 
 /**
@@ -71,24 +66,6 @@ export function shouldFilterByICO(ico: string): boolean {
 
   // Allow filtering with any number of digits (1-8)
   if (ico.length >= 1 && /^[0-9]+$/.test(ico)) {
-    return true;
-  }
-
-  return false;
-}
-
-/**
- * Check if DIČ input should be used for filtering
- * Allows partial matching for autocomplete (min 3 characters)
- */
-export function shouldFilterByDIC(
-  prefix: string | null,
-  value: string,
-): boolean {
-  if (!prefix || !value || value.trim() === "") return false;
-
-  // Allow partial DIČ in autocomplete mode (at least 3 characters)
-  if (value.length >= 2) {
     return true;
   }
 

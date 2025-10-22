@@ -33,10 +33,14 @@ export class StockMovementService {
       item_ean: movement.item_ean,
       amount: movement.amount,
       price_per_unit: movement.price_per_unit,
+      vat_rate: movement.vat_rate,
     };
     
     const result = statement.run(movementData);
-    return { changes: result.changes };
+    
+    return { 
+      changes: result.changes 
+    };
   }
 
   async update(

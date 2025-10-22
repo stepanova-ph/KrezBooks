@@ -79,6 +79,7 @@ export interface StockMovement {
   item_ean: string;
   amount: string;
   price_per_unit: string;
+  vat_rate: VatRate;
   created_at?: string;
 }
 
