@@ -21,7 +21,7 @@ interface InvoiceContactInfoProps {
   errors: Record<string, string>;
   onChange: (field: string, value: string | number) => void;
   onBlur: (field: string) => void;
-  onSelectContact: () => void;
+  onSelectContact: (contact: Contact) => void;
 }
 
 export function InvoiceContactInfo({
@@ -39,6 +39,7 @@ export function InvoiceContactInfo({
   errors,
   onChange,
   onBlur,
+  onSelectContact
 }: InvoiceContactInfoProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const requiresContactInfo = type === 2 || type === 4;
@@ -55,7 +56,10 @@ export function InvoiceContactInfo({
     onChange("email", contact.email || "");
     onChange("bank_account", contact.bank_account || "");
 
+    onSelectContact(contact);
+    console.log(`Contact selected: ${JSON.stringify(contact)}`);
     setPickerOpen(false);
+    
   };
 
   return (

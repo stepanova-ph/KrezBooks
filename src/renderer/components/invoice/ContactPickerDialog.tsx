@@ -18,7 +18,6 @@ import {
   contactPickerFilterConfig,
   initialPickerFilterState 
 } from "../../../config/pickerFilterConfig";
-import type { FilterState } from "../../../types/filter";
 
 interface ContactPickerDialogProps {
   open: boolean;
@@ -69,6 +68,7 @@ export function ContactPickerDialog({
 
   const handleSelect = (contact: Contact) => {
     onSelect(contact);
+    console.log(`handleselect z dialogu contact: ${JSON.stringify(contact)}`);
   };
 
   const renderRow = (contact: Contact, visibleColumns: Column[]) => {

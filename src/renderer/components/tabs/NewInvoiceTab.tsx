@@ -7,12 +7,14 @@ import { InvoiceItemsList } from "../invoice/InvoiceItemsList";
 import { FormSection } from "../common/form/FormSection";
 import { ItemPickerDialog } from "../invoice/ItemPickerDialog";
 import { ItemAmountPriceDialog } from "../invoice/ItemAmountPriceDialog";
-import type { InvoiceType, Item } from "../../../types/database";
+import type { Contact, InvoiceType, Item } from "../../../types/database";
+import { ContactPickerDialog } from "../invoice/ContactPickerDialog";
 
 interface InvoiceItem extends Item {
   amount: number;
   sale_price: number;
   total: number;
+  p_group_index: number;
 }
 
 function NewInvoiceTab() {
@@ -40,9 +42,14 @@ function NewInvoiceTab() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [itemPickerOpen, setItemPickerOpen] = useState(false);
   const [amountPriceDialogOpen, setAmountPriceDialogOpen] = useState(false);
+
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
+
+  const [dialogInitials, setDialogInitials] = useState({ amount: 0, price: 0, p_group_index: 0 });
 
   const isType5 = formData.type === 5;
 
@@ -57,22 +64,24 @@ function NewInvoiceTab() {
     // Validation logic here
   };
 
-  const handleSelectContact = () => {
-    // Open contact picker
+  const handleSelectContact = (contact: Contact) => {
+    setSelectedContact(contact);
+    console.log(`contact pricegroup: ${contact.price_group}`);
   };
 
   const handleSelectItem = (item: Item) => {
     setSelectedItem(item);
-    setEditingItemIndex(null); // New item, not editing
+    setEditingItemIndex(null);
     setItemPickerOpen(false);
+    setDialogInitials({ amount: 0, price: 0, p_group_index: 0 });
     setAmountPriceDialogOpen(true);
   };
 
   const handleEditItem = (item: InvoiceItem) => {
-    // Find the index of the item being edited
     const index = invoiceItems.findIndex((i) => i.ean === item.ean);
     setEditingItemIndex(index);
     setSelectedItem(item);
+    setDialogInitials({ amount: item.amount, price: item.sale_price, p_group_index: item.p_group_index });
     setAmountPriceDialogOpen(true);
   };
 
@@ -80,7 +89,7 @@ function NewInvoiceTab() {
     setInvoiceItems((prev) => prev.filter((i) => i.ean !== item.ean));
   };
 
-  const handleConfirmAmountPrice = (amount: number, price: number) => {
+  const handleConfirmAmountPrice = (amount: number, price: number, p_group_index: number) => {
     if (!selectedItem) return;
 
     const newItem: InvoiceItem = {
@@ -88,19 +97,17 @@ function NewInvoiceTab() {
       amount,
       sale_price: price,
       total: amount * price,
+      p_group_index
     };
 
     if (editingItemIndex !== null) {
-      // Editing existing item
       setInvoiceItems((prev) => {
         const updated = [...prev];
         updated[editingItemIndex] = newItem;
         return updated;
       });
     } else {
-      // Adding new item
       setInvoiceItems((prev) => [...prev, newItem]);
-      // Reopen item picker for next item
       setItemPickerOpen(true);
     }
 
@@ -114,10 +121,23 @@ function NewInvoiceTab() {
     setSelectedItem(null);
     setEditingItemIndex(null);
     
-    // Only reopen item picker if we were adding a new item (not editing)
     if (editingItemIndex === null) {
       setItemPickerOpen(true);
     }
+  };
+
+  const getInitialAmount = () => {
+    if (editingItemIndex !== null && selectedItem) {
+      return (selectedItem as InvoiceItem).amount;
+    }
+    return undefined;
+  };
+
+  const getInitialPrice = () => {
+    if (editingItemIndex !== null && selectedItem) {
+      return (selectedItem as InvoiceItem).sale_price;
+    }
+    return undefined;
   };
 
   return (
@@ -209,7 +229,9 @@ function NewInvoiceTab() {
         onConfirm={handleConfirmAmountPrice}
         item={selectedItem}
         invoiceType={formData.type}
-        contactPriceGroup={formData.modifier}
+        contactPriceGroup={selectedContact?.price_group}
+        initialAmount={getInitialAmount()}
+        initialPrice={getInitialPrice()}
       />
     </Box>
   );
