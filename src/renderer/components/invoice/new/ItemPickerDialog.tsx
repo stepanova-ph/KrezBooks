@@ -6,16 +6,16 @@ import {
   TableCell,
 } from "@mui/material";
 import { useState, useRef } from "react";
-import { useItems } from "../../../hooks/useItems";
-import { Item } from "../../../types/database";
-import { DataTable, Column } from "../common/table/DataTable";
-import ValidatedTextField from "../common/inputs/ValidatedTextField";
-import { useKeyboardShortcuts } from "../../../hooks/keyboard/useKeyboardShortcuts";
-import { WindowButton } from "../layout/WindowControls";
-import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
-import { formatVatRateShort } from "../../../utils/formattingUtils";
-import { useTableFilters } from "../../../hooks/useTableFilters";
-import { initialPickerFilterState, itemPickerFilterConfig } from "../../../config/pickerFilterConfig";
+import { useItems } from "../../../../hooks/useItems";
+import { Item } from "../../../../types/database";
+import { DataTable, Column } from "../../common/table/DataTable";
+import ValidatedTextField from "../../common/inputs/ValidatedTextField";
+import { useKeyboardShortcuts } from "../../../../hooks/keyboard/useKeyboardShortcuts";
+import { WindowButton } from "../../layout/WindowControls";
+import { useAutoSearchFocus } from "../../../../hooks/keyboard/useAutosearchFocus";
+import { formatVatRateShort } from "../../../../utils/formattingUtils";
+import { useTableFilters } from "../../../../hooks/useTableFilters";
+import { initialPickerFilterState, itemPickerFilterConfig } from "../../../../config/pickerFilterConfig";
 
 interface ItemPickerDialogProps {
   open: boolean;

@@ -1,15 +1,9 @@
 import { TableCell } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { DataTable, Column, ContextMenuAction } from "../common/table/DataTable";
-import type { Item } from "../../../types/database";
-import { formatVatRateShort } from "../../../utils/formattingUtils";
-
-interface InvoiceItem extends Item {
-  amount: number;
-  sale_price: number;
-  total: number;
-}
+import { DataTable, Column, ContextMenuAction } from "../../common/table/DataTable";
+import { formatVatRateShort } from "../../../../utils/formattingUtils";
+import type { InvoiceItem } from "../../../../hooks/useInvoiceForm";
 
 interface InvoiceItemsListProps {
   items: InvoiceItem[];
@@ -28,13 +22,11 @@ const itemColumns: Column[] = [
   { id: "total", label: "Celkem", minWidth: 120, align: "right" },
 ];
 
-export function InvoiceItemsList({ 
-  items, 
-  onEditItem, 
-  onDeleteItem 
+export function InvoiceItemsList({
+  items,
+  onEditItem,
+  onDeleteItem,
 }: InvoiceItemsListProps) {
-  
-  // Context menu actions
   const contextMenuActions: ContextMenuAction<InvoiceItem>[] = [
     {
       id: "edit",
@@ -48,7 +40,8 @@ export function InvoiceItemsList({
       icon: <DeleteIcon fontSize="small" />,
       onClick: onDeleteItem,
       requireConfirm: true,
-      confirmMessage: (item) => `Opravdu chcete odebrat "${item.name}" z dokladu?`,
+      confirmMessage: (item) =>
+        `Opravdu chcete odebrat "${item.name}" z dokladu?`,
       divider: true,
     },
   ];

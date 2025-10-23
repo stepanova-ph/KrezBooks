@@ -1,143 +1,74 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Grid, IconButton, Tooltip } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import { InvoiceHeader } from "../invoice/InvoiceHeader";
-import { InvoiceContactInfo } from "../invoice/InvoiceContactInfo";
-import { InvoiceItemsList } from "../invoice/InvoiceItemsList";
+import { InvoiceHeader } from "../invoice/new/InvoiceHeader";
+import { InvoiceContactInfo } from "../invoice/new/InvoiceContactInfo";
+import { InvoiceItemsList } from "../invoice/new/InvoiceItemsList";
 import { FormSection } from "../common/form/FormSection";
-import { ItemPickerDialog } from "../invoice/ItemPickerDialog";
-import { ItemAmountPriceDialog } from "../invoice/ItemAmountPriceDialog";
-import type { Contact, InvoiceType, Item } from "../../../types/database";
-import { ContactPickerDialog } from "../invoice/ContactPickerDialog";
-
-interface InvoiceItem extends Item {
-  amount: number;
-  sale_price: number;
-  total: number;
-  p_group_index: number;
-}
+import { ItemPickerDialog } from "../invoice/new/ItemPickerDialog";
+import { ItemAmountPriceDialog } from "../invoice/new/ItemAmountPriceDialog";
+import { ContactPickerDialog } from "../invoice/new/ContactPickerDialog";
+import { useInvoiceForm } from "../../../hooks/useInvoiceForm";
+import { useInvoiceDialogs } from "../../../hooks/useInvoiceDialogs";
+import type { Item } from "../../../types/database";
+import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 
 function NewInvoiceTab() {
-  const [formData, setFormData] = useState({
-    number: "",
-    type: 1 as InvoiceType,
-    payment_method: undefined as number | undefined,
-    date_issue: new Date().toISOString().split("T")[0],
-    date_tax: "",
-    date_due: "",
-    variable_symbol: "",
-    note: "",
-    ico: "",
-    modifier: undefined as number | undefined,
-    dic: "",
-    company_name: "",
-    bank_account: "",
-    street: "",
-    city: "",
-    postal_code: "",
-    phone: "",
-    email: "",
-  });
+  const form = useInvoiceForm();
+  const dialogs = useInvoiceDialogs();
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [itemPickerOpen, setItemPickerOpen] = useState(false);
-  const [amountPriceDialogOpen, setAmountPriceDialogOpen] = useState(false);
-
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-
-  const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
-
-  const [dialogInitials, setDialogInitials] = useState({ amount: 0, price: 0, p_group_index: 0 });
-
-  const isType5 = formData.type === 5;
-
-  const handleChange = (field: string, value: string | number) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-  };
-
-  const handleBlur = (field: string) => {
-    // Validation logic here
-  };
-
-  const handleSelectContact = (contact: Contact) => {
-    setSelectedContact(contact);
-    console.log(`contact pricegroup: ${contact.price_group}`);
-  };
+  const isType5 = form.formData.type === 5;
 
   const handleSelectItem = (item: Item) => {
-    setSelectedItem(item);
-    setEditingItemIndex(null);
-    setItemPickerOpen(false);
-    setDialogInitials({ amount: 0, price: 0, p_group_index: 0 });
-    setAmountPriceDialogOpen(true);
+    dialogs.itemPicker.closeDialog();
+    dialogs.amountPrice.openDialog(item);
   };
 
   const handleEditItem = (item: InvoiceItem) => {
-    const index = invoiceItems.findIndex((i) => i.ean === item.ean);
-    setEditingItemIndex(index);
-    setSelectedItem(item);
-    setDialogInitials({ amount: item.amount, price: item.sale_price, p_group_index: item.p_group_index });
-    setAmountPriceDialogOpen(true);
+    const index = form.invoiceItems.findIndex((i) => i.ean === item.ean);
+    dialogs.amountPrice.openDialog(item, {
+      amount: item.amount,
+      price: item.sale_price,
+      p_group_index: item.p_group_index,
+      index,
+    });
   };
 
-  const handleDeleteItem = (item: InvoiceItem) => {
-    setInvoiceItems((prev) => prev.filter((i) => i.ean !== item.ean));
-  };
+  const handleConfirmAmountPrice = (
+    amount: number,
+    price: number,
+    p_group_index: number
+  ) => {
+    if (!dialogs.amountPrice.selectedItem) return;
 
-  const handleConfirmAmountPrice = (amount: number, price: number, p_group_index: number) => {
-    if (!selectedItem) return;
-
-    const newItem: InvoiceItem = {
-      ...selectedItem,
-      amount,
-      sale_price: price,
-      total: amount * price,
-      p_group_index
-    };
-
-    if (editingItemIndex !== null) {
-      setInvoiceItems((prev) => {
-        const updated = [...prev];
-        updated[editingItemIndex] = newItem;
-        return updated;
-      });
+    if (dialogs.amountPrice.editingItemIndex !== null) {
+      form.handleUpdateItem(
+        dialogs.amountPrice.editingItemIndex,
+        dialogs.amountPrice.selectedItem,
+        amount,
+        price,
+        p_group_index
+      );
+      dialogs.amountPrice.closeDialog(false);
     } else {
-      setInvoiceItems((prev) => [...prev, newItem]);
-      setItemPickerOpen(true);
+      form.handleAddItem(
+        dialogs.amountPrice.selectedItem,
+        amount,
+        price,
+        p_group_index
+      );
+      dialogs.amountPrice.closeDialog(true);
     }
-
-    setSelectedItem(null);
-    setEditingItemIndex(null);
-    setAmountPriceDialogOpen(false);
   };
 
   const handleCloseAmountPriceDialog = () => {
-    setAmountPriceDialogOpen(false);
-    setSelectedItem(null);
-    setEditingItemIndex(null);
-    
-    if (editingItemIndex === null) {
-      setItemPickerOpen(true);
-    }
+    const shouldReopenItemPicker = dialogs.amountPrice.editingItemIndex === null;
+    dialogs.amountPrice.closeDialog(shouldReopenItemPicker);
   };
 
-  const getInitialAmount = () => {
-    if (editingItemIndex !== null && selectedItem) {
-      return (selectedItem as InvoiceItem).amount;
-    }
-    return undefined;
-  };
-
-  const getInitialPrice = () => {
-    if (editingItemIndex !== null && selectedItem) {
-      return (selectedItem as InvoiceItem).sale_price;
-    }
-    return undefined;
+  const handleSelectContact = (contact: Contact) => {
+    form.handleSelectContact(contact);
+    dialogs.contactPicker.closeDialog();
   };
 
   return (
@@ -148,37 +79,37 @@ function NewInvoiceTab() {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <InvoiceHeader
-                  type={formData.type}
-                  number={formData.number}
-                  paymentMethod={formData.payment_method}
-                  dateIssue={formData.date_issue}
-                  dateTax={formData.date_tax}
-                  dateDue={formData.date_due}
-                  variableSymbol={formData.variable_symbol}
-                  errors={errors}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
+                  type={form.formData.type}
+                  number={form.formData.number}
+                  paymentMethod={form.formData.payment_method}
+                  dateIssue={form.formData.date_issue}
+                  dateTax={form.formData.date_tax}
+                  dateDue={form.formData.date_due}
+                  variableSymbol={form.formData.variable_symbol}
+                  errors={form.errors}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
                 />
               </Grid>
 
               {!isType5 && (
                 <Grid item xs={12}>
                   <InvoiceContactInfo
-                    type={formData.type}
-                    ico={formData.ico}
-                    modifier={formData.modifier}
-                    dic={formData.dic}
-                    companyName={formData.company_name}
-                    street={formData.street}
-                    city={formData.city}
-                    postalCode={formData.postal_code}
-                    phone={formData.phone}
-                    email={formData.email}
-                    bankAccount={formData.bank_account}
-                    errors={errors}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    onSelectContact={handleSelectContact}
+                    type={form.formData.type}
+                    ico={form.formData.ico}
+                    modifier={form.formData.modifier}
+                    dic={form.formData.dic}
+                    companyName={form.formData.company_name}
+                    street={form.formData.street}
+                    city={form.formData.city}
+                    postalCode={form.formData.postal_code}
+                    phone={form.formData.phone}
+                    email={form.formData.email}
+                    bankAccount={form.formData.bank_account}
+                    errors={form.errors}
+                    onChange={form.handleChange}
+                    onBlur={form.handleBlur}
+                    onOpenContactPicker={dialogs.contactPicker.openDialog}
                   />
                 </Grid>
               )}
@@ -200,17 +131,17 @@ function NewInvoiceTab() {
                   <IconButton
                     size="small"
                     color="primary"
-                    onClick={() => setItemPickerOpen(true)}
+                    onClick={dialogs.itemPicker.openDialog}
                   >
                     <InventoryIcon sx={{ width: 24 }} />
                   </IconButton>
                 </Tooltip>
               }
             >
-              <InvoiceItemsList 
-                items={invoiceItems}
+              <InvoiceItemsList
+                items={form.invoiceItems}
                 onEditItem={handleEditItem}
-                onDeleteItem={handleDeleteItem}
+                onDeleteItem={form.handleDeleteItem}
               />
             </FormSection>
           </Grid>
@@ -218,20 +149,27 @@ function NewInvoiceTab() {
       </Grid>
 
       <ItemPickerDialog
-        open={itemPickerOpen}
-        onClose={() => setItemPickerOpen(false)}
+        open={dialogs.itemPicker.open}
+        onClose={dialogs.itemPicker.closeDialog}
         onSelect={handleSelectItem}
       />
 
       <ItemAmountPriceDialog
-        open={amountPriceDialogOpen}
+        open={dialogs.amountPrice.open}
         onClose={handleCloseAmountPriceDialog}
         onConfirm={handleConfirmAmountPrice}
-        item={selectedItem}
-        invoiceType={formData.type}
-        contactPriceGroup={selectedContact?.price_group}
-        initialAmount={getInitialAmount()}
-        initialPrice={getInitialPrice()}
+        item={dialogs.amountPrice.selectedItem}
+        invoiceType={form.formData.type}
+        contactPriceGroup={form.selectedContact?.price_group}
+        initialAmount={dialogs.amountPrice.editingItemData?.amount}
+        initialPrice={dialogs.amountPrice.editingItemData?.price}
+        initialPriceGroup={dialogs.amountPrice.editingItemData?.p_group_index}
+      />
+
+      <ContactPickerDialog
+        open={dialogs.contactPicker.open}
+        onClose={dialogs.contactPicker.closeDialog}
+        onSelect={handleSelectContact}
       />
     </Box>
   );

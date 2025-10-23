@@ -11,14 +11,14 @@ import {
   useTheme,
   Chip,
 } from "@mui/material";
-import { Item, InvoiceType } from "../../../types/database";
-import { useKeyboardShortcuts } from "../../../hooks/keyboard/useKeyboardShortcuts";
-import { NumberTextField } from "../common/inputs/NumberTextField";
-import { VatPriceField } from "../common/inputs/VatPriceField";
-import { WindowButton } from "../layout/WindowControls";
-import { VAT_RATES } from "../../../config/constants";
-import { useStockAmountByItem } from "../../../hooks/useStockMovement";
-import { FormSection } from "../common/form/FormSection";
+import { Item, InvoiceType } from "../../../../types/database";
+import { useKeyboardShortcuts } from "../../../../hooks/keyboard/useKeyboardShortcuts";
+import { NumberTextField } from "../../common/inputs/NumberTextField";
+import { VatPriceField } from "../../common/inputs/VatPriceField";
+import { WindowButton } from "../../layout/WindowControls";
+import { VAT_RATES } from "../../../../config/constants";
+import { useStockAmountByItem } from "../../../../hooks/useStockMovement";
+import { FormSection } from "../../common/form/FormSection";
 
 interface ItemAmountPriceDialogProps {
   open: boolean;
@@ -29,6 +29,32 @@ interface ItemAmountPriceDialogProps {
   contactPriceGroup?: number;
   initialAmount?: number;
   initialPrice?: number;
+  initialPriceGroup?: number;
+}
+
+type PriceGroup = "group1" | "group2" | "group3" | "group4" | "custom";
+
+function getPriceGroupFromValue(item: Item, price: number): PriceGroup {
+  if (Math.abs(price - item.sale_price_group1) < 0.01) return "group1";
+  if (Math.abs(price - item.sale_price_group2) < 0.01) return "group2";
+  if (Math.abs(price - item.sale_price_group3) < 0.01) return "group3";
+  if (Math.abs(price - item.sale_price_group4) < 0.01) return "group4";
+  return "custom";
+}
+
+function getPriceGroupIndex(priceGroup: PriceGroup): number {
+  switch (priceGroup) {
+    case "group1": return 1;
+    case "group2": return 2;
+    case "group3": return 3;
+    case "group4": return 4;
+    default: return 0;
+  }
+}
+
+function getDefaultPriceGroup(contactPriceGroup?: number): PriceGroup {
+  if (!contactPriceGroup) return "group1";
+  return `group${contactPriceGroup}` as PriceGroup;
 }
 
 export function ItemAmountPriceDialog({
@@ -40,10 +66,11 @@ export function ItemAmountPriceDialog({
   contactPriceGroup,
   initialAmount,
   initialPrice,
+  initialPriceGroup,
 }: ItemAmountPriceDialogProps) {
   const theme = useTheme();
   const [amount, setAmount] = useState<number>(1);
-  const [selectedPrice, setSelectedPrice] = useState<"group1" | "group2" | "group3" | "group4" | "custom">("group1");
+  const [selectedPrice, setSelectedPrice] = useState<PriceGroup>("group1");
   const [customPrice, setCustomPrice] = useState<number>(0);
   const [amountError, setAmountError] = useState<string>("");
 
@@ -53,39 +80,24 @@ export function ItemAmountPriceDialog({
   const isSale = invoiceType === 3 || invoiceType === 4;
   const isEditing = initialAmount !== undefined && initialPrice !== undefined;
 
-  console.log(`group: ${contactPriceGroup}`);
   useEffect(() => {
     if (open && item) {
       setAmountError("");
-      
-      if (initialAmount !== undefined) {
-        setAmount(initialAmount);
-      } else {
-        setAmount(1);
-      }
-      
+
+      setAmount(initialAmount ?? 1);
+
       if (isType5) {
         setSelectedPrice("custom");
-        setCustomPrice(initialPrice !== undefined ? initialPrice : 0);
+        setCustomPrice(initialPrice ?? 0);
       } else {
         if (initialPrice !== undefined) {
-          if (Math.abs(initialPrice - item.sale_price_group1) < 0.01) {
-            setSelectedPrice("group1");
-          } else if (Math.abs(initialPrice - item.sale_price_group2) < 0.01) {
-            setSelectedPrice("group2");
-          } else if (Math.abs(initialPrice - item.sale_price_group3) < 0.01) {
-            setSelectedPrice("group3");
-          } else if (Math.abs(initialPrice - item.sale_price_group4) < 0.01) {
-            setSelectedPrice("group4");
-          } else {
-            // Custom price
-            setSelectedPrice("custom");
+          const priceGroup = getPriceGroupFromValue(item, initialPrice);
+          setSelectedPrice(priceGroup);
+          if (priceGroup === "custom") {
             setCustomPrice(initialPrice);
           }
         } else {
-          const defaultGroup = contactPriceGroup 
-            ? (`group${contactPriceGroup}` as "group1" | "group2" | "group3" | "group4")
-            : "group1";
+          const defaultGroup = getDefaultPriceGroup(contactPriceGroup);
           setSelectedPrice(defaultGroup);
           setCustomPrice(0);
         }
@@ -96,23 +108,18 @@ export function ItemAmountPriceDialog({
   const getFinalPrice = (): number => {
     if (!item) return 0;
     if (selectedPrice === "custom") return customPrice;
-    
-    switch (selectedPrice) {
-      case "group1": return item.sale_price_group1;
-      case "group2": return item.sale_price_group2;
-      case "group3": return item.sale_price_group3;
-      case "group4": return item.sale_price_group4;
-      default: return 0;
-    }
-  };
 
-  const getSelectedPriceGroupIndex = (): number => {
     switch (selectedPrice) {
-      case "group1": return 1;
-      case "group2": return 2;
-      case "group3": return 3;
-      case "group4": return 4;
-      default: return 0;
+      case "group1":
+        return item.sale_price_group1;
+      case "group2":
+        return item.sale_price_group2;
+      case "group3":
+        return item.sale_price_group3;
+      case "group4":
+        return item.sale_price_group4;
+      default:
+        return 0;
     }
   };
 
@@ -121,7 +128,7 @@ export function ItemAmountPriceDialog({
       return stockAmount - amount;
     } else {
       return stockAmount + amount;
-    } 
+    }
   };
 
   const projectedStock = getProjectedStock();
@@ -129,7 +136,7 @@ export function ItemAmountPriceDialog({
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newAmount = parseFloat(e.target.value) || 0;
     setAmount(newAmount);
-    
+
     if (isSale && newAmount > stockAmount) {
       setAmountError("Nedostatečné množství na skladě");
     } else {
@@ -142,11 +149,10 @@ export function ItemAmountPriceDialog({
       setAmountError("Nedostatečné množství na skladě");
       return;
     }
-    
+
     const finalPrice = getFinalPrice();
-    const p_group_index = getSelectedPriceGroupIndex();
+    const p_group_index = getPriceGroupIndex(selectedPrice);
     onConfirm(amount, finalPrice, p_group_index);
-    onClose();
   };
 
   useKeyboardShortcuts(
@@ -162,7 +168,8 @@ export function ItemAmountPriceDialog({
 
   if (!item) return null;
 
-  const vatPercentage = VAT_RATES[item.vat_rate as keyof typeof VAT_RATES]?.percentage ?? 21;
+  const vatPercentage =
+    VAT_RATES[item.vat_rate as keyof typeof VAT_RATES]?.percentage ?? 21;
 
   return (
     <Dialog
@@ -177,7 +184,6 @@ export function ItemAmountPriceDialog({
         },
       }}
     >
-      {/* Header */}
       <Box
         sx={{
           width: "100%",
@@ -191,16 +197,16 @@ export function ItemAmountPriceDialog({
         }}
       >
         <Typography variant="subtitle2" fontWeight={500}>
-          {isEditing ? "Upravit položku - Množství a cena" : "Přidat položku - Množství a cena"}
+          {isEditing
+            ? "Upravit položku - Množství a cena"
+            : "Přidat položku - Množství a cena"}
         </Typography>
         <WindowButton type="close" onClick={onClose} />
       </Box>
 
-      {/* Content */}
       <Box sx={{ p: 3 }}>
         <FormSection>
           <Grid container spacing={2} alignItems="center">
-            {/* Item info */}
             <Grid item xs={12} md={9.7}>
               <Typography variant="body2" color="text.secondary">
                 {item.ean}
@@ -210,7 +216,6 @@ export function ItemAmountPriceDialog({
               </Typography>
             </Grid>
 
-            {/* Amount field */}
             <Grid item xs={12} md={2.3}>
               <NumberTextField
                 label={`Množství (${item.unit_of_measure})`}
@@ -244,7 +249,7 @@ export function ItemAmountPriceDialog({
           {!isType5 && (
             <RadioGroup
               value={selectedPrice}
-              onChange={(e) => setSelectedPrice(e.target.value as any)}
+              onChange={(e) => setSelectedPrice(e.target.value as PriceGroup)}
             >
               <Grid container spacing={2}>
                 <Grid item xs={12}>
@@ -342,7 +347,9 @@ export function ItemAmountPriceDialog({
                           name="custom_price"
                           value={customPrice}
                           vatRate={vatPercentage}
-                          onChange={(e) => setCustomPrice(parseFloat(e.target.value) || 0)}
+                          onChange={(e) =>
+                            setCustomPrice(parseFloat(e.target.value) || 0)
+                          }
                           precision={2}
                           min={0}
                         />
@@ -356,7 +363,6 @@ export function ItemAmountPriceDialog({
           )}
         </FormSection>
 
-        {/* Stock info - centered at bottom, shown for all types */}
         <Box
           sx={{
             display: "flex",
@@ -374,7 +380,9 @@ export function ItemAmountPriceDialog({
           </Typography>
           <Chip
             label={`${stockAmount.toFixed(2)} ${item.unit_of_measure}`}
-            color={stockAmount > 0 ? "success" : stockAmount < 0 ? "error" : "default"}
+            color={
+              stockAmount > 0 ? "success" : stockAmount < 0 ? "error" : "default"
+            }
             size="small"
             sx={{ fontWeight: 600 }}
           />
@@ -383,13 +391,18 @@ export function ItemAmountPriceDialog({
           </Typography>
           <Chip
             label={`${projectedStock.toFixed(2)} ${item.unit_of_measure}`}
-            color={projectedStock > 0 ? "success" : projectedStock < 0 ? "error" : "default"}
+            color={
+              projectedStock > 0
+                ? "success"
+                : projectedStock < 0
+                ? "error"
+                : "default"
+            }
             size="small"
             sx={{ fontWeight: 600 }}
           />
         </Box>
 
-        {/* Action buttons - matching FormDialog style */}
         <Box
           sx={{
             display: "flex",

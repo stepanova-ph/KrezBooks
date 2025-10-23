@@ -1,8 +1,8 @@
 import { Grid, MenuItem } from "@mui/material";
-import { FormSection } from "../common/form/FormSection";
-import ValidatedTextField from "../common/inputs/ValidatedTextField";
-import { INVOICE_TYPES, PAYMENT_METHOD_TYPES } from "../../../config/constants";
-import type { InvoiceType, PaymentMethodType } from "../../../types/database";
+import { FormSection } from "../../common/form/FormSection";
+import ValidatedTextField from "../../common/inputs/ValidatedTextField";
+import { INVOICE_TYPES, PAYMENT_METHOD_TYPES } from "../../../../config/constants";
+import type { InvoiceType, PaymentMethodType } from "../../../../types/database";
 
 interface InvoiceHeaderProps {
   number: string;

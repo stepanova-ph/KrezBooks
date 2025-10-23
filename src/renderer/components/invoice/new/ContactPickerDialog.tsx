@@ -7,17 +7,17 @@ import {
   TextField,
 } from "@mui/material";
 import { useState, useRef } from "react";
-import { useContacts } from "../../../hooks/useContacts";
-import { Contact } from "../../../types/database";
-import { DataTable, Column } from "../common/table/DataTable";
-import { useKeyboardShortcuts } from "../../../hooks/keyboard/useKeyboardShortcuts";
-import { WindowButton } from "../layout/WindowControls";
-import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
-import { useTableFilters } from "../../../hooks/useTableFilters";
+import { useContacts } from "../../../../hooks/useContacts";
+import { Contact } from "../../../../types/database";
+import { DataTable, Column } from "../../common/table/DataTable";
+import { useKeyboardShortcuts } from "../../../../hooks/keyboard/useKeyboardShortcuts";
+import { WindowButton } from "../../layout/WindowControls";
+import { useAutoSearchFocus } from "../../../../hooks/keyboard/useAutosearchFocus";
+import { useTableFilters } from "../../../../hooks/useTableFilters";
 import { 
   contactPickerFilterConfig,
   initialPickerFilterState 
-} from "../../../config/pickerFilterConfig";
+} from "../../../../config/pickerFilterConfig";
 
 interface ContactPickerDialogProps {
   open: boolean;
