@@ -1,9 +1,5 @@
 import { useMemo } from "react";
 import { FilterConfig, FilterState, TextSearchFilterDef } from "src/types/filter";
-import {
-  shouldFilterByDIC,
-  shouldFilterByICO,
-} from "../validation/filterValitation";
 
 /**
  * Hook to filter table data based on filter state

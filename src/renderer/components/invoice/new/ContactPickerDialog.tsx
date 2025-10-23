@@ -1,23 +1,16 @@
-import {
-  Dialog,
-  Box,
-  useTheme,
-  Divider,
-  TableCell,
-  TextField,
-} from "@mui/material";
+import { Box, TableCell, TextField } from "@mui/material";
 import { useState, useRef } from "react";
 import { useContacts } from "../../../../hooks/useContacts";
 import { Contact } from "../../../../types/database";
 import { DataTable, Column } from "../../common/table/DataTable";
 import { useKeyboardShortcuts } from "../../../../hooks/keyboard/useKeyboardShortcuts";
-import { WindowButton } from "../../layout/WindowControls";
 import { useAutoSearchFocus } from "../../../../hooks/keyboard/useAutosearchFocus";
 import { useTableFilters } from "../../../../hooks/useTableFilters";
-import { 
+import {
   contactPickerFilterConfig,
-  initialPickerFilterState 
+  initialPickerFilterState,
 } from "../../../../config/pickerFilterConfig";
+import { Dialog } from "../../common/dialog/Dialog";
 
 interface ContactPickerDialogProps {
   open: boolean;
@@ -38,22 +31,37 @@ export function ContactPickerDialog({
   onClose,
   onSelect,
 }: ContactPickerDialogProps) {
-  const theme = useTheme();
   const { data: allContacts = [] } = useContacts();
-  const [filters, setFilters] = useState<{search: string}>(
+  const [filters, setFilters] = useState<{ search: string }>(
     initialPickerFilterState
   );
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  
+
   const filteredContacts = useTableFilters(
-    allContacts, 
-    filters, 
+    allContacts,
+    filters,
     contactPickerFilterConfig
   );
+
+  const handleSelect = () => {
+    if (selectedContact) {
+      onSelect(selectedContact);
+    }
+  };
+
+  const handleRowClick = (contact: Contact) => {
+    setSelectedContact(contact);
+  };
+
+  const handleRowDoubleClick = (contact: Contact) => {
+    onSelect(contact);
+  };
 
   useKeyboardShortcuts(
     {
       Escape: onClose,
+      Enter: handleSelect,
     },
     {
       disabled: !open,
@@ -63,15 +71,13 @@ export function ContactPickerDialog({
 
   useAutoSearchFocus({
     inputRef: searchInputRef,
-    disabled: !open
+    disabled: !open,
   });
 
-  const handleSelect = (contact: Contact) => {
-    onSelect(contact);
-    console.log(`handleselect z dialogu contact: ${JSON.stringify(contact)}`);
-  };
-
   const renderRow = (contact: Contact, visibleColumns: Column[]) => {
+    const isSelected = selectedContact?.ico === contact.ico && 
+                       selectedContact?.modifier === contact.modifier;
+
     return visibleColumns.map((col) => {
       let content;
       switch (col.id) {
@@ -95,7 +101,13 @@ export function ContactPickerDialog({
       }
 
       return (
-        <TableCell key={col.id} align={col.align}>
+        <TableCell 
+          key={col.id} 
+          align={col.align}
+          sx={{
+            bgcolor: isSelected ? "action.selected" : "inherit",
+          }}
+        >
           {content}
         </TableCell>
       );
@@ -106,81 +118,54 @@ export function ContactPickerDialog({
     <Dialog
       open={open}
       onClose={onClose}
+      title="Vybrat kontakt"
       maxWidth="md"
-      fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: 0,
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          minHeight: "80vh",
-          maxHeight: "80vh",
+      actions={[
+        {
+          label: "Zrušit",
+          onClick: onClose,
+          variant: "outlined",
         },
-      }}
+        {
+          label: "Vybrat",
+          onClick: handleSelect,
+          variant: "contained",
+          disabled: !selectedContact,
+        },
+      ]}
     >
-      {/* Header bar */}
-      <Box
-        sx={{
-          width: "100%",
-          height: 48,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          pl: 2,
-          bgcolor: theme.palette.primary.main,
-          color: theme.palette.primary.contrastText,
-        }}
-      >
-        <Box sx={{ fontWeight: 600, fontSize: "1rem" }}>Vybrat kontakt</Box>
-
-        <WindowButton
-          type="close"
-          onClick={onClose}
-          hoverBackgroundColor={theme.palette.error.main}
-        />
-      </Box>
-
-      <Divider sx={{ borderColor: theme.palette.divider }} />
-
-      {/* Content */}
       <Box
         sx={{
           p: 2,
-          bgcolor: theme.palette.background.paper,
+          bgcolor: (theme) => theme.palette.background.default,
+          borderRadius: 1,
+          border: (theme) => `1px solid ${theme.palette.divider}`,
+          mb: 2,
         }}
       >
-        {/* Simple filter box matching FilterBar style */}
-        <Box
-          sx={{
-            p: 2,
-            bgcolor: theme.palette.background.default,
-            borderRadius: 1,
-            border: (theme) => `1px solid ${theme.palette.divider}`,
-            mb: 2,
-          }}
-        >
-          <TextField
-            size="small"
-            label="Hledat"
-            placeholder="IČO, název, DIČ..."
-            value={filters.search || ""}
-            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            inputRef={searchInputRef}
-            fullWidth
-          />
-        </Box>
+        <TextField
+          size="small"
+          label="Hledat"
+          placeholder="IČO, název, DIČ..."
+          value={filters.search || ""}
+          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+          inputRef={searchInputRef}
+          fullWidth
+        />
+      </Box>
 
-        {/* Table */}
-        <Box sx={{ maxHeight: "60vh", overflow: "auto" }}>
-          <DataTable
-            columns={pickerColumns}
-            data={filteredContacts}
-            visibleColumnIds={new Set(pickerColumns.map((c) => c.id))}
-            renderRow={renderRow}
-            getRowKey={(contact) => `${contact.ico}-${contact.modifier}`}
-            emptyMessage="Žádné kontakty nenalezeny"
-            onEnterAction={handleSelect}
-          />
-        </Box>
+      <Box sx={{ maxHeight: "60vh", overflow: "auto" }}>
+        <DataTable
+          columns={pickerColumns}
+          data={filteredContacts}
+          visibleColumnIds={new Set(pickerColumns.map((c) => c.id))}
+          renderRow={renderRow}
+          getRowKey={(contact) => `${contact.ico}-${contact.modifier}`}
+          emptyMessage="Žádné kontakty nenalezeny"
+          onRowClick={handleRowClick}
+          onRowDoubleClick={handleRowDoubleClick}
+          onEnterAction={handleSelect}
+        />
       </Box>
     </Dialog>
   );

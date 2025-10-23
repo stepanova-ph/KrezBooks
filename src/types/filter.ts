@@ -120,10 +120,7 @@ export interface ContactFilterState {
   is_supplier: boolean;
   is_customer: boolean;
   ico: string;
-  dic: {
-    prefix: string | null;
-    value: string;
-  };
+  dic: string;
   price_group: string | null;
 }
 

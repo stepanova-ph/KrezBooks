@@ -100,10 +100,7 @@ export const initialContactFilterState: ContactFilterState = {
   is_supplier: false,
   is_customer: false,
   ico: "",
-  dic: {
-    prefix: null,
-    value: "",
-  },
+  dic: "",
   price_group: null,
 };
 

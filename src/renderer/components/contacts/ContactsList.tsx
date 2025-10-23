@@ -200,6 +200,7 @@ function ContactsList({
         getRowKey={(contact) => `${contact.ico}-${contact.modifier}`}
         columnOrder={columnOrder}
         onColumnOrderChange={onColumnOrderChange}
+        onRowDoubleClick={(contact) => setEditingContact(contact)}
         renderRow={(contact, visibleColumns) => (
           <>
             {visibleColumns.map((column) => (

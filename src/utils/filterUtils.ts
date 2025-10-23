@@ -3,7 +3,6 @@
  * Wrappers around core validators that return validation objects
  */
 
-import { validateICO, validateDIC } from "./validationUtils";
 
 /**
  * Validation result object for filter inputs
@@ -19,10 +18,9 @@ export interface FilterValidationResult {
  */
 export function validateFilterICO(ico: string): FilterValidationResult {
   if (!ico || ico.trim() === "") {
-    return { valid: true }; // Empty = no filter
+    return { valid: true };
   }
 
-  // Must be 8 digits
   if (ico.length > 8) {
     return { valid: false, error: "IČO musí mít 8 číslic" };
   }
@@ -35,15 +33,15 @@ export function validateFilterICO(ico: string): FilterValidationResult {
  * Empty values are considered valid (no filter applied)
  */
 export function validateFilterDIC(value: string): FilterValidationResult {
+  console.log("Validating DIC:", value);
   if (!value || value.trim() === "") {
     return { valid: true };
   }
 
-  // Just check basic format - starts with 2 letters
   if (value.length < 10 || !/^[A-Z]{2}/.test(value)) {
     return {
       valid: false,
-      error: "DIČ musí začínat 2 písmeny (např. CZ)",
+      error: "DIČ musí začínat 2 písmeny (např. CZ) a mít méně než 10 písmen.",
     };
   }
 
@@ -64,7 +62,6 @@ export function shouldFilterByDIC(value: string): boolean {
 export function shouldFilterByICO(ico: string): boolean {
   if (!ico || ico.trim() === "") return false;
 
-  // Allow filtering with any number of digits (1-8)
   if (ico.length >= 1 && /^[0-9]+$/.test(ico)) {
     return true;
   }

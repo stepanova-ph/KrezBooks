@@ -75,6 +75,8 @@ interface DataTableProps<T> {
   columnOrder?: string[];
   onColumnOrderChange?: (newOrder: string[]) => void;
   onEnterAction?: (item: T, index: number) => void;
+  onRowClick?: (item: T, index: number) => void;
+  onRowDoubleClick?: (item: T, index: number) => void;
 }
 
 export function DataTable<T>({
@@ -88,27 +90,25 @@ export function DataTable<T>({
   columnOrder,
   onColumnOrderChange,
   onEnterAction,
+  onRowClick,
+  onRowDoubleClick,
 }: DataTableProps<T>) {
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
 
-  // Filter visible columns
   const visibleColumns = columns.filter((col) => visibleColumnIds.has(col.id));
 
-  // Order columns based on columnOrder prop, or use original order
   const orderedColumns = columnOrder
     ? columnOrder
         .map((id) => visibleColumns.find((col) => col.id === id))
         .filter((col): col is Column => col !== undefined)
     : visibleColumns;
 
-  // Context menu state
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
     mouseY: number;
     item: T | null;
   } | null>(null);
 
-  // Confirmation dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     action: ContextMenuAction<T> | null;
@@ -119,17 +119,14 @@ export function DataTable<T>({
     item: null,
   });
 
-  // Default: Enter opens context menu (simulates right-click on focused row)
   const handleEnterPress = useCallback(() => {
     if (data.length === 0) return;
 
     const focusedItem = data[focusedRowIndex];
 
     if (onEnterAction) {
-      // Custom action provided
       onEnterAction(focusedItem, focusedRowIndex);
     } else if (contextMenuActions.length > 0) {
-      // Default: open context menu for focused row
       const rowElement = rowRefs.current[focusedRowIndex];
       if (rowElement) {
         const rect = rowElement.getBoundingClientRect();
@@ -332,6 +329,8 @@ export function DataTable<T>({
                       key={getRowKey(item)}
                       ref={setRowRefWithStorage(index)}
                       onMouseEnter={() => handleRowMouseEnter(index)}
+                      onClick={() => onRowClick?.(item, index)}
+                      onDoubleClick={() => onRowDoubleClick?.(item, index)}
                       onContextMenu={(e) => handleContextMenu(e, item, index)}
                       sx={{
                         cursor:
