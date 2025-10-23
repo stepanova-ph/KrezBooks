@@ -20,7 +20,6 @@ interface InvoiceContactInfoProps {
   bankAccount: string;
   errors: Record<string, string>;
   onChange: (field: string, value: string | number) => void;
-  onDicChange: (field: "prefix" | "value", value: string | null) => void;
   onBlur: (field: string) => void;
   onSelectContact: () => void;
 }
