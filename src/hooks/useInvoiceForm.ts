@@ -86,7 +86,6 @@ export function useInvoiceForm() {
         }
       });
       setErrors(fieldErrors);
-      console.log(`Form errors: ${JSON.stringify(fieldErrors)}`);
       return false;
     }
     setErrors({});

@@ -33,7 +33,6 @@ export function validateFilterICO(ico: string): FilterValidationResult {
  * Empty values are considered valid (no filter applied)
  */
 export function validateFilterDIC(value: string): FilterValidationResult {
-  console.log("Validating DIC:", value);
   if (!value || value.trim() === "") {
     return { valid: true };
   }

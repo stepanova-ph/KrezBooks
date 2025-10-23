@@ -49,6 +49,38 @@ function HomeTab() {
     }
   };
 
+  const handleRecreateTables = async () => {
+    if (
+      !window.confirm(
+        "Smazat a znovu vytvořit všechny tabulky? VŠECHNA DATA budou ztracena!",
+      )
+    ) {
+      return;
+    }
+
+    setLoading(true);
+    setMessage(null);
+    try {
+      const result = await window.electronAPI.admin.recreateTables();
+      if (result.success) {
+        setStats({ contacts: 0, items: 0, stockMovements: 0, invoices: 0 });
+        setMessage({ type: "success", text: "Tabulky byly znovu vytvořeny" });
+        
+        queryClient.invalidateQueries({ queryKey: contactKeys.lists() });
+        queryClient.invalidateQueries({ queryKey: itemKeys.lists() });
+      } else {
+        setMessage({
+          type: "error",
+          text: result.error || "Chyba při vytváření tabulek",
+        });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: "Chyba při vytváření tabulek" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleClearDatabase = async () => {
     if (
       !window.confirm(
@@ -63,7 +95,7 @@ function HomeTab() {
     try {
       const result = await window.electronAPI.admin.clearDb();
       if (result.success) {
-        setStats({ contacts: 0, items: 0, stockMovements: 0 });
+        setStats({ contacts: 0, items: 0, stockMovements: 0, invoices: 0 });
         setMessage({ type: "success", text: "Databáze byla úspěšně vymazána" });
 
         queryClient.invalidateQueries({ queryKey: contactKeys.lists() });
@@ -79,6 +111,7 @@ function HomeTab() {
     } finally {
       setLoading(false);
     }
+    handleRecreateTables();
   };
 
   const handleFillTestData = async () => {

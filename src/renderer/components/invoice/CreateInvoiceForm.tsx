@@ -9,8 +9,6 @@ interface CreateInvoiceFormProps {
 export function CreateInvoiceForm({ open, onClose }: CreateInvoiceFormProps) {
   const handleSubmit = async (data: CreateInvoiceInput) => {
     try {
-      // TODO: Implement invoice creation via IPC
-      console.log("Vytváření dokladu:", data);
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
       onClose();
     } catch (error) {

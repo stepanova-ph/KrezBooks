@@ -139,7 +139,6 @@ function ItemsList({
       case "sale_price_group4":
         return formatPrice(item.sale_price_group4);
       default:
-        console.log(columnId)
         return "-";
     }
   };

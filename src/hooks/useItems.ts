@@ -93,10 +93,8 @@ export function useItemCategories() {
   return useQuery({
     queryKey: [...itemKeys.all, 'categories'],
 queryFn: async () => {
-  console.log("haha")
   try {
     const response = await window.electronAPI.items.getCategories();
-    console.log("Response data:", JSON.stringify(response.data));
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch categories');
     }

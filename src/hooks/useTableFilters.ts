@@ -27,7 +27,6 @@ export function useTableFilters<T extends Record<string, any>>(
 
         const matches = searchableFieldsWithMatchFunctions.some(({ field, match }) => {
         const value = item[field];
-        console.log(`Value for ${field}:`, value);
 
         if (match) {
           try {

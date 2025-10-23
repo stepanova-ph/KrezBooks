@@ -51,16 +51,17 @@ declare global {
         getDbStats: () => Promise<IpcResponse<{ contacts: number; items: number, stockMovements: number, invoices: number }>>;
         clearDb: () => Promise<IpcResponse<{ changes: number }>>;
         fillTestData: () => Promise<IpcResponse<{ contactsAdded: number; itemsAdded: number }>>;
+        recreateTables: () => Promise<IpcResponse<{}>>;
       };
 
       stockMovements:{
         getAll: () => Promise<IPCResponse<StockMovement[]>>;
         getOne: (invoiceNumber: string, itemEan: string) => Promise<IPCResponse<StockMovement>>;
         getByInvoice: (invoiceNumber: string) => Promise<IPCResponse<StockMovement[]>>;
-        getByItem: (itemEan: string) => Promise<IPCResponse<StockMovement[]>>;  // ADD THIS
-        getStockAmountByItem: (itemEan: string) => Promise<IPCResponse<number>>;  // ADD THIS
-        getAverageBuyPriceByItem: (itemEan: string) => Promise<IPCResponse<number>>;  // ADD THIS
-        getLastBuyPriceByItem: (itemEan: string) => Promise<IPCResponse<number>>;  // ADD THIS
+        getByItem: (itemEan: string) => Promise<IPCResponse<StockMovement[]>>;
+        getStockAmountByItem: (itemEan: string) => Promise<IPCResponse<number>>;
+        getAverageBuyPriceByItem: (itemEan: string) => Promise<IPCResponse<number>>;
+        getLastBuyPriceByItem: (itemEan: string) => Promise<IPCResponse<number>>;
         create: (movement: CreateStockMovementInput) => Promise<IPCResponse<{ changes: number }>>;
         update: (
           invoiceNumber: string,
@@ -77,6 +78,9 @@ declare global {
         create: (invoice: CreateInvoiceInput) => Promise<IpcResponse<{ changes: number }>>;
         update: (number: string, updates: Partial<Invoice>) => Promise<IpcResponse<{ changes: number }>>;
         delete: (number: string) => Promise<IpcResponse<{ changes: number }>>;
+        getByInvoice: (invoiceNumber: string) => Promise<IpcResponse<StockMoveent[]>>;
+        getAverageBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
+        getLastBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
       }
     };
 

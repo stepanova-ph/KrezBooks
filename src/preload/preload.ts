@@ -4,6 +4,10 @@ import type {
   Item,
   CreateContactInput,
   CreateItemInput,
+  StockMovement,
+  Invoice,
+  CreateInvoiceInput,
+  CreateStockMovementInput,
 } from "../types/database";
 
 // Expose protected methods that allow the renderer process to use
@@ -57,5 +61,37 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getDbStats: () => ipcRenderer.invoke("db:getStats"),
     clearDb: () => ipcRenderer.invoke("db:clearDatabase"),
     fillTestData: () => ipcRenderer.invoke("db:fillTestData"),
+    recreateTables: () => ipcRenderer.invoke("db:recreateTables"),
   },
+
+  invoices: {
+    getAll: () => ipcRenderer.invoke("db:invoices:getAll"),
+    getOne: (number: string) => ipcRenderer.invoke("db:invoices:getOne", number),
+    create: (invoice: CreateInvoiceInput) => ipcRenderer.invoke("db:invoices:create", invoice),
+    update: (number: string, updates: Partial<Invoice>) =>
+      ipcRenderer.invoke("db:invoices:update", number, updates),
+    delete: (number: string) => ipcRenderer.invoke("db:invoices:delete", number),
+  },
+
+  stockMovements: {
+    getAll: () => ipcRenderer.invoke("db:stockMovements:getAll"),
+    getOne: (number: string) =>
+      ipcRenderer.invoke("db:stockMovements:getOne", number),
+    create: (movement: CreateStockMovementInput) => ipcRenderer.invoke("db:stockMovements:create", movement),
+    update: (number: string, updates: Partial<StockMovement>) =>
+      ipcRenderer.invoke("db:stockMovements:update", number, updates),
+    delete: (number: string) =>
+      ipcRenderer.invoke("db:stockMovements:delete", number),
+    getByInvoice: (invoiceNumber: string) =>
+      ipcRenderer.invoke("db:stockMovements:getByInvoice", invoiceNumber),
+
+    getStockAmountByItem: (ean: string) =>
+      ipcRenderer.invoke("db:stockMovements:getStockAmountByItem", ean),
+
+    getAverageBuyPriceByItem: (ean: string) =>
+      ipcRenderer.invoke("db:stockMovements:getAverageBuyPriceByItem", ean),
+
+    getLastBuyPriceByItem: (ean: string) =>
+      ipcRenderer.invoke("db:stockMovements:getLastBuyPriceByItem", ean),
+  }
 });

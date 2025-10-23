@@ -13,7 +13,6 @@ function initLogStream() {
   if (!logStream) {
     const logPath = getLogPath();
     logStream = fs.createWriteStream(logPath, { flags: 'a' });
-    console.log('Logging to:', logPath);
   }
 }
 
@@ -25,7 +24,7 @@ function log(level: string, ...args: any[]) {
   ).join(' ')}\n`;
   
   logStream?.write(message);
-  console.log(...args); // Still log to console in dev
+  console.log(...args);
 }
 
 export const logger = {

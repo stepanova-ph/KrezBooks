@@ -2,6 +2,7 @@ import { ipcMain } from "electron";
 import { getDatabase } from "./database";
 import { testContacts, testItems } from "../utils/testUtils";
 import { logger } from "./logger";
+import { contactQueries, invoiceQueries, itemQueries, stockMovementQueries } from "./queries";
 
 function registerAdminHandlers() {
   ipcMain.handle("db:getStats", async () => {
@@ -56,6 +57,34 @@ function registerAdminHandlers() {
       return {
         success: false,
         error: error.message || "Failed to clear database",
+      };
+    }
+  });
+
+  ipcMain.handle("db:recreateTables", async () => {
+    try {
+      const db = getDatabase();
+
+      // Drop all tables
+      db.prepare("DROP TABLE IF EXISTS stock_movements").run();
+      db.prepare("DROP TABLE IF EXISTS invoices").run();
+      db.prepare("DROP TABLE IF EXISTS items").run();
+      db.prepare("DROP TABLE IF EXISTS contacts").run();
+
+      // Recreate tables by calling createTables from database.ts
+      // We need to expose this method
+      db.exec(contactQueries.createTable);
+      db.exec(itemQueries.createTable);
+      db.exec(stockMovementQueries.createTable);
+      db.exec(invoiceQueries.createTable);
+
+      logger.info("Tables recreated successfully");
+      return { success: true };
+    } catch (error: any) {
+      logger.error("Error recreating tables:", error);
+      return {
+        success: false,
+        error: error.message || "Failed to recreate tables",
       };
     }
   });

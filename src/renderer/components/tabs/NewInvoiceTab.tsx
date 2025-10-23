@@ -15,6 +15,7 @@ import { useCreateStockMovement } from "../../../hooks/useStockMovement";
 import type { Item, Contact, CreateInvoiceInput } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 
+
 function NewInvoiceTab() {
   const form = useInvoiceForm();
   const dialogs = useInvoiceDialogs();
@@ -65,6 +66,7 @@ function NewInvoiceTab() {
     }
   };
 
+
   const handleCloseAmountPriceDialog = () => {
     const shouldReopenItemPicker = dialogs.amountPrice.editingItemIndex === null;
     dialogs.amountPrice.closeDialog(shouldReopenItemPicker);
@@ -74,8 +76,7 @@ function NewInvoiceTab() {
     form.handleSelectContact(contact);
     dialogs.contactPicker.closeDialog();
   };
-
-  const handleSubmit = async (data: CreateInvoiceInput) => {
+  const handleSubmit = async () => {
     if (!form.handleValidate()) {
       alert("Opravte chyby ve formuláři");
       return;
@@ -87,19 +88,38 @@ function NewInvoiceTab() {
     }
 
     try {
-      await createInvoice.mutateAsync(data);
+      await createInvoice.mutateAsync({
+        number: form.formData.number,
+        type: form.formData.type,
+        payment_method: form.formData.payment_method,
+        date_issue: form.formData.date_issue,
+        date_tax: form.formData.date_tax || undefined,
+        date_due: form.formData.date_due || undefined,
+        variable_symbol: form.formData.variable_symbol || undefined,
+        note: form.formData.note || undefined,
+        ico: form.formData.ico || undefined,
+        modifier: form.formData.modifier,
+        dic: form.formData.dic || undefined,
+        company_name: form.formData.company_name || undefined,
+        bank_account: form.formData.bank_account || undefined,
+        street: form.formData.street || undefined,
+        city: form.formData.city || undefined,
+        postal_code: form.formData.postal_code || undefined,
+        phone: form.formData.phone || undefined,
+        email: form.formData.email || undefined,
+      });
 
-      // await Promise.all(
-      //   form.invoiceItems.map(item =>
-      //     createStockMovement.mutateAsync({
-      //       invoice_number: form.formData.number,
-      //       item_ean: item.ean,
-      //       amount: item.amount.toString(),
-      //       price_per_unit: item.sale_price.toString(),
-      //       vat_rate: item.vat_rate,
-      //     })
-      //   )
-      // );
+      await Promise.all(
+        form.invoiceItems.map(item =>
+          createStockMovement.mutateAsync({
+            invoice_number: form.formData.number,
+            item_ean: item.ean,
+            amount: item.amount.toString(),
+            price_per_unit: item.sale_price.toString(),
+            vat_rate: item.vat_rate,
+          })
+        )
+      );
 
       form.handleReset();
       alert("Doklad byl úspěšně vytvořen");
