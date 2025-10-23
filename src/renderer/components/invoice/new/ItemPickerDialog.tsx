@@ -1,18 +1,15 @@
-import { Box, TableCell } from "@mui/material";
-import { useState, useRef } from "react";
+import { TableCell } from "@mui/material";
+import { useState } from "react";
 import { useItems } from "../../../../hooks/useItems";
 import { Item } from "../../../../types/database";
-import { DataTable, Column } from "../../common/table/DataTable";
-import ValidatedTextField from "../../common/inputs/ValidatedTextField";
-import { useKeyboardShortcuts } from "../../../../hooks/keyboard/useKeyboardShortcuts";
-import { useAutoSearchFocus } from "../../../../hooks/keyboard/useAutosearchFocus";
+import { Column } from "../../common/table/DataTable";
+import { PickerDialog } from "../../common/dialog/PickerDialog";
 import { formatVatRateShort } from "../../../../utils/formattingUtils";
 import { useTableFilters } from "../../../../hooks/useTableFilters";
 import {
   initialPickerFilterState,
   itemPickerFilterConfig,
 } from "../../../../config/pickerFilterConfig";
-import { Dialog } from "../../common/dialog/Dialog";
 
 interface ItemPickerDialogProps {
   open: boolean;
@@ -37,8 +34,6 @@ export function ItemPickerDialog({
   const [filters, setFilters] = useState<{ search: string }>(
     initialPickerFilterState
   );
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const filteredItems = useTableFilters(
     allItems,
@@ -46,39 +41,7 @@ export function ItemPickerDialog({
     itemPickerFilterConfig
   );
 
-  const handleSelect = () => {
-    if (selectedItem) {
-      onSelect(selectedItem);
-    }
-  };
-
-  const handleRowClick = (item: Item) => {
-    setSelectedItem(item);
-  };
-
-  const handleRowDoubleClick = (item: Item) => {
-    onSelect(item);
-  };
-
-  useKeyboardShortcuts(
-    {
-      Escape: onClose,
-      Enter: handleSelect,
-    },
-    {
-      disabled: !open,
-      preventInInputs: false,
-    }
-  );
-
-  useAutoSearchFocus({
-    inputRef: searchInputRef,
-    disabled: !open,
-  });
-
-  const renderRow = (item: Item, visibleColumns: Column[]) => {
-    const isSelected = selectedItem?.ean === item.ean;
-
+  const renderRow = (item: Item, visibleColumns: Column[], isFocused: boolean) => {
     return visibleColumns.map((col) => {
       let content;
       switch (col.id) {
@@ -102,13 +65,7 @@ export function ItemPickerDialog({
       }
 
       return (
-        <TableCell
-          key={col.id}
-          align={col.align}
-          sx={{
-            bgcolor: isSelected ? "action.selected" : "inherit",
-          }}
-        >
+        <TableCell key={col.id} align={col.align}>
           {content}
         </TableCell>
       );
@@ -116,50 +73,19 @@ export function ItemPickerDialog({
   };
 
   return (
-    <Dialog
+    <PickerDialog
       open={open}
       onClose={onClose}
+      onSelect={onSelect}
       title="Vybrat položku"
-      maxWidth="md"
-      actions={[
-        {
-          label: "Zrušit",
-          onClick: onClose,
-          variant: "outlined",
-        },
-        {
-          label: "Vybrat",
-          onClick: handleSelect,
-          variant: "contained",
-          disabled: !selectedItem,
-        },
-      ]}
-    >
-      <Box sx={{ mb: 2 }}>
-        <ValidatedTextField
-          inputRef={searchInputRef}
-          label="Hledat"
-          placeholder="EAN, název, kategorie..."
-          value={filters.search || ""}
-          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          fullWidth
-          autoFocus
-        />
-      </Box>
-
-      <Box sx={{ maxHeight: "60vh", overflow: "auto" }}>
-        <DataTable
-          columns={pickerColumns}
-          data={filteredItems}
-          visibleColumnIds={new Set(pickerColumns.map((c) => c.id))}
-          renderRow={renderRow}
-          getRowKey={(item) => item.ean}
-          emptyMessage="Žádné položky nenalezeny"
-          onRowClick={handleRowClick}
-          onRowDoubleClick={handleRowDoubleClick}
-          onEnterAction={handleSelect}
-        />
-      </Box>
-    </Dialog>
+      columns={pickerColumns}
+      data={filteredItems}
+      getRowKey={(item) => item.ean}
+      renderRow={renderRow}
+      emptyMessage="Žádné položky nenalezeny"
+      searchPlaceholder="EAN, název, kategorie..."
+      filterValue={filters.search || ""}
+      onFilterChange={(value) => setFilters({ ...filters, search: value })}
+    />
   );
 }

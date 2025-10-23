@@ -1,16 +1,4 @@
-import React from "react";
 import { Dialog } from "../dialog/Dialog";
-
-interface FormDialogProps {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-  onSubmit: (e: React.FormEvent) => void;
-  isPending?: boolean;
-  submitLabel?: string;
-  cancelLabel?: string;
-}
 
 export function FormDialog({
   open,
@@ -20,31 +8,46 @@ export function FormDialog({
   onSubmit,
   isPending = false,
   submitLabel = "Uložit",
-  cancelLabel = "Zrušit",
-}: FormDialogProps) {
+  cancelLabel = "Vymazat formulář",
+  mode = "create",
+}: FormDialogProps & { mode?: "create" | "edit" }) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(e);
   };
+
+  const actions = mode === "create" 
+    ? [
+        {
+          label: cancelLabel,
+          onClick: onClose, // In create mode, this clears the form
+          variant: "outlined" as const,
+        },
+        {
+          label: isPending ? "Ukládám..." : submitLabel,
+          onClick: handleSubmit,
+          variant: "contained" as const,
+          disabled: isPending,
+          type: "submit" as const,
+        },
+      ]
+    : [
+        {
+          label: isPending ? "Ukládám..." : submitLabel,
+          onClick: handleSubmit,
+          variant: "contained" as const,
+          disabled: isPending,
+          type: "submit" as const,
+        },
+      ];
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
       title={title}
-      actions={[
-        {
-          label: cancelLabel,
-          onClick: onClose,
-          variant: "outlined",
-        },
-        {
-          label: isPending ? "Ukládám..." : submitLabel,
-          onClick: handleSubmit,
-          variant: "contained",
-          disabled: isPending,
-        },
-      ]}
+      actions={actions}
+      onSubmit={handleSubmit}
     >
       <form onSubmit={handleSubmit} noValidate>
         {children}

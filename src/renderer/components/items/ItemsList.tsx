@@ -156,6 +156,8 @@ function ItemsList({
         visibleColumnIds={visibleColumnIds}
         columnOrder={columnOrder}
         onColumnOrderChange={onColumnOrderChange}
+        onEnterAction={(item) => setEditingItem(item)}
+        onRowDoubleClick={(item) => setEditingItem(item)}
         renderRow={(item, visibleColumns) => (
           <>
             {visibleColumns.filter((col) => !col.hidden).map((column) => (

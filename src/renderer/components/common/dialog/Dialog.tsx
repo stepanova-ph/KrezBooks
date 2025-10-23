@@ -16,6 +16,7 @@ interface DialogAction {
   variant?: "text" | "outlined" | "contained";
   color?: "primary" | "secondary" | "error";
   disabled?: boolean;
+  type?: "button" | "submit";
 }
 
 interface DialogProps {
@@ -26,6 +27,7 @@ interface DialogProps {
   actions?: DialogAction[];
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
   fullWidth?: boolean;
+  onSubmit?: () => void; // ADD THIS - for Enter key handling
 }
 
 export function Dialog({
@@ -36,8 +38,16 @@ export function Dialog({
   actions,
   maxWidth = "sm",
   fullWidth = true,
+  onSubmit,
 }: DialogProps) {
   const theme = useTheme();
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && onSubmit && !e.shiftKey) {
+      e.preventDefault();
+      onSubmit();
+    }
+  };
 
   return (
     <MuiDialog
@@ -45,12 +55,15 @@ export function Dialog({
       onClose={onClose}
       maxWidth={maxWidth}
       fullWidth={fullWidth}
+      onKeyDown={handleKeyDown}
       PaperProps={{
         sx: {
           borderRadius: 0,
           boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
         },
       }}
+      disablePortal={false}
+      style={{ zIndex: 1300 }} // Base dialogs at 1300
     >
       <Box
         sx={{
@@ -104,6 +117,7 @@ export function Dialog({
                 variant={action.variant || "outlined"}
                 color={action.color || "primary"}
                 disabled={action.disabled}
+                type={action.type}
                 size="small"
                 sx={{
                   minHeight: 32,

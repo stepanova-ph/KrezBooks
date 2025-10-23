@@ -201,6 +201,7 @@ function ContactsList({
         columnOrder={columnOrder}
         onColumnOrderChange={onColumnOrderChange}
         onRowDoubleClick={(contact) => setEditingContact(contact)}
+        onEnterAction={(contact) => setEditingContact(contact)}
         renderRow={(contact, visibleColumns) => (
           <>
             {visibleColumns.map((column) => (
