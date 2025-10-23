@@ -5,7 +5,7 @@ export function useInvoices() {
   return useQuery({
     queryKey: ["invoices"],
     queryFn: async () => {
-      const result = await window.electronAPI.ipcRenderer.invoices.getAll();
+      const result = await window.electronAPI.invoices.getAll();
       if (!result.success) throw new Error(result.error);
       return result.data as Invoice[];
     },
@@ -16,7 +16,7 @@ export function useInvoice(number: string) {
   return useQuery({
     queryKey: ["invoices", number],
     queryFn: async () => {
-      const result = await window.electronAPI.ipcRenderer.invoices.getOne(number);
+      const result = await window.electronAPI.invoices.getOne(number);
       if (!result.success) throw new Error(result.error);
       return result.data as Invoice | undefined;
     },
@@ -29,7 +29,7 @@ export function useCreateInvoice() {
 
   return useMutation({
     mutationFn: async (invoice: CreateInvoiceInput) => {
-      const result = await window.electronAPI.ipcRenderer.invoices.create(invoice);
+      const result = await window.electronAPI.invoices.create(invoice);
       if (!result.success) throw new Error(result.error);
       return result.data;
     },
@@ -44,7 +44,7 @@ export function useUpdateInvoice() {
 
   return useMutation({
     mutationFn: async ({ number, updates }: { number: string; updates: Partial<Invoice> }) => {
-      const result = await window.electronAPI.ipcRenderer.invoices.update(number, updates);
+      const result = await window.electronAPI.invoices.update(number, updates);
       if (!result.success) throw new Error(result.error);
       return result.data;
     },
@@ -59,7 +59,7 @@ export function useDeleteInvoice() {
 
   return useMutation({
     mutationFn: async (number: string) => {
-      const result = await window.electronAPI.ipcRenderer.invoices.delete(number);
+      const result = await window.electronAPI.invoices.delete(number);
       if (!result.success) throw new Error(result.error);
       return result.data;
     },

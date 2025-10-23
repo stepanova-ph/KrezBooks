@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Contact, InvoiceType, Item } from "../types/database";
+import { invoiceSchema } from "../validation/invoiceSchema";
 
 export interface InvoiceItem extends Item {
   amount: number;
@@ -29,28 +30,29 @@ interface InvoiceFormData {
   email: string;
 }
 
-export function useInvoiceForm() {
-  const [formData, setFormData] = useState<InvoiceFormData>({
-    number: "",
-    type: 1,
-    payment_method: undefined,
-    date_issue: new Date().toISOString().split("T")[0],
-    date_tax: "",
-    date_due: "",
-    variable_symbol: "",
-    note: "",
-    ico: "",
-    modifier: undefined,
-    dic: "",
-    company_name: "",
-    bank_account: "",
-    street: "",
-    city: "",
-    postal_code: "",
-    phone: "",
-    email: "",
-  });
+const defaultFormData: InvoiceFormData = {
+  number: "",
+  type: 1,
+  payment_method: undefined,
+  date_issue: new Date().toISOString().split("T")[0],
+  date_tax: "",
+  date_due: "",
+  variable_symbol: "",
+  note: "",
+  ico: "",
+  modifier: undefined,
+  dic: "",
+  company_name: "",
+  bank_account: "",
+  street: "",
+  city: "",
+  postal_code: "",
+  phone: "",
+  email: "",
+};
 
+export function useInvoiceForm() {
+  const [formData, setFormData] = useState<InvoiceFormData>(defaultFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
@@ -63,7 +65,39 @@ export function useInvoiceForm() {
   };
 
   const handleBlur = (field: string) => {
-    // Validation logic here
+    const result = invoiceSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldError = result.error.issues.find(
+        (err) => err.path[0] === field
+      );
+      if (fieldError) {
+        setErrors((prev) => ({ ...prev, [field]: fieldError.message }));
+      }
+    }
+  };
+
+  const handleValidate = (): boolean => {
+    const result = invoiceSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        if (typeof err.path[0] === "string") {
+          fieldErrors[err.path[0]] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      console.log(`Form errors: ${JSON.stringify(fieldErrors)}`);
+      return false;
+    }
+    setErrors({});
+    return true;
+  };
+
+  const handleReset = () => {
+    setFormData(defaultFormData);
+    setInvoiceItems([]);
+    setSelectedContact(null);
+    setErrors({});
   };
 
   const handleSelectContact = (contact: Contact) => {
@@ -131,6 +165,8 @@ export function useInvoiceForm() {
     selectedContact,
     handleChange,
     handleBlur,
+    handleValidate,
+    handleReset,
     handleSelectContact,
     handleAddItem,
     handleUpdateItem,

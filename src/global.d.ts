@@ -70,7 +70,17 @@ declare global {
         delete: (invoiceNumber: string, itemEan: string) => Promise<IPCResponse<{ changes: number }>>;
         deleteByInvoice: (invoiceNumber: string) => Promise<IPCResponse<{ changes: number }>>;
       }
+
+      invoices: {
+        getAll: () => Promise<IpcResponse<Invoice[]>>;
+        getOne: (number: string) => Promise<IpcResponse<Invoice | null>>;
+        create: (invoice: CreateInvoiceInput) => Promise<IpcResponse<{ changes: number }>>;
+        update: (number: string, updates: Partial<Invoice>) => Promise<IpcResponse<{ changes: number }>>;
+        delete: (number: string) => Promise<IpcResponse<{ changes: number }>>;
+      }
     };
+
+    
   }
 }
 

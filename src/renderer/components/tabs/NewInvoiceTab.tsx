@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid, IconButton, Tooltip } from "@mui/material";
+import { Box, Grid, IconButton, Tooltip, Button } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { InvoiceHeader } from "../invoice/new/InvoiceHeader";
 import { InvoiceContactInfo } from "../invoice/new/InvoiceContactInfo";
@@ -10,12 +10,16 @@ import { ItemAmountPriceDialog } from "../invoice/new/ItemAmountPriceDialog";
 import { ContactPickerDialog } from "../invoice/new/ContactPickerDialog";
 import { useInvoiceForm } from "../../../hooks/useInvoiceForm";
 import { useInvoiceDialogs } from "../../../hooks/useInvoiceDialogs";
-import type { Item } from "../../../types/database";
+import { useCreateInvoice } from "../../../hooks/useInvoices";
+import { useCreateStockMovement } from "../../../hooks/useStockMovement";
+import type { Item, Contact, CreateInvoiceInput } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 
 function NewInvoiceTab() {
   const form = useInvoiceForm();
   const dialogs = useInvoiceDialogs();
+  const createInvoice = useCreateInvoice();
+  const createStockMovement = useCreateStockMovement();
 
   const isType5 = form.formData.type === 5;
 
@@ -69,6 +73,40 @@ function NewInvoiceTab() {
   const handleSelectContact = (contact: Contact) => {
     form.handleSelectContact(contact);
     dialogs.contactPicker.closeDialog();
+  };
+
+  const handleSubmit = async (data: CreateInvoiceInput) => {
+    if (!form.handleValidate()) {
+      alert("Opravte chyby ve formuláři");
+      return;
+    }
+
+    if (form.invoiceItems.length === 0) {
+      alert("Přidejte alespoň jednu položku");
+      return;
+    }
+
+    try {
+      await createInvoice.mutateAsync(data);
+
+      // await Promise.all(
+      //   form.invoiceItems.map(item =>
+      //     createStockMovement.mutateAsync({
+      //       invoice_number: form.formData.number,
+      //       item_ean: item.ean,
+      //       amount: item.amount.toString(),
+      //       price_per_unit: item.sale_price.toString(),
+      //       vat_rate: item.vat_rate,
+      //     })
+      //   )
+      // );
+
+      form.handleReset();
+      alert("Doklad byl úspěšně vytvořen");
+    } catch (error) {
+      console.error("Failed to create invoice:", error);
+      alert(`Chyba při vytváření dokladu: ${(error as Error).message}`);
+    }
   };
 
   return (
@@ -145,6 +183,21 @@ function NewInvoiceTab() {
               />
             </FormSection>
           </Grid>
+        </Grid>
+
+        <Grid item xs={12}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+            <Button variant="outlined" onClick={form.handleReset}>
+              Zrušit
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={createInvoice.isPending || form.invoiceItems.length === 0}
+            >
+              Vytvořit doklad
+            </Button>
+          </Box>
         </Grid>
       </Grid>
 
