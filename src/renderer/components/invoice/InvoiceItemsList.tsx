@@ -1,15 +1,20 @@
 import { TableCell } from "@mui/material";
-import { DataTable, Column } from "../common/table/DataTable";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { DataTable, Column, ContextMenuAction } from "../common/table/DataTable";
 import type { Item } from "../../../types/database";
 import { formatVatRateShort } from "../../../utils/formattingUtils";
 
 interface InvoiceItem extends Item {
+  amount: number;
   sale_price: number;
   total: number;
 }
 
 interface InvoiceItemsListProps {
   items: InvoiceItem[];
+  onEditItem: (item: InvoiceItem) => void;
+  onDeleteItem: (item: InvoiceItem) => void;
 }
 
 const itemColumns: Column[] = [
@@ -18,11 +23,36 @@ const itemColumns: Column[] = [
   { id: "category", label: "Kategorie", minWidth: 120 },
   { id: "unit_of_measure", label: "Jednotka", minWidth: 80, align: "center" },
   { id: "vat_rate", label: "DPH %", minWidth: 70, align: "right" },
+  { id: "amount", label: "Množství", minWidth: 100, align: "right" },
   { id: "sale_price", label: "Cena", minWidth: 100, align: "right" },
   { id: "total", label: "Celkem", minWidth: 120, align: "right" },
 ];
 
-export function InvoiceItemsList({ items }: InvoiceItemsListProps) {
+export function InvoiceItemsList({ 
+  items, 
+  onEditItem, 
+  onDeleteItem 
+}: InvoiceItemsListProps) {
+  
+  // Context menu actions
+  const contextMenuActions: ContextMenuAction<InvoiceItem>[] = [
+    {
+      id: "edit",
+      label: "Upravit množství/cenu",
+      icon: <EditIcon fontSize="small" />,
+      onClick: onEditItem,
+    },
+    {
+      id: "delete",
+      label: "Odebrat z dokladu",
+      icon: <DeleteIcon fontSize="small" />,
+      onClick: onDeleteItem,
+      requireConfirm: true,
+      confirmMessage: (item) => `Opravdu chcete odebrat "${item.name}" z dokladu?`,
+      divider: true,
+    },
+  ];
+
   const getCellContent = (item: InvoiceItem, columnId: string) => {
     switch (columnId) {
       case "ean":
@@ -35,6 +65,8 @@ export function InvoiceItemsList({ items }: InvoiceItemsListProps) {
         return item.unit_of_measure;
       case "vat_rate":
         return formatVatRateShort(item.vat_rate);
+      case "amount":
+        return `${item.amount.toFixed(2)} ${item.unit_of_measure}`;
       case "sale_price":
         return `${item.sale_price.toFixed(2)} Kč`;
       case "total":
@@ -49,6 +81,7 @@ export function InvoiceItemsList({ items }: InvoiceItemsListProps) {
       columns={itemColumns}
       data={items}
       visibleColumnIds={new Set(itemColumns.map((c) => c.id))}
+      contextMenuActions={contextMenuActions}
       renderRow={(item, visibleColumns) => (
         <>
           {visibleColumns.map((column) => (

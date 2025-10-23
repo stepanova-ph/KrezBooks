@@ -52,6 +52,24 @@ declare global {
         clearDb: () => Promise<IpcResponse<{ changes: number }>>;
         fillTestData: () => Promise<IpcResponse<{ contactsAdded: number; itemsAdded: number }>>;
       };
+
+      stockMovements:{
+        getAll: () => Promise<IPCResponse<StockMovement[]>>;
+        getOne: (invoiceNumber: string, itemEan: string) => Promise<IPCResponse<StockMovement>>;
+        getByInvoice: (invoiceNumber: string) => Promise<IPCResponse<StockMovement[]>>;
+        getByItem: (itemEan: string) => Promise<IPCResponse<StockMovement[]>>;  // ADD THIS
+        getStockAmountByItem: (itemEan: string) => Promise<IPCResponse<number>>;  // ADD THIS
+        getAverageBuyPriceByItem: (itemEan: string) => Promise<IPCResponse<number>>;  // ADD THIS
+        getLastBuyPriceByItem: (itemEan: string) => Promise<IPCResponse<number>>;  // ADD THIS
+        create: (movement: CreateStockMovementInput) => Promise<IPCResponse<{ changes: number }>>;
+        update: (
+          invoiceNumber: string,
+          itemEan: string,
+          updates: Partial<StockMovement>
+        ) => Promise<IPCResponse<{ changes: number }>>;
+        delete: (invoiceNumber: string, itemEan: string) => Promise<IPCResponse<{ changes: number }>>;
+        deleteByInvoice: (invoiceNumber: string) => Promise<IPCResponse<{ changes: number }>>;
+      }
     };
   }
 }

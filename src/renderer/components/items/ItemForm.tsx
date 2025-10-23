@@ -1,14 +1,18 @@
 import React, { useState } from "react";
-import { Box, Grid, MenuItem, Typography } from "@mui/material";
+import { Box, Grid, MenuItem, Typography, Chip } from "@mui/material";
 import type { CreateItemInput, Item, VatRate } from "../../../types/database";
 import { itemSchema } from "../../../validation/itemSchema";
 import { FormDialog } from "../common/form/FormDialog";
-import { FormTextField } from "../common/form/FormTextField";
 import { NumberTextField } from "../common/inputs/NumberTextField";
 import { VatPriceField } from "../common/inputs/VatPriceField";
 import { FormSection } from "../common/form/FormSection";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
-import { useItemCategories, useItems } from "../../../hooks/useItems";
+import { useItemCategories } from "../../../hooks/useItems";
+import { 
+  useStockAmountByItem, 
+  useAverageBuyPriceByItem, 
+  useLastBuyPriceByItem 
+} from "../../../hooks/useStockMovement";
 import { ValidatedAutocomplete } from "../common/inputs/ValidatedAutocomplete";
 import { VAT_RATES, UNIT_OPTIONS } from "../../../config/constants";
 
@@ -20,7 +24,6 @@ interface ItemFormProps {
   mode: "create" | "edit";
   isPending?: boolean;
 }
-
 
 const defaultFormData: CreateItemInput = {
   ean: "",
@@ -49,6 +52,12 @@ function ItemForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { data: existingCategories = [] } = useItemCategories();
+  
+  // Fetch stock data for edit mode only
+  const itemEan = mode === "edit" && initialData?.ean ? initialData.ean : "";
+  const { data: stockAmount = 0 } = useStockAmountByItem(itemEan);
+  const { data: avgBuyPrice = 0 } = useAverageBuyPriceByItem(itemEan);
+  const { data: lastBuyPrice = 0 } = useLastBuyPriceByItem(itemEan);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -60,46 +69,33 @@ function ItemForm({
     e: React.ChangeEvent<{ name?: string; value: unknown }>,
   ) => {
     const name = e.target.name as string;
+    const value = e.target.value;
     if (errors[name]) setErrors((p) => ({ ...p, [name]: "" }));
-    setFormData((p) => ({ ...p, [name]: e.target.value as string }));
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  const handleBlur = (fieldName: string) => {
+  const handleBlur = (field: string) => {
     const result = itemSchema.safeParse(formData);
     if (!result.success) {
-      const fieldError = result.error.issues.find((err) => err.path[0] === fieldName);
-      if (fieldError) setErrors((p) => ({ ...p, [fieldName]: fieldError.message }));
+      const fieldError = result.error.errors.find((e) => e.path[0] === field);
+      if (fieldError) {
+        setErrors((p) => ({ ...p, [field]: fieldError.message }));
+      }
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-
+  const handleSubmit = async () => {
     const result = itemSchema.safeParse(formData);
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.issues.forEach((err) => {
-        if (typeof err.path[0] === "string") fieldErrors[err.path[0]] = err.message;
+      const newErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) newErrors[err.path[0] as string] = err.message;
       });
-      setErrors(fieldErrors);
+      setErrors(newErrors);
       return;
     }
 
-    try {
-      await onSubmit({
-        ...result.data,
-        sale_price_group1: Number(result.data.sale_price_group1),
-        sale_price_group2: Number(result.data.sale_price_group2),
-        sale_price_group3: Number(result.data.sale_price_group3),
-        sale_price_group4: Number(result.data.sale_price_group4),
-      } as CreateItemInput);
-
-      if (mode === "create") setFormData(defaultFormData);
-    } catch (error) {
-      console.error("Chyba při ukládání položky:", error);
-      alert(`Chyba při ukládání: ${(error as Error).message}`);
-    }
+    await onSubmit(formData);
   };
 
   const title = mode === "create" ? "Přidat novou položku" : "Upravit položku";
@@ -176,45 +172,50 @@ function ItemForm({
               size="small"
               freeSolo
               options={UNIT_OPTIONS}
-              value={formData.unit_of_measure || ""}
+              value={formData.unit_of_measure}
               onChange={(_, newValue) => {
-                setFormData((p) => ({ ...p, unit_of_measure: newValue || "" }));
+                setFormData((p) => ({
+                  ...p,
+                  unit_of_measure: newValue || "",
+                }));
                 if (errors.unit_of_measure)
                   setErrors((p) => ({ ...p, unit_of_measure: "" }));
               }}
               onInputChange={(_, newInputValue) => {
-                setFormData((p) => ({ ...p, unit_of_measure: newInputValue }));
+                setFormData((p) => ({
+                  ...p,
+                  unit_of_measure: newInputValue,
+                }));
                 if (errors.unit_of_measure)
                   setErrors((p) => ({ ...p, unit_of_measure: "" }));
               }}
-              label="Měrná jednotka"
+              label="Jednotka"
               name="unit_of_measure"
               error={errors.unit_of_measure}
-              onBlur={() => handleBlur("unit_of_measure")}
               required
+              onBlur={() => handleBlur("unit_of_measure")}
             />
           </Grid>
 
           <Grid item xs={12} md={3.8}>
-            <FormTextField
+            <ValidatedTextField
               size="small"
               label="Sazba DPH"
               name="vat_rate"
-              select
               value={formData.vat_rate}
               onChange={handleSelectChange}
-              error={!!errors.vat_rate}
-              SelectProps={{ native: false }}
-              inputProps={{ autoComplete: "off" }}
+              onBlur={() => handleBlur("vat_rate")}
+              error={errors.vat_rate}
+              select
               required
               fullWidth
             >
-              {Object.entries(VAT_RATES).map(([key, rate]) => (
-                <MenuItem key={key} value={Number(key)}>
+              {VAT_RATES.map((rate) => (
+                <MenuItem key={rate.percentage} value={rate.percentage}>
                   {rate.label}
                 </MenuItem>
               ))}
-            </FormTextField>
+            </ValidatedTextField>
           </Grid>
 
           <Grid item xs={12}>
@@ -227,7 +228,7 @@ function ItemForm({
               onBlur={() => handleBlur("note")}
               error={errors.note}
               multiline
-              rows={3}
+              rows={2}
               fullWidth
               inputProps={{ autoComplete: "off" }}
             />
@@ -235,129 +236,166 @@ function ItemForm({
         </Grid>
       </FormSection>
 
-      <FormSection direction="row">
-        {/* Purchase Prices - Smaller column */}
-        <Box sx={{ width: 130, mr: 4 }}>
-          <Typography 
-            variant="caption" 
-            color="text.secondary" 
-            sx={{ 
-              mb: 1, 
-              display: 'block',
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontSize: '0.7rem',
-            }}
-          >
-            Nákupní ceny
-          </Typography>
-          <Grid container spacing={1.5}>
-            <Grid item xs={12}>
-              <NumberTextField
-                size="small"
-                disabled
-                label="Průměrná"
-                name="recommended_price"
-                value={0.0}
-                onChange={handleChange}
-                precision={2}
-                min={0}
-                grayWhenZero
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <NumberTextField
-                size="small"
-                disabled
-                label="Poslední"
-                name="last_purchase_price"
-                value={0.0}
-                onChange={handleChange}
-                precision={2}
-                min={0}
-                grayWhenZero
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-        </Box>
+      <FormSection title="Ceny">
+        <Box sx={{ display: "flex", gap: 3 }}>
+          {/* Purchase Prices + Stock - Only in edit mode */}
+          {mode === "edit" && (
+            <Box sx={{ flex: "0 0 180px" }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{
+                  mb: 1,
+                  display: "block",
+                  fontWeight: 500,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                Nákupní ceny
+              </Typography>
+              <Grid container spacing={1.5}>
+                <Grid item xs={12}>
+                  <NumberTextField
+                    size="small"
+                    disabled
+                    label="Průměrná"
+                    name="avg_buy_price"
+                    value={avgBuyPrice}
+                    onChange={() => {}}
+                    precision={2}
+                    min={0}
+                    grayWhenZero
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <NumberTextField
+                    size="small"
+                    disabled
+                    label="Poslední"
+                    name="last_buy_price"
+                    value={lastBuyPrice}
+                    onChange={() => {}}
+                    precision={2}
+                    min={0}
+                    grayWhenZero
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
 
-        {/* Sales Prices - Larger column */}
-        <Box sx={{ flex: 1 }}>
-          <Typography 
-            variant="caption" 
-            color="text.secondary" 
-            sx={{ 
-              mb: 1, 
-              display: 'block',
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              paddingLeft: 8,
-            }}
-          >
-            Prodejní ceny dle skupiny
-          </Typography>
-          <Grid container spacing={1.5}>
-            <Grid item xs={12}>
-              <VatPriceField
-                size="small"
-                label="Skupina 1"
-                name="sale_price_group1"
-                value={formData.sale_price_group1}
-                vatRate={vatPercentage}
-                onChange={handleChange}
-                onBlur={() => handleBlur("sale_price_group1")}
-                error={errors.sale_price_group1}
-                precision={2}
-                min={0}
-              />
+              {/* Stock info section */}
+              <Box sx={{ mt: 3 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    mb: 1,
+                    display: "block",
+                    fontWeight: 500,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                  }}
+                >
+                  Počet na skladě
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    p: 2,
+                    bgcolor: "background.default",
+                    borderRadius: 1,
+                    border: (theme) => `1px solid ${theme.palette.divider}`,
+                  }}
+                >
+                  <Chip
+                    label={`${stockAmount.toFixed(2)} ${formData.unit_of_measure}`}
+                    color={stockAmount > 0 ? "success" : stockAmount < 0 ? "error" : "default"}
+                    sx={{ fontWeight: 600, fontSize: "0.875rem" }}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          )}
+
+          {/* Sales Prices - Larger column */}
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{
+                mb: 1,
+                display: "block",
+                fontWeight: 500,
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                paddingLeft: mode === "edit" ? 8 : 0,
+              }}
+            >
+              Prodejní ceny dle skupiny
+            </Typography>
+            <Grid container spacing={1.5}>
+              <Grid item xs={12}>
+                <VatPriceField
+                  size="small"
+                  label="Skupina 1"
+                  name="sale_price_group1"
+                  value={formData.sale_price_group1}
+                  vatRate={vatPercentage}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("sale_price_group1")}
+                  error={errors.sale_price_group1}
+                  precision={2}
+                  min={0}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <VatPriceField
+                  size="small"
+                  label="Skupina 2"
+                  name="sale_price_group2"
+                  value={formData.sale_price_group2}
+                  vatRate={vatPercentage}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("sale_price_group2")}
+                  error={errors.sale_price_group2}
+                  precision={2}
+                  min={0}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <VatPriceField
+                  size="small"
+                  label="Skupina 3"
+                  name="sale_price_group3"
+                  value={formData.sale_price_group3}
+                  vatRate={vatPercentage}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("sale_price_group3")}
+                  error={errors.sale_price_group3}
+                  precision={2}
+                  min={0}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <VatPriceField
+                  size="small"
+                  label="Skupina 4"
+                  name="sale_price_group4"
+                  value={formData.sale_price_group4}
+                  vatRate={vatPercentage}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("sale_price_group4")}
+                  error={errors.sale_price_group4}
+                  precision={2}
+                  min={0}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <VatPriceField
-                size="small"
-                label="Skupina 2"
-                name="sale_price_group2"
-                value={formData.sale_price_group2}
-                vatRate={vatPercentage}
-                onChange={handleChange}
-                onBlur={() => handleBlur("sale_price_group2")}
-                error={errors.sale_price_group2}
-                precision={2}
-                min={0}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <VatPriceField
-                size="small"
-                label="Skupina 3"
-                name="sale_price_group3"
-                value={formData.sale_price_group3}
-                vatRate={vatPercentage}
-                onChange={handleChange}
-                onBlur={() => handleBlur("sale_price_group3")}
-                error={errors.sale_price_group3}
-                precision={2}
-                min={0}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <VatPriceField
-                size="small"
-                label="Skupina 4"
-                name="sale_price_group4"
-                value={formData.sale_price_group4}
-                vatRate={vatPercentage}
-                onChange={handleChange}
-                onBlur={() => handleBlur("sale_price_group4")}
-                error={errors.sale_price_group4}
-                precision={2}
-                min={0}
-              />
-            </Grid>
-          </Grid>
+          </Box>
         </Box>
       </FormSection>
     </FormDialog>

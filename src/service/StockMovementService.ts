@@ -103,4 +103,32 @@ export class StockMovementService {
       WHERE invoice_number = @invoice_number AND item_ean = @item_ean
     `;
   }
+
+  async getByItem(itemEan: string): Promise<StockMovement[]> {
+    const db = getDatabase();
+    const statement = db.prepare(stockMovementQueries.getByItem);
+    const movements = statement.all(itemEan);
+    return movements as StockMovement[];
+  }
+
+  async getStockAmountByItem(itemEan: string): Promise<number> {
+    const db = getDatabase();
+    const statement = db.prepare(stockMovementQueries.getStockAmountByItem);
+    const result = statement.get(itemEan) as { total_amount: number };
+    return result.total_amount;
+  }
+
+  async getAverageBuyPriceByItem(itemEan: string): Promise<number> {
+    const db = getDatabase();
+    const statement = db.prepare(stockMovementQueries.getAverageBuyPriceByItem);
+    const result = statement.get(itemEan) as { avg_price: number };
+    return result.avg_price;
+  }
+
+  async getLastBuyPriceByItem(itemEan: string): Promise<number> {
+    const db = getDatabase();
+    const statement = db.prepare(stockMovementQueries.getLastBuyPriceByItem);
+    const result = statement.get(itemEan) as { last_price: number };
+    return result.last_price || 0;
+  }
 }

@@ -54,4 +54,34 @@ export const stockMovementQueries = {
     DELETE FROM stock_movements 
     WHERE invoice_number = ?
   `,
+
+  getByItem: `
+    SELECT * FROM stock_movements 
+    WHERE item_ean = ?
+    ORDER BY created_at DESC
+  `,
+
+  getStockAmountByItem: `
+    SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) as total_amount
+    FROM stock_movements
+    WHERE item_ean = ?
+  `,
+
+  getAverageBuyPriceByItem: `
+    SELECT COALESCE(AVG(CAST(price_per_unit AS REAL)), 0) as avg_price
+    FROM stock_movements sm
+    JOIN invoices i ON sm.invoice_number = i.number
+    WHERE sm.item_ean = ?
+      AND (i.type = 1 OR i.type = 2)
+  `,
+
+  getLastBuyPriceByItem: `
+    SELECT COALESCE(CAST(sm.price_per_unit AS REAL), 0) as last_price
+    FROM stock_movements sm
+    JOIN invoices i ON sm.invoice_number = i.number
+    WHERE sm.item_ean = ?
+      AND (i.type = 1 OR i.type = 2)
+    ORDER BY sm.created_at DESC
+    LIMIT 1
+  `,
 };

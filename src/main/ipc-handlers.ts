@@ -117,6 +117,22 @@ export function registerIpcHandlers() {
     return handleIpcRequest(() => stockMovementService.deleteByInvoice(invoiceNumber));
   });
 
+  ipcMain.handle('db:stockMovements:getByItem', async (_event, itemEan: string) => {
+    return handleIpcRequest(() => stockMovementService.getByItem(itemEan));
+  });
+
+  ipcMain.handle('db:stockMovements:getStockAmountByItem', async (_event, itemEan: string) => {
+    return handleIpcRequest(() => stockMovementService.getStockAmountByItem(itemEan));
+  });
+
+  ipcMain.handle('db:stockMovements:getAverageBuyPriceByItem', async (_event, itemEan: string) => {
+    return handleIpcRequest(() => stockMovementService.getAverageBuyPriceByItem(itemEan));
+  });
+
+  ipcMain.handle('db:stockMovements:getLastBuyPriceByItem', async (_event, itemEan: string) => {
+    return handleIpcRequest(() => stockMovementService.getLastBuyPriceByItem(itemEan));
+  });
+
   // --------------------------------------------------------------------------
   // INVOICES HANDLERS
   // --------------------------------------------------------------------------

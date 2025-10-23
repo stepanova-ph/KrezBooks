@@ -41,6 +41,7 @@ function NewInvoiceTab() {
   const [itemPickerOpen, setItemPickerOpen] = useState(false);
   const [amountPriceDialogOpen, setAmountPriceDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
 
   const isType5 = formData.type === 5;
@@ -62,8 +63,21 @@ function NewInvoiceTab() {
 
   const handleSelectItem = (item: Item) => {
     setSelectedItem(item);
+    setEditingItemIndex(null); // New item, not editing
     setItemPickerOpen(false);
     setAmountPriceDialogOpen(true);
+  };
+
+  const handleEditItem = (item: InvoiceItem) => {
+    // Find the index of the item being edited
+    const index = invoiceItems.findIndex((i) => i.ean === item.ean);
+    setEditingItemIndex(index);
+    setSelectedItem(item);
+    setAmountPriceDialogOpen(true);
+  };
+
+  const handleDeleteItem = (item: InvoiceItem) => {
+    setInvoiceItems((prev) => prev.filter((i) => i.ean !== item.ean));
   };
 
   const handleConfirmAmountPrice = (amount: number, price: number) => {
@@ -76,19 +90,34 @@ function NewInvoiceTab() {
       total: amount * price,
     };
 
-    setInvoiceItems((prev) => [...prev, newItem]);
+    if (editingItemIndex !== null) {
+      // Editing existing item
+      setInvoiceItems((prev) => {
+        const updated = [...prev];
+        updated[editingItemIndex] = newItem;
+        return updated;
+      });
+    } else {
+      // Adding new item
+      setInvoiceItems((prev) => [...prev, newItem]);
+      // Reopen item picker for next item
+      setItemPickerOpen(true);
+    }
+
     setSelectedItem(null);
-    
-    // Reopen item picker for next item
+    setEditingItemIndex(null);
     setAmountPriceDialogOpen(false);
-    setItemPickerOpen(true);
   };
 
   const handleCloseAmountPriceDialog = () => {
     setAmountPriceDialogOpen(false);
     setSelectedItem(null);
-    // Reopen item picker
-    setItemPickerOpen(true);
+    setEditingItemIndex(null);
+    
+    // Only reopen item picker if we were adding a new item (not editing)
+    if (editingItemIndex === null) {
+      setItemPickerOpen(true);
+    }
   };
 
   return (
@@ -158,7 +187,11 @@ function NewInvoiceTab() {
                 </Tooltip>
               }
             >
-              <InvoiceItemsList items={invoiceItems} />
+              <InvoiceItemsList 
+                items={invoiceItems}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
             </FormSection>
           </Grid>
         </Grid>
