@@ -1,9 +1,9 @@
 export const DIC_PREFIXES = ["CZ", "SK", "vlastní"];
 
 export const VAT_RATES = [
-	{ percentage: 0, label: "0% (osvobozeno)" },
-	{ percentage: 12, label: "12% (snížená)" },
-	{ percentage: 21, label: "21% (základní)" },
+	{ value: 0, percentage: 0, label: "0% (osvobozeno)" },
+	{ value: 1, percentage: 12, label: "12% (snížená)" },
+	{ value: 2, percentage: 21, label: "21% (základní)" },
 ] as const;
 
 export const PRICE_GROUPS = [1, 2, 3, 4] as const;

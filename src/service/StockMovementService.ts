@@ -123,23 +123,23 @@ export class StockMovementService {
 	}
 
 	async getStockAmountByItem(itemEan: string): Promise<number> {
-		const db = getDatabase();
-		const statement = db.prepare(stockMovementQueries.getStockAmountByItem);
-		const result = statement.get(itemEan) as { total_amount: number };
-		return result.total_amount;
+	const db = getDatabase();
+	const statement = db.prepare(stockMovementQueries.getStockAmountByItem);
+	const result = statement.get(itemEan) as { total_amount: number } | undefined;
+	return result?.total_amount || 0;
 	}
 
 	async getAverageBuyPriceByItem(itemEan: string): Promise<number> {
-		const db = getDatabase();
-		const statement = db.prepare(stockMovementQueries.getAverageBuyPriceByItem);
-		const result = statement.get(itemEan) as { avg_price: number };
-		return result.avg_price;
+	const db = getDatabase();
+	const statement = db.prepare(stockMovementQueries.getAverageBuyPriceByItem);
+	const result = statement.get(itemEan) as { avg_price: number } | undefined;
+	return result?.avg_price || 0;
 	}
 
 	async getLastBuyPriceByItem(itemEan: string): Promise<number> {
-		const db = getDatabase();
-		const statement = db.prepare(stockMovementQueries.getLastBuyPriceByItem);
-		const result = statement.get(itemEan) as { last_price: number };
-		return result.last_price || 0;
+	const db = getDatabase();
+	const statement = db.prepare(stockMovementQueries.getLastBuyPriceByItem);
+	const result = statement.get(itemEan) as { last_price: number } | undefined;
+	return result?.last_price || 0;
 	}
 }

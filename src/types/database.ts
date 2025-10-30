@@ -6,7 +6,7 @@ import {
 	PAYMENT_METHOD_TYPES,
 } from "src/config/constants";
 
-export type VatRate = typeof VAT_RATES;
+export type VatRate = (typeof VAT_RATES)[number]['value'];  // → 0 | 1 | 2
 
 export type PriceGroup = (typeof PRICE_GROUPS)[number];
 

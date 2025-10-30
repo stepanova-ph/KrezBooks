@@ -27,7 +27,8 @@ interface DialogProps {
 	actions?: DialogAction[];
 	maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
 	fullWidth?: boolean;
-	onSubmit?: () => void; // ADD THIS - for Enter key handling
+	onSubmit?: () => void;
+	noCloseButton?: true;
 }
 
 export function Dialog({
@@ -39,6 +40,7 @@ export function Dialog({
 	maxWidth = "sm",
 	fullWidth = true,
 	onSubmit,
+	noCloseButton
 }: DialogProps) {
 	const theme = useTheme();
 
@@ -78,11 +80,11 @@ export function Dialog({
 				}}
 			>
 				<Box sx={{ fontWeight: 600, fontSize: "1rem" }}>{title}</Box>
-				<WindowButton
+				{!noCloseButton && <WindowButton
 					type="close"
 					onClick={onClose}
 					hoverBackgroundColor={theme.palette.error.main}
-				/>
+				/>}
 			</Box>
 
 			<Divider sx={{ borderColor: theme.palette.divider }} />

@@ -30,7 +30,7 @@ const defaultFormData: CreateItemInput = {
 	name: "",
 	category: "",
 	note: "",
-	vat_rate: 2 as VatRate,
+	vat_rate: 2,
 	unit_of_measure: "",
 	sale_price_group1: 0,
 	sale_price_group2: 0,
@@ -211,7 +211,7 @@ function ItemForm({
 							fullWidth
 						>
 							{VAT_RATES.map((rate) => (
-								<MenuItem key={rate.percentage} value={rate.percentage}>
+								<MenuItem key={rate.value} value={rate.value}>
 									{rate.label}
 								</MenuItem>
 							))}
