@@ -33,16 +33,27 @@ export function deserializeContact(dbContact: any): Contact {
  * Convert contact from TypeScript format to database format
  */
 export function serializeContact(contact: Partial<Contact>): any {
-	const result = { ...contact };
-	if ("is_supplier" in result) {
-		result.is_supplier = booleanToSQLiteInteger(
-			result.is_supplier as boolean,
-		) as any;
-	}
-	if ("is_customer" in result) {
-		result.is_customer = booleanToSQLiteInteger(
-			result.is_customer as boolean,
-		) as any;
-	}
+	const result = {
+		ico: contact.ico ?? null,
+		modifier: contact.modifier ?? null,
+		dic: contact.dic ?? null,
+		company_name: contact.company_name ?? null,
+		representative_name: contact.representative_name ?? null,
+		street: contact.street ?? null,
+		city: contact.city ?? null,
+		postal_code: contact.postal_code ?? null,
+		phone: contact.phone ?? null,
+		email: contact.email ?? null,
+		website: contact.website ?? null,
+		bank_account: contact.bank_account ?? null,
+		is_supplier: "is_supplier" in contact 
+			? booleanToSQLiteInteger(contact.is_supplier as boolean)
+			: null,
+		is_customer: "is_customer" in contact
+			? booleanToSQLiteInteger(contact.is_customer as boolean)
+			: null,
+		price_group: contact.price_group ?? null,
+	};
+	
 	return result;
 }

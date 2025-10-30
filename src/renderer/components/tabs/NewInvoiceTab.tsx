@@ -68,12 +68,12 @@ function NewInvoiceTab() {
 			price,
 			p_group_index
 			);
-			dialogs.amountPrice.closeDialog(false);  // Changed to false
+			dialogs.amountPrice.closeDialog(false);
 		}
 	};
 
 	const handleCloseAmountPriceDialog = () => {
-	dialogs.amountPrice.closeDialog(false);  // Never reopen item picker
+	dialogs.amountPrice.closeDialog(false);
 	};
 
   const handleSelectContact = (contact: Contact) => {
