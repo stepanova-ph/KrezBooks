@@ -14,6 +14,7 @@ interface VatPriceFieldProps {
   min?: number;
   grayWhenZero?: boolean;
   size?: "small" | "medium";
+  readonly?: true
 }
 
 export function VatPriceField({
@@ -28,6 +29,7 @@ export function VatPriceField({
   min = 0,
   grayWhenZero,
   size = "small",
+  readonly
 }: VatPriceFieldProps) {
   const [basePrice, setBasePrice] = useState<number>(value);
 
@@ -121,6 +123,7 @@ export function VatPriceField({
                 min={min}
                 grayWhenZero={grayWhenZero}
                 size={size}
+                disabled={readonly}
               />
             </Grid>
             <Grid item xs={4}>
@@ -151,6 +154,7 @@ export function VatPriceField({
                 min={min}
                 grayWhenZero={grayWhenZero}
                 size={size}
+                disabled={readonly}
               />
             </Grid>
           </Grid>
