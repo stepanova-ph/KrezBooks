@@ -2,28 +2,28 @@ import { InvoiceForm } from "./InvoiceForm";
 import type { CreateInvoiceInput } from "../../../types/database";
 
 interface CreateInvoiceFormProps {
-  open: boolean;
-  onClose: () => void;
+	open: boolean;
+	onClose: () => void;
 }
 
 export function CreateInvoiceForm({ open, onClose }: CreateInvoiceFormProps) {
-  const handleSubmit = async (data: CreateInvoiceInput) => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      onClose();
-    } catch (error) {
-      console.error("Chyba při vytváření dokladu:", error);
-      throw error;
-    }
-  };
+	const handleSubmit = async (data: CreateInvoiceInput) => {
+		try {
+			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+			onClose();
+		} catch (error) {
+			console.error("Chyba při vytváření dokladu:", error);
+			throw error;
+		}
+	};
 
-  return (
-    <InvoiceForm
-      open={open}
-      onClose={onClose}
-      onSubmit={handleSubmit}
-      mode="create"
-      isPending={false}
-    />
-  );
+	return (
+		<InvoiceForm
+			open={open}
+			onClose={onClose}
+			onSubmit={handleSubmit}
+			mode="create"
+			isPending={false}
+		/>
+	);
 }

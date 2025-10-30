@@ -10,15 +10,15 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 const container = document.getElementById("root");
 
 if (!container) {
-  throw new Error("Root element not found");
+	throw new Error("Root element not found");
 }
 
 // Create React root and render the app
 const root = createRoot(container);
 root.render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </React.StrictMode>,
+	<React.StrictMode>
+		<ErrorBoundary>
+			<App />
+		</ErrorBoundary>
+	</React.StrictMode>,
 );

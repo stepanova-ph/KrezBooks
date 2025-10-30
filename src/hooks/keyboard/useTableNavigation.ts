@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useKeyboardShortcuts } from './useKeyboardShortcuts';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useKeyboardShortcuts } from "./useKeyboardShortcuts";
 
 export interface UseTableNavigationOptions {
-  disabled?: boolean;
-  dataLength: number;
-  onFocusChange?: (index: number) => void;
-  onEnterPress?: () => void;
+	disabled?: boolean;
+	dataLength: number;
+	onFocusChange?: (index: number) => void;
+	onEnterPress?: () => void;
 }
 
 /**
@@ -13,85 +13,88 @@ export interface UseTableNavigationOptions {
  * manages focused row index and provides auto-scroll
  */
 export function useTableNavigation(options: UseTableNavigationOptions) {
-  const { disabled = false, dataLength, onFocusChange, onEnterPress } = options;
-  
-  const [focusedRowIndex, setFocusedRowIndex] = useState(0);
-  const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+	const { disabled = false, dataLength, onFocusChange, onEnterPress } = options;
 
-  // reset focused index if data changes
-  useEffect(() => {
-    if (focusedRowIndex >= dataLength && dataLength > 0) {
-      setFocusedRowIndex(dataLength - 1);
-    }
-  }, [dataLength, focusedRowIndex]);
+	const [focusedRowIndex, setFocusedRowIndex] = useState(0);
+	const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
 
-  // auto-scroll to focused row
-  useEffect(() => {
-    if (rowRefs.current[focusedRowIndex]) {
-      rowRefs.current[focusedRowIndex]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-      });
-    }
-  }, [focusedRowIndex]);
+	// reset focused index if data changes
+	useEffect(() => {
+		if (focusedRowIndex >= dataLength && dataLength > 0) {
+			setFocusedRowIndex(dataLength - 1);
+		}
+	}, [dataLength, focusedRowIndex]);
 
-  // notify parent when focus changes
-  useEffect(() => {
-    onFocusChange?.(focusedRowIndex);
-  }, [focusedRowIndex, onFocusChange]);
+	// auto-scroll to focused row
+	useEffect(() => {
+		if (rowRefs.current[focusedRowIndex]) {
+			rowRefs.current[focusedRowIndex]?.scrollIntoView({
+				behavior: "smooth",
+				block: "nearest",
+			});
+		}
+	}, [focusedRowIndex]);
 
-  const moveUp = useCallback(() => {
-    setFocusedRowIndex(prev => Math.max(0, prev - 1));
-  }, []);
+	// notify parent when focus changes
+	useEffect(() => {
+		onFocusChange?.(focusedRowIndex);
+	}, [focusedRowIndex, onFocusChange]);
 
-  const moveDown = useCallback(() => {
-    setFocusedRowIndex(prev => Math.min(dataLength - 1, prev + 1));
-  }, [dataLength]);
+	const moveUp = useCallback(() => {
+		setFocusedRowIndex((prev) => Math.max(0, prev - 1));
+	}, []);
 
-  const movePageUp = useCallback(() => {
-    setFocusedRowIndex(prev => Math.max(0, prev - 10));
-  }, []);
+	const moveDown = useCallback(() => {
+		setFocusedRowIndex((prev) => Math.min(dataLength - 1, prev + 1));
+	}, [dataLength]);
 
-  const movePageDown = useCallback(() => {
-    setFocusedRowIndex(prev => Math.min(dataLength - 1, prev + 10));
-  }, [dataLength]);
+	const movePageUp = useCallback(() => {
+		setFocusedRowIndex((prev) => Math.max(0, prev - 10));
+	}, []);
 
-  const moveToTop = useCallback(() => {
-    setFocusedRowIndex(0);
-  }, []);
+	const movePageDown = useCallback(() => {
+		setFocusedRowIndex((prev) => Math.min(dataLength - 1, prev + 10));
+	}, [dataLength]);
 
-  const moveToBottom = useCallback(() => {
-    setFocusedRowIndex(dataLength - 1);
-  }, [dataLength]);
+	const moveToTop = useCallback(() => {
+		setFocusedRowIndex(0);
+	}, []);
 
-  const handleEnter = useCallback(() => {
-    if (onEnterPress) {
-      onEnterPress();
-    }
-  }, [onEnterPress]);
+	const moveToBottom = useCallback(() => {
+		setFocusedRowIndex(dataLength - 1);
+	}, [dataLength]);
 
-  useKeyboardShortcuts({
-    'ArrowUp': moveUp,
-    'ArrowDown': moveDown,
-    'PageUp': movePageUp,
-    'PageDown': movePageDown,
-    'Home': moveToTop,
-    'End': moveToBottom,
-    'Enter': handleEnter,
-  }, {
-    disabled: disabled || dataLength === 0,
-    preventInInputs: true,
-  });
+	const handleEnter = useCallback(() => {
+		if (onEnterPress) {
+			onEnterPress();
+		}
+	}, [onEnterPress]);
 
-  const setRowRef = useCallback((index: number) => {
-    return (el: HTMLTableRowElement | null) => {
-      rowRefs.current[index] = el;
-    };
-  }, []);
+	useKeyboardShortcuts(
+		{
+			ArrowUp: moveUp,
+			ArrowDown: moveDown,
+			PageUp: movePageUp,
+			PageDown: movePageDown,
+			Home: moveToTop,
+			End: moveToBottom,
+			Enter: handleEnter,
+		},
+		{
+			disabled: disabled || dataLength === 0,
+			preventInInputs: true,
+		},
+	);
 
-  return {
-    focusedRowIndex,
-    setFocusedRowIndex, // expose this for mouse interactions
-    setRowRef,
-  };
+	const setRowRef = useCallback((index: number) => {
+		return (el: HTMLTableRowElement | null) => {
+			rowRefs.current[index] = el;
+		};
+	}, []);
+
+	return {
+		focusedRowIndex,
+		setFocusedRowIndex, // expose this for mouse interactions
+		setRowRef,
+	};
 }

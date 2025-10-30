@@ -1,8 +1,8 @@
-import { TextField, TextFieldProps } from '@mui/material';
-import { forwardRef } from 'react';
+import { TextField, TextFieldProps } from "@mui/material";
+import { forwardRef } from "react";
 
-export interface FormTextFieldProps extends Omit<TextFieldProps, 'error'> {
-  error?: string | boolean;
+export interface FormTextFieldProps extends Omit<TextFieldProps, "error"> {
+	error?: string | boolean;
 }
 
 /**
@@ -10,20 +10,20 @@ export interface FormTextFieldProps extends Omit<TextFieldProps, 'error'> {
  * Accepts error as string (message) or boolean and converts it properly
  */
 export const FormTextField = forwardRef<HTMLDivElement, FormTextFieldProps>(
-  ({ error, helperText, ...props }, ref) => {
-    const hasError = typeof error === 'string' ? !!error : !!error;
-    const errorMessage = typeof error === 'string' ? error : undefined;
-    
-    return (
-      <TextField
-        ref={ref}
-        {...props}
-        error={hasError}
-        helperText={errorMessage || helperText}
-        fullWidth
-      />
-    );
-  }
+	({ error, helperText, ...props }, ref) => {
+		const hasError = typeof error === "string" ? !!error : !!error;
+		const errorMessage = typeof error === "string" ? error : undefined;
+
+		return (
+			<TextField
+				ref={ref}
+				{...props}
+				error={hasError}
+				helperText={errorMessage || helperText}
+				fullWidth
+			/>
+		);
+	},
 );
 
-FormTextField.displayName = 'FormTextField';
+FormTextField.displayName = "FormTextField";

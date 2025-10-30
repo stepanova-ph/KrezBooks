@@ -157,7 +157,7 @@
 //         alignItems: "center",
 //         backgroundColor: "rgba(0, 0, 0, 0.5)",
 //       }}
-//     >   
+//     >
 //       <InvoiceHeader
 //         number={formData.number}
 //         type={formData.type}

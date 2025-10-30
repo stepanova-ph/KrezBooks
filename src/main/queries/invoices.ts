@@ -1,5 +1,5 @@
 export const invoiceQueries = {
-  createTable: `
+	createTable: `
     CREATE TABLE IF NOT EXISTS invoices (
       number TEXT PRIMARY KEY NOT NULL,
       type INTEGER NOT NULL,
@@ -26,17 +26,17 @@ export const invoiceQueries = {
     )
   `,
 
-  getAll: `
+	getAll: `
     SELECT * FROM invoices 
     ORDER BY date_issue DESC, number DESC
   `,
 
-  getOne: `
+	getOne: `
     SELECT * FROM invoices 
     WHERE number = ?
   `,
 
-  create: `
+	create: `
     INSERT INTO invoices (
       number,
       type,
@@ -78,7 +78,7 @@ export const invoiceQueries = {
     )
   `,
 
-  delete: `
+	delete: `
     DELETE FROM invoices 
     WHERE number = ?
   `,

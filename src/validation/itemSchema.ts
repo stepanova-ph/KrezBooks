@@ -3,68 +3,60 @@ import { z } from "zod";
 import { optionalString } from "./optionalString";
 
 export const itemSchema = z.object({
-  ean: z.string()
-    .min(1, validationMessages.item.eanRequired || "EAN je povinný")
-    .max(50, validationMessages.item.eanMaxLength || "EAN je příliš dlouhý"),
-  
-  name: z
-    .string()
-    .min(1, validationMessages.item.nameRequired)
-    .max(200, validationMessages.item.nameMaxLength),
-  
-  category: optionalString
-      .refine(
-        (val) => !val || val.length <= 100,
-        validationMessages.item.categoryMaxLength || "Kategorie je příliš dlouhá",
-      ),
-  
-  note: optionalString
-      .refine(
-        (val) => !val || val.length <= 500,
-        validationMessages.item.noteMaxLength || "Maximální délka poznámky je 500 znaků.",
-      ),
-  
-  vat_rate: z.preprocess(
-    (v) => Number(v),
-    z.number().refine((n) => !isNaN(n), {
-      message: validationMessages.item.vatRate,
-    }),
-  ),
-  
-  unit_of_measure: z
-    .string()
-    .min(1, validationMessages.item.unitRequired || "Měrná jednotka je povinná")
-    .max(20, validationMessages.item.unitMaxLength || "Měrná jednotka je příliš dlouhá"),
-  
-  sale_price_group1: z.preprocess(
-    (v) => Number(v),
-    z
-      .number()
-      .min(0, validationMessages.item.priceMin)
-      .default(0),
-  ),
-  
-  sale_price_group2: z.preprocess(
-    (v) => Number(v),
-    z
-      .number()
-      .min(0, validationMessages.item.priceMin)
-      .default(0),
-  ),
-  
-  sale_price_group3: z.preprocess(
-    (v) => Number(v),
-    z
-      .number()
-      .min(0, validationMessages.item.priceMin)
-      .default(0),
-  ),
-  
-  sale_price_group4: z.preprocess(
-    (v) => Number(v),
-    z
-      .number()
-      .min(0, validationMessages.item.priceMin)
-      .default(0),
-  ),
+	ean: z
+		.string()
+		.min(1, validationMessages.item.eanRequired || "EAN je povinný")
+		.max(50, validationMessages.item.eanMaxLength || "EAN je příliš dlouhý"),
+
+	name: z
+		.string()
+		.min(1, validationMessages.item.nameRequired)
+		.max(200, validationMessages.item.nameMaxLength),
+
+	category: optionalString.refine(
+		(val) => !val || val.length <= 100,
+		validationMessages.item.categoryMaxLength || "Kategorie je příliš dlouhá",
+	),
+
+	note: optionalString.refine(
+		(val) => !val || val.length <= 500,
+		validationMessages.item.noteMaxLength ||
+			"Maximální délka poznámky je 500 znaků.",
+	),
+
+	vat_rate: z.preprocess(
+		(v) => Number(v),
+		z.number().refine((n) => !isNaN(n), {
+			message: validationMessages.item.vatRate,
+		}),
+	),
+
+	unit_of_measure: z
+		.string()
+		.min(1, validationMessages.item.unitRequired || "Měrná jednotka je povinná")
+		.max(
+			20,
+			validationMessages.item.unitMaxLength ||
+				"Měrná jednotka je příliš dlouhá",
+		),
+
+	sale_price_group1: z.preprocess(
+		(v) => Number(v),
+		z.number().min(0, validationMessages.item.priceMin).default(0),
+	),
+
+	sale_price_group2: z.preprocess(
+		(v) => Number(v),
+		z.number().min(0, validationMessages.item.priceMin).default(0),
+	),
+
+	sale_price_group3: z.preprocess(
+		(v) => Number(v),
+		z.number().min(0, validationMessages.item.priceMin).default(0),
+	),
+
+	sale_price_group4: z.preprocess(
+		(v) => Number(v),
+		z.number().min(0, validationMessages.item.priceMin).default(0),
+	),
 });

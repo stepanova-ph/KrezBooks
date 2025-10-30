@@ -1,5 +1,5 @@
 export const contactQueries = {
-  createTable: `
+	createTable: `
     CREATE TABLE IF NOT EXISTS contacts (
       ico TEXT NOT NULL,
       modifier INTEGER NOT NULL DEFAULT 1,
@@ -23,17 +23,17 @@ export const contactQueries = {
     )
   `,
 
-  getAll: `
+	getAll: `
     SELECT * FROM contacts 
     ORDER BY company_name
   `,
-  
-  getOne: `
+
+	getOne: `
     SELECT * FROM contacts 
     WHERE ico = ? AND modifier = ?
   `,
-  
-  create: `
+
+	create: `
     INSERT INTO contacts (
       ico, 
       modifier, 
@@ -68,8 +68,8 @@ export const contactQueries = {
       @bank_account
     )
   `,
-  
-  delete: `
+
+	delete: `
     DELETE FROM contacts 
     WHERE ico = ? AND modifier = ?
   `,

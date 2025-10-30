@@ -1,5 +1,5 @@
 export const itemQueries = {
-  createTable: `
+	createTable: `
     CREATE TABLE IF NOT EXISTS items (
       ean TEXT PRIMARY KEY NOT NULL,
       category TEXT,
@@ -17,17 +17,17 @@ export const itemQueries = {
     )
   `,
 
-  getAll: `
+	getAll: `
     SELECT * FROM items 
     ORDER BY name
   `,
-  
-  getOne: `
+
+	getOne: `
     SELECT * FROM items 
     WHERE ean = ?
   `,
-  
-  create: `
+
+	create: `
     INSERT INTO items (
       ean,
       category, 
@@ -52,13 +52,13 @@ export const itemQueries = {
       @sale_price_group4
     )
   `,
-  
-  delete: `
+
+	delete: `
     DELETE FROM items 
     WHERE ean = ?
   `,
 
-  getCategories: `
+	getCategories: `
     SELECT DISTINCT category 
     FROM items 
     WHERE category IS NOT NULL 

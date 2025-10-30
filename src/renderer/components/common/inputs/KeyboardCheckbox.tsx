@@ -1,40 +1,37 @@
 // src/renderer/components/common/KeyboardCheckbox.tsx
-import { Checkbox, CheckboxProps } from '@mui/material';
-import { useRef } from 'react';
+import { Checkbox, CheckboxProps } from "@mui/material";
+import { useRef } from "react";
 
 interface KeyboardCheckboxProps extends CheckboxProps {
-  // all standard checkbox props supported
+	// all standard checkbox props supported
 }
 
-export function KeyboardCheckbox({ 
-  checked, 
-  onChange, 
-  ...props 
+export function KeyboardCheckbox({
+	checked,
+	onChange,
+	...props
 }: KeyboardCheckboxProps) {
-  const checkboxRef = useRef<HTMLButtonElement>(null);
+	const checkboxRef = useRef<HTMLButtonElement>(null);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      e.stopPropagation(); // prevent datatable Enter action
-      
-      // trigger the change
-      if (onChange) {
-        onChange(
-          { target: { checked: !checked } } as any, 
-          !checked
-        );
-      }
-    }
-  };
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			e.stopPropagation(); // prevent datatable Enter action
 
-  return (
-    <Checkbox
-      ref={checkboxRef}
-      checked={checked}
-      onChange={onChange}
-      onKeyDown={handleKeyDown}
-      {...props}
-    />
-  );
+			// trigger the change
+			if (onChange) {
+				onChange({ target: { checked: !checked } } as any, !checked);
+			}
+		}
+	};
+
+	return (
+		<Checkbox
+			ref={checkboxRef}
+			checked={checked}
+			onChange={onChange}
+			onKeyDown={handleKeyDown}
+			{...props}
+		/>
+	);
 }

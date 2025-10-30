@@ -13,40 +13,40 @@ import { useGlobalShortcuts } from "../hooks/keyboard/useGlobalShortcuts";
 import InvoiceTab from "./components/tabs/NewInvoiceTab";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<AppPage>("domu");
+	const [currentPage, setCurrentPage] = useState<AppPage>("domu");
 
-  // enable f1-f5 keyboard shortcuts for tab navigation
-  useGlobalShortcuts(setCurrentPage);
+	// enable f1-f5 keyboard shortcuts for tab navigation
+	useGlobalShortcuts(setCurrentPage);
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case "domu":
-        return <HomeTab />;
-      case "adresar":
-        return <ContactsTab />;
-      case "sklad":
-        return <InventoryTab />;
-      case "novy_doklad":
-        return <InvoiceTab />
-      default:
-        return null;
-    }
-  };
+	const renderPage = () => {
+		switch (currentPage) {
+			case "domu":
+				return <HomeTab />;
+			case "adresar":
+				return <ContactsTab />;
+			case "sklad":
+				return <InventoryTab />;
+			case "novy_doklad":
+				return <InvoiceTab />;
+			default:
+				return null;
+		}
+	};
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+	return (
+		<QueryClientProvider client={queryClient}>
+			<ThemeProvider theme={theme}>
+				<CssBaseline />
 
-        <AppLayout currentPage={currentPage} onPageChange={setCurrentPage}>
-          {renderPage()}
-        </AppLayout>
+				<AppLayout currentPage={currentPage} onPageChange={setCurrentPage}>
+					{renderPage()}
+				</AppLayout>
 
-        {/* Dev tools - remove in production */}
-        <ReactQueryDevtools initialIsOpen={false} />
-      </ThemeProvider>
-    </QueryClientProvider>
-  );
+				{/* Dev tools - remove in production */}
+				<ReactQueryDevtools initialIsOpen={false} />
+			</ThemeProvider>
+		</QueryClientProvider>
+	);
 }
 
 export default App;

@@ -1,5 +1,5 @@
 export const stockMovementQueries = {
-  createTable: `
+	createTable: `
     CREATE TABLE IF NOT EXISTS stock_movements (
       invoice_number TEXT NOT NULL,
       item_ean TEXT NOT NULL,
@@ -13,23 +13,23 @@ export const stockMovementQueries = {
     )
   `,
 
-  getAll: `
+	getAll: `
     SELECT * FROM stock_movements 
     ORDER BY created_at DESC
   `,
-  
-  getOne: `
+
+	getOne: `
     SELECT * FROM stock_movements 
     WHERE invoice_number = ? AND item_ean = ?
   `,
-  
-  getByInvoice: `
+
+	getByInvoice: `
     SELECT * FROM stock_movements 
     WHERE invoice_number = ?
     ORDER BY item_ean
   `,
-  
-  create: `
+
+	create: `
     INSERT INTO stock_movements (
       invoice_number,
       item_ean,
@@ -44,30 +44,30 @@ export const stockMovementQueries = {
       @vat_rate
     )
   `,
-  
-  delete: `
+
+	delete: `
     DELETE FROM stock_movements 
     WHERE invoice_number = ? AND item_ean = ?
   `,
-  
-  deleteByInvoice: `
+
+	deleteByInvoice: `
     DELETE FROM stock_movements 
     WHERE invoice_number = ?
   `,
 
-  getByItem: `
+	getByItem: `
     SELECT * FROM stock_movements 
     WHERE item_ean = ?
     ORDER BY created_at DESC
   `,
 
-  getStockAmountByItem: `
+	getStockAmountByItem: `
     SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) as total_amount
     FROM stock_movements
     WHERE item_ean = ?
   `,
 
-  getAverageBuyPriceByItem: `
+	getAverageBuyPriceByItem: `
     SELECT COALESCE(AVG(CAST(price_per_unit AS REAL)), 0) as avg_price
     FROM stock_movements sm
     JOIN invoices i ON sm.invoice_number = i.number
@@ -75,7 +75,7 @@ export const stockMovementQueries = {
       AND (i.type = 1 OR i.type = 2)
   `,
 
-  getLastBuyPriceByItem: `
+	getLastBuyPriceByItem: `
     SELECT COALESCE(CAST(sm.price_per_unit AS REAL), 0) as last_price
     FROM stock_movements sm
     JOIN invoices i ON sm.invoice_number = i.number
