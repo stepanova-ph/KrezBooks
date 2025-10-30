@@ -31,7 +31,7 @@ function NewInvoiceTab() {
   const isType5 = form.formData.type === 5;
 
   const handleSelectItem = (item: Item) => {
-    dialogs.itemPicker.closeDialog();
+    // dialogs.itemPicker.closeDialog();
     dialogs.amountPrice.openDialog(item);
   };
 
@@ -45,37 +45,36 @@ function NewInvoiceTab() {
     });
   };
 
-  const handleConfirmAmountPrice = (
-    amount: number,
-    price: number,
-    p_group_index: number
-  ) => {
-    if (!dialogs.amountPrice.selectedItem) return;
+	const handleConfirmAmountPrice = (
+		amount: number,
+		price: number,
+		p_group_index: number
+		) => {
+		if (!dialogs.amountPrice.selectedItem) return;
 
-    if (dialogs.amountPrice.editingItemIndex !== null) {
-      form.handleUpdateItem(
-        dialogs.amountPrice.editingItemIndex,
-        dialogs.amountPrice.selectedItem,
-        amount,
-        price,
-        p_group_index
-      );
-      dialogs.amountPrice.closeDialog(false);
-    } else {
-      form.handleAddItem(
-        dialogs.amountPrice.selectedItem,
-        amount,
-        price,
-        p_group_index
-      );
-      dialogs.amountPrice.closeDialog(true);
-    }
-  };
+		if (dialogs.amountPrice.editingItemIndex !== null) {
+			form.handleUpdateItem(
+			dialogs.amountPrice.editingItemIndex,
+			dialogs.amountPrice.selectedItem,
+			amount,
+			price,
+			p_group_index
+			);
+			dialogs.amountPrice.closeDialog(false);
+		} else {
+			form.handleAddItem(
+			dialogs.amountPrice.selectedItem,
+			amount,
+			price,
+			p_group_index
+			);
+			dialogs.amountPrice.closeDialog(false);  // Changed to false
+		}
+	};
 
-  const handleCloseAmountPriceDialog = () => {
-    const shouldReopenItemPicker = dialogs.amountPrice.editingItemIndex === null;
-    dialogs.amountPrice.closeDialog(shouldReopenItemPicker);
-  };
+	const handleCloseAmountPriceDialog = () => {
+	dialogs.amountPrice.closeDialog(false);  // Never reopen item picker
+	};
 
   const handleSelectContact = (contact: Contact) => {
     form.handleSelectContact(contact);
@@ -164,7 +163,7 @@ function NewInvoiceTab() {
           <Grid container spacing={3}>
             <Grid item xs={12} md={isType5 ? 12 : 4}>
               <Grid container spacing={3}>
-                <Grid item xs={12}>
+                <Grid item xs={12} sx={{direction: 'row', alignItems: 'center', px: 10}}>
                   <InvoiceHeader
                     type={form.formData.type}
                     number={form.formData.number}

@@ -19,9 +19,9 @@ const itemColumns: Column[] = [
 	{ id: "ean", label: "EAN", minWidth: 120 },
 	{ id: "name", label: "Název", minWidth: 200 },
 	{ id: "category", label: "Kategorie", minWidth: 120 },
+	{ id: "amount", label: "Množství", minWidth: 100, align: "right" },
 	{ id: "unit_of_measure", label: "Jednotka", minWidth: 80, align: "center" },
 	{ id: "vat_rate", label: "DPH %", minWidth: 70, align: "right" },
-	{ id: "amount", label: "Množství", minWidth: 100, align: "right" },
 	{ id: "sale_price", label: "Cena", minWidth: 100, align: "right" },
 	{ id: "total", label: "Celkem", minWidth: 120, align: "right" },
 ];
