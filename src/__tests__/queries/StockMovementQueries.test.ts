@@ -452,7 +452,7 @@ describe('stockMovementQueries', () => {
       insert.run(serializeStockMovement({
         invoice_number: 'INV002',
         item_ean: '1234567890123',
-        amount: '5',
+        amount: '10',
         price_per_unit: '120',
         vat_rate: 1,
       }));

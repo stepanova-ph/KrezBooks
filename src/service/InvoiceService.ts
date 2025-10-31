@@ -69,6 +69,11 @@ export class InvoiceService {
 		}
 
 		const result = statement.run(updateData);
+
+		if (result.changes === 0) {
+			throw new Error("Invoice not found");
+		}
+
 		return { changes: result.changes };
 	}
 
@@ -76,6 +81,11 @@ export class InvoiceService {
 		const db = getDatabase();
 		const statement = db.prepare(invoiceQueries.delete);
 		const result = statement.run(number);
+
+		if (result.changes === 0) {
+			throw new Error("Invoice not found");
+		}
+		
 		return { changes: result.changes };
 	}
 
