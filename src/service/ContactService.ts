@@ -11,7 +11,8 @@ export class ContactService {
 		const db = getDatabase();
 		const statement = db.prepare(contactQueries.getAll);
 		const contacts = statement.all();
-		return contacts.map(deserializeContact);
+		return contacts
+		// return contacts.map(deserializeContact);
 	}
 
 	async getOne(ico: string, modifier: number): Promise<Contact | undefined> {
@@ -47,8 +48,12 @@ export class ContactService {
 		const sql = this.buildUpdateQuery("contacts", fieldsToUpdate);
 		const statement = db.prepare(sql);
 
-		const serialized = serializeContact({ ico, modifier, ...updates });
+		const serialized = serializeContact({ ...updates, ico, modifier });
 		const result = statement.run(serialized);
+
+		if (result.changes === 0) {
+			throw new Error("Contact not found");
+		}
 
 		return { changes: result.changes };
 	}
@@ -57,6 +62,11 @@ export class ContactService {
 		const db = getDatabase();
 		const statement = db.prepare(contactQueries.delete);
 		const result = statement.run(ico, modifier);
+		
+		if (result.changes === 0) {
+			throw new Error("Contact not found");
+		}
+
 		return { changes: result.changes };
 	}
 

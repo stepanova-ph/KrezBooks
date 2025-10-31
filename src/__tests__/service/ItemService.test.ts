@@ -91,7 +91,7 @@ describe('ItemService', () => {
     it('should accept all valid VAT rates (0, 12, 21)', async () => {
       for (let i = 0; i <= 2; i++) {
         const item: CreateItemInput = {
-          ean: `${VAT_RATES[i]}000000000`,
+          ean: `${i}000000000`,
           name: `Product VAT ${VAT_RATES[i]}`,
           vat_rate: i as VatRate,
           unit_of_measure: 'ks',
@@ -104,7 +104,7 @@ describe('ItemService', () => {
         const result = await itemService.create(item);
         expect(result.changes).toBe(1);
 
-        const retrieved = await itemService.getOne(`${VAT_RATES[i]}000000000`);
+        const retrieved = await itemService.getOne(`${i}000000000`);
         expect(retrieved?.vat_rate).toBe(VAT_RATES[i].value);
       }
     });
