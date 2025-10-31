@@ -13,9 +13,12 @@ interface InvoiceItemsListProps {
 	items: InvoiceItem[];
 	onEditItem: (item: InvoiceItem) => void;
 	onDeleteItem: (item: InvoiceItem) => void;
+	visibleColumnIds?: Set<string>;
+	columnOrder?: string[];
+	onColumnOrderChange?: (newOrder: string[]) => void;
 }
 
-const itemColumns: Column[] = [
+export const invoiceItemColumns: Column[] = [
 	{ id: "ean", label: "EAN", minWidth: 120 },
 	{ id: "name", label: "Název", minWidth: 200 },
 	{ id: "category", label: "Kategorie", minWidth: 120 },
@@ -30,6 +33,9 @@ export function InvoiceItemsList({
 	items,
 	onEditItem,
 	onDeleteItem,
+	visibleColumnIds = new Set(invoiceItemColumns.map((c) => c.id)),
+	columnOrder,
+	onColumnOrderChange,
 }: InvoiceItemsListProps) {
 	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = [
 		{
@@ -75,9 +81,11 @@ export function InvoiceItemsList({
 
 	return (
 		<DataTable
-			columns={itemColumns}
+			columns={invoiceItemColumns}
 			data={items}
-			visibleColumnIds={new Set(itemColumns.map((c) => c.id))}
+			visibleColumnIds={visibleColumnIds}
+			columnOrder={columnOrder}
+			onColumnOrderChange={onColumnOrderChange}
 			contextMenuActions={contextMenuActions}
 			renderRow={(item, visibleColumns) => (
 				<>

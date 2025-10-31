@@ -15,6 +15,10 @@ import { useCreateInvoice } from "../../../hooks/useInvoices";
 import { useCreateStockMovement } from "../../../hooks/useStockMovement";
 import type { Item, Contact } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
+import { ColumnSelectorButton } from "../common/filtering/ColumnSelectorButton";
+import { invoiceItemColumns } from "../invoice/new/InvoiceItemsList";
+import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
+import { defaultVisibleColumnsInvoiceItems } from "../../../config/invoiceFilterConfig";
 
 function NewInvoiceTab() {
   const form = useInvoiceForm();
@@ -27,6 +31,13 @@ function NewInvoiceTab() {
     title: string;
     message: string;
   } | null>(null);
+
+  const {
+  visibleColumnIds,
+  columnOrder,
+  handleVisibleColumnsChange,
+  setColumnOrder,
+} = useColumnVisibility(defaultVisibleColumnsInvoiceItems);
 
   const isType5 = form.formData.type === 5;
 
@@ -162,8 +173,8 @@ function NewInvoiceTab() {
         <Grid item xs={12}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={isType5 ? 12 : 4}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sx={{direction: 'row', alignItems: 'center', px: 10}}>
+              <Grid container spacing={3} px={isType5 ? 60 : 0}>
+                <Grid item xs={12} sx={{direction: 'row', alignItems: 'center'}}>
                   <InvoiceHeader
                     type={form.formData.type}
                     number={form.formData.number}
@@ -213,21 +224,32 @@ function NewInvoiceTab() {
                 hideDivider
                 title="Položky dokladu"
                 actions={
-                  <Tooltip title="Přidat položku ze skladu">
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={dialogs.itemPicker.openDialog}
-                    >
-                      <InventoryIcon sx={{ width: 24 }} />
-                    </IconButton>
-                  </Tooltip>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <ColumnSelectorButton
+                      columns={invoiceItemColumns}
+                      visibleColumnIds={visibleColumnIds}
+                      onVisibleColumnsChange={handleVisibleColumnsChange}
+                      defaultColumnIds={defaultVisibleColumnsInvoiceItems}
+                    />
+                    <Tooltip title="Přidat položku ze skladu">
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={dialogs.itemPicker.openDialog}
+                      >
+                        <InventoryIcon sx={{ width: 24 }} />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 }
               >
                 <InvoiceItemsList
                   items={form.invoiceItems}
                   onEditItem={handleEditItem}
                   onDeleteItem={form.handleDeleteItem}
+                  visibleColumnIds={visibleColumnIds}
+                  columnOrder={columnOrder}
+                  onColumnOrderChange={setColumnOrder}
                 />
               </FormSection>
             </Grid>

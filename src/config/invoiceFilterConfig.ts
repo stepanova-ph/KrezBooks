@@ -25,3 +25,13 @@ export const defaultVisibleColumnsInvoice = [
 	"company_name",
 	"total",
 ];
+
+
+export const defaultVisibleColumnsInvoiceItems = [
+  "ean",
+  "name",
+  "amount",
+  "unit_of_measure",
+  "sale_price",
+  "total",
+];
