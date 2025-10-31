@@ -6,9 +6,10 @@ import { CSS } from "@dnd-kit/utilities";
 
 interface DraggableHeaderCellProps {
 	column: Column;
+	disabled?: true;
 }
 
-function DraggableHeaderCell({ column }: DraggableHeaderCellProps) {
+function DraggableHeaderCell({ column, disabled }: DraggableHeaderCellProps) {
 	const {
 		attributes,
 		listeners,
@@ -32,15 +33,14 @@ function DraggableHeaderCell({ column }: DraggableHeaderCellProps) {
 				minWidth: column.minWidth,
 				maxWidth: column.maxWidth,
 				width: column.width,
-				position: "relative", // důležité pro absolute handle
+				position: "relative",
 			}}
 			align={column.align}
 			{...attributes}
 		>
-			{/* Label – přidáme jen vnitřní padding/margin doprava, ne na buňku */}
 			<Box
 				sx={{
-					pr: column.align === "right" ? "24px" : 0, // rezerva pro handle (neovlivní šířku sloupce)
+					pr: column.align === "right" ? "24px" : 0,
 					overflow: "hidden",
 					whiteSpace: "nowrap",
 					textOverflow: "ellipsis",
@@ -52,8 +52,7 @@ function DraggableHeaderCell({ column }: DraggableHeaderCellProps) {
 				{column.label}
 			</Box>
 
-			{/* Drag handle – absolutní, neovlivňuje layout */}
-			<Box
+			{!disabled && <Box
 				{...listeners}
 				sx={{
 					position: "absolute",
@@ -72,7 +71,7 @@ function DraggableHeaderCell({ column }: DraggableHeaderCellProps) {
 				aria-label={`Přesunout sloupec ${column.label}`}
 			>
 				<DragHandleIcon sx={{ fontSize: 16, opacity: 0.7 }} />
-			</Box>
+			</Box>}
 		</TableCell>
 	);
 }

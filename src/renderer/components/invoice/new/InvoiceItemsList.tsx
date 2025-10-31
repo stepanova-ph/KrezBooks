@@ -81,6 +81,7 @@ export function InvoiceItemsList({
 
 	return (
 		<DataTable
+			disableDrag
 			columns={invoiceItemColumns}
 			data={items}
 			visibleColumnIds={visibleColumnIds}

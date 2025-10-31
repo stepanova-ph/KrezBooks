@@ -5,6 +5,7 @@ import {
 } from "../../../../context/TableControlsContext";
 import { useKeyboardShortcuts } from "../../../../hooks/keyboard/useKeyboardShortcuts";
 import { DataTableContent } from "./DataTableContent";
+import type { OrderByConfig } from "../filtering/ColumnSelectorButton";
 
 export interface Column {
 	id: string;
@@ -44,6 +45,10 @@ interface DataTableProps<T> {
 	onEnterAction?: (item: T, index: number) => void;
 	onRowClick?: (item: T, index: number) => void;
 	onRowDoubleClick?: (item: T, index: number) => void;
+	orderBy?: OrderByConfig;
+	getCellContent?: (item: T, columnId: string) => any;
+	onFocusChange?: (item: T | null) => void;
+	disableDrag?: true;
 }
 
 function DataTableInner<T>(props: DataTableProps<T>) {
@@ -68,7 +73,6 @@ function DataTableInner<T>(props: DataTableProps<T>) {
 
 	// Update data in context whenever it changes
 	useEffect(() => {
-		console.log(`Updating data in context:`, props.data);
 		controls.setData(props.data, props.getRowKey || ((item: any) => item.id));
 	}, [props.data, props.getRowKey, controls]);
 
@@ -87,6 +91,13 @@ function DataTableInner<T>(props: DataTableProps<T>) {
 			controls.setOnEnterPress(undefined);
 		}
 	}, [handleEnter, props.onEnterAction, controls]);
+
+	// Notify parent of focus changes
+	useEffect(() => {
+		if (props.onFocusChange) {
+			props.onFocusChange(controls.focusedItem);
+		}
+	}, [controls.focusedItem, props.onFocusChange]);
 
 	return <DataTableContent {...props} />;
 }

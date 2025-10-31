@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { AppBarButton } from "./AppBarButton";
 import { WindowControls } from "./WindowControls";
 
-export type AppPage = "domu" | "adresar" | "sklad" | "novy_doklad";
+export type AppPage = "domu" | "adresar" | "sklad" | "novy_doklad" | "doklady";
 
 interface AppBarProps {
 	currentPage: AppPage;
@@ -74,6 +74,11 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 					label="Sklad"
 					active={currentPage === "sklad"}
 					onClick={() => onPageChange("sklad")}
+				/>
+				<AppBarButton
+					label="Doklady"
+					active={currentPage === "doklady"}
+					onClick={() => onPageChange("doklady")}
 				/>
 			</Box>
 

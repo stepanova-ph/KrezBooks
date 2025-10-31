@@ -17,6 +17,7 @@ interface DialogAction {
 	color?: "primary" | "secondary" | "error";
 	disabled?: boolean;
 	type?: "button" | "submit";
+	icon?: React.ReactNode;
 }
 
 interface DialogProps {
@@ -125,6 +126,7 @@ export function Dialog({
 									minHeight: 32,
 									textTransform: "none",
 								}}
+								startIcon={action.icon}
 							>
 								{action.label}
 							</Button>
