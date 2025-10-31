@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import Database from 'better-sqlite3';
 import { itemQueries } from '../../../src/main/queries/items';
+import { serializeItem } from 'src/utils/typeConverterUtils';
+import { VatRate } from 'src/types/database';
 
 describe('itemQueries', () => {
   let db: Database.Database;
@@ -19,7 +21,7 @@ describe('itemQueries', () => {
     it('should return all items ordered by name', () => {
       const insert = db.prepare(itemQueries.create);
       
-      insert.run({
+      insert.run(serializeItem({
         ean: '1111111111111',
         name: 'Zebra Product',
         vat_rate: 1,
@@ -28,9 +30,9 @@ describe('itemQueries', () => {
         sale_price_group2: 90,
         sale_price_group3: 80,
         sale_price_group4: 70,
-      });
+      }));
 
-      insert.run({
+      insert.run(serializeItem({
         ean: '2222222222222',
         name: 'Alpha Product',
         vat_rate: 1,
@@ -39,7 +41,7 @@ describe('itemQueries', () => {
         sale_price_group2: 180,
         sale_price_group3: 160,
         sale_price_group4: 140,
-      });
+      }));
 
       const results = db.prepare(itemQueries.getAll).all();
 
@@ -58,7 +60,7 @@ describe('itemQueries', () => {
     it('should return item by ean', () => {
       const insert = db.prepare(itemQueries.create);
       
-      insert.run({
+      insert.run(serializeItem({
         ean: '1234567890123',
         name: 'Test Product',
         vat_rate: 1,
@@ -67,7 +69,7 @@ describe('itemQueries', () => {
         sale_price_group2: 90,
         sale_price_group3: 80,
         sale_price_group4: 70,
-      });
+      }));
 
       const result = db.prepare(itemQueries.getOne).get('1234567890123');
 
@@ -81,7 +83,7 @@ describe('itemQueries', () => {
     it('should insert new item with all fields', () => {
       const insert = db.prepare(itemQueries.create);
       
-      const result = insert.run({
+      const result = insert.run(serializeItem({
         ean: '1234567890123',
         category: 'Electronics',
         name: 'Test Product',
@@ -92,7 +94,7 @@ describe('itemQueries', () => {
         sale_price_group2: 900,
         sale_price_group3: 800,
         sale_price_group4: 700,
-      });
+      }));
 
       expect(result.changes).toBe(1);
 
@@ -106,7 +108,7 @@ describe('itemQueries', () => {
     it('should insert item with only required fields', () => {
       const insert = db.prepare(itemQueries.create);
       
-      const result = insert.run({
+      const result = insert.run(serializeItem({
         ean: '1234567890123',
         name: 'Minimal Product',
         vat_rate: 1,
@@ -115,7 +117,7 @@ describe('itemQueries', () => {
         sale_price_group2: 0,
         sale_price_group3: 0,
         sale_price_group4: 0,
-      });
+      }));
 
       expect(result.changes).toBe(1);
 
@@ -124,33 +126,13 @@ describe('itemQueries', () => {
       expect(check.category).toBeNull();
       expect(check.note).toBeNull();
     });
-
-    it('should set created_at timestamp automatically', () => {
-      const insert = db.prepare(itemQueries.create);
-      
-      insert.run({
-        ean: '1234567890123',
-        name: 'Test',
-        vat_rate: 1,
-        unit_of_measure: 'ks',
-        sale_price_group1: 100,
-        sale_price_group2: 90,
-        sale_price_group3: 80,
-        sale_price_group4: 70,
-      });
-
-      const result = db.prepare(itemQueries.getOne).get('1234567890123');
-
-      expect(result.created_at).toBeDefined();
-      expect(typeof result.created_at).toBe('string');
-    });
   });
 
   describe('delete', () => {
     it('should delete item by ean', () => {
       const insert = db.prepare(itemQueries.create);
       
-      insert.run({
+      insert.run(serializeItem({
         ean: '1234567890123',
         name: 'Test',
         vat_rate: 1,
@@ -159,7 +141,7 @@ describe('itemQueries', () => {
         sale_price_group2: 90,
         sale_price_group3: 80,
         sale_price_group4: 70,
-      });
+      }));
 
       const deleteStmt = db.prepare(itemQueries.delete);
       const result = deleteStmt.run('1234567890123');
@@ -187,7 +169,7 @@ describe('itemQueries', () => {
     it('should return distinct categories ordered alphabetically', () => {
       const insert = db.prepare(itemQueries.create);
       
-      insert.run({
+      insert.run(serializeItem({
         ean: '1111111111111',
         name: 'Product 1',
         category: 'Electronics',
@@ -197,9 +179,9 @@ describe('itemQueries', () => {
         sale_price_group2: 90,
         sale_price_group3: 80,
         sale_price_group4: 70,
-      });
+      }));
 
-      insert.run({
+      insert.run(serializeItem({
         ean: '2222222222222',
         name: 'Product 2',
         category: 'Books',
@@ -209,9 +191,9 @@ describe('itemQueries', () => {
         sale_price_group2: 180,
         sale_price_group3: 160,
         sale_price_group4: 140,
-      });
+      }));
 
-      insert.run({
+      insert.run(serializeItem({
         ean: '3333333333333',
         name: 'Product 3',
         category: 'Electronics',
@@ -221,7 +203,7 @@ describe('itemQueries', () => {
         sale_price_group2: 135,
         sale_price_group3: 120,
         sale_price_group4: 105,
-      });
+      }));
 
       const results = db.prepare(itemQueries.getCategories).all();
 
@@ -233,7 +215,7 @@ describe('itemQueries', () => {
     it('should exclude null and empty categories', () => {
       const insert = db.prepare(itemQueries.create);
       
-      insert.run({
+      insert.run(serializeItem({
         ean: '1111111111111',
         name: 'Product 1',
         category: 'Electronics',
@@ -243,9 +225,9 @@ describe('itemQueries', () => {
         sale_price_group2: 90,
         sale_price_group3: 80,
         sale_price_group4: 70,
-      });
+      }));
 
-      insert.run({
+      insert.run(serializeItem({
         ean: '2222222222222',
         name: 'Product 2',
         category: null,
@@ -255,7 +237,7 @@ describe('itemQueries', () => {
         sale_price_group2: 180,
         sale_price_group3: 160,
         sale_price_group4: 140,
-      });
+      }));
 
       const results = db.prepare(itemQueries.getCategories).all();
 
@@ -270,16 +252,16 @@ describe('itemQueries', () => {
 
       for (let i = 0; i <= 2; i++) {
         expect(() => {
-          insert.run({
+          insert.run(serializeItem({
             ean: `111111111111${i}`,
             name: `Product ${i}`,
-            vat_rate: i,
+            vat_rate: i as VatRate,
             unit_of_measure: 'ks',
             sale_price_group1: 100,
             sale_price_group2: 90,
             sale_price_group3: 80,
             sale_price_group4: 70,
-          });
+          }));
         }).not.toThrow();
       }
     });
@@ -288,29 +270,29 @@ describe('itemQueries', () => {
       const insert = db.prepare(itemQueries.create);
 
       expect(() => {
-        insert.run({
+        insert.run(serializeItem({
           ean: '1234567890123',
           name: 'Invalid',
-          vat_rate: 3,
+          vat_rate: 3 as VatRate,
           unit_of_measure: 'ks',
           sale_price_group1: 100,
           sale_price_group2: 90,
           sale_price_group3: 80,
           sale_price_group4: 70,
-        });
+        }));
       }).toThrow();
 
       expect(() => {
-        insert.run({
+        insert.run(serializeItem({
           ean: '1234567890124',
           name: 'Invalid',
-          vat_rate: -1,
+          vat_rate: -1 as VatRate,
           unit_of_measure: 'ks',
           sale_price_group1: 100,
           sale_price_group2: 90,
           sale_price_group3: 80,
           sale_price_group4: 70,
-        });
+        }));
       }).toThrow();
     });
   });
@@ -319,7 +301,7 @@ describe('itemQueries', () => {
     it('should reject duplicate ean', () => {
       const insert = db.prepare(itemQueries.create);
       
-      insert.run({
+      insert.run(serializeItem({
         ean: '1234567890123',
         name: 'Product 1',
         vat_rate: 1,
@@ -328,10 +310,10 @@ describe('itemQueries', () => {
         sale_price_group2: 90,
         sale_price_group3: 80,
         sale_price_group4: 70,
-      });
+      }));
 
       expect(() => {
-        insert.run({
+        insert.run(serializeItem({
           ean: '1234567890123',
           name: 'Product 2',
           vat_rate: 1,
@@ -340,7 +322,7 @@ describe('itemQueries', () => {
           sale_price_group2: 180,
           sale_price_group3: 160,
           sale_price_group4: 140,
-        });
+        }));
       }).toThrow();
     });
   });

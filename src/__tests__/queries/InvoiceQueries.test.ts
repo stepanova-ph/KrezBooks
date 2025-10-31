@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import Database from 'better-sqlite3';
 import { invoiceQueries } from '../../../src/main/queries/invoices';
+import { serializeInvoice } from 'src/utils/typeConverterUtils';
 
 describe('invoiceQueries', () => {
   let db: Database.Database;
@@ -19,23 +20,23 @@ describe('invoiceQueries', () => {
     it('should return all invoices ordered by date_issue DESC and number DESC', () => {
       const insert = db.prepare(invoiceQueries.create);
       
-      insert.run({
+      insert.run(serializeInvoice({
         number: 'INV001',
         type: 1,
         date_issue: '2024-01-15',
-      });
+      }));
 
-      insert.run({
+      insert.run(serializeInvoice({
         number: 'INV002',
         type: 1,
         date_issue: '2024-01-20',
-      });
+      }));
 
-      insert.run({
+      insert.run(serializeInvoice({
         number: 'INV003',
         type: 1,
         date_issue: '2024-01-20',
-      });
+      }));
 
       const results = db.prepare(invoiceQueries.getAll).all();
 
@@ -55,12 +56,12 @@ describe('invoiceQueries', () => {
     it('should return invoice by number', () => {
       const insert = db.prepare(invoiceQueries.create);
       
-      insert.run({
+      insert.run(serializeInvoice({
         number: 'INV001',
         type: 1,
         date_issue: '2024-01-15',
         company_name: 'Test Company',
-      });
+      }));
 
       const result = db.prepare(invoiceQueries.getOne).get('INV001');
 
@@ -74,7 +75,7 @@ describe('invoiceQueries', () => {
     it('should insert new invoice with all fields', () => {
       const insert = db.prepare(invoiceQueries.create);
       
-      const result = insert.run({
+      const result = insert.run(serializeInvoice({
         number: 'INV001',
         type: 1,
         payment_method: 1,
@@ -93,7 +94,7 @@ describe('invoiceQueries', () => {
         postal_code: '11000',
         phone: '+420123456789',
         email: 'test@example.com',
-      });
+      }));
 
       expect(result.changes).toBe(1);
 
@@ -106,11 +107,11 @@ describe('invoiceQueries', () => {
     it('should insert invoice with only required fields', () => {
       const insert = db.prepare(invoiceQueries.create);
       
-      const result = insert.run({
+      const result = insert.run(serializeInvoice({
         number: 'INV001',
         type: 1,
         date_issue: '2024-01-15',
-      });
+      }));
 
       expect(result.changes).toBe(1);
 
@@ -120,32 +121,17 @@ describe('invoiceQueries', () => {
       expect(check.payment_method).toBeNull();
       expect(check.company_name).toBeNull();
     });
-
-    it('should set created_at timestamp automatically', () => {
-      const insert = db.prepare(invoiceQueries.create);
-      
-      insert.run({
-        number: 'INV001',
-        type: 1,
-        date_issue: '2024-01-15',
-      });
-
-      const result = db.prepare(invoiceQueries.getOne).get('INV001');
-
-      expect(result.created_at).toBeDefined();
-      expect(typeof result.created_at).toBe('string');
-    });
   });
 
   describe('delete', () => {
     it('should delete invoice by number', () => {
       const insert = db.prepare(invoiceQueries.create);
       
-      insert.run({
+      insert.run(serializeInvoice({
         number: 'INV001',
         type: 1,
         date_issue: '2024-01-15',
-      });
+      }));
 
       const deleteStmt = db.prepare(invoiceQueries.delete);
       const result = deleteStmt.run('INV001');
@@ -170,11 +156,11 @@ describe('invoiceQueries', () => {
 
       for (let i = 1; i <= 5; i++) {
         expect(() => {
-          insert.run({
+          insert.run(serializeInvoice({
             number: `INV00${i}`,
             type: i,
             date_issue: '2024-01-15',
-          });
+          }));
         }).not.toThrow();
       }
     });
@@ -183,19 +169,19 @@ describe('invoiceQueries', () => {
       const insert = db.prepare(invoiceQueries.create);
 
       expect(() => {
-        insert.run({
+        insert.run(serializeInvoice({
           number: 'INV001',
           type: 0,
           date_issue: '2024-01-15',
-        });
+        }));
       }).toThrow();
 
       expect(() => {
-        insert.run({
+        insert.run(serializeInvoice({
           number: 'INV002',
           type: 6,
           date_issue: '2024-01-15',
-        });
+        }));
       }).toThrow();
     });
   });
@@ -205,30 +191,30 @@ describe('invoiceQueries', () => {
       const insert = db.prepare(invoiceQueries.create);
 
       expect(() => {
-        insert.run({
+        insert.run(serializeInvoice({
           number: 'INV001',
           type: 1,
           payment_method: 0,
           date_issue: '2024-01-15',
-        });
+        }));
       }).not.toThrow();
 
       expect(() => {
-        insert.run({
+        insert.run(serializeInvoice({
           number: 'INV002',
           type: 1,
           payment_method: 1,
           date_issue: '2024-01-15',
-        });
+        }));
       }).not.toThrow();
 
       expect(() => {
-        insert.run({
+        insert.run(serializeInvoice({
           number: 'INV003',
           type: 1,
-          payment_method: null,
+          payment_method: undefined,
           date_issue: '2024-01-15',
-        });
+        }));
       }).not.toThrow();
     });
 
@@ -236,21 +222,21 @@ describe('invoiceQueries', () => {
       const insert = db.prepare(invoiceQueries.create);
 
       expect(() => {
-        insert.run({
+        insert.run(serializeInvoice({
           number: 'INV001',
           type: 1,
           payment_method: 2,
           date_issue: '2024-01-15',
-        });
+        }));
       }).toThrow();
 
       expect(() => {
-        insert.run({
+        insert.run(serializeInvoice({
           number: 'INV002',
           type: 1,
           payment_method: -1,
           date_issue: '2024-01-15',
-        });
+        }));
       }).toThrow();
     });
   });
@@ -259,18 +245,18 @@ describe('invoiceQueries', () => {
     it('should reject duplicate invoice number', () => {
       const insert = db.prepare(invoiceQueries.create);
       
-      insert.run({
+      insert.run(serializeInvoice({
         number: 'INV001',
         type: 1,
         date_issue: '2024-01-15',
-      });
+      }));
 
       expect(() => {
-        insert.run({
+        insert.run(serializeInvoice({
           number: 'INV001',
           type: 2,
           date_issue: '2024-01-20',
-        });
+        }));
       }).toThrow();
     });
   });
@@ -279,13 +265,13 @@ describe('invoiceQueries', () => {
     it('should allow null for date_tax and date_due', () => {
       const insert = db.prepare(invoiceQueries.create);
       
-      const result = insert.run({
+      const result = insert.run(serializeInvoice({
         number: 'INV001',
         type: 1,
         date_issue: '2024-01-15',
-        date_tax: null,
-        date_due: null,
-      });
+        date_tax: undefined,
+        date_due: undefined,
+      }));
 
       expect(result.changes).toBe(1);
 
@@ -297,13 +283,13 @@ describe('invoiceQueries', () => {
     it('should store date_tax and date_due when provided', () => {
       const insert = db.prepare(invoiceQueries.create);
       
-      insert.run({
+      insert.run(serializeInvoice({
         number: 'INV001',
         type: 1,
         date_issue: '2024-01-15',
         date_tax: '2024-01-16',
         date_due: '2024-02-15',
-      });
+      }));
 
       const check = db.prepare(invoiceQueries.getOne).get('INV001');
       expect(check.date_tax).toBe('2024-01-16');

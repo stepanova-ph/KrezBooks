@@ -69,13 +69,7 @@ export function validatePSC(psc: string): boolean {
 export function normalizePSC(psc: string): string {
 	if (!psc || psc.trim() === "") return "";
 
-	const digits = psc.replace(/\D/g, "");
-
-	if (digits.length === 5) {
-		return digits.slice(0, 3) + " " + digits.slice(3);
-	}
-
-	return psc;
+	return psc.replace(/\D/g, "");
 }
 
 /**

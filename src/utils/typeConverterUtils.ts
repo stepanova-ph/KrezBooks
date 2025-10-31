@@ -1,4 +1,4 @@
-import { Contact } from "src/types/database";
+import { Contact, Invoice, Item, StockMovement } from "src/types/database";
 
 /**
  * Convert TypeScript boolean to SQLite integer (0/1)
@@ -13,7 +13,7 @@ export function booleanToSQLiteInteger(value: boolean): number {
  * Handles any truthy/falsy value for robustness
  */
 export function sqliteIntegerToBoolean(
-	value: number | null | undefined,
+	value: number | undefined | null,
 ): boolean {
 	return Boolean(value);
 }
@@ -56,4 +56,54 @@ export function serializeContact(contact: Partial<Contact>): any {
 	};
 	
 	return result;
+}
+
+export function serializeItem(item: Partial<Item>): any {
+	const result = {
+		ean: item.ean ?? null,
+		category: item.category ?? null,
+		name: item.name ?? null,
+		note: item.note ?? null,
+		vat_rate: item.vat_rate ?? null,
+		unit_of_measure: item.unit_of_measure ?? null,
+		sale_price_group1: item.sale_price_group1 ?? null,
+		sale_price_group2: item.sale_price_group2 ?? null,
+		sale_price_group3: item.sale_price_group3 ?? null,
+		sale_price_group4: item.sale_price_group4 ?? null,
+	}
+
+	return result
+}
+
+export function serializeStockMovement(movement: Partial<StockMovement>): any {
+  return {
+    invoice_number: movement.invoice_number ?? null,
+    item_ean: movement.item_ean ?? null,
+    amount: movement.amount ?? null,
+    price_per_unit: movement.price_per_unit ?? null,
+    vat_rate: movement.vat_rate ?? null,
+  };
+}
+
+export function serializeInvoice(invoice: Partial<Invoice>): any {
+  return {
+    number: invoice.number ?? null,
+    type: invoice.type ?? null,
+    payment_method: invoice.payment_method ?? null,
+    date_issue: invoice.date_issue ?? null,
+    date_tax: invoice.date_tax ?? null,
+    date_due: invoice.date_due ?? null,
+    variable_symbol: invoice.variable_symbol ?? null,
+    note: invoice.note ?? null,
+    ico: invoice.ico ?? null,
+    modifier: invoice.modifier ?? null,
+    dic: invoice.dic ?? null,
+    company_name: invoice.company_name ?? null,
+    bank_account: invoice.bank_account ?? null,
+    street: invoice.street ?? null,
+    city: invoice.city ?? null,
+    postal_code: invoice.postal_code ?? null,
+    phone: invoice.phone ?? null,
+    email: invoice.email ?? null,
+  };
 }

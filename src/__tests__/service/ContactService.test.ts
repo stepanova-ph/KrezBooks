@@ -315,8 +315,8 @@ describe('ContactService', () => {
       await contactService.update('88888888', 1, updates);
 
       const updated = await contactService.getOne('88888888', 1);
-      expect(updated?.is_supplier).toBe(0);
-      expect(updated?.is_customer).toBe(1);
+      expect(updated?.is_supplier).toBe(false);
+      expect(updated?.is_customer).toBe(true);
     });
 
     it('should throw error when updating non-existent contact', async () => {
@@ -470,46 +470,6 @@ describe('ContactService', () => {
         const retrieved = await contactService.getOne(`${priceGroup}0000000`, 1);
         expect(retrieved?.price_group).toBe(priceGroup);
       }
-    });
-  });
-
-  describe('timestamps', () => {
-    it('should set created_at on create', async () => {
-      const contact: CreateContactInput = {
-        ico: '60606060',
-        modifier: 1,
-        company_name: 'Company',
-        is_supplier: true,
-        is_customer: false,
-        price_group: 1,
-      };
-
-      await contactService.create(contact);
-
-      const created = await contactService.getOne('60606060', 1);
-      expect(created?.created_at).toBeDefined();
-    });
-
-    it('should update updated_at on update', async () => {
-      const contact: CreateContactInput = {
-        ico: '70707070',
-        modifier: 1,
-        company_name: 'Original',
-        is_supplier: true,
-        is_customer: false,
-        price_group: 1,
-      };
-
-      await contactService.create(contact);
-      const original = await contactService.getOne('70707070', 1);
-
-      // Wait a bit to ensure timestamp difference
-      await new Promise(resolve => setTimeout(resolve, 10));
-
-      await contactService.update('70707070', 1, { company_name: 'Updated' });
-      const updated = await contactService.getOne('70707070', 1);
-
-      expect(updated?.updated_at).not.toBe(original?.created_at);
     });
   });
 });

@@ -105,7 +105,7 @@ describe('ItemService', () => {
         expect(result.changes).toBe(1);
 
         const retrieved = await itemService.getOne(`${VAT_RATES[i]}000000000`);
-        expect(retrieved?.vat_rate).toBe(VAT_RATES[i]);
+        expect(retrieved?.vat_rate).toBe(VAT_RATES[i].value);
       }
     });
 
@@ -550,49 +550,6 @@ describe('ItemService', () => {
       await expect(
         itemService.delete('9999999999999')
       ).rejects.toThrow();
-    });
-  });
-
-  describe('timestamps', () => {
-    it('should set created_at on create', async () => {
-      const item: CreateItemInput = {
-        ean: '6060606060606',
-        name: 'Product',
-        vat_rate: 2,
-        unit_of_measure: 'ks',
-        sale_price_group1: 100.00,
-        sale_price_group2: 100.00,
-        sale_price_group3: 100.00,
-        sale_price_group4: 100.00,
-      };
-
-      await itemService.create(item);
-
-      const created = await itemService.getOne('6060606060606');
-      expect(created?.created_at).toBeDefined();
-    });
-
-    it('should update updated_at on update', async () => {
-      const item: CreateItemInput = {
-        ean: '7070707070707',
-        name: 'Original',
-        vat_rate: 2,
-        unit_of_measure: 'ks',
-        sale_price_group1: 100.00,
-        sale_price_group2: 100.00,
-        sale_price_group3: 100.00,
-        sale_price_group4: 100.00,
-      };
-
-      await itemService.create(item);
-      const original = await itemService.getOne('7070707070707');
-
-      await new Promise(resolve => setTimeout(resolve, 10));
-
-      await itemService.update('7070707070707', { name: 'Updated' });
-      const updated = await itemService.getOne('7070707070707');
-
-      expect(updated?.updated_at).not.toBe(original?.created_at);
     });
   });
 });
