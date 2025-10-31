@@ -23,7 +23,7 @@
     "package:linux": "npm run build && electron-builder --linux",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
+    "format": "prettier --use-tabs --write \"src/**/*.{ts,tsx,json}\"",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"

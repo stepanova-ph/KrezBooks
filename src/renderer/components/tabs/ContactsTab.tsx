@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
 import { Box, Typography } from "@mui/material";
-import { FilterBar, FilterBarRef } from "../common/FilterBar";
+import { FilterBar, FilterBarRef } from "../common/filtering/FilterBar";
 import { useTableFilters } from "../../../hooks/useTableFilters";
 import {
-  contactFilterConfig,
-  initialContactFilterState,
-  defaultVisibleColumnsContact,
+	contactFilterConfig,
+	initialContactFilterState,
+	defaultVisibleColumnsContact,
 } from "../../../config/contactFilterConfig";
 import type { ContactFilterState } from "../../../types/filter";
 import ContactsList, { contactColumns } from "../contacts/ContactsList";
@@ -17,76 +17,80 @@ import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
 import { Loading } from "../layout/Loading";
 
 function ContactTab() {
-  const { data: contacts = [], isLoading } = useContacts();
-  
-  const [filters, setFilters] = useState<ContactFilterState>(
-    initialContactFilterState,
-  );
+	const { data: contacts = [], isLoading } = useContacts();
 
-  const { 
-    visibleColumnIds, 
-    columnOrder, 
-    handleVisibleColumnsChange, 
-    setColumnOrder 
-  } = useColumnVisibility(defaultVisibleColumnsContact);
+	const [filters, setFilters] = useState<ContactFilterState>(
+		initialContactFilterState,
+	);
 
-  const filterBarRef = useRef<FilterBarRef>(null);
+	const {
+		visibleColumnIds,
+		columnOrder,
+		handleVisibleColumnsChange,
+		setColumnOrder,
+	} = useColumnVisibility(defaultVisibleColumnsContact);
 
-  useAutoSearchFocus({
-    filterBarRef: filterBarRef,
-    disabled: false,
-  });
+	const filterBarRef = useRef<FilterBarRef>(null);
 
-  const filteredContacts = useTableFilters(contacts, filters);
+	useAutoSearchFocus({
+		filterBarRef: filterBarRef,
+		disabled: false,
+	});
 
-  if (isLoading) {
-    return (
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          minHeight: '100%',
-          height: '100%'
-        }}
-      >
-        <Loading size="large" text="Načítám adresář..." />
-      </Box>
-    );
-  }
+	const filteredContacts = useTableFilters(
+		contacts,
+		filters,
+		contactFilterConfig,
+	);
 
-  return (
-    <Box sx={{ p: 3 }}>
-      <FilterBar
-        ref={filterBarRef}
-        config={contactFilterConfig}
-        filters={filters}
-        onFiltersChange={setFilters}
-        columns={contactColumns}
-        visibleColumnIds={visibleColumnIds}
-        onVisibleColumnsChange={handleVisibleColumnsChange}
-        defaultColumnIds={defaultVisibleColumnsContact}
-        actions={[
-          {
-            id: "add-contact",
-            label: "Přidat kontakt",
-            startIcon: <PersonAddIcon />,
-            renderDialog: ({ open, onClose }) => (
-              <CreateContactForm open={open} onClose={onClose} />
-            ),
-          },
-        ]}
-      />
+	if (isLoading) {
+		return (
+			<Box
+				sx={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					minHeight: "100%",
+					height: "100%",
+				}}
+			>
+				<Loading size="large" text="Načítám adresář..." />
+			</Box>
+		);
+	}
 
-      {/* Data Table */}
-      <ContactsList
-        contacts={filteredContacts}
-        visibleColumnIds={visibleColumnIds}
-        columnOrder={columnOrder}
-        onColumnOrderChange={setColumnOrder}
-      />
-    </Box>
-  );
+	return (
+		<Box sx={{ p: 3 }}>
+			<FilterBar
+				ref={filterBarRef}
+				config={contactFilterConfig}
+				filters={filters}
+				onFiltersChange={setFilters}
+				columns={contactColumns}
+				visibleColumnIds={visibleColumnIds}
+				onVisibleColumnsChange={handleVisibleColumnsChange}
+				defaultColumnIds={defaultVisibleColumnsContact}
+				actions={[
+					{
+						id: "add-contact",
+						label: "Přidat kontakt",
+						startIcon: <PersonAddIcon />,
+						renderDialog: ({ open, onClose }) => (
+							<CreateContactForm open={open} onClose={onClose} />
+						),
+					},
+				]}
+			/>
+
+			{/* Data Table */}
+			<ContactsList
+				contacts={filteredContacts}
+				visibleColumnIds={visibleColumnIds}
+				columnOrder={columnOrder}
+				onColumnOrderChange={setColumnOrder}
+			/>
+		</Box>
+	);
 }
 
 export default ContactTab;
