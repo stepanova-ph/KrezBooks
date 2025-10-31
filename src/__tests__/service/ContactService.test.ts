@@ -186,8 +186,8 @@ describe('ContactService', () => {
         company_name: 'Full Contact',
         dic: 'CZ12345678',
         representative_name: 'Jane Smith',
-        is_supplier: 1,
-        is_customer: 1,
+        is_supplier: true,
+        is_customer: true,
         price_group: 3,
       });
     });
