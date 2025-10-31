@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import Database from 'better-sqlite3';
-import { stockMovementQueries } from '../../../src/main/queries/stockMovements';
-import { invoiceQueries } from '../../../src/main/queries/invoices';
-import { itemQueries } from '../../../src/main/queries/items';
-import { serializeInvoice, serializeItem, serializeStockMovement } from 'src/utils/typeConverterUtils';
+import { stockMovementQueries } from '../../main/queries/stockMovements';
+import { invoiceQueries } from '../../main/queries/invoices';
+import { itemQueries } from '../../main/queries/items';
+import { serializeInvoice, serializeItem, serializeStockMovement } from '../../utils/typeConverterUtils';
 
 describe('stockMovementQueries', () => {
   let db: Database.Database;

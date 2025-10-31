@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import Database from 'better-sqlite3';
-import { invoiceQueries } from '../../../src/main/queries/invoices';
-import { serializeInvoice } from 'src/utils/typeConverterUtils';
+import { invoiceQueries } from '../../main/queries/invoices';
+import { serializeInvoice } from '../../utils/typeConverterUtils';
 
 describe('invoiceQueries', () => {
   let db: Database.Database;

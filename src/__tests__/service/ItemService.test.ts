@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ItemService } from '../../service/ItemService';
 import type { CreateItemInput, Item, VatRate } from '../../types/database';
-import { VAT_RATES } from 'src/config/constants';
+import { VAT_RATES } from '../../config/constants';
 
 describe('ItemService', () => {
   let itemService: ItemService;

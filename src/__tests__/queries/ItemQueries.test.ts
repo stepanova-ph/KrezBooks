@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import Database from 'better-sqlite3';
-import { itemQueries } from '../../../src/main/queries/items';
-import { serializeItem } from 'src/utils/typeConverterUtils';
-import { VatRate } from 'src/types/database';
+import { itemQueries } from '../../main/queries/items';
+import { serializeItem } from '../../utils/typeConverterUtils';
+import { VatRate } from '../../types/database';
 
 describe('itemQueries', () => {
   let db: Database.Database;
