@@ -67,6 +67,10 @@ export class ItemService {
 
 		const result = statement.run(updateData);
 
+		if (result.changes === 0) {
+			throw new Error("Item not found");
+		}
+
 		return { changes: result.changes };
 	}
 
@@ -74,6 +78,11 @@ export class ItemService {
 		const db = getDatabase();
 		const statement = db.prepare(itemQueries.delete);
 		const result = statement.run(ean);
+
+		if (result.changes === 0) {
+			throw new Error("Item not found");
+		}
+		
 		return { changes: result.changes };
 	}
 

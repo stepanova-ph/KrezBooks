@@ -67,21 +67,28 @@ export const stockMovementQueries = {
     WHERE item_ean = ?
   `,
 
-	getAverageBuyPriceByItem: `
-    SELECT COALESCE(AVG(CAST(price_per_unit AS REAL)), 0) as avg_price
+  getAverageBuyPriceByItem: `
+    SELECT COALESCE(
+      SUM(CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL)) / 
+      NULLIF(SUM(CAST(sm.amount AS REAL)), 0),
+      0
+    ) as avg_price
     FROM stock_movements sm
     JOIN invoices i ON sm.invoice_number = i.number
     WHERE sm.item_ean = ?
       AND (i.type = 1 OR i.type = 2)
   `,
 
-	getLastBuyPriceByItem: `
-    SELECT COALESCE(CAST(sm.price_per_unit AS REAL), 0) as last_price
-    FROM stock_movements sm
-    JOIN invoices i ON sm.invoice_number = i.number
-    WHERE sm.item_ean = ?
-      AND (i.type = 1 OR i.type = 2)
-    ORDER BY sm.created_at DESC
-    LIMIT 1
+  getLastBuyPriceByItem: `
+    SELECT COALESCE(
+      (SELECT CAST(sm.price_per_unit AS REAL)
+      FROM stock_movements sm
+      JOIN invoices i ON sm.invoice_number = i.number
+      WHERE sm.item_ean = ?
+        AND (i.type = 1 OR i.type = 2)
+      ORDER BY i.date_issue DESC, sm.created_at DESC
+      LIMIT 1),
+      0
+    ) as last_price
   `,
 };

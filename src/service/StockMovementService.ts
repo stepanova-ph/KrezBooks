@@ -76,6 +76,11 @@ export class StockMovementService {
 		}
 
 		const result = statement.run(updateData);
+
+		if (result.changes === 0) {
+			throw new Error("Stock movement not found");
+		}
+
 		return { changes: result.changes };
 	}
 
@@ -86,6 +91,11 @@ export class StockMovementService {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.delete);
 		const result = statement.run(invoiceNumber, itemEan);
+
+		if (result.changes === 0) {
+			throw new Error("Stock movement not found");
+		}
+
 		return { changes: result.changes };
 	}
 
@@ -93,6 +103,7 @@ export class StockMovementService {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.deleteByInvoice);
 		const result = statement.run(invoiceNumber);
+
 		return { changes: result.changes };
 	}
 
