@@ -9,7 +9,11 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
-      include: ['src/service/**', 'src/validation/**', 'src/main/queries/**'],
+      include: [
+        'src/service/**', 
+        'src/validation/**', 
+        'src/main/queries/**'
+      ],
       exclude: ['**/*.d.ts', '**/__tests__/**', '**/node_modules/**'],
     },
     testTimeout: 10000,
