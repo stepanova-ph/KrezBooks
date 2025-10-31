@@ -10,7 +10,7 @@ import {
   ContextMenuAction,
 } from "../common/table/DataTable";
 import EditContactForm from "./EditContactForm";
-import type { OrderByConfig } from "../common/filtering/ColumnSelectorButton";
+import type { OrderByConfig } from "../common/filtering/ColumnPickerButton";
 
 interface ContactsListProps {
   contacts: Contact[];

@@ -54,7 +54,7 @@ export function AlertDialog({
           py: 2,
         }}
       >
-        <Typography variant="body1" color="text.primary">
+        <Typography variant="body1" color="text.primary" sx={{ whiteSpace: "pre-line" }}>
           {message}
         </Typography>
       </Box>

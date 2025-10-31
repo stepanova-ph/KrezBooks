@@ -5,7 +5,7 @@ import {
 } from "../../../../context/TableControlsContext";
 import { useKeyboardShortcuts } from "../../../../hooks/keyboard/useKeyboardShortcuts";
 import { DataTableContent } from "./DataTableContent";
-import type { OrderByConfig } from "../filtering/ColumnSelectorButton";
+import type { OrderByConfig } from "../filtering/ColumnPickerButton";
 
 export interface Column {
 	id: string;

@@ -34,8 +34,8 @@ export function InvoiceItemsList({
 	onEditItem,
 	onDeleteItem,
 	visibleColumnIds = new Set(invoiceItemColumns.map((c) => c.id)),
-	columnOrder,
-	onColumnOrderChange,
+	// columnOrder,
+	// onColumnOrderChange,
 }: InvoiceItemsListProps) {
 	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = [
 		{
@@ -85,8 +85,8 @@ export function InvoiceItemsList({
 			columns={invoiceItemColumns}
 			data={items}
 			visibleColumnIds={visibleColumnIds}
-			columnOrder={columnOrder}
-			onColumnOrderChange={onColumnOrderChange}
+			// columnOrder={columnOrder}
+			// onColumnOrderChange={onColumnOrderChange}
 			contextMenuActions={contextMenuActions}
 			renderRow={(item, visibleColumns) => (
 				<>

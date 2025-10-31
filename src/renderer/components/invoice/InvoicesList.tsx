@@ -1,7 +1,7 @@
 import { TableCell } from "@mui/material";
 import type { Invoice } from "../../../types/database";
 import { DataTable, Column } from "../common/table/DataTable";
-import type { OrderByConfig } from "../common/filtering/ColumnSelectorButton";
+import type { OrderByConfig } from "../common/filtering/ColumnPickerButton";
 
 interface InvoicesListProps {
   invoices: Invoice[];

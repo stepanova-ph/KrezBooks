@@ -14,7 +14,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import EditItemForm from "./EditItemForm";
-import type { OrderByConfig } from "../common/filtering/ColumnSelectorButton";
+import type { OrderByConfig } from "../common/filtering/ColumnPickerButton";
 
 interface ItemsListProps {
   items: Item[];

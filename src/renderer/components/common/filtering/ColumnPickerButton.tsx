@@ -37,7 +37,7 @@ interface ColumnSelectorButtonProps {
   onOrderByChange?: (orderBy: OrderByConfig) => void;
 }
 
-export function ColumnSelectorButton({
+export function ColumnPickerButton({
   columns,
   visibleColumnIds,
   onVisibleColumnsChange,
@@ -96,6 +96,7 @@ export function ColumnSelectorButton({
 
   return (
     <>
+      {/* {orderBy && */}
       <Button
         onClick={handleOpen}
         variant="outlined"
@@ -105,7 +106,7 @@ export function ColumnSelectorButton({
       >
         <ViewColumnIcon />
       </Button>
-
+      {/* } */}
       <Dialog
         open={dialogOpen}
         onClose={handleClose}
@@ -203,4 +204,4 @@ export function ColumnSelectorButton({
   );
 }
 
-export default ColumnSelectorButton;
+export default ColumnPickerButton;

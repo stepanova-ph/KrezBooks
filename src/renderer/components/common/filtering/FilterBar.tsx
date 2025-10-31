@@ -18,11 +18,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import type { ReactNode } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import { FilterConfig, FilterState } from "src/types/filter";
-import { ColumnSelectorButton } from "./ColumnSelectorButton";
+import { ColumnPickerButton } from "./ColumnPickerButton";
 import type { Column } from "../table/DataTable";
 import type { FilterAction } from "src/types/filter";
 import { KeyboardCheckbox } from "../inputs/KeyboardCheckbox";
-import type { OrderByConfig } from "./ColumnSelectorButton";
+import type { OrderByConfig } from "./ColumnPickerButton";
 
 interface FilterBarProps {
   config: FilterConfig;
@@ -351,7 +351,7 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
           </Box>
 
           <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start", flexShrink: 0 }}>
-            <ColumnSelectorButton
+            <ColumnPickerButton
               columns={columns}
               visibleColumnIds={visibleColumnIds}
               onVisibleColumnsChange={onVisibleColumnsChange}

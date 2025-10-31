@@ -8,7 +8,7 @@ import { Loading } from "../layout/Loading";
 import type { FilterConfig, FilterState } from "../../../types/filter";
 import type { Column } from "../common/table/DataTable";
 import type { FilterAction } from "../../../types/filter";
-import type { OrderByConfig } from "../common/filtering/ColumnSelectorButton";
+import type { OrderByConfig } from "./filtering/ColumnPickerButton";
 
 interface ListTabComponentProps<TData, TFilter extends FilterState> {
   data: TData[];

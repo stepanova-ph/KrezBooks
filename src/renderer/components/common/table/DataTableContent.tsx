@@ -38,7 +38,7 @@ import DraggableHeaderCell from "./DraggableHeaderCell";
 import { useTableControls } from "../../../../context/TableControlsContext";
 import { ConfirmDialog } from "../dialog/ConfirmDialog";
 import type { Column, ContextMenuAction } from "./DataTable";
-import type { OrderByConfig } from "../filtering/ColumnSelectorButton";
+import type { OrderByConfig } from "../filtering/ColumnPickerButton";
 
 interface DataTableContentProps<T> {
 	columns: Column[];

@@ -15,7 +15,7 @@ import { useCreateInvoice } from "../../../hooks/useInvoices";
 import { useCreateStockMovement } from "../../../hooks/useStockMovement";
 import type { Item, Contact } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
-import { ColumnSelectorButton } from "../common/filtering/ColumnSelectorButton";
+import { ColumnPickerButton } from "../common/filtering/ColumnPickerButton";
 import { invoiceItemColumns } from "../invoice/new/InvoiceItemsList";
 import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
 import { defaultVisibleColumnsInvoiceItems } from "../../../config/invoiceFilterConfig";
@@ -42,7 +42,6 @@ function NewInvoiceTab() {
   const isType5 = form.formData.type === 5;
 
   const handleSelectItem = (item: Item) => {
-    // dialogs.itemPicker.closeDialog();
     dialogs.amountPrice.openDialog(item);
   };
 
@@ -95,13 +94,13 @@ function NewInvoiceTab() {
   const handleSubmit = async () => {
     if (!form.handleValidate()) {
       const errorMessages = Object.entries(form.errors)
-        .map(([field, msg]) => `${field}: ${msg}`)
+        .map(([_, msg]) => `${msg}`)
         .join("\n");
 
       setAlertDialog({
         open: true,
         title: "Chyby ve formuláři",
-        message: errorMessages,
+        message: `Opravte chyby ve formuláři: \n${errorMessages}`,
       });
       return;
     }
@@ -225,7 +224,7 @@ function NewInvoiceTab() {
                 title="Položky dokladu"
                 actions={
                   <Box sx={{ display: "flex", gap: 1 }}>
-                    <ColumnSelectorButton
+                    <ColumnPickerButton
                       columns={invoiceItemColumns}
                       visibleColumnIds={visibleColumnIds}
                       onVisibleColumnsChange={handleVisibleColumnsChange}
