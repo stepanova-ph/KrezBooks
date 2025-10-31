@@ -12,7 +12,6 @@ export class ContactService {
 		const statement = db.prepare(contactQueries.getAll);
 		const contacts = statement.all();
 		return contacts
-		// return contacts.map(deserializeContact);
 	}
 
 	async getOne(ico: string, modifier: number): Promise<Contact | undefined> {
