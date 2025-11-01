@@ -13,9 +13,6 @@ interface InvoiceItemsListProps {
 	items: InvoiceItem[];
 	onEditItem: (item: InvoiceItem) => void;
 	onDeleteItem: (item: InvoiceItem) => void;
-	visibleColumnIds?: Set<string>;
-	columnOrder?: string[];
-	onColumnOrderChange?: (newOrder: string[]) => void;
 }
 
 export const invoiceItemColumns: Column[] = [
@@ -34,8 +31,6 @@ export function InvoiceItemsList({
 	onEditItem,
 	onDeleteItem,
 	visibleColumnIds = new Set(invoiceItemColumns.map((c) => c.id)),
-	// columnOrder,
-	// onColumnOrderChange,
 }: InvoiceItemsListProps) {
 	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = [
 		{
@@ -69,7 +64,7 @@ export function InvoiceItemsList({
 			case "vat_rate":
 				return formatVatRateShort(item.vat_rate);
 			case "amount":
-				return `${item.amount.toFixed(2)} ${item.unit_of_measure}`;
+				return `${item.amount.toFixed(0)} ${item.unit_of_measure}`;
 			case "sale_price":
 				return `${item.sale_price.toFixed(2)} Kč`;
 			case "total":
@@ -84,9 +79,7 @@ export function InvoiceItemsList({
 			disableDrag
 			columns={invoiceItemColumns}
 			data={items}
-			visibleColumnIds={visibleColumnIds}
-			// columnOrder={columnOrder}
-			// onColumnOrderChange={onColumnOrderChange}
+			visibleColumnIds={new Set(invoiceItemColumns.map((c) => c.id))}
 			contextMenuActions={contextMenuActions}
 			renderRow={(item, visibleColumns) => (
 				<>

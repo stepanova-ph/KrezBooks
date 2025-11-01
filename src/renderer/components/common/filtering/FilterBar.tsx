@@ -36,6 +36,7 @@ interface FilterBarProps {
   clearLabel?: string;
   orderBy?: OrderByConfig;
   onOrderByChange?: (orderBy: OrderByConfig) => void;
+  hideColumnPicker?: boolean;
 }
 
 export interface FilterBarRef {
@@ -56,6 +57,7 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
       clearLabel = "Vymazat filtry",
       orderBy,
       onOrderByChange,
+      hideColumnPicker = false,
     },
     ref,
   ) => {
@@ -351,14 +353,16 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
           </Box>
 
           <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start", flexShrink: 0 }}>
-            <ColumnPickerButton
-              columns={columns}
-              visibleColumnIds={visibleColumnIds}
-              onVisibleColumnsChange={onVisibleColumnsChange}
-              defaultColumnIds={defaultColumnIds}
-              orderBy={orderBy}
-              onOrderByChange={onOrderByChange}
-            />
+            {!hideColumnPicker && ( // NEW - conditionally render
+              <ColumnPickerButton
+                columns={columns}
+                visibleColumnIds={visibleColumnIds}
+                onVisibleColumnsChange={onVisibleColumnsChange}
+                defaultColumnIds={defaultColumnIds}
+                orderBy={orderBy}
+                onOrderByChange={onOrderByChange}
+              />
+            )}
 
             <Button variant="outlined" size="small" onClick={handleClearFilters}>
               {clearLabel}

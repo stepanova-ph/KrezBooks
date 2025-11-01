@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Grid, IconButton, Tooltip, Button } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { InvoiceHeader } from "../invoice/new/InvoiceHeader";
@@ -15,10 +15,6 @@ import { useCreateInvoice } from "../../../hooks/useInvoices";
 import { useCreateStockMovement } from "../../../hooks/useStockMovement";
 import type { Item, Contact } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
-import { ColumnPickerButton } from "../common/filtering/ColumnPickerButton";
-import { invoiceItemColumns } from "../invoice/new/InvoiceItemsList";
-import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
-import { defaultVisibleColumnsInvoiceItems } from "../../../config/invoiceFilterConfig";
 
 function NewInvoiceTab() {
   const form = useInvoiceForm();
@@ -32,12 +28,6 @@ function NewInvoiceTab() {
     message: string;
   } | null>(null);
 
-  const {
-  visibleColumnIds,
-  columnOrder,
-  handleVisibleColumnsChange,
-  setColumnOrder,
-} = useColumnVisibility(defaultVisibleColumnsInvoiceItems);
 
   const isType5 = form.formData.type === 5;
 
@@ -223,32 +213,21 @@ function NewInvoiceTab() {
                 hideDivider
                 title="Položky dokladu"
                 actions={
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <ColumnPickerButton
-                      columns={invoiceItemColumns}
-                      visibleColumnIds={visibleColumnIds}
-                      onVisibleColumnsChange={handleVisibleColumnsChange}
-                      defaultColumnIds={defaultVisibleColumnsInvoiceItems}
-                    />
-                    <Tooltip title="Přidat položku ze skladu">
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={dialogs.itemPicker.openDialog}
-                      >
-                        <InventoryIcon sx={{ width: 24 }} />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
+                  <Tooltip title="Přidat položku ze skladu">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={dialogs.itemPicker.openDialog}
+                    >
+                      <InventoryIcon sx={{ width: 24 }} />
+                    </IconButton>
+                  </Tooltip>
                 }
               >
                 <InvoiceItemsList
                   items={form.invoiceItems}
                   onEditItem={handleEditItem}
                   onDeleteItem={form.handleDeleteItem}
-                  visibleColumnIds={visibleColumnIds}
-                  columnOrder={columnOrder}
-                  onColumnOrderChange={setColumnOrder}
                 />
               </FormSection>
             </Grid>
