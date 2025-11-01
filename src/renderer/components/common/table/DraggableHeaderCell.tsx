@@ -40,7 +40,7 @@ function DraggableHeaderCell({ column, disabled }: DraggableHeaderCellProps) {
 		>
 			<Box
 				sx={{
-					pr: column.align === "right" ? "24px" : 0,
+					pr: column.align === "right" ? disabled ? 0 : "24px" : 0,
 					overflow: "hidden",
 					whiteSpace: "nowrap",
 					textOverflow: "ellipsis",

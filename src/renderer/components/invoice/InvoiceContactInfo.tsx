@@ -1,8 +1,8 @@
 import { Grid, IconButton, Tooltip } from "@mui/material";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
-import { FormSection } from "../../common/form/FormSection";
-import ValidatedTextField from "../../common/inputs/ValidatedTextField";
-import type { InvoiceType } from "../../../../types/database";
+import { FormSection } from "../common/form/FormSection";
+import ValidatedTextField from "../common/inputs/ValidatedTextField";
+import type { InvoiceType } from "../../../types/database";
 
 interface InvoiceContactInfoProps {
 	type: InvoiceType;
@@ -63,7 +63,7 @@ export function InvoiceContactInfo({
 						label="IČO"
 						name="ico"
 						value={ico}
-						onChange={(e) => onChange("ico", e.target.value)}
+						onChange={(e: { target: { value: string | number; }; }) => onChange("ico", e.target.value)}
 						onBlur={() => onBlur("ico")}
 						error={errors.ico}
 						required={requiresContactInfo}
@@ -77,7 +77,7 @@ export function InvoiceContactInfo({
 						name="modifier"
 						type="number"
 						value={modifier ?? ""}
-						onChange={(e) =>
+						onChange={(e: { target: { value: any; }; }) =>
 							onChange("modifier", e.target.value ? Number(e.target.value) : "")
 						}
 						onBlur={() => onBlur("modifier")}
@@ -92,7 +92,7 @@ export function InvoiceContactInfo({
 						label="DIČ"
 						name="dic"
 						value={dic}
-						onChange={(e) => onChange("dic", e.target.value)}
+						onChange={(e: { target: { value: string | number; }; }) => onChange("dic", e.target.value)}
 						onBlur={() => onBlur("dic")}
 						error={errors.dic}
 						fullWidth
@@ -104,7 +104,7 @@ export function InvoiceContactInfo({
 						label="Název firmy"
 						name="company_name"
 						value={companyName}
-						onChange={(e) => onChange("company_name", e.target.value)}
+						onChange={(e: { target: { value: string | number; }; }) => onChange("company_name", e.target.value)}
 						onBlur={() => onBlur("company_name")}
 						error={errors.company_name}
 						required={requiresContactInfo}
@@ -117,7 +117,7 @@ export function InvoiceContactInfo({
 						label="Ulice"
 						name="street"
 						value={street}
-						onChange={(e) => onChange("street", e.target.value)}
+						onChange={(e: { target: { value: string | number; }; }) => onChange("street", e.target.value)}
 						onBlur={() => onBlur("street")}
 						error={errors.street}
 						fullWidth
@@ -129,7 +129,7 @@ export function InvoiceContactInfo({
 						label="Město"
 						name="city"
 						value={city}
-						onChange={(e) => onChange("city", e.target.value)}
+						onChange={(e: { target: { value: string | number; }; }) => onChange("city", e.target.value)}
 						onBlur={() => onBlur("city")}
 						error={errors.city}
 						fullWidth
@@ -141,7 +141,7 @@ export function InvoiceContactInfo({
 						label="PSČ"
 						name="postal_code"
 						value={postalCode}
-						onChange={(e) => onChange("postal_code", e.target.value)}
+						onChange={(e: { target: { value: string | number; }; }) => onChange("postal_code", e.target.value)}
 						onBlur={() => onBlur("postal_code")}
 						error={errors.postal_code}
 						fullWidth
@@ -153,7 +153,7 @@ export function InvoiceContactInfo({
 						label="Telefon"
 						name="phone"
 						value={phone}
-						onChange={(e) => onChange("phone", e.target.value)}
+						onChange={(e: { target: { value: string | number; }; }) => onChange("phone", e.target.value)}
 						onBlur={() => onBlur("phone")}
 						error={errors.phone}
 						fullWidth
@@ -165,7 +165,7 @@ export function InvoiceContactInfo({
 						label="Email"
 						name="email"
 						value={email}
-						onChange={(e) => onChange("email", e.target.value)}
+						onChange={(e: { target: { value: string | number; }; }) => onChange("email", e.target.value)}
 						onBlur={() => onBlur("email")}
 						error={errors.email}
 						fullWidth
@@ -177,7 +177,7 @@ export function InvoiceContactInfo({
 						label="Bankovní účet"
 						name="bank_account"
 						value={bankAccount}
-						onChange={(e) => onChange("bank_account", e.target.value)}
+						onChange={(e: { target: { value: string | number; }; }) => onChange("bank_account", e.target.value)}
 						onBlur={() => onBlur("bank_account")}
 						error={errors.bank_account}
 						fullWidth

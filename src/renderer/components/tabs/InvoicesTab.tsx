@@ -13,6 +13,8 @@ function InvoicesTab() {
 
   return (
     <ListTabComponent
+      storageKey="COLUMN_ORDER_INVENTORY"
+      tabKey="invoices"
       data={invoices}
       isLoading={isLoading}
       loadingText="Načítám doklady..."

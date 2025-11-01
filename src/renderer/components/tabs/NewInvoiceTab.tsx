@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Box, Grid, IconButton, Tooltip, Button } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import { InvoiceHeader } from "../invoice/new/InvoiceHeader";
-import { InvoiceContactInfo } from "../invoice/new/InvoiceContactInfo";
-import { InvoiceItemsList } from "../invoice/new/InvoiceItemsList";
+import { InvoiceHeader } from "../invoice/InvoiceHeader";
+import { InvoiceContactInfo } from "../invoice/InvoiceContactInfo";
+import { InvoiceItemsList } from "../invoice/InvoiceItemsList";
 import { FormSection } from "../common/form/FormSection";
 import { ItemPickerDialog } from "../invoice/new/ItemPickerDialog";
 import { ItemAmountPriceDialog } from "../invoice/new/ItemAmountPriceDialog";

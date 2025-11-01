@@ -28,6 +28,8 @@ function InventoryTab() {
 
   return (
     <ListTabComponent
+      storageKey="COLUMN_ORDER_INVENTORY"
+      tabKey="inventory"
       data={items}
       isLoading={isLoading}
       loadingText="Načítám sklad..."

@@ -5,24 +5,25 @@ import {
 	DataTable,
 	Column,
 	ContextMenuAction,
-} from "../../common/table/DataTable";
-import { formatVatRateShort } from "../../../../utils/formattingUtils";
-import type { InvoiceItem } from "../../../../hooks/useInvoiceForm";
+} from "../common/table/DataTable";
+import { formatVatRateShort } from "../../../utils/formattingUtils";
+import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 
 interface InvoiceItemsListProps {
 	items: InvoiceItem[];
 	onEditItem: (item: InvoiceItem) => void;
 	onDeleteItem: (item: InvoiceItem) => void;
+	readOnly?: boolean;
 }
 
 export const invoiceItemColumns: Column[] = [
 	{ id: "ean", label: "EAN", minWidth: 120 },
 	{ id: "name", label: "Název", minWidth: 200 },
-	{ id: "category", label: "Kategorie", minWidth: 120 },
+	// { id: "category", label: "Kategorie", minWidth: 120 },
 	{ id: "amount", label: "Množství", minWidth: 100, align: "right" },
-	{ id: "unit_of_measure", label: "Jednotka", minWidth: 80, align: "center" },
-	{ id: "vat_rate", label: "DPH %", minWidth: 70, align: "right" },
+	// { id: "unit_of_measure", label: "Jednotka", minWidth: 80, align: "center" },
 	{ id: "sale_price", label: "Cena", minWidth: 100, align: "right" },
+	{ id: "vat_rate", label: "DPH %", minWidth: 70, align: "right" },
 	{ id: "total", label: "Celkem", minWidth: 120, align: "right" },
 ];
 
@@ -31,25 +32,29 @@ export function InvoiceItemsList({
 	onEditItem,
 	onDeleteItem,
 	visibleColumnIds = new Set(invoiceItemColumns.map((c) => c.id)),
+	readOnly = false,
 }: InvoiceItemsListProps) {
-	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = [
-		{
-			id: "edit",
-			label: "Upravit množství/cenu",
-			icon: <EditIcon fontSize="small" />,
-			onClick: onEditItem,
-		},
-		{
-			id: "delete",
-			label: "Odebrat z dokladu",
-			icon: <DeleteIcon fontSize="small" />,
-			onClick: onDeleteItem,
-			requireConfirm: true,
-			confirmMessage: (item) =>
-				`Opravdu chcete odebrat "${item.name}" z dokladu?`,
-			divider: true,
-		},
-	];
+	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = readOnly 
+		? [] // No actions in read-only mode
+		: [
+			{
+				id: "edit",
+				label: "Upravit množství/cenu",
+				icon: <EditIcon fontSize="small" />,
+				onClick: onEditItem,
+			},
+			{
+				id: "delete",
+				label: "Odebrat z dokladu",
+				icon: <DeleteIcon fontSize="small" />,
+				onClick: onDeleteItem,
+				requireConfirm: true,
+				confirmMessage: (item) =>
+					`Opravdu chcete odebrat "${item.name}" z dokladu?`,
+				divider: true,
+			},
+		];
+
 
 	const getCellContent = (item: InvoiceItem, columnId: string) => {
 		switch (columnId) {
@@ -79,7 +84,7 @@ export function InvoiceItemsList({
 			disableDrag
 			columns={invoiceItemColumns}
 			data={items}
-			visibleColumnIds={new Set(invoiceItemColumns.map((c) => c.id))}
+			visibleColumnIds={visibleColumnIds}
 			contextMenuActions={contextMenuActions}
 			renderRow={(item, visibleColumns) => (
 				<>

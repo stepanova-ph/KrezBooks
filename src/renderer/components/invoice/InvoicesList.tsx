@@ -1,14 +1,19 @@
 import { TableCell } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { Invoice } from "../../../types/database";
-import { DataTable, Column } from "../common/table/DataTable";
+import { DataTable, Column, ContextMenuAction } from "../common/table/DataTable";
 import type { OrderByConfig } from "../common/filtering/ColumnPickerButton";
+import { useDeleteInvoice } from "../../../hooks/useInvoices";
+import { ViewInvoiceDialog } from "./ViewInvoiceDialog";
+import { AlertDialog } from "../common/dialog/AlertDialog";
+import { useState } from "react";
 
 interface InvoicesListProps {
   invoices: Invoice[];
   visibleColumnIds: Set<string>;
   columnOrder?: string[];
   onColumnOrderChange?: (newOrder: string[]) => void;
-  /** NEW: applied by DataTable for sorting */
   orderBy?: OrderByConfig;
 }
 
@@ -32,9 +37,54 @@ function InvoicesList({
   onColumnOrderChange,
   orderBy,
 }: InvoicesListProps) {
+  const deleteInvoice = useDeleteInvoice();
+  const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null);
+  const [alertDialog, setAlertDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+  } | null>(null);
+
   const handleRowClick = (invoice: Invoice) => {
     console.log("Kliknuto na doklad:", invoice);
   };
+
+  const handleDelete = async (invoice: Invoice) => {
+    try {
+      await deleteInvoice.mutateAsync(invoice.number);
+      setAlertDialog({
+        open: true,
+        title: "Úspěch",
+        message: `Doklad ${invoice.number} byl úspěšně smazán.`,
+      });
+    } catch (error) {
+      console.error("Chyba při mazání dokladu:", error);
+      setAlertDialog({
+        open: true,
+        title: "Chyba",
+        message: `Chyba při mazání dokladu: ${(error as Error).message}`,
+      });
+    }
+  };
+
+  const contextMenuActions: ContextMenuAction<Invoice>[] = [
+    {
+      id: "view",
+      label: "Zobrazit doklad",
+      icon: <VisibilityIcon fontSize="small" />,
+      onClick: (invoice) => setViewingInvoice(invoice),
+    },
+    {
+      id: "delete",
+      label: "Smazat",
+      icon: <DeleteIcon fontSize="small" />,
+      onClick: handleDelete,
+      requireConfirm: true,
+      confirmMessage: (invoice) =>
+        `Opravdu chcete smazat doklad "${invoice.number}"?\n\nTato akce také smaže všechny pohyby skladu související s tímto dokladem.`,
+      divider: true,
+    },
+  ];
 
   const getCellContent = (invoice: Invoice, columnId: string) => {
     switch (columnId) {
@@ -63,35 +113,55 @@ function InvoicesList({
   };
 
   return (
-    <DataTable
-      data={invoices}
-      columns={invoiceColumns}
-      visibleColumnIds={visibleColumnIds}
-      onRowClick={handleRowClick}
-      emptyMessage="Žádné doklady. Klikněte na 'Vytvořit doklad' pro vytvoření nového."
-      columnOrder={columnOrder}
-      onColumnOrderChange={onColumnOrderChange}
-      getRowKey={(invoice) => invoice.number}
-      orderBy={orderBy}
-      getCellContent={getCellContent}
-      renderRow={(invoice, visibleColumns) => (
-        <>
-          {visibleColumns.map((column) => (
-            <TableCell
-              key={column.id}
-              align={column.align}
-              style={{
-                maxWidth: column.maxWidth,
-                minWidth: column.minWidth,
-                width: column.width,
-              }}
-            >
-              {getCellContent(invoice, column.id)}
-            </TableCell>
-          ))}
-        </>
+    <>
+      <DataTable
+        data={invoices}
+        columns={invoiceColumns}
+        visibleColumnIds={visibleColumnIds}
+        onRowClick={handleRowClick}
+        emptyMessage="Žádné doklady. Klikněte na 'Vytvořit doklad' pro vytvoření nového."
+        columnOrder={columnOrder}
+        onColumnOrderChange={onColumnOrderChange}
+        getRowKey={(invoice) => invoice.number}
+        orderBy={orderBy}
+        getCellContent={getCellContent}
+        contextMenuActions={contextMenuActions}
+        renderRow={(invoice, visibleColumns) => (
+          <>
+            {visibleColumns.map((column) => (
+              <TableCell
+                key={column.id}
+                align={column.align}
+                style={{
+                  maxWidth: column.maxWidth,
+                  minWidth: column.minWidth,
+                  width: column.width,
+                }}
+              >
+                {getCellContent(invoice, column.id)}
+              </TableCell>
+            ))}
+          </>
+        )}
+      />
+
+      {viewingInvoice && (
+        <ViewInvoiceDialog
+          open={!!viewingInvoice}
+          onClose={() => setViewingInvoice(null)}
+          invoiceNumber={viewingInvoice.number}
+        />
       )}
-    />
+
+      {alertDialog && (
+        <AlertDialog
+          open={alertDialog.open}
+          title={alertDialog.title}
+          message={alertDialog.message}
+          onConfirm={() => setAlertDialog(null)}
+        />
+      )}
+    </>
   );
 }
 

@@ -14,6 +14,8 @@ function ContactsTab() {
 
   return (
     <ListTabComponent
+      storageKey="COLUMN_ORDER_CONTACTS"
+      tabKey="contacts"
       data={contacts}
       isLoading={isLoading}
       loadingText="Načítám adresář..."

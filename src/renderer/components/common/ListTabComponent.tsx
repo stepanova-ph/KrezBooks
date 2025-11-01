@@ -1,14 +1,16 @@
-import { useState, useRef, useMemo, ReactNode } from "react";
+import { useState, useRef, useMemo, ReactNode, useEffect } from "react";
 import { AppBar, Box } from "@mui/material";
 import { FilterBar, FilterBarRef } from "../common/filtering/FilterBar";
 import { useTableFilters } from "../../../hooks/useTableFilters";
 import { useColumnVisibility } from "../../../hooks/useColumnVisibility";
+import { useTabPersistence } from "../../../context/TabPersistanceContext";
 import { useAutoSearchFocus } from "../../../hooks/keyboard/useAutosearchFocus";
 import { Loading } from "../layout/Loading";
 import type { FilterConfig, FilterState } from "../../../types/filter";
 import type { Column } from "../common/table/DataTable";
 import type { FilterAction } from "../../../types/filter";
 import type { OrderByConfig } from "./filtering/ColumnPickerButton";
+import { ORDER_STORAGE_KEYS } from "../../../utils/storageUtils";
 
 interface ListTabComponentProps<TData, TFilter extends FilterState> {
   data: TData[];
@@ -28,6 +30,8 @@ interface ListTabComponentProps<TData, TFilter extends FilterState> {
     orderBy: OrderByConfig | undefined;
   }) => ReactNode;
   dynamicFilterConfig?: (baseConfig: FilterConfig, data: TData[]) => FilterConfig;
+  storageKey: keyof typeof ORDER_STORAGE_KEYS;
+  tabKey: "contacts" | "invoices" | "inventory";
 }
 
 export function ListTabComponent<TData, TFilter extends FilterState>({
@@ -41,8 +45,13 @@ export function ListTabComponent<TData, TFilter extends FilterState>({
   actions,
   renderList,
   dynamicFilterConfig,
+  storageKey,
+  tabKey,
 }: ListTabComponentProps<TData, TFilter>) {
-  const [filters, setFilters] = useState<TFilter>(initialFilterState);
+  const { getFilterState, setFilterState } = useTabPersistence();
+  const initialFilters = getFilterState(tabKey) || initialFilterState;
+  const [filters, setFilters] = useState<TFilter>(initialFilters);
+
   const [orderBy, setOrderBy] = useState<OrderByConfig | undefined>(undefined);
 
   const {
@@ -50,9 +59,14 @@ export function ListTabComponent<TData, TFilter extends FilterState>({
     columnOrder,
     handleVisibleColumnsChange,
     setColumnOrder,
-  } = useColumnVisibility(defaultVisibleColumns);
+  } = useColumnVisibility(defaultVisibleColumns, storageKey);
 
   const filterBarRef = useRef<FilterBarRef>(null);
+
+  useEffect(() => {
+    setFilterState(tabKey, filters);
+  }, [filters, tabKey, setFilterState]);
+
 
   useAutoSearchFocus({
     filterBarRef: filterBarRef,
