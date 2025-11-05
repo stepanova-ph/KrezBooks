@@ -14,7 +14,7 @@ import {
 	ListItemText,
 	Divider,
 } from "@mui/material";
-import { useState, MouseEvent, useCallback } from "react";
+import { useState, MouseEvent, useMemo } from "react";
 import {
 	DndContext,
 	closestCenter,
@@ -38,6 +38,7 @@ import DraggableHeaderCell from "./DraggableHeaderCell";
 import { useTableControls } from "../../../../context/TableControlsContext";
 import { ConfirmDialog } from "../dialog/ConfirmDialog";
 import type { Column, ContextMenuAction } from "./DataTable";
+import type { OrderByConfig } from "../filtering/ColumnPickerButton";
 
 interface DataTableContentProps<T> {
 	columns: Column[];
@@ -55,6 +56,9 @@ interface DataTableContentProps<T> {
 	onColumnOrderChange?: (newOrder: string[]) => void;
 	onRowClick?: (item: T, index: number) => void;
 	onRowDoubleClick?: (item: T, index: number) => void;
+	orderBy?: OrderByConfig;
+	getCellContent?: (item: T, columnId: string) => any;
+	disableDrag?:true;
 }
 
 export function DataTableContent<T>({
@@ -69,6 +73,9 @@ export function DataTableContent<T>({
 	onColumnOrderChange,
 	onRowClick,
 	onRowDoubleClick,
+	orderBy,
+	getCellContent,
+	disableDrag,
 }: DataTableContentProps<T>) {
 	const controls = useTableControls<T>();
 
@@ -79,6 +86,49 @@ export function DataTableContent<T>({
 				.map((id) => visibleColumns.find((col) => col.id === id))
 				.filter((col): col is Column => col !== undefined)
 		: visibleColumns;
+
+	// Sort data based on orderBy config
+	const sortedData = useMemo(() => {
+		if (!orderBy || !orderBy.columnId) {
+			return data;
+		}
+
+		const sorted = [...data].sort((a, b) => {
+			let aValue: any;
+			let bValue: any;
+
+			if (getCellContent) {
+				aValue = getCellContent(a, orderBy.columnId!);
+				bValue = getCellContent(b, orderBy.columnId!);
+			} else {
+				aValue = (a as any)[orderBy.columnId!];
+				bValue = (b as any)[orderBy.columnId!];
+			}
+
+			// Handle null/undefined
+			if (aValue == null && bValue == null) return 0;
+			if (aValue == null) return 1;
+			if (bValue == null) return -1;
+
+			// Convert to string for comparison
+			const aStr = String(aValue).toLowerCase();
+			const bStr = String(bValue).toLowerCase();
+
+			// Try numeric comparison if both are numbers
+			const aNum = Number(aValue);
+			const bNum = Number(bValue);
+			if (!isNaN(aNum) && !isNaN(bNum)) {
+				return orderBy.order === "asc" ? aNum - bNum : bNum - aNum;
+			}
+
+			// String comparison
+			if (aStr < bStr) return orderBy.order === "asc" ? -1 : 1;
+			if (aStr > bStr) return orderBy.order === "asc" ? 1 : -1;
+			return 0;
+		});
+
+		return sorted;
+	}, [data, orderBy, getCellContent]);
 
 	const [contextMenu, setContextMenu] = useState<{
 		mouseX: number;
@@ -127,6 +177,10 @@ export function DataTableContent<T>({
 	const handleRowClick = (item: T, index: number) => {
 		controls.setFocusedIndex(index);
 		onRowClick?.(item, index);
+	};
+
+	const handleRowDoubleClick = (item: T, index: number) => {
+		onRowDoubleClick?.(item, index);
 	};
 
 	const handleContextMenu = (event: MouseEvent, item: T, index: number) => {
@@ -214,7 +268,7 @@ export function DataTableContent<T>({
 											<DraggableHeaderCell
 												key={column.id}
 												column={column}
-												isDragDisabled={!onColumnOrderChange}
+												disabled={disableDrag}
 											/>
 										))}
 								</SortableContext>
@@ -222,41 +276,44 @@ export function DataTableContent<T>({
 						</TableHead>
 
 						<TableBody>
-							{data.length === 0 ? (
+							{sortedData.length === 0 ? (
 								<TableRow>
 									<TableCell
-										colSpan={orderedColumns.length}
-										align="center"
-										sx={{ border: "none !important" }}
+										colSpan={orderedColumns.filter((col) => !col.hidden).length}
+										sx={{ py: 8 }}
 									>
-										<Typography color="text.secondary" py={4}>
+										<Typography
+											variant="body2"
+											color="text.secondary"
+											align="center"
+										>
 											{emptyMessage}
 										</Typography>
 									</TableCell>
 								</TableRow>
 							) : (
-								data.map((item, index) => {
-									const isFocused = index === controls.focusedIndex;
+								sortedData.map((item, index) => {
+									const key = getRowKey(item);
+									const isFocused = controls.focusedIndex === index;
 
 									return (
 										<TableRow
-											key={getRowKey(item)}
+											key={key}
 											ref={controls.setRowRef(index)}
+											hover
 											onMouseEnter={() => handleRowMouseEnter(index)}
 											onClick={() => handleRowClick(item, index)}
-											onDoubleClick={() => onRowDoubleClick?.(item, index)}
+											onDoubleClick={() => handleRowDoubleClick(item, index)}
 											onContextMenu={(e) => handleContextMenu(e, item, index)}
 											sx={{
-												cursor:
-													contextMenuActions.length > 0 || onRowClick
-														? "pointer"
-														: "default",
-												backgroundColor: isFocused
-													? "rgba(20, 184, 166, 0.15)"
-													: "transparent",
-												transition: "background-color 0.15s ease",
+												cursor: "pointer",
+												bgcolor: isFocused
+													? "action.selected"
+													: "background.paper",
 												"&:hover": {
-													backgroundColor: "rgba(20, 184, 166, 0.15)",
+													bgcolor: isFocused
+														? "action.selected"
+														: "action.hover",
 												},
 											}}
 										>
@@ -281,25 +338,28 @@ export function DataTableContent<T>({
 						: undefined
 				}
 			>
-				{contextMenuActions.map((action, index) => (
-					<Box key={action.id}>
-						{action.divider && index > 0 && <Divider />}
-						<MenuItem onClick={() => handleActionClick(action)}>
-							{action.icon && <ListItemIcon>{action.icon}</ListItemIcon>}
-							<ListItemText>{action.label}</ListItemText>
-						</MenuItem>
-					</Box>
-				))}
+				{contextMenuActions.map((action, index) => {
+					const showDivider = action.divider && index < contextMenuActions.length - 1;
+
+					return (
+						<Box key={action.id}>
+							<MenuItem onClick={() => handleActionClick(action)}>
+								{action.icon && <ListItemIcon>{action.icon}</ListItemIcon>}
+								<ListItemText>{action.label}</ListItemText>
+							</MenuItem>
+							{showDivider && <Divider />}
+						</Box>
+					);
+				})}
 			</Menu>
 
-			{/* Confirmation Dialog */}
+			{/* Confirm Dialog */}
 			<ConfirmDialog
 				open={confirmDialog.open}
 				title="Potvrdit akci"
 				message={getConfirmMessage()}
 				onConfirm={handleConfirmAction}
 				onCancel={handleCancelConfirm}
-				variant="warning"
 			/>
 		</Box>
 	);

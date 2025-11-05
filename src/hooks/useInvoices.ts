@@ -18,7 +18,7 @@ export function useInvoice(number: string) {
 		queryFn: async () => {
 			const result = await window.electronAPI.invoices.getOne(number);
 			if (!result.success) throw new Error(result.error);
-			return result.data as Invoice | undefined;
+			return result.data;
 		},
 		enabled: !!number,
 	});

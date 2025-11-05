@@ -198,11 +198,11 @@ export function ItemAmountPriceDialog({
 						<NumberTextField
 							label={`Množství (${item.unit_of_measure})`}
 							name="amount"
-							type="number"
 							value={amount}
 							onChange={handleAmountChange}
 							precision={0}
 							min={isType5 ? undefined : 0}
+							allowNegative={isType5}
 							fullWidth
 							autoFocus
 						/>

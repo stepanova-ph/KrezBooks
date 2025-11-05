@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Contact, InvoiceType, Item } from "../types/database";
 import { invoiceSchema } from "../validation/invoiceSchema";
+import { useTabPersistence } from "../context/TabPersistanceContext";
 
 export interface InvoiceItem extends Item {
 	amount: number;
@@ -9,7 +10,7 @@ export interface InvoiceItem extends Item {
 	p_group_index: number;
 }
 
-interface InvoiceFormData {
+export interface InvoiceFormData {
 	number: string;
 	type: InvoiceType;
 	payment_method: number | undefined;
@@ -52,10 +53,29 @@ const defaultFormData: InvoiceFormData = {
 };
 
 export function useInvoiceForm() {
-	const [formData, setFormData] = useState<InvoiceFormData>(defaultFormData);
+	const { invoiceFormState, setInvoiceFormState, clearInvoiceFormState } = useTabPersistence();
+
+	const [formData, setFormData] = useState<InvoiceFormData>(
+		invoiceFormState?.formData || defaultFormData
+	);
+	
+	const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>(
+		invoiceFormState?.invoiceItems || []
+	);
+	
+	const [selectedContact, setSelectedContact] = useState<Contact | null>(
+		invoiceFormState?.selectedContact || null
+	);
+	
 	const [errors, setErrors] = useState<Record<string, string>>({});
-	const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
-	const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+
+	useEffect(() => {
+		setInvoiceFormState({
+		formData,
+		invoiceItems,
+		selectedContact,
+		});
+	}, [formData, invoiceItems, selectedContact, setInvoiceFormState]);
 
 	const handleChange = (field: string, value: string | number) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
@@ -97,6 +117,7 @@ export function useInvoiceForm() {
 		setInvoiceItems([]);
 		setSelectedContact(null);
 		setErrors({});
+		clearInvoiceFormState();
 	};
 
 	const handleSelectContact = (contact: Contact) => {

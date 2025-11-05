@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import Database from 'better-sqlite3';
-import { contactQueries } from '../../../src/main/queries/contacts';
-import { serializeContact } from 'src/utils/typeConverterUtils';
-import { PriceGroup } from 'src/types/database';
+import { contactQueries } from '../../main/queries/contacts';
+import { serializeContact } from '../../utils/typeConverterUtils';
+import { PriceGroup } from '../../types/database';
 
 describe('contactQueries', () => {
   let db: Database.Database;

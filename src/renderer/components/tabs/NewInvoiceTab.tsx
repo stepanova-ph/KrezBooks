@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Grid, IconButton, Tooltip, Button } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import { InvoiceHeader } from "../invoice/new/InvoiceHeader";
-import { InvoiceContactInfo } from "../invoice/new/InvoiceContactInfo";
-import { InvoiceItemsList } from "../invoice/new/InvoiceItemsList";
+import { InvoiceHeader } from "../invoice/InvoiceHeader";
+import { InvoiceContactInfo } from "../invoice/InvoiceContactInfo";
+import { InvoiceItemsList } from "../invoice/InvoiceItemsList";
 import { FormSection } from "../common/form/FormSection";
 import { ItemPickerDialog } from "../invoice/new/ItemPickerDialog";
 import { ItemAmountPriceDialog } from "../invoice/new/ItemAmountPriceDialog";
@@ -28,10 +28,10 @@ function NewInvoiceTab() {
     message: string;
   } | null>(null);
 
+
   const isType5 = form.formData.type === 5;
 
   const handleSelectItem = (item: Item) => {
-    // dialogs.itemPicker.closeDialog();
     dialogs.amountPrice.openDialog(item);
   };
 
@@ -84,13 +84,13 @@ function NewInvoiceTab() {
   const handleSubmit = async () => {
     if (!form.handleValidate()) {
       const errorMessages = Object.entries(form.errors)
-        .map(([field, msg]) => `${field}: ${msg}`)
+        .map(([_, msg]) => `${msg}`)
         .join("\n");
 
       setAlertDialog({
         open: true,
         title: "Chyby ve formuláři",
-        message: errorMessages,
+        message: `Opravte chyby ve formuláři: \n${errorMessages}`,
       });
       return;
     }
@@ -162,8 +162,8 @@ function NewInvoiceTab() {
         <Grid item xs={12}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={isType5 ? 12 : 4}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sx={{direction: 'row', alignItems: 'center', px: 10}}>
+              <Grid container spacing={3} px={isType5 ? 60 : 0}>
+                <Grid item xs={12} sx={{direction: 'row', alignItems: 'center'}}>
                   <InvoiceHeader
                     type={form.formData.type}
                     number={form.formData.number}
