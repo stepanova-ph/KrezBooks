@@ -45,13 +45,13 @@ function headerType5({
 
 						onChange={(e: { target: { value: string | number; }; }) => {
               if (onChange) {
-                onChange("date_issue", e.target.value);
+                onChange("type", e.target.value);
               }
             }}
 
 						onBlur={() => {
               if(onBlur) {
-                onBlur("number")
+                onBlur("type")
               }
             }}
 					>
@@ -74,7 +74,7 @@ function headerType5({
 
 						onChange={(e: { target: { value: string | number; }; }) => {
               if (onChange) {
-                onChange("date_issue", e.target.value);
+                onChange("number", e.target.value);
               }
             }}
 
@@ -105,7 +105,7 @@ function headerType5({
 
 						onBlur={() => {
               if(onBlur) {
-                onBlur("number")
+                onBlur("date_issue")
               }
             }}
 					/>
@@ -178,7 +178,7 @@ export function InvoiceHeader({
           />
         </Grid>
 
-        <Grid item xs={4}>
+        <Grid item xs={showDateDue? 4 : 6}>
           <ValidatedTextField
             label="Datum vystavení"
             name="date_issue"
@@ -199,7 +199,7 @@ export function InvoiceHeader({
         </Grid>
 
         {showDateTax && (
-          <Grid item xs={4}>
+          <Grid item xs={showDateDue? 4 : 6}>
             <ValidatedTextField
               label="Datum zdanitelného plnění"
               name="date_tax"

@@ -141,12 +141,14 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 
         case "checkbox": {
           const canUncheck = validateRequiredGroup(filter.id, false);
+          const checked = !!filters[filter.id];
           return (
             <FormControlLabel
+              sx={{color: (theme) => checked? theme.palette.primary.main : theme.palette.text.secondary}}
               key={filter.id}
               control={
                 <KeyboardCheckbox
-                  checked={!!filters[filter.id]}
+                  checked={checked}
                   onChange={(e) => {
                     if (!e.target.checked && !canUncheck) return;
                     updateFilter(filter.id, e.target.checked);

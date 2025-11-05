@@ -3,6 +3,7 @@ import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import react from 'eslint-plugin-react';
 import prettier from 'eslint-config-prettier';
+import globals from 'globals';
 
 export default [
   js.configs.recommended,
@@ -32,6 +33,10 @@ export default [
         version: 'detect',
       },
     },
+    globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
   },
   prettier,
 ];
