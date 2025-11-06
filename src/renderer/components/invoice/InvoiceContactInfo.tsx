@@ -5,6 +5,8 @@ import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import type { InvoiceType } from "../../../types/database";
 
 interface InvoiceContactInfoProps {
+	disabled?: true;
+	hideContactPicker?: true;
 	type: InvoiceType;
 	ico: string;
 	modifier: number | undefined;
@@ -23,6 +25,8 @@ interface InvoiceContactInfoProps {
 }
 
 export function InvoiceContactInfo({
+	hideContactPicker,
+	disabled,
 	type,
 	ico,
 	modifier,
@@ -46,15 +50,17 @@ export function InvoiceContactInfo({
 			hideDivider
 			title="Kontaktní informace"
 			actions={
-				<Tooltip title="Vybrat z adresáře">
-					<IconButton
-						size="small"
-						onClick={onOpenContactPicker}
-						color="primary"
-					>
-						<PersonSearchIcon />
-					</IconButton>
-				</Tooltip>
+				!hideContactPicker ? (  // Add this condition
+					<Tooltip title="Vybrat z adresáře">
+						<IconButton
+							size="small"
+							onClick={onOpenContactPicker}
+							color="primary"
+						>
+							<PersonSearchIcon />
+						</IconButton>
+					</Tooltip>
+				) : undefined
 			}
 		>
 			<Grid container spacing={2}>
@@ -67,6 +73,7 @@ export function InvoiceContactInfo({
 						onBlur={() => onBlur("ico")}
 						error={errors.ico}
 						required={requiresContactInfo}
+						disabled={disabled}
 						fullWidth
 					/>
 				</Grid>
@@ -83,6 +90,7 @@ export function InvoiceContactInfo({
 						onBlur={() => onBlur("modifier")}
 						error={errors.modifier}
 						required={requiresContactInfo}
+						disabled={disabled}
 						fullWidth
 					/>
 				</Grid>
@@ -95,6 +103,7 @@ export function InvoiceContactInfo({
 						onChange={(e: { target: { value: string | number; }; }) => onChange("dic", e.target.value)}
 						onBlur={() => onBlur("dic")}
 						error={errors.dic}
+						disabled={disabled}
 						fullWidth
 					/>
 				</Grid>
@@ -108,6 +117,7 @@ export function InvoiceContactInfo({
 						onBlur={() => onBlur("company_name")}
 						error={errors.company_name}
 						required={requiresContactInfo}
+						disabled={disabled}
 						fullWidth
 					/>
 				</Grid>
@@ -120,6 +130,7 @@ export function InvoiceContactInfo({
 						onChange={(e: { target: { value: string | number; }; }) => onChange("street", e.target.value)}
 						onBlur={() => onBlur("street")}
 						error={errors.street}
+						disabled={disabled}
 						fullWidth
 					/>
 				</Grid>
@@ -132,6 +143,7 @@ export function InvoiceContactInfo({
 						onChange={(e: { target: { value: string | number; }; }) => onChange("city", e.target.value)}
 						onBlur={() => onBlur("city")}
 						error={errors.city}
+						disabled={disabled}
 						fullWidth
 					/>
 				</Grid>
@@ -144,6 +156,7 @@ export function InvoiceContactInfo({
 						onChange={(e: { target: { value: string | number; }; }) => onChange("postal_code", e.target.value)}
 						onBlur={() => onBlur("postal_code")}
 						error={errors.postal_code}
+						disabled={disabled}
 						fullWidth
 					/>
 				</Grid>
@@ -156,6 +169,7 @@ export function InvoiceContactInfo({
 						onChange={(e: { target: { value: string | number; }; }) => onChange("phone", e.target.value)}
 						onBlur={() => onBlur("phone")}
 						error={errors.phone}
+						disabled={disabled}
 						fullWidth
 					/>
 				</Grid>
@@ -168,6 +182,7 @@ export function InvoiceContactInfo({
 						onChange={(e: { target: { value: string | number; }; }) => onChange("email", e.target.value)}
 						onBlur={() => onBlur("email")}
 						error={errors.email}
+						disabled={disabled}
 						fullWidth
 					/>
 				</Grid>
@@ -180,6 +195,7 @@ export function InvoiceContactInfo({
 						onChange={(e: { target: { value: string | number; }; }) => onChange("bank_account", e.target.value)}
 						onBlur={() => onBlur("bank_account")}
 						error={errors.bank_account}
+						disabled={disabled}
 						fullWidth
 					/>
 				</Grid>

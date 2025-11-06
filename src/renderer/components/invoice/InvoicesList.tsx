@@ -46,7 +46,7 @@ function InvoicesList({
   } | null>(null);
 
   const handleRowClick = (invoice: Invoice) => {
-    console.log("Kliknuto na doklad:", invoice);
+    setViewingInvoice(invoice)
   };
 
   const handleDelete = async (invoice: Invoice) => {

@@ -73,7 +73,7 @@ export function ViewInvoiceDialog({ open, onClose, invoiceNumber }: ViewInvoiceD
                     errors={{}}
                     onChange={() => {}}
                     onBlur={() => {}}
-                    disabled={true}
+                    disabled
                   />
                 </Grid>
 
@@ -95,7 +95,8 @@ export function ViewInvoiceDialog({ open, onClose, invoiceNumber }: ViewInvoiceD
                       onChange={() => {}}
                       onBlur={() => {}}
                       onOpenContactPicker={() => {}}
-                      disabled={true}
+                      disabled
+                      hideContactPicker
                     />
                   </Grid>
                 )}
