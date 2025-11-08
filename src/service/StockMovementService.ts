@@ -153,4 +153,25 @@ export class StockMovementService {
 	const result = statement.get(itemEan) as { last_price: number } | undefined;
 	return result?.last_price || 0;
 	}
+
+	async getTotalByItemEanAndInvoiceNumber(itemEan: string, invoiceNumber: string): Promise<number> {
+		const db = getDatabase();
+		const statement = db.prepare(stockMovementQueries.getTotalbyItemEanAndInvoiceNumber);
+		const result = statement.get(itemEan, invoiceNumber) as { total_amount: number } | undefined;
+		return result?.total_amount || 0;
+	}
+
+	async getTotalByInvoiceNumber(invoiceNumber: string): Promise<number> {
+		const db = getDatabase();
+		const statement = db.prepare(stockMovementQueries.getTotalByInvoiceNumber);
+		const result = statement.get(invoiceNumber) as { total_amount: number } | undefined;
+		return result?.total_amount || 0;
+	}
+
+	async getTotalByInvoiceNumberVat(invoiceNumber: string): Promise<number> {
+		const db = getDatabase();
+		const statement = db.prepare(stockMovementQueries.getTotalByInvoiceNumberVat);
+		const result = statement.get(invoiceNumber) as { total_with_vat: number } | undefined;
+		return result?.total_with_vat || 0;
+	}
 }

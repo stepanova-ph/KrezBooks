@@ -95,6 +95,12 @@ declare global {
 				deleteByInvoice: (
 					invoiceNumber: string,
 				) => Promise<IPCResponse<{ changes: number }>>;
+				getTotalByItemEanAndInvoiceNumber: (
+					ean: string, 
+					invoiceNumber: string)
+				 => Promise<IpcResponse<number>>;
+				 getTotalByInvoiceNumber: (invoiceNumber: string) => Promise<IpcResponse<number>>;
+				 getTotalByInvoiceNumberVat: (invoiceNumber: string) => Promise<IpcResponse<number>>;
 			};
 
 			invoices: {
@@ -113,6 +119,7 @@ declare global {
 				) => Promise<IpcResponse<StockMoveent[]>>;
 				getAverageBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
 				getLastBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
+				
 			};
 		};
 	}

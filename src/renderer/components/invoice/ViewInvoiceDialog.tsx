@@ -9,6 +9,7 @@ import { InvoiceContactInfo } from "./InvoiceContactInfo";
 import { InvoiceItemsList } from "./InvoiceItemsList";
 import { Loading } from "../layout/Loading";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
+import { calculateTotalWithoutVat, calculateTotalWithVat } from "../../../utils/formUtils";
 
 interface ViewInvoiceDialogProps {
   open: boolean;
@@ -44,17 +45,6 @@ export function ViewInvoiceDialog({ open, onClose, invoiceNumber }: ViewInvoiceD
       sale_price_group4: item?.sale_price_group4 || 0,
     };
   });
-
-  const calculateTotalWithoutVat = () => {
-    return invoiceItems.reduce((sum, item) => sum + item.total, 0);
-  };
-
-  const calculateTotalWithVat = () => {
-    return invoiceItems.reduce((sum, item) => {
-      const totalWithVat = item.total * (1 + item.vat_rate / 100);
-      return sum + totalWithVat;
-    }, 0);
-  };
 
   if (!invoice) return null;
 
@@ -169,7 +159,7 @@ export function ViewInvoiceDialog({ open, onClose, invoiceNumber }: ViewInvoiceD
                     Celkem bez DPH:
                   </Typography>
                   <Typography variant="h6" fontWeight={700}>
-                    {calculateTotalWithoutVat().toFixed(2)} Kč
+                    {calculateTotalWithoutVat(invoiceItems).toFixed(2)} Kč
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -177,7 +167,7 @@ export function ViewInvoiceDialog({ open, onClose, invoiceNumber }: ViewInvoiceD
                     Celkem s DPH:
                   </Typography>
                   <Typography variant="h6" fontWeight={700} color="primary.main">
-                    {calculateTotalWithVat().toFixed(2)} Kč
+                    {calculateTotalWithVat(invoiceItems).toFixed(2)} Kč
                   </Typography>
                 </Box>
               </Box>

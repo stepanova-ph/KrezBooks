@@ -15,6 +15,7 @@ import { useCreateInvoice } from "../../../hooks/useInvoices";
 import { useCreateStockMovement } from "../../../hooks/useStockMovement";
 import type { Item, Contact } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
+import { calculateTotalWithoutVat, calculateTotalWithVat } from "../../../utils/formUtils";
 
 function NewInvoiceTab() {
   const form = useInvoiceForm();
@@ -56,17 +57,6 @@ function NewInvoiceTab() {
       p_group_index: item.p_group_index,
       index,
     });
-  };
-
-  const calculateTotalWithoutVat = () => {
-    return form.invoiceItems.reduce((sum, item) => sum + item.total, 0);
-  };
-
-  const calculateTotalWithVat = () => {
-    return form.invoiceItems.reduce((sum, item) => {
-      const totalWithVat = item.total * (1 + item.vat_rate / 100);
-      return sum + totalWithVat;
-    }, 0);
   };
 
   const handleConfirmAmountPrice = (
@@ -240,7 +230,7 @@ function NewInvoiceTab() {
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Header for Type 5 */}
         {isType5 && (
-          <Box sx={{ p: 3, pb: 2 }}>
+          <Box sx={{ p: 4, px: 105, pb: 2 }}>
             <InvoiceHeader
               type={form.formData.type}
               number={form.formData.number}
@@ -257,7 +247,7 @@ function NewInvoiceTab() {
         )}
 
         {/* Items Table - Stretches to fill space */}
-        <Box sx={{ flex: 1, minHeight: 0, p: 3, pt: isType5 ? 2 : 3, display: 'flex', flexDirection: 'column', overflowY: 'scroll'  }}>
+        <Box sx={{ flex: 1, minHeight: 0, p: 3, px: isType5 ? 40 : 3, pt: isType5 ? 2 : 3, display: 'flex', flexDirection: 'column', overflowY: 'scroll'  }}>
           <FormSection
             hideDivider
             title="Položky dokladu"
@@ -301,7 +291,7 @@ function NewInvoiceTab() {
                 Celkem bez DPH:
               </Typography>
               <Typography variant="h6" fontWeight={700}>
-                {calculateTotalWithoutVat().toFixed(2)} Kč
+                {calculateTotalWithoutVat(form.invoiceItems).toFixed(2)} Kč
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -309,7 +299,7 @@ function NewInvoiceTab() {
                 Celkem s DPH:
               </Typography>
               <Typography variant="h6" fontWeight={700} color="primary.main">
-                {calculateTotalWithVat().toFixed(2)} Kč
+                {calculateTotalWithVat(form.invoiceItems).toFixed(2)} Kč
               </Typography>
             </Box>
           </Box>

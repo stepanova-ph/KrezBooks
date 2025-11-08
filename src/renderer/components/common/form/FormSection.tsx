@@ -8,8 +8,8 @@ interface FormSectionProps {
 	actions?: React.ReactNode;
 	hideDivider?: boolean;
 	direction?: "row" | "column";
-	mb?: number;
-	my?: number;
+	mb?: number | string;
+	my?: number | string;
 }
 
 export function FormSection({
@@ -20,6 +20,7 @@ export function FormSection({
 	hideDivider = false,
 	direction = "column",
 	my = undefined,
+	
 }: FormSectionProps) {
 	const showHeader = !!title || !!actions;
 

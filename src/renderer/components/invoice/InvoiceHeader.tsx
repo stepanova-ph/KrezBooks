@@ -35,7 +35,7 @@ function headerType5({
 	return (
 		<FormSection title="Hlavička" my={2}>
 			<Grid container spacing={2}>
-				<Grid item xs={4}>
+				<Grid item xs={4.5}>
 					<ValidatedTextField
             select
 						required
@@ -66,7 +66,7 @@ function headerType5({
 					</ValidatedTextField>
 				</Grid>
 
-				<Grid item xs={5}>
+				<Grid item xs={4}>
 					<ValidatedTextField
             required
 						fullWidth
@@ -90,7 +90,7 @@ function headerType5({
 					/>
 				</Grid>
 
-				<Grid item xs={3}>
+				<Grid item xs={3.5}>
 					<ValidatedTextField
             required
 						fullWidth
@@ -160,7 +160,7 @@ export function InvoiceHeader({
             fullWidth
             sx={{
               ".MuiInputBase-input": {
-                fontSize: showDateTax ? "0.78rem" : undefined,
+                // fontSize: showDateTax ? "0.78rem" : undefined,
               },
             }}
           >

@@ -8,6 +8,7 @@ import { useDeleteInvoice } from "../../../hooks/useInvoices";
 import { ViewInvoiceDialog } from "./ViewInvoiceDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { useState } from "react";
+import { useTotalByInvoiceNumberVat } from "../../../hooks/useStockMovement";
 
 interface InvoicesListProps {
   invoices: Invoice[];
@@ -104,9 +105,12 @@ function InvoicesList({
         return invoice.date_issue;
       case "company_name":
         return invoice.company_name || "-";
-      case "total":
-        // TODO: Calculate total from invoice items
-        return "0.00 Kč";
+      case "total": {
+        const { data, isLoading } = useTotalByInvoiceNumberVat(invoice.number);
+        if (isLoading) return "...";
+        return data?.toFixed(2) || "0.00";
+      }
+
       default:
         return "";
     }

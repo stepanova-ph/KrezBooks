@@ -209,6 +209,36 @@ export function registerIpcHandlers() {
 		},
 	);
 
+	ipcMain.handle(
+		"db:stockMovements:getTotalByItemEanAndInvoiceNumber",
+		async (_event, itemEan: string, invoiceNumber: string) => {
+			return handleIpcRequest(() =>
+				stockMovementService.getTotalbyItemEanAndInvoiceNumber(
+					itemEan,
+					invoiceNumber,
+				),
+			);
+		},
+	)
+
+	ipcMain.handle(
+		"db:stockMovements:getTotalByInvoiceNumber",
+		async (_event, invoiceNumber: string) => {
+			return handleIpcRequest(() =>
+				stockMovementService.getTotalByInvoiceNumber(invoiceNumber),
+			);
+		},
+	);
+
+	ipcMain.handle(
+		"db:stockMovements:getTotalByInvoiceNumberVat",
+		async (_event, invoiceNumber: string) => {
+			return handleIpcRequest(() =>
+				stockMovementService.getTotalByInvoiceNumberVat(invoiceNumber),
+			);
+		},
+	)
+
 	// --------------------------------------------------------------------------
 	// INVOICES HANDLERS
 	// --------------------------------------------------------------------------
