@@ -2,12 +2,15 @@ import { describe, it, expect, beforeEach } from "vitest";
 import Database from "better-sqlite3";
 import { invoiceQueries } from "../../main/queries/invoices";
 import { serializeInvoice } from "../../utils/typeConverterUtils";
+import { itemQueries, stockMovementQueries } from "../../main/queries";
 
 describe("invoiceQueries", () => {
 	let db: Database.Database;
 
 	beforeEach(() => {
 		db = new Database(":memory:");
+		db.exec(itemQueries.createTable);
+		db.exec(stockMovementQueries.createTable);
 		db.exec(invoiceQueries.createTable);
 	});
 
