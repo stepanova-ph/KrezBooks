@@ -45,8 +45,6 @@ function App() {
 						{renderPage()}
 					</AppLayout>
 				</TabPersistenceProvider>
-				{/* Dev tools - remove in production */}
-				<ReactQueryDevtools initialIsOpen={false} />
 			</ThemeProvider>
 		</QueryClientProvider>
 	);

@@ -92,27 +92,4 @@ export const stockMovementQueries = {
     ) as last_price
   `,
 
-  getTotalByItemEanAndInvoiceNumber: `
-    SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) as total_amount
-    FROM stock_movements
-    WHERE item_ean = ? AND invoice_number = ?
-  `,
-
-  getTotalByInvoiceNumber: `
-  SELECT COALESCE(
-    SUM(CAST(amount AS REAL) * CAST(price_per_unit AS REAL)),
-    0
-  ) as total
-  FROM stock_movements
-  WHERE invoice_number = ?
-`,
-
-getTotalByInvoiceNumberVat: `
-  SELECT COALESCE(
-    SUM(CAST(amount AS REAL) * CAST(price_per_unit AS REAL) * (1 + CAST(vat_rate AS REAL) / 100)),
-    0
-  ) as total_with_vat
-  FROM stock_movements
-  WHERE invoice_number = ?
-`,
 };

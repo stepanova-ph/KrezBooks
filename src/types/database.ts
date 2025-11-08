@@ -33,6 +33,10 @@ export interface Contact {
 	email?: string;
 	website?: string;
 	bank_account?: string;
+
+	total_without_vat?: number;
+	total_with_vat?: number;
+	
 	created_at?: string;
 	updated_at?: string;
 }

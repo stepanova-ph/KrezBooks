@@ -105,11 +105,8 @@ function InvoicesList({
         return invoice.date_issue;
       case "company_name":
         return invoice.company_name || "-";
-      case "total": {
-        const { data, isLoading } = useTotalByInvoiceNumberVat(invoice.number);
-        if (isLoading) return "...";
-        return data?.toFixed(2) || "0.00";
-      }
+        case "total":
+          return (invoice.total_with_vat?.toFixed(2) || "0.00") + " Kč";
 
       default:
         return "";
