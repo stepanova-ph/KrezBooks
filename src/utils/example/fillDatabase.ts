@@ -1,9 +1,14 @@
-import type Database from 'better-sqlite3';
-import { exampleContacts } from './contacts';
-import { exampleItems } from './items';
-import { exampleInvoices } from './invoices';
-import { contactQueries, invoiceQueries, itemQueries, stockMovementQueries } from '../../main/queries';
-import { exampleStockMovements } from './stockMovements';
+import type Database from "better-sqlite3";
+import { exampleContacts } from "./contacts";
+import { exampleItems } from "./items";
+import { exampleInvoices } from "./invoices";
+import {
+	contactQueries,
+	invoiceQueries,
+	itemQueries,
+	stockMovementQueries,
+} from "../../main/queries";
+import { exampleStockMovements } from "./stockMovements";
 // import { exampleInvoices } from './invoices';
 // import { exampleStockMovements } from './stockMovements';
 
@@ -76,53 +81,55 @@ export function fillTestData(db: Database.Database): FillResult {
 		}
 	}
 
-    const insertInvoice = db.prepare(invoiceQueries.create)
+	const insertInvoice = db.prepare(invoiceQueries.create);
 
-    for (const invoice of exampleInvoices) {
-        try {
-            insertInvoice.run({
-                number: invoice.number,
-                type: invoice.type,
-                payment_method: invoice.payment_method,
-                date_issue: invoice.date_issue,
-                date_tax: invoice.date_tax,
-                date_due: invoice.date_due,
-                variable_symbol: invoice.variable_symbol,
-                note: invoice.note,
+	for (const invoice of exampleInvoices) {
+		try {
+			insertInvoice.run({
+				number: invoice.number,
+				type: invoice.type,
+				payment_method: invoice.payment_method,
+				date_issue: invoice.date_issue,
+				date_tax: invoice.date_tax,
+				date_due: invoice.date_due,
+				variable_symbol: invoice.variable_symbol,
+				note: invoice.note,
 
-                ico: invoice.ico,
-                modifier: invoice.modifier,
-                dic: invoice.dic,
-                company_name: invoice.company_name,
-                bank_account: invoice.bank_account,
-                street: invoice.street,
-                city: invoice.city,
-                postal_code: invoice.postal_code,
-                phone: invoice.phone,
-                email: invoice.email,
-            })
-            invoicesAdded++;
-        } catch (error: any) {
-            errors.push(`Invoice ${invoice.number}: ${error.message}`);
-        }
-    }
+				ico: invoice.ico,
+				modifier: invoice.modifier,
+				dic: invoice.dic,
+				company_name: invoice.company_name,
+				bank_account: invoice.bank_account,
+				street: invoice.street,
+				city: invoice.city,
+				postal_code: invoice.postal_code,
+				phone: invoice.phone,
+				email: invoice.email,
+			});
+			invoicesAdded++;
+		} catch (error: any) {
+			errors.push(`Invoice ${invoice.number}: ${error.message}`);
+		}
+	}
 
-    const insertStockMovement = db.prepare(stockMovementQueries.create)
+	const insertStockMovement = db.prepare(stockMovementQueries.create);
 
-    for (const movement of exampleStockMovements) {
-        try {
-            insertStockMovement.run({
-                invoice_number: movement.invoice_number,
-                item_ean: movement.item_ean,
-                amount: movement.amount,
-                price_per_unit: movement.price_per_unit,
-                vat_rate: movement.vat_rate,
-            })
-            stockMovementsAdded++;
-        } catch (error: any) {
-            errors.push(`Stock movement ${movement.invoice_number}: ${error.message}`);
-        }
-    }
+	for (const movement of exampleStockMovements) {
+		try {
+			insertStockMovement.run({
+				invoice_number: movement.invoice_number,
+				item_ean: movement.item_ean,
+				amount: movement.amount,
+				price_per_unit: movement.price_per_unit,
+				vat_rate: movement.vat_rate,
+			});
+			stockMovementsAdded++;
+		} catch (error: any) {
+			errors.push(
+				`Stock movement ${movement.invoice_number}: ${error.message}`,
+			);
+		}
+	}
 
 	return {
 		contactsAdded,

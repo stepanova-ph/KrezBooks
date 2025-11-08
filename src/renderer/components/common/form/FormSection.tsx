@@ -20,7 +20,6 @@ export function FormSection({
 	hideDivider = false,
 	direction = "column",
 	my = undefined,
-	
 }: FormSectionProps) {
 	const showHeader = !!title || !!actions;
 

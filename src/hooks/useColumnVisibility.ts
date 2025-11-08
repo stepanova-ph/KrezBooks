@@ -1,7 +1,10 @@
 import { useState, useCallback, useEffect } from "react";
 import { storage, ORDER_STORAGE_KEYS } from "../utils/storageUtils";
 
-export function useColumnVisibility(defaultColumns: string[], storageKey: keyof typeof ORDER_STORAGE_KEYS) {
+export function useColumnVisibility(
+	defaultColumns: string[],
+	storageKey: keyof typeof ORDER_STORAGE_KEYS,
+) {
 	// load columnOrder on mount
 	const getInitialColumnOrder = () => {
 		const stored = storage.get<string[]>(ORDER_STORAGE_KEYS[storageKey]);
@@ -16,7 +19,9 @@ export function useColumnVisibility(defaultColumns: string[], storageKey: keyof 
 	const [visibleColumnIds, setVisibleColumnIds] = useState<Set<string>>(
 		new Set(defaultColumns),
 	);
-	const [columnOrder, setColumnOrder] = useState<string[]>(getInitialColumnOrder);
+	const [columnOrder, setColumnOrder] = useState<string[]>(
+		getInitialColumnOrder,
+	);
 
 	// save columnOrder when it changes
 	useEffect(() => {

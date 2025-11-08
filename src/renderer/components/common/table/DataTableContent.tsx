@@ -58,7 +58,7 @@ interface DataTableContentProps<T> {
 	onRowDoubleClick?: (item: T, index: number) => void;
 	orderBy?: OrderByConfig;
 	getCellContent?: (item: T, columnId: string) => any;
-	disableDrag?:true;
+	disableDrag?: true;
 }
 
 export function DataTableContent<T>({
@@ -309,7 +309,12 @@ export function DataTableContent<T>({
 											onDoubleClick={() => handleRowDoubleClick(item, index)}
 											onContextMenu={(e) => handleContextMenu(e, item, index)}
 											sx={{
-												cursor: contextMenuActions.length > 0 || onRowClick || onRowDoubleClick ? "pointer" : "default",
+												cursor:
+													contextMenuActions.length > 0 ||
+													onRowClick ||
+													onRowDoubleClick
+														? "pointer"
+														: "default",
 												bgcolor: isFocused
 													? "action.selected"
 													: "background.paper",
@@ -342,7 +347,8 @@ export function DataTableContent<T>({
 				}
 			>
 				{contextMenuActions.map((action, index) => {
-					const showDivider = action.divider && index < contextMenuActions.length - 1;
+					const showDivider =
+						action.divider && index < contextMenuActions.length - 1;
 
 					return (
 						<Box key={action.id}>

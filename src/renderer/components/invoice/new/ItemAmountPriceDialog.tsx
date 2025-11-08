@@ -85,7 +85,7 @@ export function ItemAmountPriceDialog({
 	useEffect(() => {
 		if (open && item) {
 			setAmount(initialAmount ?? 1);
-			console.log(amount) // its 2 here
+			console.log(amount); // its 2 here
 
 			if (isType5) {
 				setSelectedPrice("custom");

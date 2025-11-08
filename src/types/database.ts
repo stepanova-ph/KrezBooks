@@ -6,7 +6,7 @@ import {
 	PAYMENT_METHOD_TYPES,
 } from "src/config/constants";
 
-export type VatRate = (typeof VAT_RATES)[number]['value'];  // → 0 | 1 | 2
+export type VatRate = (typeof VAT_RATES)[number]["value"]; // → 0 | 1 | 2
 
 export type PriceGroup = (typeof PRICE_GROUPS)[number];
 
@@ -36,7 +36,7 @@ export interface Contact {
 
 	total_without_vat?: number;
 	total_with_vat?: number;
-	
+
 	created_at?: string;
 	updated_at?: string;
 }

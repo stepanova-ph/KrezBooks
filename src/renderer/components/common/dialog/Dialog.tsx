@@ -41,7 +41,7 @@ export function Dialog({
 	maxWidth = "sm",
 	fullWidth = true,
 	onSubmit,
-	noCloseButton
+	noCloseButton,
 }: DialogProps) {
 	const theme = useTheme();
 
@@ -81,11 +81,13 @@ export function Dialog({
 				}}
 			>
 				<Box sx={{ fontWeight: 600, fontSize: "1rem" }}>{title}</Box>
-				{!noCloseButton && <WindowButton
-					type="close"
-					onClick={onClose}
-					hoverBackgroundColor={theme.palette.error.main}
-				/>}
+				{!noCloseButton && (
+					<WindowButton
+						type="close"
+						onClick={onClose}
+						hoverBackgroundColor={theme.palette.error.main}
+					/>
+				)}
 			</Box>
 
 			<Divider sx={{ borderColor: theme.palette.divider }} />

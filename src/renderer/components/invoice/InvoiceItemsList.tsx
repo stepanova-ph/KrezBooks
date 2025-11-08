@@ -36,27 +36,26 @@ export function InvoiceItemsList({
 	readOnly = false,
 	maxHeight,
 }: InvoiceItemsListProps) {
-	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = readOnly 
+	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = readOnly
 		? [] // No actions in read-only mode
 		: [
-			{
-				id: "edit",
-				label: "Upravit množství/cenu",
-				icon: <EditIcon fontSize="small" />,
-				onClick: onEditItem,
-			},
-			{
-				id: "delete",
-				label: "Odebrat z dokladu",
-				icon: <DeleteIcon fontSize="small" />,
-				onClick: onDeleteItem,
-				requireConfirm: true,
-				confirmMessage: (item) =>
-					`Opravdu chcete odebrat "${item.name}" z dokladu?`,
-				divider: true,
-			},
-		];
-
+				{
+					id: "edit",
+					label: "Upravit množství/cenu",
+					icon: <EditIcon fontSize="small" />,
+					onClick: onEditItem,
+				},
+				{
+					id: "delete",
+					label: "Odebrat z dokladu",
+					icon: <DeleteIcon fontSize="small" />,
+					onClick: onDeleteItem,
+					requireConfirm: true,
+					confirmMessage: (item) =>
+						`Opravdu chcete odebrat "${item.name}" z dokladu?`,
+					divider: true,
+				},
+			];
 
 	const getCellContent = (item: InvoiceItem, columnId: string) => {
 		switch (columnId) {
@@ -112,11 +111,7 @@ export function InvoiceItemsList({
 	);
 
 	if (maxHeight) {
-		return (
-			<Box sx={{ maxHeight, overflow: 'auto' }}>
-				{content}
-			</Box>
-		);
+		return <Box sx={{ maxHeight, overflow: "auto" }}>{content}</Box>;
 	}
 
 	return content;

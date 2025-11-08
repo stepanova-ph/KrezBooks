@@ -113,7 +113,6 @@ declare global {
 				) => Promise<IpcResponse<StockMoveent[]>>;
 				getAverageBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
 				getLastBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
-				
 			};
 		};
 	}

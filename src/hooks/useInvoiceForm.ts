@@ -53,27 +53,28 @@ const defaultFormData: InvoiceFormData = {
 };
 
 export function useInvoiceForm() {
-	const { invoiceFormState, setInvoiceFormState, clearInvoiceFormState } = useTabPersistence();
+	const { invoiceFormState, setInvoiceFormState, clearInvoiceFormState } =
+		useTabPersistence();
 
 	const [formData, setFormData] = useState<InvoiceFormData>(
-		invoiceFormState?.formData || defaultFormData
+		invoiceFormState?.formData || defaultFormData,
 	);
-	
+
 	const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>(
-		invoiceFormState?.invoiceItems || []
+		invoiceFormState?.invoiceItems || [],
 	);
-	
+
 	const [selectedContact, setSelectedContact] = useState<Contact | null>(
-		invoiceFormState?.selectedContact || null
+		invoiceFormState?.selectedContact || null,
 	);
-	
+
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
 	useEffect(() => {
 		setInvoiceFormState({
-		formData,
-		invoiceItems,
-		selectedContact,
+			formData,
+			invoiceItems,
+			selectedContact,
 		});
 	}, [formData, invoiceItems, selectedContact, setInvoiceFormState]);
 

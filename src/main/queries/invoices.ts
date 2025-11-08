@@ -26,7 +26,7 @@ export const invoiceQueries = {
     )
   `,
 
-  getAll: `
+	getAll: `
     SELECT 
       i.*,
       COALESCE(

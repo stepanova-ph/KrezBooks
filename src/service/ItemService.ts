@@ -82,7 +82,7 @@ export class ItemService {
 		if (result.changes === 0) {
 			throw new Error("Item not found");
 		}
-		
+
 		return { changes: result.changes };
 	}
 

@@ -11,7 +11,7 @@ export function useGlobalShortcuts(onPageChange: (page: AppPage) => void) {
 			F2: () => onPageChange("novy_doklad"),
 			F3: () => onPageChange("adresar"),
 			F4: () => onPageChange("sklad"),
-			'F5': () => onPageChange('doklady'),
+			F5: () => onPageChange("doklady"),
 			// 'F6': () => onPageChange(''),
 		},
 		{

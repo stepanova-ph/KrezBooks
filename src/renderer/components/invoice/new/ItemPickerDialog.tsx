@@ -43,10 +43,7 @@ export function ItemPickerDialog({
 		itemPickerFilterConfig,
 	);
 
-	const renderRow = (
-		item: Item,
-		visibleColumns: Column[],
-	) => {
+	const renderRow = (item: Item, visibleColumns: Column[]) => {
 		const isSelected = selectedItemEans?.has(item.ean) || false;
 		return visibleColumns.map((col) => {
 			let content;
@@ -71,15 +68,15 @@ export function ItemPickerDialog({
 			}
 
 			return (
-				<TableCell 
-				key={col.id} 
-				align={col.align}
-				sx={{
-					bgcolor: isSelected ? 'action.selected' : undefined,
-					fontWeight: isSelected ? 'bold' : undefined,
-				}}
+				<TableCell
+					key={col.id}
+					align={col.align}
+					sx={{
+						bgcolor: isSelected ? "action.selected" : undefined,
+						fontWeight: isSelected ? "bold" : undefined,
+					}}
 				>
-				{content}
+					{content}
 				</TableCell>
 			);
 		});

@@ -40,7 +40,7 @@ function DraggableHeaderCell({ column, disabled }: DraggableHeaderCellProps) {
 		>
 			<Box
 				sx={{
-					pr: column.align === "right" ? disabled ? 0 : "24px" : 0,
+					pr: column.align === "right" ? (disabled ? 0 : "24px") : 0,
 					overflow: "hidden",
 					whiteSpace: "nowrap",
 					textOverflow: "ellipsis",
@@ -52,26 +52,28 @@ function DraggableHeaderCell({ column, disabled }: DraggableHeaderCellProps) {
 				{column.label}
 			</Box>
 
-			{!disabled && <Box
-				{...listeners}
-				sx={{
-					position: "absolute",
-					right: 4,
-					top: "50%",
-					transform: "translateY(-50%)",
-					cursor: "grab",
-					lineHeight: 0,
-					display: "flex",
-					alignItems: "center",
-					"&:active": { cursor: "grabbing" },
-					"&:hover": { color: "primary.main" },
-					color: "text.disabled",
-					p: 0.25,
-				}}
-				aria-label={`Přesunout sloupec ${column.label}`}
-			>
-				<DragHandleIcon sx={{ fontSize: 16, opacity: 0.7 }} />
-			</Box>}
+			{!disabled && (
+				<Box
+					{...listeners}
+					sx={{
+						position: "absolute",
+						right: 4,
+						top: "50%",
+						transform: "translateY(-50%)",
+						cursor: "grab",
+						lineHeight: 0,
+						display: "flex",
+						alignItems: "center",
+						"&:active": { cursor: "grabbing" },
+						"&:hover": { color: "primary.main" },
+						color: "text.disabled",
+						p: 0.25,
+					}}
+					aria-label={`Přesunout sloupec ${column.label}`}
+				>
+					<DragHandleIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+				</Box>
+			)}
 		</TableCell>
 	);
 }

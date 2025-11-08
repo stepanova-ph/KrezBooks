@@ -11,7 +11,7 @@ export class ContactService {
 		const db = getDatabase();
 		const statement = db.prepare(contactQueries.getAll);
 		const contacts = statement.all();
-		return contacts.map(c => deserializeContact(c));
+		return contacts.map((c) => deserializeContact(c));
 	}
 
 	async getOne(ico: string, modifier: number): Promise<Contact | undefined> {
@@ -61,7 +61,7 @@ export class ContactService {
 		const db = getDatabase();
 		const statement = db.prepare(contactQueries.delete);
 		const result = statement.run(ico, modifier);
-		
+
 		if (result.changes === 0) {
 			throw new Error("Contact not found");
 		}

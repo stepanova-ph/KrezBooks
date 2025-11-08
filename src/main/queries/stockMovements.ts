@@ -67,7 +67,7 @@ export const stockMovementQueries = {
     WHERE item_ean = ?
   `,
 
-  getAverageBuyPriceByItem: `
+	getAverageBuyPriceByItem: `
     SELECT COALESCE(
       SUM(CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL)) / 
       NULLIF(SUM(CAST(sm.amount AS REAL)), 0),
@@ -79,7 +79,7 @@ export const stockMovementQueries = {
       AND (i.type = 1 OR i.type = 2)
   `,
 
-  getLastBuyPriceByItem: `
+	getLastBuyPriceByItem: `
     SELECT COALESCE(
       (SELECT CAST(sm.price_per_unit AS REAL)
       FROM stock_movements sm
@@ -91,5 +91,4 @@ export const stockMovementQueries = {
       0
     ) as last_price
   `,
-
 };

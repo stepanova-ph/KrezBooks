@@ -85,7 +85,7 @@ export class InvoiceService {
 		if (result.changes === 0) {
 			throw new Error("Invoice not found");
 		}
-		
+
 		return { changes: result.changes };
 	}
 
