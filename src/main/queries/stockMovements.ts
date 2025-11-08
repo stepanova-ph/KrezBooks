@@ -91,4 +91,5 @@ export const stockMovementQueries = {
       0
     ) as last_price
   `,
+
 };

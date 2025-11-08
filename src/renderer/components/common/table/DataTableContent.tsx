@@ -184,6 +184,9 @@ export function DataTableContent<T>({
 	};
 
 	const handleContextMenu = (event: MouseEvent, item: T, index: number) => {
+		if (contextMenuActions.length === 0) {
+			return;
+		}
 		event.preventDefault();
 		controls.setFocusedIndex(index);
 
@@ -306,7 +309,7 @@ export function DataTableContent<T>({
 											onDoubleClick={() => handleRowDoubleClick(item, index)}
 											onContextMenu={(e) => handleContextMenu(e, item, index)}
 											sx={{
-												cursor: "pointer",
+												cursor: contextMenuActions.length > 0 || onRowClick || onRowDoubleClick ? "pointer" : "default",
 												bgcolor: isFocused
 													? "action.selected"
 													: "background.paper",

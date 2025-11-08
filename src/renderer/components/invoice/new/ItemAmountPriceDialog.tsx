@@ -85,6 +85,7 @@ export function ItemAmountPriceDialog({
 	useEffect(() => {
 		if (open && item) {
 			setAmount(initialAmount ?? 1);
+			console.log(amount) // its 2 here
 
 			if (isType5) {
 				setSelectedPrice("custom");
@@ -180,6 +181,7 @@ export function ItemAmountPriceDialog({
 					label: isEditing ? "Uložit změny" : "Přidat položku",
 					onClick: handleConfirm,
 					variant: "contained",
+					disabled: amount === 0 && !isEditing,
 				},
 			]}
 		>
@@ -204,7 +206,7 @@ export function ItemAmountPriceDialog({
 							min={isType5 ? undefined : 0}
 							allowNegative={isType5}
 							fullWidth
-							autoFocus
+							// autoFocus
 						/>
 					</Grid>
 				</Grid>

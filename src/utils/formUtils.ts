@@ -28,3 +28,15 @@ export function combineBankAccount(
 	if (!bankCode) return accountNumber;
 	return `${accountNumber}/${bankCode}`;
 }
+
+
+export const calculateTotalWithVat = (items) => {
+	return items.reduce((sum, item) => {
+		const totalWithVat = item.total * (1 + item.vat_rate / 100);
+		return sum + totalWithVat;
+	}, 0);
+};
+
+export const calculateTotalWithoutVat = (items) => {
+	return items.reduce((sum, item) => sum + item.total, 0);
+}

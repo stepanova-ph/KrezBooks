@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, Tooltip, Button } from "@mui/material";
+import { Box, IconButton, Tooltip, Button, Typography } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { InvoiceHeader } from "../invoice/InvoiceHeader";
 import { InvoiceContactInfo } from "../invoice/InvoiceContactInfo";
@@ -15,6 +15,7 @@ import { useCreateInvoice } from "../../../hooks/useInvoices";
 import { useCreateStockMovement } from "../../../hooks/useStockMovement";
 import type { Item, Contact } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
+import { calculateTotalWithoutVat, calculateTotalWithVat } from "../../../utils/formUtils";
 
 function NewInvoiceTab() {
   const form = useInvoiceForm();
@@ -28,11 +29,24 @@ function NewInvoiceTab() {
     message: string;
   } | null>(null);
 
-
   const isType5 = form.formData.type === 5;
 
   const handleSelectItem = (item: Item) => {
-    dialogs.amountPrice.openDialog(item);
+    const existingIndex = form.invoiceItems.findIndex(i => i.ean === item.ean);
+    
+    if (existingIndex !== -1) {
+      // Item already exists - open edit dialog
+      const existing = form.invoiceItems[existingIndex];
+      dialogs.amountPrice.openDialog(item, {
+        amount: existing.amount,
+        price: existing.sale_price,
+        p_group_index: existing.p_group_index,
+        index: existingIndex,
+      });
+    } else {
+      // New item - open with defaults
+      dialogs.amountPrice.openDialog(item);
+    }
   };
 
   const handleEditItem = (item: InvoiceItem) => {
@@ -45,36 +59,45 @@ function NewInvoiceTab() {
     });
   };
 
-	const handleConfirmAmountPrice = (
-		amount: number,
-		price: number,
-		p_group_index: number
-		) => {
-		if (!dialogs.amountPrice.selectedItem) return;
+  const handleConfirmAmountPrice = (
+    amount: number,
+    price: number,
+    p_group_index: number
+  ) => {
+    if (!dialogs.amountPrice.selectedItem) return;
 
-		if (dialogs.amountPrice.editingItemIndex !== null) {
-			form.handleUpdateItem(
-			dialogs.amountPrice.editingItemIndex,
-			dialogs.amountPrice.selectedItem,
-			amount,
-			price,
-			p_group_index
-			);
-			dialogs.amountPrice.closeDialog(false);
-		} else {
-			form.handleAddItem(
-			dialogs.amountPrice.selectedItem,
-			amount,
-			price,
-			p_group_index
-			);
-			dialogs.amountPrice.closeDialog(false);
-		}
-	};
+    if (amount === 0) {
+      // Remove item if amount is 0
+      if (dialogs.amountPrice.editingItemIndex !== null) {
+        form.handleDeleteItem(form.invoiceItems[dialogs.amountPrice.editingItemIndex]);
+      }
+      dialogs.amountPrice.closeDialog(true); // reopen picker
+      return;
+    }
 
-	const handleCloseAmountPriceDialog = () => {
-	dialogs.amountPrice.closeDialog(false);
-	};
+    if (dialogs.amountPrice.editingItemIndex !== null) {
+      form.handleUpdateItem(
+        dialogs.amountPrice.editingItemIndex,
+        dialogs.amountPrice.selectedItem,
+        amount,
+        price,
+        p_group_index
+      );
+      dialogs.amountPrice.closeDialog(true); // reopen picker
+    } else {
+      form.handleAddItem(
+        dialogs.amountPrice.selectedItem,
+        amount,
+        price,
+        p_group_index
+      );
+      dialogs.amountPrice.closeDialog(false);
+    }
+  };
+
+  const handleCloseAmountPriceDialog = () => {
+    dialogs.amountPrice.closeDialog(false);
+  };
 
   const handleSelectContact = (contact: Contact) => {
     form.handleSelectContact(contact);
@@ -157,103 +180,152 @@ function NewInvoiceTab() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={isType5 ? 12 : 4}>
-              <Grid container spacing={3} px={isType5 ? 60 : 0}>
-                <Grid item xs={12} sx={{direction: 'row', alignItems: 'center'}}>
-                  <InvoiceHeader
-                    type={form.formData.type}
-                    number={form.formData.number}
-                    paymentMethod={form.formData.payment_method}
-                    dateIssue={form.formData.date_issue}
-                    dateTax={form.formData.date_tax}
-                    dateDue={form.formData.date_due}
-                    variableSymbol={form.formData.variable_symbol}
-                    errors={form.errors}
-                    onChange={form.handleChange}
-                    onBlur={form.handleBlur}
-                  />
-                </Grid>
+    <Box sx={{ height: '100%', display: 'flex', overflow: 'hidden' }}>
+      {/* Left Column - Header & Contact Info */}
+      <Box 
+        sx={{ 
+          width: isType5 ? 0 : 450, 
+          flexShrink: 0, 
+          p: 3, 
+          overflowY: 'auto',
+          borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+          display: isType5 ? 'none' : 'block'
+        }}
+      >
+        <Box sx={{ mb: 3 }}>
+          <InvoiceHeader
+            type={form.formData.type}
+            number={form.formData.number}
+            paymentMethod={form.formData.payment_method}
+            dateIssue={form.formData.date_issue}
+            dateTax={form.formData.date_tax}
+            dateDue={form.formData.date_due}
+            variableSymbol={form.formData.variable_symbol}
+            errors={form.errors}
+            onChange={form.handleChange}
+            onBlur={form.handleBlur}
+          />
+        </Box>
 
-                {!isType5 && (
-                  <Grid item xs={12}>
-                    <InvoiceContactInfo
-                      type={form.formData.type}
-                      ico={form.formData.ico}
-                      modifier={form.formData.modifier}
-                      dic={form.formData.dic}
-                      companyName={form.formData.company_name}
-                      street={form.formData.street}
-                      city={form.formData.city}
-                      postalCode={form.formData.postal_code}
-                      phone={form.formData.phone}
-                      email={form.formData.email}
-                      bankAccount={form.formData.bank_account}
-                      errors={form.errors}
-                      onChange={form.handleChange}
-                      onBlur={form.handleBlur}
-                      onOpenContactPicker={dialogs.contactPicker.openDialog}
-                    />
-                  </Grid>
-                )}
-              </Grid>
-            </Grid>
+        <InvoiceContactInfo
+          type={form.formData.type}
+          ico={form.formData.ico}
+          modifier={form.formData.modifier}
+          dic={form.formData.dic}
+          companyName={form.formData.company_name}
+          street={form.formData.street}
+          city={form.formData.city}
+          postalCode={form.formData.postal_code}
+          phone={form.formData.phone}
+          email={form.formData.email}
+          bankAccount={form.formData.bank_account}
+          errors={form.errors}
+          onChange={form.handleChange}
+          onBlur={form.handleBlur}
+          onOpenContactPicker={dialogs.contactPicker.openDialog}
+        />
+      </Box>
 
-            <Grid
-              item
-              xs={12}
-              md={isType5 ? 12 : 8}
-              marginX={isType5 ? "10vh" : 0}
-              minHeight={"100%"}
-            >
-              <FormSection
-                hideDivider
-                title="Položky dokladu"
-                actions={
-                  <Tooltip title="Přidat položku ze skladu">
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={dialogs.itemPicker.openDialog}
-                    >
-                      <InventoryIcon sx={{ width: 24 }} />
-                    </IconButton>
-                  </Tooltip>
-                }
-              >
-                <InvoiceItemsList
-                  items={form.invoiceItems}
-                  onEditItem={handleEditItem}
-                  onDeleteItem={form.handleDeleteItem}
-                />
-              </FormSection>
-            </Grid>
-          </Grid>
+      {/* Right Column - Items Table & Totals */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Header for Type 5 */}
+        {isType5 && (
+          <Box sx={{ p: 4, px: 105, pb: 2 }}>
+            <InvoiceHeader
+              type={form.formData.type}
+              number={form.formData.number}
+              paymentMethod={form.formData.payment_method}
+              dateIssue={form.formData.date_issue}
+              dateTax={form.formData.date_tax}
+              dateDue={form.formData.date_due}
+              variableSymbol={form.formData.variable_symbol}
+              errors={form.errors}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+            />
+          </Box>
+        )}
 
-          <Grid item xs={12}>
-            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-              <Button variant="outlined" onClick={form.handleReset}>
-                Zrušit
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={createInvoice.isPending || form.invoiceItems.length === 0}
-              >
-                Vytvořit doklad
-              </Button>
+        {/* Items Table - Stretches to fill space */}
+        <Box sx={{ flex: 1, minHeight: 0, p: 3, px: isType5 ? 40 : 3, pt: isType5 ? 2 : 3, display: 'flex', flexDirection: 'column', overflowY: 'scroll'  }}>
+          <FormSection
+            hideDivider
+            title="Položky dokladu"
+            actions={
+              <Tooltip title="Přidat položku ze skladu">
+                <IconButton
+                  size="small"
+                  color="primary"
+                  onClick={dialogs.itemPicker.openDialog}
+                >
+                  <InventoryIcon sx={{ width: 24 }} />
+                </IconButton>
+              </Tooltip>
+            }
+          >
+            <Box sx={{ height: '100%', minHeight: 400 }}>
+              <InvoiceItemsList
+                items={form.invoiceItems}
+                onEditItem={handleEditItem}
+                onDeleteItem={form.handleDeleteItem}
+              />
             </Box>
-          </Grid>
-        </Grid>
-      </Grid>
+          </FormSection>
+        </Box>
+
+        {/* Totals & Buttons */}
+        <Box sx={{ borderTop: (theme) => `1px solid ${theme.palette.divider}`, bgcolor: 'background.paper' }}>
+          {/* Totals */}
+          <Box 
+            sx={{ 
+              px: 4, 
+              py: 2.5,
+              display: 'flex', 
+              justifyContent: 'flex-end',
+              gap: 8,
+              borderBottom: (theme) => `1px solid ${theme.palette.divider}`
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="body1" fontWeight={500} color="text.secondary">
+                Celkem bez DPH:
+              </Typography>
+              <Typography variant="h6" fontWeight={700}>
+                {calculateTotalWithoutVat(form.invoiceItems).toFixed(2)} Kč
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="body1" fontWeight={500} color="text.secondary">
+                Celkem s DPH:
+              </Typography>
+              <Typography variant="h6" fontWeight={700} color="primary.main">
+                {calculateTotalWithVat(form.invoiceItems).toFixed(2)} Kč
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Buttons */}
+          <Box sx={{ px: 4, py: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Button variant="outlined" onClick={form.handleReset} size="large">
+              Zrušit
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={createInvoice.isPending || form.invoiceItems.length === 0}
+              size="large"
+            >
+              Vytvořit doklad
+            </Button>
+          </Box>
+        </Box>
+      </Box>
 
       <ItemPickerDialog
         open={dialogs.itemPicker.open}
         onClose={dialogs.itemPicker.closeDialog}
         onSelect={handleSelectItem}
+        selectedItemEans={new Set(form.invoiceItems.map(i => i.ean))}
       />
 
       <ItemAmountPriceDialog

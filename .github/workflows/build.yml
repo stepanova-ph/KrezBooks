@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ main, database-update ]
+    branches: [ main, testing-ui ]
   workflow_dispatch:
 
 jobs:

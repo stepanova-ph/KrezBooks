@@ -21,19 +21,21 @@ interface InvoiceHeaderProps {
 	errors: Record<string, string>;
 	onChange: (field: string, value: string | number) => void;
 	onBlur: (field: string) => void;
+  disabled?: true;
 }
 
 function headerType5({
 	number,
 	dateIssue,
 	errors,
+  disabled,
 	onChange,
 	onBlur
 }: Partial<InvoiceHeaderProps>) {
 	return (
 		<FormSection title="Hlavička" my={2}>
 			<Grid container spacing={2}>
-				<Grid item xs={4}>
+				<Grid item xs={4.5}>
 					<ValidatedTextField
             select
 						required
@@ -41,6 +43,7 @@ function headerType5({
 						label="Typ dokladu"
 						name="type"
 						value={5}
+            disabled={disabled}
 						error={errors?.type}
 
 						onChange={(e: { target: { value: string | number; }; }) => {
@@ -63,7 +66,7 @@ function headerType5({
 					</ValidatedTextField>
 				</Grid>
 
-				<Grid item xs={5}>
+				<Grid item xs={4}>
 					<ValidatedTextField
             required
 						fullWidth
@@ -71,6 +74,7 @@ function headerType5({
 						name="number"
 						value={number}
             error={errors?.number}
+            disabled={disabled}
 
 						onChange={(e: { target: { value: string | number; }; }) => {
               if (onChange) {
@@ -86,7 +90,7 @@ function headerType5({
 					/>
 				</Grid>
 
-				<Grid item xs={3}>
+				<Grid item xs={3.5}>
 					<ValidatedTextField
             required
 						fullWidth
@@ -94,6 +98,7 @@ function headerType5({
 						name="date_issue"
 						type="date"
 						value={dateIssue}
+            disabled={disabled}
             error={errors?.date_issue}
 						InputLabelProps={{ shrink: true }}
 
@@ -124,6 +129,7 @@ export function InvoiceHeader({
   dateDue,
   variableSymbol,
   errors,
+  disabled,
   onChange,
   onBlur,
 }: InvoiceHeaderProps) {
@@ -134,7 +140,7 @@ export function InvoiceHeader({
   const showPaymentMethod = type === 2 || type === 4; // keep your original behavior
 
   if (isType5) {
-      return headerType5({ number, dateIssue, errors, onChange, onBlur });
+      return headerType5({ number, dateIssue, errors, disabled, onChange, onBlur });
   }
 
   return (
@@ -150,10 +156,11 @@ export function InvoiceHeader({
             error={errors.type}
             select
             required
+            disabled={disabled}
             fullWidth
             sx={{
               ".MuiInputBase-input": {
-                fontSize: showDateTax ? "0.78rem" : undefined,
+                // fontSize: showDateTax ? "0.78rem" : undefined,
               },
             }}
           >
@@ -174,6 +181,7 @@ export function InvoiceHeader({
             onBlur={() => onBlur("number")}
             error={errors.number}
             required
+            disabled={disabled}
             fullWidth
           />
         </Grid>
@@ -188,6 +196,7 @@ export function InvoiceHeader({
             onBlur={() => onBlur("date_issue")}
             error={errors.date_issue}
             required
+            disabled={disabled}
             fullWidth
             InputLabelProps={{ shrink: true }}
             sx={{
@@ -209,6 +218,7 @@ export function InvoiceHeader({
               onBlur={() => onBlur("date_tax")}
               error={errors.date_tax}
               required
+              disabled={disabled}
               fullWidth
               InputLabelProps={{ shrink: true }}
 			  sx={{
@@ -231,6 +241,7 @@ export function InvoiceHeader({
               onBlur={() => onBlur("date_due")}
               error={errors.date_due}
               required
+            disabled={disabled}
               fullWidth
               InputLabelProps={{ shrink: true }}
 			  sx={{
@@ -252,6 +263,7 @@ export function InvoiceHeader({
               onBlur={() => onBlur("payment_method")}
               error={errors.payment_method}
               select
+            disabled={disabled}
               fullWidth
             >
               <MenuItem value="">
@@ -277,6 +289,7 @@ export function InvoiceHeader({
               onBlur={() => onBlur("variable_symbol")}
               error={errors.variable_symbol}
               required
+              disabled={disabled}
               fullWidth
             />
           </Grid>

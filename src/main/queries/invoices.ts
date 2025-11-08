@@ -26,9 +26,21 @@ export const invoiceQueries = {
     )
   `,
 
-	getAll: `
-    SELECT * FROM invoices 
-    ORDER BY date_issue DESC, number DESC
+  getAll: `
+    SELECT 
+      i.*,
+      COALESCE(
+        SUM(CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL)),
+        0
+      ) as total_without_vat,
+      COALESCE(
+        SUM(CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL) * (1 + CAST(sm.vat_rate AS REAL) / 100)),
+        0
+      ) as total_with_vat
+    FROM invoices i
+    LEFT JOIN stock_movements sm ON i.number = sm.invoice_number
+    GROUP BY i.number
+    ORDER BY i.date_issue DESC, i.number DESC
   `,
 
 	getOne: `

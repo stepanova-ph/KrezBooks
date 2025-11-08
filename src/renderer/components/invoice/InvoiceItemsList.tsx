@@ -1,4 +1,4 @@
-import { TableCell } from "@mui/material";
+import { TableCell, Box } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -14,6 +14,7 @@ interface InvoiceItemsListProps {
 	onEditItem: (item: InvoiceItem) => void;
 	onDeleteItem: (item: InvoiceItem) => void;
 	readOnly?: boolean;
+	maxHeight?: string;
 }
 
 export const invoiceItemColumns: Column[] = [
@@ -24,7 +25,7 @@ export const invoiceItemColumns: Column[] = [
 	// { id: "unit_of_measure", label: "Jednotka", minWidth: 80, align: "center" },
 	{ id: "sale_price", label: "Cena", minWidth: 100, align: "right" },
 	{ id: "vat_rate", label: "DPH %", minWidth: 70, align: "right" },
-	{ id: "total", label: "Celkem", minWidth: 120, align: "right" },
+	{ id: "total", label: "Celkem s DPH", minWidth: 120, align: "right" },
 ];
 
 export function InvoiceItemsList({
@@ -33,6 +34,7 @@ export function InvoiceItemsList({
 	onDeleteItem,
 	visibleColumnIds = new Set(invoiceItemColumns.map((c) => c.id)),
 	readOnly = false,
+	maxHeight,
 }: InvoiceItemsListProps) {
 	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = readOnly 
 		? [] // No actions in read-only mode
@@ -73,13 +75,14 @@ export function InvoiceItemsList({
 			case "sale_price":
 				return `${item.sale_price.toFixed(2)} Kč`;
 			case "total":
-				return `${item.total.toFixed(2)} Kč`;
+				const totalWithVat = item.total * (1 + item.vat_rate / 100);
+				return `${totalWithVat.toFixed(2)} Kč`;
 			default:
 				return "";
 		}
 	};
 
-	return (
+	const content = (
 		<DataTable
 			disableDrag
 			columns={invoiceItemColumns}
@@ -107,4 +110,14 @@ export function InvoiceItemsList({
 			emptyMessage="Žádné položky"
 		/>
 	);
+
+	if (maxHeight) {
+		return (
+			<Box sx={{ maxHeight, overflow: 'auto' }}>
+				{content}
+			</Box>
+		);
+	}
+
+	return content;
 }
