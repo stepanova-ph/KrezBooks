@@ -91,4 +91,10 @@ export const stockMovementQueries = {
       0
     ) as last_price
   `,
+
+  getTotalbyItemEanAndInvoiceNumber: `
+    SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) as total_amount
+    FROM stock_movements
+    WHERE item_ean = ? AND invoice_number = ?
+  `,
 };

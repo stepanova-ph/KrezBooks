@@ -140,7 +140,7 @@ export function InvoiceHeader({
   const showPaymentMethod = type === 2 || type === 4; // keep your original behavior
 
   if (isType5) {
-      return headerType5({ number, dateIssue, errors, onChange, onBlur });
+      return headerType5({ number, dateIssue, errors, disabled, onChange, onBlur });
   }
 
   return (
@@ -289,7 +289,7 @@ export function InvoiceHeader({
               onBlur={() => onBlur("variable_symbol")}
               error={errors.variable_symbol}
               required
-            disabled={disabled}
+              disabled={disabled}
               fullWidth
             />
           </Grid>

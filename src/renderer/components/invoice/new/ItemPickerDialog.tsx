@@ -15,6 +15,7 @@ interface ItemPickerDialogProps {
 	open: boolean;
 	onClose: () => void;
 	onSelect: (item: Item) => void;
+	selectedItemEans?: Set<String>;
 }
 
 const pickerColumns: Column[] = [
@@ -29,6 +30,7 @@ export function ItemPickerDialog({
 	open,
 	onClose,
 	onSelect,
+	selectedItemEans,
 }: ItemPickerDialogProps) {
 	const { data: allItems = [] } = useItems();
 	const [filters, setFilters] = useState<{ search: string }>(
@@ -44,8 +46,8 @@ export function ItemPickerDialog({
 	const renderRow = (
 		item: Item,
 		visibleColumns: Column[],
-		isFocused: boolean,
 	) => {
+		const isSelected = selectedItemEans?.has(item.ean) || false;
 		return visibleColumns.map((col) => {
 			let content;
 			switch (col.id) {
@@ -69,8 +71,15 @@ export function ItemPickerDialog({
 			}
 
 			return (
-				<TableCell key={col.id} align={col.align}>
-					{content}
+				<TableCell 
+				key={col.id} 
+				align={col.align}
+				sx={{
+					bgcolor: isSelected ? 'action.selected' : undefined,
+					fontWeight: isSelected ? 'bold' : undefined,
+				}}
+				>
+				{content}
 				</TableCell>
 			);
 		});
