@@ -34,7 +34,15 @@ export const invoiceQueries = {
         0
       ) as total_without_vat,
       COALESCE(
-        SUM(CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL) * (1 + CAST(sm.vat_rate AS REAL) / 100)),
+        SUM(
+          CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL) * 
+          (1 + CASE sm.vat_rate 
+            WHEN 0 THEN 0.0
+            WHEN 1 THEN 0.12
+            WHEN 2 THEN 0.21
+            ELSE 0.0
+          END)
+        ),
         0
       ) as total_with_vat
     FROM invoices i
