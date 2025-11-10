@@ -210,6 +210,22 @@ export function ViewInvoiceDialog({
 										fontWeight={500}
 										color="text.secondary"
 									>
+										DPH:
+									</Typography>
+									<Typography
+										variant="h6"
+										fontWeight={700}
+										color="text.primary"
+									>
+										{(calculateTotalWithVat(invoiceItems).toFixed(2) - calculateTotalWithoutVat(invoiceItems).toFixed(2)).toFixed(2)} Kč
+									</Typography>
+								</Box>
+								<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+									<Typography
+										variant="body1"
+										fontWeight={500}
+										color="text.secondary"
+									>
 										Celkem s DPH:
 									</Typography>
 									<Typography

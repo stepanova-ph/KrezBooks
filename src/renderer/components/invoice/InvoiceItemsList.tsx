@@ -8,6 +8,7 @@ import {
 } from "../common/table/DataTable";
 import { formatVatRateShort } from "../../../utils/formattingUtils";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
+import { calculateTotalWithVat } from "../../../utils/formUtils";
 
 interface InvoiceItemsListProps {
 	items: InvoiceItem[];
@@ -74,8 +75,7 @@ export function InvoiceItemsList({
 			case "sale_price":
 				return `${item.sale_price.toFixed(2)} Kč`;
 			case "total":
-				const totalWithVat = item.total * (1 + item.vat_rate / 100);
-				return `${totalWithVat.toFixed(2)} Kč`;
+				return calculateTotalWithVat([item]).toFixed(2)
 			default:
 				return "";
 		}

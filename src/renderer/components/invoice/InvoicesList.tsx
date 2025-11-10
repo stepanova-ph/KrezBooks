@@ -12,7 +12,6 @@ import { useDeleteInvoice } from "../../../hooks/useInvoices";
 import { ViewInvoiceDialog } from "./ViewInvoiceDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { useState } from "react";
-import { useTotalByInvoiceNumberVat } from "../../../hooks/useStockMovement";
 
 interface InvoicesListProps {
 	invoices: Invoice[];

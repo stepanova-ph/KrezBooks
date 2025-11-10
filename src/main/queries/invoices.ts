@@ -1,3 +1,5 @@
+import { vatRateCaseStatement } from "../../utils/queryUtils";
+
 export const invoiceQueries = {
 	createTable: `
     CREATE TABLE IF NOT EXISTS invoices (
@@ -37,9 +39,7 @@ export const invoiceQueries = {
         SUM(
           CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL) * 
           (1 + CASE sm.vat_rate 
-            WHEN 0 THEN 0.0
-            WHEN 1 THEN 0.12
-            WHEN 2 THEN 0.21
+            ${vatRateCaseStatement}
             ELSE 0.0
           END)
         ),
