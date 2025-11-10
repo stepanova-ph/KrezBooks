@@ -186,30 +186,12 @@ export function ItemAmountPriceDialog({
 			]}
 		>
 			<FormSection>
-				<Grid container spacing={2} alignItems="center">
-					<Grid item xs={12} md={9.7}>
-						<Typography variant="body2" color="text.secondary">
-							{item.ean}
-						</Typography>
-						<Typography variant="h6" sx={{ mt: 0.5 }}>
-							{item.name}
-						</Typography>
-					</Grid>
-
-					<Grid item xs={12} md={2.3}>
-						<NumberTextField
-							label={`Množství (${item.unit_of_measure})`}
-							name="amount"
-							value={amount}
-							onChange={handleAmountChange}
-							precision={0}
-							min={isType5 ? undefined : 0}
-							allowNegative={isType5}
-							fullWidth
-							// autoFocus
-						/>
-					</Grid>
-				</Grid>
+				<Typography variant="body2" color="text.secondary">
+					{item.ean}
+				</Typography>
+				<Typography variant="h6" sx={{ mt: 0.5 }}>
+					{item.name}
+				</Typography>
 			</FormSection>
 
 			<FormSection title="Cena" my={2} hideDivider>
@@ -350,38 +332,62 @@ export function ItemAmountPriceDialog({
 				sx={{
 					display: "flex",
 					alignItems: "center",
-					justifyContent: "center",
-					gap: 2,
+					justifyContent: "space-between",
+					gap: 4,
 					p: 2,
+					mx: 2,
 					mt: 3,
 					bgcolor: "background.default",
 					borderRadius: 1,
 				}}
 			>
-				<Typography variant="body2" color="text.secondary">
-					Aktuální stav:
-				</Typography>
-				<Chip
-					label={`${stockAmount.toFixed(0)} ${item.unit_of_measure}`}
-					color={stockAmount < 0 ? "error" : "default"}
-					size="small"
-					sx={{ fontWeight: 600 }}
-				/>
-				<Typography variant="body2" color="text.secondary" sx={{ mx: 1 }}>
-					→
-				</Typography>
-				<Chip
-					label={`${projectedStock.toFixed(0)} ${item.unit_of_measure}`}
-					color={
-						projectedStock > 0
-							? "success"
-							: projectedStock < 0
-								? "error"
-								: "default"
-					}
-					size="small"
-					sx={{ fontWeight: 600 }}
-				/>
+				<Box sx={{ flex: "0 0 auto", maxWidth: "100px" }}>
+					<NumberTextField
+						label={`Množství (${item.unit_of_measure})`}
+						name="amount"
+						value={amount}
+						onChange={handleAmountChange}
+						precision={0}
+						min={isType5 ? undefined : 0}
+						allowNegative={isType5}
+						fullWidth
+					/>
+				</Box>
+
+				<Box
+					sx={{
+						display: "flex",
+						alignItems: "center",
+						gap: 2,
+						flex: 1,
+						justifyContent: "center",
+					}}
+				>
+					<Typography variant="body2" color="text.secondary">
+						Aktuální stav:
+					</Typography>
+					<Chip
+						label={`${stockAmount.toFixed(0)} ${item.unit_of_measure}`}
+						color={stockAmount < 0 ? "error" : "default"}
+						size="small"
+						sx={{ fontWeight: 600 }}
+					/>
+					<Typography variant="body2" color="text.secondary" sx={{ mx: 1 }}>
+						→
+					</Typography>
+					<Chip
+						label={`${projectedStock.toFixed(0)} ${item.unit_of_measure}`}
+						color={
+							projectedStock > 0
+								? "success"
+								: projectedStock < 0
+									? "error"
+									: "default"
+						}
+						size="small"
+						sx={{ fontWeight: 600 }}
+					/>
+				</Box>
 			</Box>
 		</Dialog>
 	);
