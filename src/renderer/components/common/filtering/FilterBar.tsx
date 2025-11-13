@@ -216,6 +216,15 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 							onUpdate={(value) => updateFilter(filter.id, value)}
 						/>
 					);
+				
+				case "date-comparator":
+					return (
+						<DateComparatorFilter
+							filter={filter}
+							value={filters[filter.id] || { greaterThan: "", equals: "", lessThan: "", comparator: ">" }}
+							onUpdate={(value) => updateFilter(filter.id, value)}
+						/>
+					);
 
 				case "action-button":
 					return (

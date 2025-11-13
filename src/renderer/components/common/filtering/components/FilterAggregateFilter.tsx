@@ -38,11 +38,12 @@ export function FilterAggregateFilter({
 	onRemove,
 	renderExpandedFilter
 }: FilterAggregateFilterProps) {
-	if (filter.primaryFilter.type !== 'number-comparator') return null;
+	if (filter.primaryFilter.type !== 'number-comparator' && filter.primaryFilter.type !== 'date-comparator') return null;
 
 	const currentValue = value || { comparator: ">", greaterThan: "", equals: "", lessThan: "" };
 	const comparators: Array<'>' | '=' | '<'> = ['>', '=', '<'];
-	
+	const isDateInput = filter.primaryFilter.type === 'date-comparator';
+
 	const collapsedRef = useRef<HTMLDivElement>(null);
 	const [collapsedWidth, setCollapsedWidth] = useState<number | undefined>(undefined);
 
@@ -128,18 +129,27 @@ export function FilterAggregateFilter({
 				</Button>
 				<TextField
 					size="small"
+					type={isDateInput ? "date" : undefined}
 					label={filter.primaryFilter.label}
-					placeholder={filter.primaryFilter.placeholder || "0"}
+					placeholder={isDateInput ? undefined : (filter.primaryFilter.placeholder || "0")}
 					value={getCollapsedValue()}
+					InputLabelProps={isDateInput ? { shrink: true } : undefined}
 					onChange={(e) => {
 						const input = e.target.value;
-						if (filter.primaryFilter.allowNegative) {
-							if (input === '' || input === '-' || /^-?\d*$/.test(input)) {
-								updateCollapsedValue(input);
+						
+						if (!isDateInput) {
+							// Number validation
+							if (filter.primaryFilter.allowNegative) {
+								if (input === '' || input === '-' || /^-?\d*$/.test(input)) {
+									updateCollapsedValue(input);
+								}
+							} else {
+								const numOnly = input.replace(/\D/g, "");
+								updateCollapsedValue(numOnly);
 							}
 						} else {
-							const numOnly = input.replace(/\D/g, "");
-							updateCollapsedValue(numOnly);
+							// Date input - no validation needed
+							updateCollapsedValue(input);
 						}
 					}}
 					sx={{
@@ -227,18 +237,24 @@ export function FilterAggregateFilter({
 								</Box>
 								<TextField
 									size="small"
+									type={isDateInput ? "date" : undefined}
 									label={filter.primaryFilter.label}
-									placeholder={filter.primaryFilter.placeholder || "0"}
+									placeholder={isDateInput ? undefined : (filter.primaryFilter.placeholder || "0")}
 									value={displayValue}
+									InputLabelProps={isDateInput ? { shrink: true } : undefined}
 									onChange={(e) => {
 										const input = e.target.value;
 										let newValue = input;
-										if (filter.primaryFilter.allowNegative) {
-											if (input !== '' && input !== '-' && !/^-?\d*$/.test(input)) {
-												return;
+										
+										if (!isDateInput) {
+											// Number validation
+											if (filter.primaryFilter.allowNegative) {
+												if (input !== '' && input !== '-' && !/^-?\d*$/.test(input)) {
+													return;
+												}
+											} else {
+												newValue = input.replace(/\D/g, "");
 											}
-										} else {
-											newValue = input.replace(/\D/g, "");
 										}
 										
 										if (comp === '>') {
