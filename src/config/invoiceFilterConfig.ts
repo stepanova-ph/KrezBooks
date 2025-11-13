@@ -9,13 +9,14 @@ export const dateDueFilter: FilterAggregateFilterDef = {
 	collapsible: false,
 	primaryFilter: {
 		id: "date_due",
-		type: "number-comparator",
+		type: "date-comparator",  // CHANGED
 		label: "Datum splatnosti",
 		field: "date_due",
 		width: 150,
 	},
 	expandedFilters: [],
 };
+
 
 export const dateTaxFilter: FilterAggregateFilterDef = {
 	id: "date_tax_aggregate",
@@ -25,7 +26,7 @@ export const dateTaxFilter: FilterAggregateFilterDef = {
 	collapsible: false,
 	primaryFilter: {
 		id: "date_tax",
-		type: "number-comparator",
+		type: "date-comparator",  // CHANGED
 		label: "Datum zdanění",
 		field: "date_tax",
 		width: 150,
@@ -86,7 +87,7 @@ export const invoiceFilterConfig: FilterConfig = {
 			lockPrimaryWhenExpanded: true,
 			primaryFilter: {
 				id: "date_issue",
-				type: "number-comparator",
+				type: "date-comparator",  // CHANGED
 				label: "Datum",
 				field: "date_issue",
 				width: 150,
@@ -113,9 +114,9 @@ export const invoiceFilterConfig: FilterConfig = {
 
 export const initialInvoiceFilterState = {
 	search: "",
-	total_amount: { value: "", comparator: ">" },
+	total_amount: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
 	total_amount_with_vat: false,
-	date_issue: { value: "", comparator: ">" },
+	date_issue: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
 	_dynamicFilters: [],
 };
 

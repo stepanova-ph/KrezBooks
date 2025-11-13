@@ -15,6 +15,8 @@ import { NumberInputFilter } from "./components/NumberInputFilter";
 import { SelectFilter } from "./components/SelectFilter";
 import { NumberComparatorFilter } from "./components/NumberComparatorFilter";
 import { FilterAggregateFilter } from "./components";
+import { clear } from "console";
+import { DateComparatorFilter } from "./components/DateComparatorFilter";
 
 // Import filter components
 
@@ -110,6 +112,9 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 								clearFilter(subFilter);
 							}
 						});
+						break;
+					case "date-comparator":
+						cleared[filter.id] = { greaterThan: "", equals: "", lessThan: "", comparator: ">" };
 						break;
 					case "action-button":
 						break;

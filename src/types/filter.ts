@@ -11,6 +11,7 @@ export type FilterType =
 	| "select" // Single selection dropdown
 	| "multiselect" // Multiple selection dropdown
 	| "number-comparator" // Number with comparator (>, =, <)
+	| "date-comparator" // Date with comparator (>, =, <)	
 	| "filter-aggregate" // Groups multiple filters with collapsible UI
 	| "action-button"; // Clickable button that triggers FilterAction
 
@@ -106,6 +107,11 @@ export interface NumberComparatorFilterDef extends BaseFilterDef {
 	allowNegative?: boolean;
 }
 
+export interface DateComparatorFilterDef extends BaseFilterDef {
+	type: "date-comparator";
+	field: string;
+}
+
 /**
  * Action button filter - clickable button that triggers FilterAction
  */
@@ -139,8 +145,9 @@ export type FilterDef =
 	| SelectFilterDef
 	| MultiSelectFilterDef
 	| NumberComparatorFilterDef
-	| ActionButtonFilterDef
-	| FilterAggregateFilterDef;
+	| DateComparatorFilterDef
+	| FilterAggregateFilterDef
+	| ActionButtonFilterDef;
 
 /**
  * Filter configuration for a table
