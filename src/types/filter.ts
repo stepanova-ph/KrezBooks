@@ -175,9 +175,9 @@ export interface InvoiceFilterState {
 	search: string;
 	total_amount?: { value: string; comparator: '>' | '=' | '<' };
 	total_amount_with_vat?: boolean;
-	date_issue?: { value: string; comparator: '>' | '=' | '<' };
-	date_due?: { value: string; comparator: '>' | '=' | '<' };
-	date_tax?: { value: string; comparator: '>' | '=' | '<' };
+	date_issue?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
+	date_due?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
+	date_tax?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
 	_dynamicFilters?: string[]; // IDs of dynamically added filters
 }
 

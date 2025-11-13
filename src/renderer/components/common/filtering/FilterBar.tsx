@@ -239,11 +239,18 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 				case "filter-aggregate": {
 					const isExpanded = filters._aggregateExpanded?.[filter.id] ?? filter.defaultExpanded ?? false;
 					const isRemovable = isDynamicFilter(filter.id);
+					
+					let defaultValue: any;
+					if (filter.primaryFilter.type === 'date-comparator') {
+						defaultValue = { greaterThan: "", equals: "", lessThan: "", comparator: ">" };
+					} else {
+						defaultValue = { value: "", comparator: ">" };
+					}
 
 					return (
 						<FilterAggregateFilter
 							filter={filter}
-							value={filters[filter.primaryFilter.id] || { value: "", comparator: ">" }}
+							value={filters[filter.primaryFilter.id] || defaultValue}
 							onUpdate={(value) => updateFilter(filter.primaryFilter.id, value)}
 							isExpanded={isExpanded}
 							onToggleExpanded={() => {

@@ -247,7 +247,6 @@ export function FilterAggregateFilter({
 										let newValue = input;
 										
 										if (!isDateInput) {
-											// Number validation
 											if (filter.primaryFilter.allowNegative) {
 												if (input !== '' && input !== '-' && !/^-?\d*$/.test(input)) {
 													return;
