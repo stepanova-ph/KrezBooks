@@ -54,8 +54,6 @@ export function applyDateComparatorFilter(
 		if (!(itemValue > greaterThan)) return false;
 	}
 	
-	
-	// Check less than
 	if (lessThan && lessThan.trim() !== '') {
 		if (!(itemValue < lessThan)) return false;
 	}

@@ -176,14 +176,14 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 						/>
 					);
 
-				case "number-with-prefix":
-					return (
-						<NumberWithPrefixFilter
-							filter={filter}
-							value={filters[filter.id] || { prefix: null, value: "" }}
-							onUpdate={(value) => updateFilter(filter.id, value)}
-						/>
-					);
+				// case "number-with-prefix":
+				// 	return (
+				// 		<NumberWithPrefixFilter
+				// 			filter={filter}
+				// 			value={filters[filter.id] || { prefix: null, value: "" }}
+				// 			onUpdate={(value) => updateFilter(filter.id, value)}
+				// 		/>
+				// 	);
 
 				case "select":
 					return (

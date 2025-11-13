@@ -45,16 +45,24 @@ export const itemFilterConfig: FilterConfig = {
 			options: [],
 		},
 		{
-			id: "stock_amount",
-			type: "number-comparator",
+			id: "stock_amount_aggregate",
+			type: "filter-aggregate",
 			label: "Množství",
-			field: "stock_amount",
 			columnId: "stock_amount",
-			placeholder: "0",
-			allowNegative: true,
-			width: 100,
+			collapsible: true,
+			defaultExpanded: false,
+			lockPrimaryWhenExpanded: true,
+			primaryFilter: {
+				id: "stock_amount",
+				type: "number-comparator",
+				label: "Množství",
+				field: "stock_amount",
+				placeholder: "0",
+				allowNegative: true,
+				width: 100,
+			},
+			expandedFilters: [],
 		},
-
 		{
 			id: "price_aggregate",
 			type: "filter-aggregate",
@@ -106,10 +114,10 @@ export const initialItemFilterState: ItemFilterState = {
 	vat_rate: [],
 	unit_of_measure: "",
 	category: [],
-	stock_amount: { value: "", comparator: ">" },
-	price: { value: "", comparator: ">" },
+	stock_amount: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
+	price: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
 	price_with_vat: false,
-	price_groups: [1, 2, 3, 4], // All groups selected by default
+	price_groups: [1, 2, 3, 4],
 };
 
 export const defaultVisibleColumnsItem = [

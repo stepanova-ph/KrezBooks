@@ -113,20 +113,11 @@ export function useTableFilters<T extends Record<string, any>>(
 				if (!filters.category.includes(categoryValue)) return false;
 			}
 
-			if (filters.stock_amount && filters.stock_amount.value.trim() !== "") {
-				const filterValue = parseFloat(filters.stock_amount.value);
+			if (filters.stock_amount) {
 				const itemValue = parseFloat(item.stock_amount) || 0;
 
-				switch (filters.stock_amount.comparator) {
-					case '>':
-						if (!(itemValue > filterValue)) return false;
-						break;
-					case '=':
-						if (itemValue !== filterValue) return false;
-						break;
-					case '<':
-						if (!(itemValue < filterValue)) return false;
-						break;
+				if (!applyNumberComparatorFilter(itemValue, filters.stock_amount)){
+					return false;
 				}
 			}
 
