@@ -6,7 +6,7 @@ export const dateDueFilter: FilterAggregateFilterDef = {
 	type: "filter-aggregate",
 	label: "Datum splatnosti",
 	columnId: "date_due",
-	collapsible: false,
+	collapsible: true,
 	primaryFilter: {
 		id: "date_due",
 		type: "date-comparator",  // CHANGED
@@ -23,7 +23,7 @@ export const dateTaxFilter: FilterAggregateFilterDef = {
 	type: "filter-aggregate",
 	label: "Datum zdanění",
 	columnId: "date_tax",
-	collapsible: false,
+	collapsible: true,
 	primaryFilter: {
 		id: "date_tax",
 		type: "date-comparator",  // CHANGED
@@ -117,6 +117,8 @@ export const initialInvoiceFilterState = {
 	total_amount: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
 	total_amount_with_vat: false,
 	date_issue: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
+	date_due: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },  // ADD
+	date_tax: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },  // ADD
 	_dynamicFilters: [],
 };
 
