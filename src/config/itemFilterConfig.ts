@@ -44,6 +44,16 @@ export const itemFilterConfig: FilterConfig = {
 			placeholder: "Všechny kategorie",
 			options: [],
 		},
+		{
+			id: "stock_amount",
+			type: "number-comparator",
+			label: "Množství",
+			field: "stock_amount",
+			columnId: "stock_amount",
+			placeholder: "0",
+			allowNegative: true,
+			width: 100,
+		},
 	],
 };
 
@@ -55,6 +65,7 @@ export const initialItemFilterState: ItemFilterState = {
 	vat_rate: [],
 	unit_of_measure: "",
 	category: [],
+	stock_amount: { value: "", comparator: ">" },
 };
 
 export const defaultVisibleColumnsItem = [

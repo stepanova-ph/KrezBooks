@@ -9,7 +9,8 @@ export type FilterType =
 	| "number-input" // Number-only input with autocomplete
 	| "number-with-prefix" // Special: number with country prefix selector (DIC)
 	| "select" // Single selection dropdown
-	| "multiselect"; // Multiple selection dropdown
+	| "multiselect" // Multiple selection dropdown
+	| "number-comparator"; // ADD THIS
 
 /**
  * Base filter definition
@@ -94,6 +95,16 @@ export interface MultiSelectFilterDef extends BaseFilterDef {
 }
 
 /**
+ * Number comparator filter (for amount filtering with >, =, <)
+ */
+export interface NumberComparatorFilterDef extends BaseFilterDef {
+	type: "number-comparator";
+	field: string;
+	placeholder?: string;
+	allowNegative?: boolean;
+}
+
+/**
  * Union of all filter definition types
  */
 export type FilterDef =
@@ -102,7 +113,8 @@ export type FilterDef =
 	| NumberInputFilterDef
 	| NumberWithPrefixFilterDef
 	| SelectFilterDef
-	| MultiSelectFilterDef;
+	| MultiSelectFilterDef
+	| NumberComparatorFilterDef;
 
 /**
  * Filter configuration for a table
@@ -131,6 +143,7 @@ export interface ItemFilterState {
 	vat_rate: number[]; // Multiple selection
 	unit_of_measure: string; // Text search
 	category: string[]; // Text search
+	stock_amount?: { value: string; comparator: '>' | '=' | '<' }; // Number comparator
 }
 
 /**
@@ -149,3 +162,4 @@ export type FilterAction = {
 	onClick?: () => void; // if you want to handle it in parent
 	renderDialog?: (props: { open: boolean; onClose: () => void }) => ReactNode; // if you want FilterBar to open a modal for you
 };
+

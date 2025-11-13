@@ -85,3 +85,13 @@ export function isFilterEmpty(value: any): boolean {
 	if (Array.isArray(value)) return value.length === 0;
 	return false;
 }
+
+export type FilterComparator = '>' | '=' | '<';
+
+export const getNextComparator = (current: FilterComparator): FilterComparator => {
+  switch (current) {
+    case '>': return '=';
+    case '=': return '<';
+    case '<': return '>';
+  }
+};

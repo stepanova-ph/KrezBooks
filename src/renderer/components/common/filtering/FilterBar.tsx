@@ -13,6 +13,7 @@ import {
 	Chip,
 	OutlinedInput,
 	SelectChangeEvent,
+	InputAdornment,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import type { ReactNode } from "react";
@@ -96,6 +97,9 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 					case "multiselect":
 						cleared[filter.id] = [];
 						break;
+					case "number-comparator":
+						cleared[filter.id] = { value: "", comparator: ">" };
+						break;	
 				}
 			});
 			onFiltersChange(cleared);
@@ -346,6 +350,69 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 						</FormControl>
 					);
 				}
+case "number-comparator": {
+	const value = filters[filter.id] || { value: "", comparator: ">" };
+	
+	const getComparatorIcon = () => {
+		switch (value.comparator) {
+			case '>': return '>';
+			case '=': return '=';
+			case '<': return '<';
+		}
+	};
+	
+	const cycleComparator = () => {
+		const next = value.comparator === '>' ? '=' : value.comparator === '=' ? '<' : '>';
+		updateFilter(filter.id, { ...value, comparator: next });
+	};
+	
+	return (
+		<Box key={filter.id} sx={{ display: 'flex', gap: 0, alignItems: 'flex-start' }}>
+			<Button
+				onClick={cycleComparator}
+				size="small"
+				variant="outlined"
+				sx={{
+					minWidth: 40,
+					height: 37,
+					borderColor: (theme) => theme.palette.grey[400],
+					borderTopRightRadius: 0,
+					borderBottomRightRadius: 0,
+					borderRight: 'none',
+					fontSize: '1rem',
+					fontWeight: 'bold',
+					px: 1,
+				}}
+			>
+				{getComparatorIcon()}
+			</Button>
+			<TextField
+				size="small"
+				label={filter.label}
+				placeholder={filter.placeholder || "0"}
+				value={value.value}
+				onChange={(e) => {
+					const input = e.target.value;
+					if (filter.allowNegative) {
+						if (input === '' || input === '-' || /^-?\d*$/.test(input)) {
+							updateFilter(filter.id, { ...value, value: input });
+						}
+					} else {
+						const numOnly = input.replace(/\D/g, "");
+						updateFilter(filter.id, { ...value, value: numOnly });
+					}
+				}}
+				sx={{
+					width: filter.width || 100,
+					'& .MuiOutlinedInput-root': {
+						borderTopLeftRadius: 0,
+						borderBottomLeftRadius: 0,
+					},
+				}}
+			/>
+		</Box>
+	);
+}
 
 				default:
 					return null;
