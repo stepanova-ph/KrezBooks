@@ -35,7 +35,13 @@ export const itemColumns: Column[] = [
 		align: "center" as const,
 	},
 	{ id: "unit", label: "Jednotka", minWidth: 0, align: "center" as const },
-	{ id: "vat", label: "DPH", minWidth: 15, align: "center" as const },
+	{ id: "vat", label: "DPH", minWidth: 55, align: "center" as const },
+	{
+		id: "stock_amount",
+		label: "Sklad",
+		minWidth: 55,
+		align: "center" as const,
+	},
 	{
 		id: "sale_price_group1",
 		label: "Cena (Sk. 1)",
@@ -116,6 +122,9 @@ function ItemsList({
 
 			case "vat":
 				return formatVatRateShort(item.vat_rate);
+
+			case "stock_amount":
+				return item.stock_amount !== undefined ? String(item.stock_amount) : "0";
 
 			case "sale_price_group1":
 				return formatPrice(item.sale_price_group1);

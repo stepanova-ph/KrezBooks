@@ -12,6 +12,7 @@ export interface InvoiceItem extends Item {
 
 export interface InvoiceFormData {
 	number: string;
+	prefix: string;
 	type: InvoiceType;
 	payment_method: number | undefined;
 	date_issue: string;
@@ -33,6 +34,7 @@ export interface InvoiceFormData {
 
 const defaultFormData: InvoiceFormData = {
 	number: "",
+	prefix: "",
 	type: 1,
 	payment_method: undefined,
 	date_issue: new Date().toISOString().split("T")[0],

@@ -87,6 +87,7 @@ export function fillTestData(db: Database.Database): FillResult {
 		try {
 			insertInvoice.run({
 				number: invoice.number,
+				prefix: invoice.prefix || null,
 				type: invoice.type,
 				payment_method: invoice.payment_method,
 				date_issue: invoice.date_issue,

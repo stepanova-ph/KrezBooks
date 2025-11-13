@@ -6,6 +6,7 @@
 import { Invoice } from "src/types/database";
 import { exampleContacts } from "./contacts";
 import { anonymousContacts } from "./anonymousContacts";
+import { INVOICE_PREFIX_DEFAULTS } from "../../config/constants";
 
 export const exampleInvoices: Array<Invoice> = [
 	// ─────────────────────────────
@@ -13,60 +14,70 @@ export const exampleInvoices: Array<Invoice> = [
 	// ─────────────────────────────
 	{
 		number: "0001",
+		prefix: INVOICE_PREFIX_DEFAULTS[5],
 		type: 5,
 		date_issue: "2025-05-01",
 		note: "Initial inventory correction – Ponorná čerpadla series",
 	},
 	{
 		number: "0002",
+		prefix: INVOICE_PREFIX_DEFAULTS[5],
 		type: 5,
 		date_issue: "2025-05-02",
 		note: "Initial inventory correction – Kalová čerpadla series",
 	},
 	{
 		number: "0003",
+		prefix: INVOICE_PREFIX_DEFAULTS[5],
 		type: 5,
 		date_issue: "2025-05-03",
 		note: "Initial inventory correction – Zahradní čerpadla",
 	},
 	{
 		number: "0004",
+		prefix: INVOICE_PREFIX_DEFAULTS[5],
 		type: 5,
 		date_issue: "2025-05-04",
 		note: "Initial inventory correction – Tlaková čerpadla",
 	},
 	{
 		number: "0005",
+		prefix: INVOICE_PREFIX_DEFAULTS[5],
 		type: 5,
 		date_issue: "2025-05-05",
 		note: "Initial inventory correction – Cirkulační čerpadla",
 	},
 	{
 		number: "0006",
+		prefix: INVOICE_PREFIX_DEFAULTS[5],
 		type: 5,
 		date_issue: "2025-05-06",
 		note: "Initial inventory correction – Příslušenství – hadice",
 	},
 	{
 		number: "0007",
+		prefix: INVOICE_PREFIX_DEFAULTS[5],
 		type: 5,
 		date_issue: "2025-05-07",
 		note: "Initial inventory correction – Příslušenství – spínače",
 	},
 	{
 		number: "0008",
+		prefix: INVOICE_PREFIX_DEFAULTS[5],
 		type: 5,
 		date_issue: "2025-05-08",
 		note: "Initial inventory correction – Příslušenství – nádoby",
 	},
 	{
 		number: "0009",
+		prefix: INVOICE_PREFIX_DEFAULTS[5],
 		type: 5,
 		date_issue: "2025-05-09",
 		note: "Initial inventory correction – Příslušenství – měřidla",
 	},
 	{
 		number: "0010",
+		prefix: INVOICE_PREFIX_DEFAULTS[5],
 		type: 5,
 		date_issue: "2025-05-10",
 		note: "Initial inventory correction – miscellaneous items",
@@ -77,6 +88,7 @@ export const exampleInvoices: Array<Invoice> = [
 	// ─────────────────────────────
 	{
 		number: "0011",
+		prefix: INVOICE_PREFIX_DEFAULTS[1],
 		type: 1,
 		date_issue: "2025-05-11",
 		date_tax: "2025-05-11",
@@ -93,6 +105,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0012",
+		prefix: INVOICE_PREFIX_DEFAULTS[1],
 		type: 1,
 		date_issue: "2025-05-12",
 		date_tax: "2025-05-12",
@@ -109,6 +122,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0013",
+		prefix: INVOICE_PREFIX_DEFAULTS[1],
 		type: 1,
 		date_issue: "2025-05-13",
 		date_tax: "2025-05-13",
@@ -125,6 +139,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0014",
+		prefix: INVOICE_PREFIX_DEFAULTS[1],
 		type: 1,
 		date_issue: "2025-05-14",
 		date_tax: "2025-05-14",
@@ -141,6 +156,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0015",
+		prefix: INVOICE_PREFIX_DEFAULTS[1],
 		type: 1,
 		date_issue: "2025-05-15",
 		date_tax: "2025-05-15",
@@ -157,6 +173,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0016",
+		prefix: INVOICE_PREFIX_DEFAULTS[1],
 		type: 1,
 		date_issue: "2025-05-16",
 		date_tax: "2025-05-16",
@@ -173,6 +190,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0017",
+		prefix: INVOICE_PREFIX_DEFAULTS[1],
 		type: 1,
 		date_issue: "2025-05-17",
 		date_tax: "2025-05-17",
@@ -189,6 +207,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0018",
+		prefix: INVOICE_PREFIX_DEFAULTS[1],
 		type: 1,
 		date_issue: "2025-05-18",
 		date_tax: "2025-05-18",
@@ -205,6 +224,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0019",
+		prefix: INVOICE_PREFIX_DEFAULTS[1],
 		type: 1,
 		date_issue: "2025-05-19",
 		date_tax: "2025-05-19",
@@ -221,6 +241,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0020",
+		prefix: INVOICE_PREFIX_DEFAULTS[1],
 		type: 1,
 		date_issue: "2025-05-20",
 		date_tax: "2025-05-20",
@@ -241,6 +262,7 @@ export const exampleInvoices: Array<Invoice> = [
 	// ─────────────────────────────
 	{
 		number: "0021",
+		prefix: INVOICE_PREFIX_DEFAULTS[2],
 		type: 2,
 		payment_method: 1,
 		date_issue: "2025-05-21",
@@ -260,6 +282,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0022",
+		prefix: INVOICE_PREFIX_DEFAULTS[2],
 		type: 2,
 		payment_method: 1,
 		date_issue: "2025-05-22",
@@ -279,6 +302,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0023",
+		prefix: INVOICE_PREFIX_DEFAULTS[2],
 		type: 2,
 		payment_method: 1,
 		date_issue: "2025-05-23",
@@ -298,6 +322,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0024",
+		prefix: INVOICE_PREFIX_DEFAULTS[2],
 		type: 2,
 		payment_method: 1,
 		date_issue: "2025-05-24",
@@ -317,6 +342,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0025",
+		prefix: INVOICE_PREFIX_DEFAULTS[2],
 		type: 2,
 		payment_method: 1,
 		date_issue: "2025-05-25",
@@ -336,6 +362,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0026",
+		prefix: INVOICE_PREFIX_DEFAULTS[2],
 		type: 2,
 		payment_method: 1,
 		date_issue: "2025-05-26",
@@ -355,6 +382,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0027",
+		prefix: INVOICE_PREFIX_DEFAULTS[2],
 		type: 2,
 		payment_method: 1,
 		date_issue: "2025-05-27",
@@ -374,6 +402,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0028",
+		prefix: INVOICE_PREFIX_DEFAULTS[2],
 		type: 2,
 		payment_method: 1,
 		date_issue: "2025-05-28",
@@ -393,6 +422,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0029",
+		prefix: INVOICE_PREFIX_DEFAULTS[2],
 		type: 2,
 		payment_method: 1,
 		date_issue: "2025-05-29",
@@ -412,6 +442,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0030",
+		prefix: INVOICE_PREFIX_DEFAULTS[2],
 		type: 2,
 		payment_method: 1,
 		date_issue: "2025-05-30",
@@ -435,6 +466,7 @@ export const exampleInvoices: Array<Invoice> = [
 	// ─────────────────────────────
 	{
 		number: "0031",
+		prefix: INVOICE_PREFIX_DEFAULTS[3],
 		type: 3,
 		date_issue: "2025-05-31",
 		date_tax: "2025-05-31",
@@ -451,6 +483,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0032",
+		prefix: INVOICE_PREFIX_DEFAULTS[3],
 		type: 3,
 		date_issue: "2025-06-01",
 		date_tax: "2025-06-01",
@@ -467,6 +500,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0033",
+		prefix: INVOICE_PREFIX_DEFAULTS[3],
 		type: 3,
 		date_issue: "2025-06-02",
 		date_tax: "2025-06-02",
@@ -483,6 +517,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0034",
+		prefix: INVOICE_PREFIX_DEFAULTS[3],
 		type: 3,
 		date_issue: "2025-06-03",
 		date_tax: "2025-06-03",
@@ -499,6 +534,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0035",
+		prefix: INVOICE_PREFIX_DEFAULTS[3],
 		type: 3,
 		date_issue: "2025-06-04",
 		date_tax: "2025-06-04",
@@ -515,6 +551,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0036",
+		prefix: INVOICE_PREFIX_DEFAULTS[3],
 		type: 3,
 		date_issue: "2025-06-05",
 		date_tax: "2025-06-05",
@@ -531,6 +568,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0037",
+		prefix: INVOICE_PREFIX_DEFAULTS[3],
 		type: 3,
 		date_issue: "2025-06-06",
 		date_tax: "2025-06-06",
@@ -547,6 +585,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0038",
+		prefix: INVOICE_PREFIX_DEFAULTS[3],
 		type: 3,
 		date_issue: "2025-06-07",
 		date_tax: "2025-06-07",
@@ -563,6 +602,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0039",
+		prefix: INVOICE_PREFIX_DEFAULTS[3],
 		type: 3,
 		date_issue: "2025-06-08",
 		date_tax: "2025-06-08",
@@ -579,6 +619,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0040",
+		prefix: INVOICE_PREFIX_DEFAULTS[3],
 		type: 3,
 		date_issue: "2025-06-09",
 		date_tax: "2025-06-09",
@@ -599,6 +640,7 @@ export const exampleInvoices: Array<Invoice> = [
 	// ─────────────────────────────
 	{
 		number: "0041",
+		prefix: INVOICE_PREFIX_DEFAULTS[4],
 		type: 4,
 		payment_method: 1,
 		date_issue: "2025-06-10",
@@ -618,6 +660,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0042",
+		prefix: INVOICE_PREFIX_DEFAULTS[4],
 		type: 4,
 		payment_method: 1,
 		date_issue: "2025-06-11",
@@ -637,6 +680,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0043",
+		prefix: INVOICE_PREFIX_DEFAULTS[4],
 		type: 4,
 		payment_method: 1,
 		date_issue: "2025-06-12",
@@ -656,6 +700,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0044",
+		prefix: INVOICE_PREFIX_DEFAULTS[4],
 		type: 4,
 		payment_method: 1,
 		date_issue: "2025-06-13",
@@ -675,6 +720,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0045",
+		prefix: INVOICE_PREFIX_DEFAULTS[4],
 		type: 4,
 		payment_method: 1,
 		date_issue: "2025-06-14",
@@ -694,6 +740,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0046",
+		prefix: INVOICE_PREFIX_DEFAULTS[4],
 		type: 4,
 		payment_method: 1,
 		date_issue: "2025-06-15",
@@ -713,6 +760,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0047",
+		prefix: INVOICE_PREFIX_DEFAULTS[4],
 		type: 4,
 		payment_method: 1,
 		date_issue: "2025-06-16",
@@ -732,6 +780,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0048",
+		prefix: INVOICE_PREFIX_DEFAULTS[4],
 		type: 4,
 		payment_method: 1,
 		date_issue: "2025-06-17",
@@ -751,6 +800,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0049",
+		prefix: INVOICE_PREFIX_DEFAULTS[4],
 		type: 4,
 		payment_method: 1,
 		date_issue: "2025-06-18",
@@ -770,6 +820,7 @@ export const exampleInvoices: Array<Invoice> = [
 	},
 	{
 		number: "0050",
+		prefix: INVOICE_PREFIX_DEFAULTS[4],
 		type: 4,
 		payment_method: 1,
 		date_issue: "2025-06-19",

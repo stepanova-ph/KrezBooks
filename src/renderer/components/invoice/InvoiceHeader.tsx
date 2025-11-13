@@ -6,6 +6,7 @@ import type { InvoiceType, PaymentMethodType } from "../../../types/database";
 
 interface InvoiceHeaderProps {
 	number: string;
+	prefix: string;
 	type: InvoiceType;
 	paymentMethod?: PaymentMethodType;
 	dateIssue: string;
@@ -20,6 +21,7 @@ interface InvoiceHeaderProps {
 
 function headerType5({
 	number,
+	prefix,
 	dateIssue,
 	errors,
 	disabled,
@@ -29,7 +31,7 @@ function headerType5({
 	return (
 		<FormSection title="Hlavička" my={2}>
 			<Grid container spacing={2}>
-				<Grid item xs={4.5}>
+				<Grid item xs={3.5}>
 					<ValidatedTextField
 						select
 						required
@@ -58,7 +60,28 @@ function headerType5({
 					</ValidatedTextField>
 				</Grid>
 
-				<Grid item xs={4}>
+				<Grid item xs={1.5}>
+					<ValidatedTextField
+						fullWidth
+						label="Prefix"
+						name="prefix"
+						value={prefix}
+						error={errors?.prefix}
+						disabled={disabled}
+						onChange={(e: { target: { value: string | number } }) => {
+							if (onChange) {
+								onChange("prefix", e.target.value);
+							}
+						}}
+						onBlur={() => {
+							if (onBlur) {
+								onBlur("prefix");
+							}
+						}}
+					/>
+				</Grid>
+
+				<Grid item xs={3.5}>
 					<ValidatedTextField
 						required
 						fullWidth
@@ -110,6 +133,7 @@ function headerType5({
 
 export function InvoiceHeader({
 	number,
+	prefix,
 	type, // 1: nákup hotovost, 2: nákup faktura, 3: prodej hotovost, 4: prodej faktura, 5: korekce
 	paymentMethod,
 	dateIssue,
@@ -130,6 +154,7 @@ export function InvoiceHeader({
 	if (isType5) {
 		return headerType5({
 			number,
+			prefix,
 			dateIssue,
 			errors,
 			disabled,
@@ -169,7 +194,22 @@ export function InvoiceHeader({
 					</ValidatedTextField>
 				</Grid>
 
-				<Grid item xs={6}>
+				<Grid item xs={1.5}>
+					<ValidatedTextField
+						label="Prefix"
+						name="prefix"
+						value={prefix}
+						onChange={(e: { target: { value: string | number } }) =>
+							onChange("prefix", e.target.value)
+						}
+						onBlur={() => onBlur("prefix")}
+						error={errors.prefix}
+						disabled={disabled}
+						fullWidth
+					/>
+				</Grid>
+
+				<Grid item xs={4.5}>
 					<ValidatedTextField
 						label="Číslo dokladu"
 						name="number"

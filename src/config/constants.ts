@@ -27,3 +27,11 @@ export const PAYMENT_METHOD_TYPES = [
 	{ value: 0, label: "Hotovost" },
 	{ value: 1, label: "Bankovní převod" },
 ] as const;
+
+export const INVOICE_PREFIX_DEFAULTS: Record<number, string> = {
+	1: "NH",
+	2: "NF",
+	3: "PH",
+	4: "PF",
+	5: "K",
+};

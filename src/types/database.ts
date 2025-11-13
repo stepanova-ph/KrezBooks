@@ -65,6 +65,7 @@ export interface Item {
 	sale_price_group2: number;
 	sale_price_group3: number;
 	sale_price_group4: number;
+	stock_amount?: number; // Computed field from SUM of stock_movements
 	created_at?: string;
 	updated_at?: string;
 }
@@ -105,6 +106,7 @@ export type UpdateStockMovementInput = UpdateInput<
  */
 export interface Invoice {
 	number: string;
+	prefix?: string;
 	type: InvoiceType;
 	payment_method?: PaymentMethodType;
 	date_issue: string;

@@ -23,6 +23,7 @@ export class InvoiceService {
 
 		const invoiceData = {
 			number: invoice.number,
+			prefix: invoice.prefix || null,
 			type: invoice.type,
 			payment_method: invoice.payment_method ?? null,
 			date_issue: invoice.date_issue,
@@ -91,6 +92,7 @@ export class InvoiceService {
 
 	private buildUpdateQuery(tableName: string, fields: string[]): string {
 		const allowedFields = new Set([
+			"prefix",
 			"type",
 			"payment_method",
 			"date_issue",

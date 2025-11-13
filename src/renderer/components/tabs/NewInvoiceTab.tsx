@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, IconButton, Tooltip, Button, Typography } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { InvoiceHeader } from "../invoice/InvoiceHeader";
@@ -20,6 +20,7 @@ import {
 	calculateTotalWithVat,
 } from "../../../utils/formUtils";
 import { InvoiceTotals } from "../invoice/InvoiceTotals";
+import { INVOICE_PREFIX_DEFAULTS } from "../../../config/constants";
 
 function NewInvoiceTab() {
 	const form = useInvoiceForm();
@@ -34,6 +35,14 @@ function NewInvoiceTab() {
 	} | null>(null);
 
 	const isType5 = form.formData.type === 5;
+
+	// Auto-populate prefix when type changes
+	useEffect(() => {
+		const defaultPrefix = INVOICE_PREFIX_DEFAULTS[form.formData.type as number];
+		if (defaultPrefix && form.formData.prefix !== defaultPrefix) {
+			form.handleChange("prefix", defaultPrefix);
+		}
+	}, [form.formData.type]);
 
 	const handleSelectItem = (item: Item) => {
 		const existingIndex = form.invoiceItems.findIndex(
@@ -138,6 +147,7 @@ function NewInvoiceTab() {
 		try {
 			await createInvoice.mutateAsync({
 				number: form.formData.number,
+				prefix: form.formData.prefix || undefined,
 				type: form.formData.type,
 				payment_method: form.formData.payment_method,
 				date_issue: form.formData.date_issue,
@@ -204,6 +214,7 @@ function NewInvoiceTab() {
 					<InvoiceHeader
 						type={form.formData.type}
 						number={form.formData.number}
+						prefix={form.formData.prefix}
 						paymentMethod={form.formData.payment_method}
 						dateIssue={form.formData.date_issue}
 						dateTax={form.formData.date_tax}
@@ -249,6 +260,7 @@ function NewInvoiceTab() {
 						<InvoiceHeader
 							type={form.formData.type}
 							number={form.formData.number}
+							prefix={form.formData.prefix}
 							paymentMethod={form.formData.payment_method}
 							dateIssue={form.formData.date_issue}
 							dateTax={form.formData.date_tax}

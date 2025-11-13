@@ -63,6 +63,7 @@ export const defaultVisibleColumnsItem = [
 	"category",
 	"unit",
 	"vat",
+	"stock_amount",
 	"sale_price_group1",
 	"sale_price_group2",
 ];

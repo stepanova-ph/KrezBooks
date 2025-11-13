@@ -4,6 +4,7 @@ export const invoiceQueries = {
 	createTable: `
     CREATE TABLE IF NOT EXISTS invoices (
       number TEXT PRIMARY KEY NOT NULL,
+      prefix TEXT,
       type INTEGER NOT NULL,
       payment_method INTEGER,
       date_issue TEXT NOT NULL,
@@ -59,6 +60,7 @@ export const invoiceQueries = {
 	create: `
     INSERT INTO invoices (
       number,
+      prefix,
       type,
       payment_method,
       date_issue,
@@ -78,6 +80,7 @@ export const invoiceQueries = {
       email
     ) VALUES (
       @number,
+      @prefix,
       @type,
       @payment_method,
       @date_issue,

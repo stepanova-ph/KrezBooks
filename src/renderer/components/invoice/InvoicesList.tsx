@@ -93,7 +93,7 @@ function InvoicesList({
 	const getCellContent = (invoice: Invoice, columnId: string) => {
 		switch (columnId) {
 			case "number":
-				return invoice.number;
+				return `${invoice.prefix || ""}${invoice.number}`;
 			case "type": {
 				const types: Record<number, string> = {
 					1: "Nákup (hotovost)",
