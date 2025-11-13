@@ -5,6 +5,7 @@ import {
 	TextSearchFilterDef,
 } from "src/types/filter";
 
+import { applyDateComparatorFilter, applyNumberComparatorFilter } from "../utils/comparatorUtils";
 /**
  * Hook to filter table data based on filter state
  *
@@ -130,83 +131,43 @@ export function useTableFilters<T extends Record<string, any>>(
 			}
 
 			// Invoice: Total amount filter with VAT checkbox
-			if (filters.total_amount && filters.total_amount.value.trim() !== "") {
-				const filterValue = parseFloat(filters.total_amount.value);
+			if (filters.total_amount) {
 				const useVat = filters.total_amount_with_vat === true;
 				const itemValue = useVat
 					? parseFloat(item.total_with_vat) || 0
 					: parseFloat(item.total_without_vat) || 0;
 
-				switch (filters.total_amount.comparator) {
-					case '>':
-						if (!(itemValue > filterValue)) return false;
-						break;
-					case '=':
-						if (itemValue !== filterValue) return false;
-						break;
-					case '<':
-						if (!(itemValue < filterValue)) return false;
-						break;
+				if (!applyNumberComparatorFilter(itemValue, filters.total_amount)) {
+					return false;
 				}
 			}
 
 			// Invoice: Date issue filter
-			if (filters.date_issue && filters.date_issue.value.trim() !== "") {
-				const filterValue = filters.date_issue.value;
+			if (filters.date_issue) {
 				const itemValue = String(item.date_issue || "");
-
-				switch (filters.date_issue.comparator) {
-					case '>':
-						if (!(itemValue > filterValue)) return false;
-						break;
-					case '=':
-						if (itemValue !== filterValue) return false;
-						break;
-					case '<':
-						if (!(itemValue < filterValue)) return false;
-						break;
+				if (!applyDateComparatorFilter(itemValue, filters.date_issue)) {
+					return false;
 				}
 			}
 
 			// Invoice: Date due filter (dynamic)
-			if (filters.date_due && filters.date_due.value.trim() !== "") {
-				const filterValue = filters.date_due.value;
+			if (filters.date_due) {
 				const itemValue = String(item.date_due || "");
-
-				switch (filters.date_due.comparator) {
-					case '>':
-						if (!(itemValue > filterValue)) return false;
-						break;
-					case '=':
-						if (itemValue !== filterValue) return false;
-						break;
-					case '<':
-						if (!(itemValue < filterValue)) return false;
-						break;
+				if (!applyDateComparatorFilter(itemValue, filters.date_due)) {
+					return false;
 				}
 			}
 
 			// Invoice: Date tax filter (dynamic)
-			if (filters.date_tax && filters.date_tax.value.trim() !== "") {
-				const filterValue = filters.date_tax.value;
+			if (filters.date_tax) {
 				const itemValue = String(item.date_tax || "");
-
-				switch (filters.date_tax.comparator) {
-					case '>':
-						if (!(itemValue > filterValue)) return false;
-						break;
-					case '=':
-						if (itemValue !== filterValue) return false;
-						break;
-					case '<':
-						if (!(itemValue < filterValue)) return false;
-						break;
+				if (!applyDateComparatorFilter(itemValue, filters.date_tax)) {
+					return false;
 				}
 			}
 
 			// Item: Price filter with VAT checkbox and price groups
-			if (filters.price && filters.price.value.trim() !== "") {
-				const filterValue = parseFloat(filters.price.value);
+			if (filters.price) {
 				const useVat = filters.price_with_vat === true;
 				const selectedGroups = filters.price_groups || [1, 2, 3, 4];
 
@@ -222,21 +183,12 @@ export function useTableFilters<T extends Record<string, any>>(
 						itemPrice = itemPrice * (1 + vatRate / 100);
 					}
 
-					// Apply comparator
-					switch (filters.price.comparator) {
-						case '>':
-							return itemPrice > filterValue;
-						case '=':
-							return itemPrice === filterValue;
-						case '<':
-							return itemPrice < filterValue;
-						default:
-							return false;
-					}
+					return applyNumberComparatorFilter(itemPrice, filters.price);
 				});
 
 				if (!matchesAnyGroup) return false;
 			}
+
 
 			return true;
 		});

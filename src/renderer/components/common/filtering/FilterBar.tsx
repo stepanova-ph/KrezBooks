@@ -1,28 +1,23 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from "react";
-import {
-	Box,
-	TextField,
-	FormControlLabel,
-	Select,
-	MenuItem,
-	Button,
-	IconButton,
-	FormControl,
-	InputLabel,
-	Chip,
-	OutlinedInput,
-	SelectChangeEvent,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import type { ReactNode } from "react";
+import { Box, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+import type { ReactNode } from "react";
 import { FilterConfig, FilterState, FilterDef } from "src/types/filter";
 import { ColumnPickerButton } from "./ColumnPickerButton";
 import type { Column } from "../table/DataTable";
 import type { FilterAction } from "src/types/filter";
-import { KeyboardCheckbox } from "../inputs/KeyboardCheckbox";
 import type { OrderByConfig } from "./ColumnPickerButton";
+import { TextSearchFilter } from "./components/TextSearchFilter";
+import { ActionButtonFilter } from "./components/ActionButtonFilter";
+import { CheckboxFilter } from "./components/CheckboxFilter";
+import { MultiSelectFilter } from "./components/MultiSelectFilter";
+import { NumberInputFilter } from "./components/NumberInputFilter";
+import { SelectFilter } from "./components/SelectFilter";
+import { NumberComparatorFilter } from "./components/NumberComparatorFilter";
+import { FilterAggregateFilter } from "./components";
+
+// Import filter components
+
 
 interface FilterBarProps {
 	config: FilterConfig;
@@ -33,8 +28,8 @@ interface FilterBarProps {
 	onVisibleColumnsChange: (columnIds: Set<string>) => void;
 	defaultColumnIds?: string[];
 	actions?: FilterAction[];
-	filterActions?: FilterAction[]; // Actions for filter buttons (add dynamic filters)
-	onRemoveDynamicFilter?: (filterId: string) => void; // Callback to remove dynamic filters
+	filterActions?: FilterAction[];
+	onRemoveDynamicFilter?: (filterId: string) => void;
 	clearLabel?: string;
 	orderBy?: OrderByConfig;
 	onOrderByChange?: (orderBy: OrderByConfig) => void;
@@ -76,7 +71,6 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 			(f) => !f.columnId || visibleColumnIds.has(f.columnId),
 		);
 
-		// Helper to check if a filter is dynamic (removable)
 		const isDynamicFilter = (filterId: string): boolean => {
 			return filterId.includes("_aggregate") && (filterId === "date_due_aggregate" || filterId === "date_tax_aggregate");
 		};
@@ -110,9 +104,7 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 						cleared[filter.id] = { value: "", comparator: ">" };
 						break;
 					case "filter-aggregate":
-						// Clear primary filter
 						clearFilter(filter.primaryFilter);
-						// Clear expanded filters
 						filter.expandedFilters.forEach(subFilter => {
 							if (subFilter.type !== "action-button") {
 								clearFilter(subFilter);
@@ -120,14 +112,11 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 						});
 						break;
 					case "action-button":
-						// No state to clear
 						break;
 				}
 			};
 
 			config.filters.forEach(clearFilter);
-
-			// Clear expansion state
 			cleared._aggregateExpanded = {};
 
 			onFiltersChange(cleared);
@@ -154,406 +143,107 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 			return checkedCount > 0;
 		};
 
-		const renderFilter = (
-			filter: (typeof visibleFilters)[number],
-		): ReactNode => {
-			return renderFilterInternal(filter, false);
-		};
-
-		const renderFilterWithLock = (
-			filter: FilterDef,
-			locked: boolean
-		): ReactNode => {
-			return renderFilterInternal(filter, locked);
-		};
-
-		const renderFilterInternal = (
-			filter: FilterDef,
-			locked: boolean = false,
-		): ReactNode => {
+		const renderFilter = (filter: FilterDef): ReactNode => {
 			switch (filter.type) {
 				case "text-search":
 					return (
-						<TextField
-							key={filter.id}
-							size="small"
-							label={filter.label}
+						<TextSearchFilter
+							filter={filter}
 							value={filters[filter.id] || ""}
-							onChange={(e) => updateFilter(filter.id, e.target.value)}
-							inputRef={filter.id === "search" ? searchInputRef : undefined}
-							sx={{ minWidth: filter.width || 250 }}
+							onUpdate={(value) => updateFilter(filter.id, value)}
+							searchInputRef={filter.id === "search" ? searchInputRef : undefined}
 						/>
 					);
 
 				case "checkbox": {
 					const canUncheck = validateRequiredGroup(filter.id, false);
-					const checked = !!filters[filter.id];
 					return (
-						<FormControlLabel
-							sx={{
-								color: (theme) =>
-									checked
-										? theme.palette.primary.main
-										: theme.palette.text.secondary,
-							}}
-							key={filter.id}
-							control={
-								<KeyboardCheckbox
-									checked={checked}
-									onChange={(e) => {
-										if (!e.target.checked && !canUncheck) return;
-										updateFilter(filter.id, e.target.checked);
-									}}
-								/>
-							}
-							label={filter.label}
+						<CheckboxFilter
+							filter={filter}
+							value={!!filters[filter.id]}
+							onUpdate={(value) => updateFilter(filter.id, value)}
+							canUncheck={canUncheck}
 						/>
 					);
 				}
 
-				case "number-input": {
-					const value = filters[filter.id] || "";
-					const validation = filter.validate
-						? filter.validate(value)
-						: { valid: true };
+				case "number-input":
 					return (
-						<TextField
-							key={filter.id}
-							size="small"
-							label={filter.label}
-							placeholder={filter.placeholder}
-							value={value}
-							onChange={(e) => {
-								const newValue = e.target.value.replace(/\D/g, "");
-								if (filter.maxLength && newValue.length > filter.maxLength)
-									return;
-								updateFilter(filter.id, newValue);
-							}}
-							error={!validation.valid}
-							helperText={validation.error}
-							sx={{ minWidth: filter.width || 150 }}
+						<NumberInputFilter
+							filter={filter}
+							value={filters[filter.id] || ""}
+							onUpdate={(value) => updateFilter(filter.id, value)}
 						/>
 					);
-				}
 
-				case "number-with-prefix": {
-					const dicValue = filters[filter.id] || { prefix: null, value: "" };
-					const isCustom = dicValue.prefix === "vlastní";
-					const validation = filter.validate
-						? filter.validate(dicValue.prefix, dicValue.value)
-						: { valid: true };
-
+				case "number-with-prefix":
 					return (
-						<Box
-							key={filter.id}
-							sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}
-						>
-							{!isCustom ? (
-								<>
-									<FormControl
-										size="small"
-										sx={{ minWidth: filter.prefixWidth || 70 }}
-									>
-										<InputLabel>{filter.label}</InputLabel>
-										<Select
-											value={dicValue.prefix || ""}
-											label={filter.label}
-											onChange={(e) => {
-												const newPrefix = e.target.value || null;
-												updateFilter(filter.id, {
-													prefix: newPrefix,
-													value: newPrefix ? dicValue.value : "",
-												});
-											}}
-										>
-											<MenuItem value="">
-												<em>Vybrat...</em>
-											</MenuItem>
-											{filter.prefixes.map((prefix: string) => (
-												<MenuItem key={prefix} value={prefix}>
-													{prefix}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-									<TextField
-										size="small"
-										placeholder={filter.placeholder}
-										value={dicValue.value}
-										disabled={!dicValue.prefix}
-										onChange={(e) => {
-											const newValue = e.target.value.replace(/\D/g, "");
-											updateFilter(filter.id, { ...dicValue, value: newValue });
-										}}
-										error={!validation.valid}
-										helperText={validation.error}
-										sx={{ minWidth: filter.width || 150 }}
-									/>
-								</>
-							) : (
-								<Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-									<TextField
-										size="small"
-										label={filter.label}
-										placeholder={filter.customPlaceholder}
-										value={dicValue.value}
-										onChange={(e) =>
-											updateFilter(filter.id, {
-												...dicValue,
-												value: e.target.value,
-											})
-										}
-										error={!validation.valid}
-										helperText={validation.error}
-										sx={{ minWidth: filter.width || 200 }}
-									/>
-									<IconButton
-										size="small"
-										onClick={() =>
-											updateFilter(filter.id, { prefix: null, value: "" })
-										}
-										title="Zrušit vlastní DIČ"
-									>
-										<CloseIcon fontSize="small" />
-									</IconButton>
-								</Box>
-							)}
-						</Box>
+						<NumberWithPrefixFilter
+							filter={filter}
+							value={filters[filter.id] || { prefix: null, value: "" }}
+							onUpdate={(value) => updateFilter(filter.id, value)}
+						/>
 					);
-				}
 
 				case "select":
 					return (
-						<FormControl
-							key={filter.id}
-							size="small"
-							sx={{ minWidth: filter.width || 180 }}
-						>
-							<InputLabel>{filter.label}</InputLabel>
-							<Select
-								value={filters[filter.id] ?? ""}
-								label={filter.label}
-								onChange={(e: SelectChangeEvent) =>
-									updateFilter(filter.id, e.target.value || null)
-								}
-							>
-								<MenuItem value="">
-									<em>{filter.placeholder || "Vše"}</em>
-								</MenuItem>
-								{filter.options.map((option: any) => (
-									<MenuItem key={option.value} value={option.value}>
-										{option.label}
-									</MenuItem>
-								))}
-							</Select>
-						</FormControl>
+						<SelectFilter
+							filter={filter}
+							value={filters[filter.id] ?? null}
+							onUpdate={(value) => updateFilter(filter.id, value)}
+						/>
 					);
 
-				case "multiselect": {
-					const selectedValues = filters[filter.id] || [];
+				case "multiselect":
 					return (
-						<FormControl
-							key={filter.id}
-							size="small"
-							sx={{ minWidth: filter.width || 220 }}
-						>
-							<InputLabel>{filter.label}</InputLabel>
-							<Select
-								multiple
-								value={selectedValues}
-								label={filter.label}
-								onChange={(e: SelectChangeEvent<typeof selectedValues>) =>
-									updateFilter(filter.id, e.target.value)
-								}
-								input={<OutlinedInput label={filter.label} />}
-								renderValue={(selected) => (
-									<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-										{selected.map((value: any) => {
-											const option = filter.options.find(
-												(o: any) => o.value === value,
-											);
-											return (
-												<Chip
-													key={value}
-													label={option?.label || value}
-													size="small"
-												/>
-											);
-										})}
-									</Box>
-								)}
-							>
-								{filter.options.map((option: any) => (
-									<MenuItem key={option.value} value={option.value}>
-										{option.label}
-									</MenuItem>
-								))}
-							</Select>
-						</FormControl>
+						<MultiSelectFilter
+							filter={filter}
+							value={filters[filter.id] || []}
+							onUpdate={(value) => updateFilter(filter.id, value)}
+						/>
+					);
+
+				case "number-comparator":
+					return (
+						<NumberComparatorFilter
+							filter={filter}
+							value={filters[filter.id] || { value: "", comparator: ">" }}
+							onUpdate={(value) => updateFilter(filter.id, value)}
+						/>
+					);
+
+				case "action-button":
+					return (
+						<ActionButtonFilter
+							filter={filter}
+							actions={actions}
+							filterActions={filterActions}
+							onOpenAction={(actionId) => setOpenActionId(actionId)}
+						/>
+					);
+
+				case "filter-aggregate": {
+					const isExpanded = filters._aggregateExpanded?.[filter.id] ?? filter.defaultExpanded ?? false;
+					const isRemovable = isDynamicFilter(filter.id);
+
+					return (
+						<FilterAggregateFilter
+							filter={filter}
+							value={filters[filter.primaryFilter.id] || { value: "", comparator: ">" }}
+							onUpdate={(value) => updateFilter(filter.primaryFilter.id, value)}
+							isExpanded={isExpanded}
+							onToggleExpanded={() => {
+								updateFilter("_aggregateExpanded", {
+									...(filters._aggregateExpanded || {}),
+									[filter.id]: !isExpanded,
+								});
+							}}
+							isRemovable={isRemovable}
+							onRemove={isRemovable && onRemoveDynamicFilter ? () => onRemoveDynamicFilter(filter.id) : undefined}
+							renderExpandedFilter={(subFilter) => renderFilter(subFilter)}
+						/>
 					);
 				}
-case "number-comparator": {
-	const value = filters[filter.id] || { value: "", comparator: ">" };
-
-	const getComparatorIcon = () => {
-		switch (value.comparator) {
-			case '>': return '>';
-			case '=': return '=';
-			case '<': return '<';
-		}
-	};
-
-	const cycleComparator = () => {
-		const next = value.comparator === '>' ? '=' : value.comparator === '=' ? '<' : '>';
-		updateFilter(filter.id, { ...value, comparator: next });
-	};
-
-	return (
-		<Box key={filter.id} sx={{ display: 'flex', gap: 0, alignItems: 'flex-start' }}>
-			{locked ? (
-				<Box
-					sx={{
-						minWidth: 40,
-						height: 37,
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						border: (theme) => `1px solid ${theme.palette.grey[400]}`,
-						borderTopRightRadius: 0,
-						borderBottomRightRadius: 0,
-						borderRight: 'none',
-						fontSize: '1rem',
-						fontWeight: 'bold',
-						bgcolor: 'action.disabledBackground',
-						color: 'text.disabled',
-					}}
-				>
-					{getComparatorIcon()}
-				</Box>
-			) : (
-				<Button
-					onClick={cycleComparator}
-					size="small"
-					variant="outlined"
-					sx={{
-						minWidth: 40,
-						height: 37,
-						borderColor: (theme) => theme.palette.grey[400],
-						borderTopRightRadius: 0,
-						borderBottomRightRadius: 0,
-						borderRight: 'none',
-						fontSize: '1rem',
-						fontWeight: 'bold',
-						px: 1,
-					}}
-				>
-					{getComparatorIcon()}
-				</Button>
-			)}
-			<TextField
-				size="small"
-				label={filter.label}
-				placeholder={filter.placeholder || "0"}
-				value={value.value}
-				onChange={(e) => {
-					const input = e.target.value;
-					if (filter.allowNegative) {
-						if (input === '' || input === '-' || /^-?\d*$/.test(input)) {
-							updateFilter(filter.id, { ...value, value: input });
-						}
-					} else {
-						const numOnly = input.replace(/\D/g, "");
-						updateFilter(filter.id, { ...value, value: numOnly });
-					}
-				}}
-				sx={{
-					width: filter.width || 100,
-					'& .MuiOutlinedInput-root': {
-						borderTopLeftRadius: 0,
-						borderBottomLeftRadius: 0,
-					},
-				}}
-			/>
-		</Box>
-	);
-}
-
-			case "action-button": {
-				return (
-					<Button
-						key={filter.id}
-						variant={filter.variant || "outlined"}
-						size="small"
-						onClick={() => {
-							// First check filterActions, then actions
-							const action = [...filterActions, ...actions].find(a => a.id === filter.actionId);
-							if (action?.renderDialog) {
-								setOpenActionId(action.id);
-							} else {
-								action?.onClick?.();
-							}
-						}}
-					>
-						{filter.label}
-					</Button>
-				);
-			}
-
-			case "filter-aggregate": {
-				const isExpanded = filters._aggregateExpanded?.[filter.id] ?? filter.defaultExpanded ?? false;
-				const lockPrimary = filter.lockPrimaryWhenExpanded ?? true;
-				const isRemovable = isDynamicFilter(filter.id);
-
-				const toggleExpanded = () => {
-					const newExpanded = !isExpanded;
-					updateFilter("_aggregateExpanded", {
-						...(filters._aggregateExpanded || {}),
-						[filter.id]: newExpanded,
-					});
-				};
-
-				return (
-					<Box key={filter.id} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-						{/* Primary filter row with expand/collapse button */}
-						<Box sx={{ display: 'flex', gap: 0, alignItems: 'flex-start' }}>
-							{/* Render primary filter with locked state */}
-							{renderFilterWithLock(filter.primaryFilter, isExpanded && lockPrimary)}
-
-							{/* Expand/collapse button */}
-							{filter.collapsible && (
-								<IconButton
-									size="small"
-									onClick={toggleExpanded}
-									sx={{ height: 37 }}
-								>
-									{isExpanded ? <RemoveIcon /> : <AddIcon />}
-								</IconButton>
-							)}
-
-							{/* Remove button for dynamic filters */}
-							{isRemovable && onRemoveDynamicFilter && (
-								<IconButton
-									size="small"
-									onClick={() => onRemoveDynamicFilter(filter.id)}
-									sx={{ height: 37 }}
-									title="Odstranit filtr"
-								>
-									<CloseIcon fontSize="small" />
-								</IconButton>
-							)}
-						</Box>
-
-						{/* Expanded filters */}
-						{isExpanded && (
-							<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, pl: 1 }}>
-								{filter.expandedFilters.map((subFilter) =>
-									renderFilterInternal(subFilter, false)
-								)}
-							</Box>
-						)}
-					</Box>
-				);
-			}
 
 				default:
 					return null;
@@ -596,7 +286,7 @@ case "number-comparator": {
 							flexShrink: 0,
 						}}
 					>
-						{!hideColumnPicker && ( // NEW - conditionally render
+						{!hideColumnPicker && (
 							<ColumnPickerButton
 								columns={columns}
 								visibleColumnIds={visibleColumnIds}
