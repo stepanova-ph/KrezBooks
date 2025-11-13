@@ -209,6 +209,15 @@ export function registerIpcHandlers() {
 		},
 	);
 
+	ipcMain.handle(
+		"db:stockMovements:shouldSetResetPoint",
+		async (_event, itemEan: string, newAmount: string) => {
+			return handleIpcRequest(() =>
+				stockMovementService.shouldSetResetPoint(itemEan, newAmount),
+			);
+		},
+	);
+
 	// --------------------------------------------------------------------------
 	// INVOICES HANDLERS
 	// --------------------------------------------------------------------------

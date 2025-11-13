@@ -97,5 +97,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
 		getLastBuyPriceByItem: (ean: string) =>
 			ipcRenderer.invoke("db:stockMovements:getLastBuyPriceByItem", ean),
+
+		shouldSetResetPoint: (itemEan: string, newAmount: string) =>
+			ipcRenderer.invoke(
+				"db:stockMovements:shouldSetResetPoint",
+				itemEan,
+				newAmount,
+			),
 	},
 });

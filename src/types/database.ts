@@ -84,9 +84,10 @@ export type UpdateItemInput = UpdateInput<
 export interface StockMovement {
 	invoice_number: string;
 	item_ean: string;
-	amount: string;
-	price_per_unit: string;
+	amount: number;
+	price_per_unit: number;
 	vat_rate: VatRate;
+	reset_point?: boolean;
 	created_at?: string;
 }
 

@@ -3,6 +3,10 @@ import type {
 	Item,
 	CreateContactInput,
 	CreateItemInput,
+	StockMovement,
+	CreateStockMovementInput,
+	Invoice,
+	CreateInvoiceInput,
 } from "./types/database";
 import type { IpcResponse } from "./main/ipcWrapper";
 
@@ -64,37 +68,41 @@ declare global {
 			};
 
 			stockMovements: {
-				getAll: () => Promise<IPCResponse<StockMovement[]>>;
+				getAll: () => Promise<IpcResponse<StockMovement[]>>;
 				getOne: (
 					invoiceNumber: string,
 					itemEan: string,
-				) => Promise<IPCResponse<StockMovement>>;
+				) => Promise<IpcResponse<StockMovement>>;
 				getByInvoice: (
 					invoiceNumber: string,
-				) => Promise<IPCResponse<StockMovement[]>>;
-				getByItem: (itemEan: string) => Promise<IPCResponse<StockMovement[]>>;
-				getStockAmountByItem: (itemEan: string) => Promise<IPCResponse<number>>;
+				) => Promise<IpcResponse<StockMovement[]>>;
+				getByItem: (itemEan: string) => Promise<IpcResponse<StockMovement[]>>;
+				getStockAmountByItem: (itemEan: string) => Promise<IpcResponse<number>>;
 				getAverageBuyPriceByItem: (
 					itemEan: string,
-				) => Promise<IPCResponse<number>>;
+				) => Promise<IpcResponse<number>>;
 				getLastBuyPriceByItem: (
 					itemEan: string,
-				) => Promise<IPCResponse<number>>;
+				) => Promise<IpcResponse<number>>;
+				shouldSetResetPoint: (
+					itemEan: string,
+					newAmount: string,
+				) => Promise<IpcResponse<boolean>>;
 				create: (
 					movement: CreateStockMovementInput,
-				) => Promise<IPCResponse<{ changes: number }>>;
+				) => Promise<IpcResponse<{ changes: number }>>;
 				update: (
 					invoiceNumber: string,
 					itemEan: string,
 					updates: Partial<StockMovement>,
-				) => Promise<IPCResponse<{ changes: number }>>;
+				) => Promise<IpcResponse<{ changes: number }>>;
 				delete: (
 					invoiceNumber: string,
 					itemEan: string,
-				) => Promise<IPCResponse<{ changes: number }>>;
+				) => Promise<IpcResponse<{ changes: number }>>;
 				deleteByInvoice: (
 					invoiceNumber: string,
-				) => Promise<IPCResponse<{ changes: number }>>;
+				) => Promise<IpcResponse<{ changes: number }>>;
 			};
 
 			invoices: {
@@ -110,7 +118,7 @@ declare global {
 				delete: (number: string) => Promise<IpcResponse<{ changes: number }>>;
 				getByInvoice: (
 					invoiceNumber: string,
-				) => Promise<IpcResponse<StockMoveent[]>>;
+				) => Promise<IpcResponse<StockMovement[]>>;
 				getAverageBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
 				getLastBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
 			};

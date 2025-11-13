@@ -168,15 +168,24 @@ function NewInvoiceTab() {
 			});
 
 			await Promise.all(
-				form.invoiceItems.map((item) =>
-					createStockMovement.mutateAsync({
+				form.invoiceItems.map(async (item) => {
+					// Check if we should set reset point for this item
+					const shouldSetResetPoint =
+						await window.electronAPI.stockMovements.shouldSetResetPoint(
+							item.ean,
+							item.amount.toString(),
+						);
+					console.log(`Should set reset point for ${item.ean}: ${shouldSetResetPoint}`);
+
+					return createStockMovement.mutateAsync({
 						invoice_number: form.formData.number,
 						item_ean: item.ean,
 						amount: item.amount.toString(),
 						price_per_unit: item.sale_price.toString(),
 						vat_rate: item.vat_rate,
-					}),
-				),
+						reset_point: shouldSetResetPoint,
+					});
+				}),
 			);
 
 			form.handleReset();

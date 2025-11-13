@@ -35,6 +35,7 @@ export function useTableFilters<T extends Record<string, any>>(
 					({ field, match }) => {
 						const value = item[field];
 
+						if (!value) return false;
 						if (match) {
 							try {
 								return match(value, searchTerm);
