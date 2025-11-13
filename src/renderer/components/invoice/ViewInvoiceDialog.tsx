@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { Dialog } from "../common/dialog/Dialog";
 import { useInvoice } from "../../../hooks/useInvoices";
 import { useStockMovementsByInvoice } from "../../../hooks/useStockMovement";
@@ -9,10 +9,7 @@ import { InvoiceContactInfo } from "./InvoiceContactInfo";
 import { InvoiceItemsList } from "./InvoiceItemsList";
 import { Loading } from "../layout/Loading";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
-import {
-	calculateTotalWithoutVat,
-	calculateTotalWithVat,
-} from "../../../utils/formUtils";
+import { InvoiceTotals } from "./InvoiceTotals";
 
 interface ViewInvoiceDialogProps {
 	open: boolean;
@@ -176,68 +173,7 @@ export function ViewInvoiceDialog({
 							</FormSection>
 						</Box>
 
-						{/* Totals */}
-						<Box
-							sx={{
-								borderTop: (theme) => `1px solid ${theme.palette.divider}`,
-								bgcolor: "background.paper",
-							}}
-						>
-							<Box
-								sx={{
-									px: 4,
-									py: 2.5,
-									display: "flex",
-									justifyContent: "flex-end",
-									gap: 8,
-								}}
-							>
-								<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-									<Typography
-										variant="body1"
-										fontWeight={500}
-										color="text.secondary"
-									>
-										Celkem bez DPH:
-									</Typography>
-									<Typography variant="h6" fontWeight={700}>
-										{calculateTotalWithoutVat(invoiceItems).toFixed(2)} Kč
-									</Typography>
-								</Box>
-								<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-									<Typography
-										variant="body1"
-										fontWeight={500}
-										color="text.secondary"
-									>
-										DPH:
-									</Typography>
-									<Typography
-										variant="h6"
-										fontWeight={700}
-										color="text.primary"
-									>
-										{(calculateTotalWithVat(invoiceItems).toFixed(2) - calculateTotalWithoutVat(invoiceItems).toFixed(2)).toFixed(2)} Kč
-									</Typography>
-								</Box>
-								<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-									<Typography
-										variant="body1"
-										fontWeight={500}
-										color="text.secondary"
-									>
-										Celkem s DPH:
-									</Typography>
-									<Typography
-										variant="h6"
-										fontWeight={700}
-										color="primary.main"
-									>
-										{calculateTotalWithVat(invoiceItems).toFixed(2)} Kč
-									</Typography>
-								</Box>
-							</Box>
-						</Box>
+						<InvoiceTotals items={invoiceItems} />
 					</Box>
 				</Box>
 			)}

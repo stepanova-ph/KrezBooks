@@ -1,16 +1,11 @@
 import {
-	IconButton,
-	Tooltip,
 	Select,
 	MenuItem,
 	FormControl,
 	InputLabel,
 	Grid,
-	Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import LockIcon from "@mui/icons-material/Lock";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
 import type { CreateContactInput, Contact } from "../../../types/database";
 import { contactSchema } from "../../../validation/contactSchema";
 import { FormDialog } from "../common/form/FormDialog";
@@ -75,13 +70,10 @@ function ContactForm({
 
 	const [bankAccountParts, setBankAccountParts] = useState(initialBankAccount);
 	const [errors, setErrors] = useState<Record<string, string>>({});
-	const [isUnlocked, setIsUnlocked] = useState(false);
 
 	useEffect(() => {
-		// Reset form when dialog opens
 		if (open) {
 			if (initialData) {
-				// Edit mode - populate with initial data
 				setFormData({
 					...defaultFormData,
 					...initialData,
@@ -96,19 +88,16 @@ function ContactForm({
 				});
 				setBankAccountParts(splitBankAccount(initialData.bank_account));
 			} else {
-				// Create mode - reset to defaults
 				setFormData(defaultFormData);
 				setBankAccountParts({ accountNumber: "", bankCode: "" });
 			}
-			// Always clear errors when dialog opens
 			setErrors({});
-			setIsUnlocked(false);
 		}
 	}, [open, initialData]);
+
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value, type, checked } = e.target;
 
-		// Clear error when user starts typing
 		if (errors[name]) {
 			setErrors((prev) => ({ ...prev, [name]: "" }));
 		}
@@ -208,41 +197,7 @@ function ContactForm({
 			isPending={isPending}
 			submitLabel={submitLabel}
 		>
-			<FormSection
-				title="Základní údaje"
-				spacing={mode === "edit" ? 1 : undefined}
-				actions={
-					mode === "edit" ? (
-						<>
-							<Tooltip
-								title={
-									isUnlocked
-										? "Zamknout IČO a DIČ"
-										: "Odemknout IČO a DIČ pro úpravu"
-								}
-							>
-								<IconButton
-									size="small"
-									onClick={() => setIsUnlocked(!isUnlocked)}
-									color={isUnlocked ? "error" : "default"}
-								>
-									{isUnlocked ? (
-										<LockOpenIcon sx={{ height: "16px", width: "16px" }} />
-									) : (
-										<LockIcon sx={{ height: "16px", width: "16px" }} />
-									)}
-								</IconButton>
-							</Tooltip>
-							<Typography
-								sx={{ fontSize: "0.875rem", color: "text.secondary" }}
-							>
-								{isUnlocked ? "IČO a DIČ jsou odemčeny" : "Odemčení IČO a DIČ"}
-							</Typography>
-						</>
-					) : null
-				}
-			>
-				{/* Row 1: ICO + Modifier + DIC prefix + DIC value (or custom DIČ) */}
+			<FormSection title="Základní údaje">
 				<Grid container spacing={2} alignItems="center">
 					<Grid item md={4.8} mr={-0.5}>
 						<ValidatedTextField
@@ -254,12 +209,11 @@ function ContactForm({
 							error={errors.ico}
 							grayWhenEmpty
 							required
-							disabled={mode === "edit" && !isUnlocked}
+							disabled={mode === "edit"}
 							fullWidth
 						/>
 					</Grid>
 
-					{/* 1.5 + 4.7 + 1.3 */}
 					<Grid item md={1.3}>
 						<ValidatedTextField
 							label="Mod"
@@ -271,6 +225,7 @@ function ContactForm({
 							error={errors.modifier}
 							grayWhenZero
 							inputProps={{ step: "1" }}
+							disabled={mode === "edit"}
 							fullWidth
 						/>
 					</Grid>
@@ -284,13 +239,11 @@ function ContactForm({
 							onBlur={() => handleBlur("dic")}
 							error={errors.dic}
 							placeholder="CZ12345678"
-							disabled={mode === "edit" && !isUnlocked}
 							fullWidth
 						/>
 					</Grid>
 				</Grid>
 
-				{/* Row 2: Název firmy + Odběratel + Dodavatel */}
 				<Grid container spacing={2} alignItems="center">
 					<Grid item md={6}>
 						<ValidatedTextField

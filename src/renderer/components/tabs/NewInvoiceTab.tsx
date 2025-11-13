@@ -19,6 +19,7 @@ import {
 	calculateTotalWithoutVat,
 	calculateTotalWithVat,
 } from "../../../utils/formUtils";
+import { InvoiceTotals } from "../invoice/InvoiceTotals";
 
 function NewInvoiceTab() {
 	const form = useInvoiceForm();
@@ -306,57 +307,7 @@ function NewInvoiceTab() {
 					}}
 				>
 					{/* Totals */}
-					<Box
-						sx={{
-							px: 4,
-							py: 2.5,
-							display: "flex",
-							justifyContent: "flex-end",
-							gap: 8,
-							borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-						}}
-					>
-						<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-							<Typography
-								variant="body1"
-								fontWeight={500}
-								color="text.secondary"
-							>
-								Celkem bez DPH:
-							</Typography>
-							<Typography variant="h6" fontWeight={700}>
-								{calculateTotalWithoutVat(form.invoiceItems).toFixed(2)} Kč
-							</Typography>
-						</Box>
-						<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-							<Typography
-								variant="body1"
-								fontWeight={500}
-								color="text.secondary"
-							>
-								DPH:
-							</Typography>
-							<Typography
-								variant="h6"
-								fontWeight={700}
-								color="text.primary"
-							>
-								{(calculateTotalWithVat(form.invoiceItems).toFixed(2) - calculateTotalWithoutVat(form.invoiceItems).toFixed(2)).toFixed(2)} Kč
-							</Typography>
-						</Box>
-						<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-							<Typography
-								variant="body1"
-								fontWeight={500}
-								color="text.secondary"
-							>
-								Celkem s DPH:
-							</Typography>
-							<Typography variant="h6" fontWeight={700} color="primary.main">
-								{calculateTotalWithVat(form.invoiceItems).toFixed(2)} Kč
-							</Typography>
-						</Box>
-					</Box>
+					<InvoiceTotals items={form.invoiceItems} />
 
 					{/* Buttons */}
 					<Box
