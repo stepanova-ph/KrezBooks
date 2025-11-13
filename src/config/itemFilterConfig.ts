@@ -54,6 +54,46 @@ export const itemFilterConfig: FilterConfig = {
 			allowNegative: true,
 			width: 100,
 		},
+
+		{
+			id: "price_aggregate",
+			type: "filter-aggregate",
+			label: "Cena",
+			columnId: "sale_price_group1",
+			collapsible: true,
+			defaultExpanded: false,
+			lockPrimaryWhenExpanded: true,
+			primaryFilter: {
+				id: "price",
+				type: "number-comparator",
+				label: "Cena",
+				field: "price",
+				placeholder: "0",
+				allowNegative: false,
+				width: 120,
+			},
+			expandedFilters: [
+				{
+					id: "price_with_vat",
+					type: "checkbox",
+					label: "S DPH",
+					field: "price_with_vat",
+				},
+				{
+					id: "price_groups",
+					type: "multiselect",
+					label: "Cenová skupina",
+					field: "price_groups",
+					options: [
+						{ value: 1, label: "Skupina 1" },
+						{ value: 2, label: "Skupina 2" },
+						{ value: 3, label: "Skupina 3" },
+						{ value: 4, label: "Skupina 4" },
+					],
+					placeholder: "Všechny skupiny",
+				},
+			],
+		},
 	],
 };
 
@@ -66,6 +106,9 @@ export const initialItemFilterState: ItemFilterState = {
 	unit_of_measure: "",
 	category: [],
 	stock_amount: { value: "", comparator: ">" },
+	price: { value: "", comparator: ">" },
+	price_with_vat: false,
+	price_groups: [1, 2, 3, 4], // All groups selected by default
 };
 
 export const defaultVisibleColumnsItem = [

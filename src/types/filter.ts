@@ -10,7 +10,9 @@ export type FilterType =
 	| "number-with-prefix" // Special: number with country prefix selector (DIC)
 	| "select" // Single selection dropdown
 	| "multiselect" // Multiple selection dropdown
-	| "number-comparator"; // ADD THIS
+	| "number-comparator" // Number with comparator (>, =, <)
+	| "filter-aggregate" // Groups multiple filters with collapsible UI
+	| "action-button"; // Clickable button that triggers FilterAction
 
 /**
  * Base filter definition
@@ -105,6 +107,28 @@ export interface NumberComparatorFilterDef extends BaseFilterDef {
 }
 
 /**
+ * Action button filter - clickable button that triggers FilterAction
+ */
+export interface ActionButtonFilterDef extends BaseFilterDef {
+	type: "action-button";
+	actionId: string; // references FilterAction.id
+	variant?: "text" | "outlined" | "contained";
+}
+
+/**
+ * Filter aggregate - groups multiple filters with collapsible UI
+ * Primary filter shown when collapsed, additional controls when expanded
+ */
+export interface FilterAggregateFilterDef extends BaseFilterDef {
+	type: "filter-aggregate";
+	collapsible: boolean;
+	defaultExpanded?: boolean; // default: false
+	primaryFilter: FilterDef; // shown always, locked when expanded
+	expandedFilters: Array<FilterDef | ActionButtonFilterDef>; // shown when expanded
+	lockPrimaryWhenExpanded?: boolean; // default: true - disables primary comparator
+}
+
+/**
  * Union of all filter definition types
  */
 export type FilterDef =
@@ -114,7 +138,9 @@ export type FilterDef =
 	| NumberWithPrefixFilterDef
 	| SelectFilterDef
 	| MultiSelectFilterDef
-	| NumberComparatorFilterDef;
+	| NumberComparatorFilterDef
+	| ActionButtonFilterDef
+	| FilterAggregateFilterDef;
 
 /**
  * Filter configuration for a table
@@ -136,6 +162,19 @@ export interface ContactFilterState {
 }
 
 /**
+ * Filter state for invoices
+ */
+export interface InvoiceFilterState {
+	search: string;
+	total_amount?: { value: string; comparator: '>' | '=' | '<' };
+	total_amount_with_vat?: boolean;
+	date_issue?: { value: string; comparator: '>' | '=' | '<' };
+	date_due?: { value: string; comparator: '>' | '=' | '<' };
+	date_tax?: { value: string; comparator: '>' | '=' | '<' };
+	_dynamicFilters?: string[]; // IDs of dynamically added filters
+}
+
+/**
  * Filter state for items
  */
 export interface ItemFilterState {
@@ -144,12 +183,21 @@ export interface ItemFilterState {
 	unit_of_measure: string; // Text search
 	category: string[]; // Text search
 	stock_amount?: { value: string; comparator: '>' | '=' | '<' }; // Number comparator
+	price?: { value: string; comparator: '>' | '=' | '<' }; // Number comparator
+	price_with_vat?: boolean;
+	price_groups?: number[]; // Selected price groups (1-4)
 }
 
 /**
  * Generic filter state
  */
-export type FilterState = Record<string, any>;
+export type FilterState = {
+	[filterId: string]: any;
+	_aggregateExpanded?: {
+		[aggregateId: string]: boolean;
+	};
+	_dynamicFilters?: string[]; // IDs of dynamically added filters
+};
 
 /**
  * Filter action button definition

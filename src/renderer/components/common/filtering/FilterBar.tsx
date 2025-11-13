@@ -3,7 +3,6 @@ import {
 	Box,
 	TextField,
 	FormControlLabel,
-	Checkbox,
 	Select,
 	MenuItem,
 	Button,
@@ -13,12 +12,12 @@ import {
 	Chip,
 	OutlinedInput,
 	SelectChangeEvent,
-	InputAdornment,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import type { ReactNode } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import { FilterConfig, FilterState } from "src/types/filter";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { FilterConfig, FilterState, FilterDef } from "src/types/filter";
 import { ColumnPickerButton } from "./ColumnPickerButton";
 import type { Column } from "../table/DataTable";
 import type { FilterAction } from "src/types/filter";
@@ -34,6 +33,8 @@ interface FilterBarProps {
 	onVisibleColumnsChange: (columnIds: Set<string>) => void;
 	defaultColumnIds?: string[];
 	actions?: FilterAction[];
+	filterActions?: FilterAction[]; // Actions for filter buttons (add dynamic filters)
+	onRemoveDynamicFilter?: (filterId: string) => void; // Callback to remove dynamic filters
 	clearLabel?: string;
 	orderBy?: OrderByConfig;
 	onOrderByChange?: (orderBy: OrderByConfig) => void;
@@ -55,6 +56,8 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 			onVisibleColumnsChange,
 			defaultColumnIds = [],
 			actions = [],
+			filterActions = [],
+			onRemoveDynamicFilter,
 			clearLabel = "Vymazat filtry",
 			orderBy,
 			onOrderByChange,
@@ -73,13 +76,19 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 			(f) => !f.columnId || visibleColumnIds.has(f.columnId),
 		);
 
+		// Helper to check if a filter is dynamic (removable)
+		const isDynamicFilter = (filterId: string): boolean => {
+			return filterId.includes("_aggregate") && (filterId === "date_due_aggregate" || filterId === "date_tax_aggregate");
+		};
+
 		const updateFilter = (filterId: string, value: any) => {
 			onFiltersChange({ ...filters, [filterId]: value });
 		};
 
 		const handleClearFilters = () => {
 			const cleared: FilterState = {};
-			config.filters.forEach((filter) => {
+
+			const clearFilter = (filter: FilterDef) => {
 				switch (filter.type) {
 					case "text-search":
 					case "number-input":
@@ -99,9 +108,28 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 						break;
 					case "number-comparator":
 						cleared[filter.id] = { value: "", comparator: ">" };
-						break;	
+						break;
+					case "filter-aggregate":
+						// Clear primary filter
+						clearFilter(filter.primaryFilter);
+						// Clear expanded filters
+						filter.expandedFilters.forEach(subFilter => {
+							if (subFilter.type !== "action-button") {
+								clearFilter(subFilter);
+							}
+						});
+						break;
+					case "action-button":
+						// No state to clear
+						break;
 				}
-			});
+			};
+
+			config.filters.forEach(clearFilter);
+
+			// Clear expansion state
+			cleared._aggregateExpanded = {};
+
 			onFiltersChange(cleared);
 		};
 
@@ -128,6 +156,20 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 
 		const renderFilter = (
 			filter: (typeof visibleFilters)[number],
+		): ReactNode => {
+			return renderFilterInternal(filter, false);
+		};
+
+		const renderFilterWithLock = (
+			filter: FilterDef,
+			locked: boolean
+		): ReactNode => {
+			return renderFilterInternal(filter, locked);
+		};
+
+		const renderFilterInternal = (
+			filter: FilterDef,
+			locked: boolean = false,
 		): ReactNode => {
 			switch (filter.type) {
 				case "text-search":
@@ -352,7 +394,7 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 				}
 case "number-comparator": {
 	const value = filters[filter.id] || { value: "", comparator: ">" };
-	
+
 	const getComparatorIcon = () => {
 		switch (value.comparator) {
 			case '>': return '>';
@@ -360,32 +402,54 @@ case "number-comparator": {
 			case '<': return '<';
 		}
 	};
-	
+
 	const cycleComparator = () => {
 		const next = value.comparator === '>' ? '=' : value.comparator === '=' ? '<' : '>';
 		updateFilter(filter.id, { ...value, comparator: next });
 	};
-	
+
 	return (
 		<Box key={filter.id} sx={{ display: 'flex', gap: 0, alignItems: 'flex-start' }}>
-			<Button
-				onClick={cycleComparator}
-				size="small"
-				variant="outlined"
-				sx={{
-					minWidth: 40,
-					height: 37,
-					borderColor: (theme) => theme.palette.grey[400],
-					borderTopRightRadius: 0,
-					borderBottomRightRadius: 0,
-					borderRight: 'none',
-					fontSize: '1rem',
-					fontWeight: 'bold',
-					px: 1,
-				}}
-			>
-				{getComparatorIcon()}
-			</Button>
+			{locked ? (
+				<Box
+					sx={{
+						minWidth: 40,
+						height: 37,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						border: (theme) => `1px solid ${theme.palette.grey[400]}`,
+						borderTopRightRadius: 0,
+						borderBottomRightRadius: 0,
+						borderRight: 'none',
+						fontSize: '1rem',
+						fontWeight: 'bold',
+						bgcolor: 'action.disabledBackground',
+						color: 'text.disabled',
+					}}
+				>
+					{getComparatorIcon()}
+				</Box>
+			) : (
+				<Button
+					onClick={cycleComparator}
+					size="small"
+					variant="outlined"
+					sx={{
+						minWidth: 40,
+						height: 37,
+						borderColor: (theme) => theme.palette.grey[400],
+						borderTopRightRadius: 0,
+						borderBottomRightRadius: 0,
+						borderRight: 'none',
+						fontSize: '1rem',
+						fontWeight: 'bold',
+						px: 1,
+					}}
+				>
+					{getComparatorIcon()}
+				</Button>
+			)}
 			<TextField
 				size="small"
 				label={filter.label}
@@ -413,6 +477,83 @@ case "number-comparator": {
 		</Box>
 	);
 }
+
+			case "action-button": {
+				return (
+					<Button
+						key={filter.id}
+						variant={filter.variant || "outlined"}
+						size="small"
+						onClick={() => {
+							// First check filterActions, then actions
+							const action = [...filterActions, ...actions].find(a => a.id === filter.actionId);
+							if (action?.renderDialog) {
+								setOpenActionId(action.id);
+							} else {
+								action?.onClick?.();
+							}
+						}}
+					>
+						{filter.label}
+					</Button>
+				);
+			}
+
+			case "filter-aggregate": {
+				const isExpanded = filters._aggregateExpanded?.[filter.id] ?? filter.defaultExpanded ?? false;
+				const lockPrimary = filter.lockPrimaryWhenExpanded ?? true;
+				const isRemovable = isDynamicFilter(filter.id);
+
+				const toggleExpanded = () => {
+					const newExpanded = !isExpanded;
+					updateFilter("_aggregateExpanded", {
+						...(filters._aggregateExpanded || {}),
+						[filter.id]: newExpanded,
+					});
+				};
+
+				return (
+					<Box key={filter.id} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+						{/* Primary filter row with expand/collapse button */}
+						<Box sx={{ display: 'flex', gap: 0, alignItems: 'flex-start' }}>
+							{/* Render primary filter with locked state */}
+							{renderFilterWithLock(filter.primaryFilter, isExpanded && lockPrimary)}
+
+							{/* Expand/collapse button */}
+							{filter.collapsible && (
+								<IconButton
+									size="small"
+									onClick={toggleExpanded}
+									sx={{ height: 37 }}
+								>
+									{isExpanded ? <RemoveIcon /> : <AddIcon />}
+								</IconButton>
+							)}
+
+							{/* Remove button for dynamic filters */}
+							{isRemovable && onRemoveDynamicFilter && (
+								<IconButton
+									size="small"
+									onClick={() => onRemoveDynamicFilter(filter.id)}
+									sx={{ height: 37 }}
+									title="Odstranit filtr"
+								>
+									<CloseIcon fontSize="small" />
+								</IconButton>
+							)}
+						</Box>
+
+						{/* Expanded filters */}
+						{isExpanded && (
+							<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, pl: 1 }}>
+								{filter.expandedFilters.map((subFilter) =>
+									renderFilterInternal(subFilter, false)
+								)}
+							</Box>
+						)}
+					</Box>
+				);
+			}
 
 				default:
 					return null;

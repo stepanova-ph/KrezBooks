@@ -35,9 +35,11 @@ interface ListTabComponentProps<TData, TFilter extends FilterState> {
 	) => FilterConfig;
 	storageKey: keyof typeof ORDER_STORAGE_KEYS;
 	tabKey: "contacts" | "invoices" | "inventory";
+	filterActions?: FilterAction[]; // Actions for filter buttons (add dynamic filters)
+	onRemoveDynamicFilter?: (filterId: string) => void; // Callback to remove dynamic filters
 }
 
-export function ListTabComponent<TData, TFilter extends FilterState>({
+export function ListTabComponent<TData extends Record<string, any>, TFilter extends FilterState>({
 	data,
 	isLoading,
 	loadingText,
@@ -50,9 +52,11 @@ export function ListTabComponent<TData, TFilter extends FilterState>({
 	dynamicFilterConfig,
 	storageKey,
 	tabKey,
+	filterActions = [],
+	onRemoveDynamicFilter,
 }: ListTabComponentProps<TData, TFilter>) {
 	const { getFilterState, setFilterState } = useTabPersistence();
-	const initialFilters = getFilterState(tabKey) || initialFilterState;
+	const initialFilters = (getFilterState(tabKey) as TFilter) || initialFilterState;
 	const [filters, setFilters] = useState<TFilter>(initialFilters);
 
 	const [orderBy, setOrderBy] = useState<OrderByConfig | undefined>(undefined);
@@ -82,7 +86,7 @@ export function ListTabComponent<TData, TFilter extends FilterState>({
 		return filterConfig;
 	}, [dynamicFilterConfig, filterConfig, data]);
 
-	const filteredData = useTableFilters(data, filters, finalFilterConfig);
+	const filteredData = useTableFilters<TData>(data, filters, finalFilterConfig);
 
 	if (isLoading) {
 		return (
@@ -140,12 +144,14 @@ export function ListTabComponent<TData, TFilter extends FilterState>({
 							ref={filterBarRef}
 							config={finalFilterConfig}
 							filters={filters}
-							onFiltersChange={setFilters}
+							onFiltersChange={setFilters as (filters: FilterState) => void}
 							columns={columns}
 							visibleColumnIds={visibleColumnIds}
 							onVisibleColumnsChange={handleVisibleColumnsChange}
 							defaultColumnIds={defaultVisibleColumns}
 							actions={actions}
+							filterActions={filterActions}
+							onRemoveDynamicFilter={onRemoveDynamicFilter}
 							orderBy={orderBy}
 							onOrderByChange={setOrderBy}
 						/>
