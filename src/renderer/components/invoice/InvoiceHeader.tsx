@@ -31,7 +31,7 @@ function headerType5({
 	return (
 		<FormSection title="Hlavička" my={2}>
 			<Grid container spacing={2}>
-				<Grid item xs={3.5}>
+				<Grid item xs={3.8}>
 					<ValidatedTextField
 						select
 						required
@@ -60,7 +60,7 @@ function headerType5({
 					</ValidatedTextField>
 				</Grid>
 
-				<Grid item xs={1.5}>
+				<Grid item xs={2}>
 					<ValidatedTextField
 						fullWidth
 						label="Prefix"
@@ -78,10 +78,11 @@ function headerType5({
 								onBlur("prefix");
 							}
 						}}
+						inputProps={{ style: { textTransform: "uppercase", textAlign: "right" } }}
 					/>
 				</Grid>
 
-				<Grid item xs={3.5}>
+				<Grid item xs={3.1}>
 					<ValidatedTextField
 						required
 						fullWidth
@@ -103,7 +104,7 @@ function headerType5({
 					/>
 				</Grid>
 
-				<Grid item xs={3.5}>
+				<Grid item xs={3.1}>
 					<ValidatedTextField
 						required
 						fullWidth
@@ -166,7 +167,7 @@ export function InvoiceHeader({
 	return (
 		<FormSection title="Hlavička" my={2}>
 			<Grid container spacing={2}>
-				<Grid item xs={6}>
+				<Grid item xs={5.3}>
 					<ValidatedTextField
 						label="Typ dokladu"
 						name="type"
@@ -194,7 +195,7 @@ export function InvoiceHeader({
 					</ValidatedTextField>
 				</Grid>
 
-				<Grid item xs={1.5}>
+				<Grid item xs={2.4}>
 					<ValidatedTextField
 						label="Prefix"
 						name="prefix"
@@ -209,7 +210,7 @@ export function InvoiceHeader({
 					/>
 				</Grid>
 
-				<Grid item xs={4.5}>
+				<Grid item xs={4.3}>
 					<ValidatedTextField
 						label="Číslo dokladu"
 						name="number"

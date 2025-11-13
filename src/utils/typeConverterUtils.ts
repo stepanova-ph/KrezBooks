@@ -5,6 +5,7 @@ import { Contact, Invoice, Item, StockMovement } from "src/types/database";
  * SQLite doesn't have a native boolean type, so we use integers
  */
 export function booleanToSQLiteInteger(value: boolean): number {
+	console.log(`Converting boolean to SQLite integer: ${value} = ${value ? 1 : 0}`);
 	return value ? 1 : 0;
 }
 

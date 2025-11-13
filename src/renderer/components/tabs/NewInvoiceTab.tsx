@@ -211,7 +211,7 @@ function NewInvoiceTab() {
 			{/* Left Column - Header & Contact Info */}
 			<Box
 				sx={{
-					width: isType5 ? 0 : 450,
+					width: isType5 ? 0 : 480,
 					flexShrink: 0,
 					p: 3,
 					overflowY: "auto",

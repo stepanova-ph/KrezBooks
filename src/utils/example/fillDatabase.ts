@@ -9,6 +9,7 @@ import {
 	stockMovementQueries,
 } from "../../main/queries";
 import { exampleStockMovements } from "./stockMovements";
+import { booleanToSQLiteInteger } from "../typeConverterUtils";
 // import { exampleInvoices } from './invoices';
 // import { exampleStockMovements } from './stockMovements';
 
@@ -117,14 +118,13 @@ export function fillTestData(db: Database.Database): FillResult {
 
 	for (const movement of exampleStockMovements) {
 		try {
-			console.log(movement)
 			insertStockMovement.run({
 				invoice_number: movement.invoice_number,
 				item_ean: movement.item_ean,
 				amount: movement.amount,
 				price_per_unit: movement.price_per_unit,
 				vat_rate: movement.vat_rate,
-				reset_point: movement.reset_point,
+				reset_point: booleanToSQLiteInteger(movement.reset_point ?? false),
 			});
 			stockMovementsAdded++;
 		} catch (error: any) {

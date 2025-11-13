@@ -135,7 +135,14 @@ export function ItemAmountPriceDialog({
 	const projectedStock = getProjectedStock();
 
 	const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newAmount = parseFloat(e.target.value) || 0;
+	let newAmount = parseFloat(e.target.value);
+
+	if (isNaN(newAmount)) {
+		newAmount = 0;
+	}
+
+	setAmount(newAmount);
+
 		setAmount(newAmount);
 	};
 
@@ -348,7 +355,6 @@ export function ItemAmountPriceDialog({
 						value={amount}
 						onChange={handleAmountChange}
 						precision={0}
-						min={isType5 ? undefined : 0}
 						allowNegative={isType5}
 						fullWidth
 					/>
