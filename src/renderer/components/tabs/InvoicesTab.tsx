@@ -57,14 +57,14 @@ function InvoicesTab() {
 			dynamicFilterConfig={dynamicFilterConfig}
 			filterActions={[
 				{
+					id: "add_date_tax_filter",
+					label: "Datum zdanitelného plnění",
+					onClick: () => addDynamicFilter("date_tax_aggregate"),
+				},
+				{
 					id: "add_date_due_filter",
 					label: "Datum splatnosti",
 					onClick: () => addDynamicFilter("date_due_aggregate"),
-				},
-				{
-					id: "add_date_tax_filter",
-					label: "Datum zdanění",
-					onClick: () => addDynamicFilter("date_tax_aggregate"),
 				},
 			]}
 			onRemoveDynamicFilter={removeDynamicFilter}

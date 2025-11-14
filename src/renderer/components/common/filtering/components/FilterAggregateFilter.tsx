@@ -45,6 +45,7 @@ export function FilterAggregateFilter({
 	const isDateInput = filter.primaryFilter.type === 'date-comparator';
 
 	const collapsedRef = useRef<HTMLDivElement>(null);
+	const expandedRef = useRef<HTMLDivElement>(null);
 	const [collapsedWidth, setCollapsedWidth] = useState<number | undefined>(undefined);
 
 	// Measure collapsed width when not expanded
@@ -54,12 +55,38 @@ export function FilterAggregateFilter({
 		}
 	}, [isExpanded]);
 
+	// Handle click outside and Escape key to close
+	useEffect(() => {
+		if (!isExpanded) return;
+
+		const handleClickOutside = (event: MouseEvent) => {
+			if (expandedRef.current && !expandedRef.current.contains(event.target as Node)) {
+				onToggleExpanded();
+			}
+		};
+
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				onToggleExpanded();
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		document.addEventListener('keydown', handleEscape);
+
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+			document.removeEventListener('keydown', handleEscape);
+		};
+	}, [isExpanded, onToggleExpanded]);
+
 	const getComparatorIcon = () => {
-		switch (currentValue.comparator) {
-			case '>': return '>';
-			case '=': return '=';
-			case '<': return '<';
-		}
+		// Show the first non-empty field's comparator
+		if (currentValue.greaterThan && currentValue.greaterThan !== '') return '>';
+		if (currentValue.equals && currentValue.equals !== '') return '=';
+		if (currentValue.lessThan && currentValue.lessThan !== '') return '<';
+		// Fall back to current comparator if all empty
+		return currentValue.comparator;
 	};
 
 	const cycleComparator = () => {
@@ -68,6 +95,11 @@ export function FilterAggregateFilter({
 	};
 
 	const getCollapsedValue = () => {
+		// Show the first non-empty value
+		if (currentValue.greaterThan && currentValue.greaterThan !== '') return currentValue.greaterThan;
+		if (currentValue.equals && currentValue.equals !== '') return currentValue.equals;
+		if (currentValue.lessThan && currentValue.lessThan !== '') return currentValue.lessThan;
+		// Fall back to current comparator's value if all empty
 		switch (currentValue.comparator) {
 			case '>': return currentValue.greaterThan || '';
 			case '=': return currentValue.equals || '';
@@ -193,6 +225,7 @@ export function FilterAggregateFilter({
 			{/* Expanded view - absolutely positioned */}
 			{isExpanded && (
 				<Box
+					ref={expandedRef}
 					sx={{
 						position: 'absolute',
 						top: 0,
@@ -206,7 +239,7 @@ export function FilterAggregateFilter({
 						boxShadow: 2,
 					}}
 				>
-					{comparators.map((comp, index) => {
+					{comparators.map((comp, idx) => {
 						const displayValue = comp === '>' ? (currentValue.greaterThan || '') :
 						                     comp === '=' ? (currentValue.equals || '') :
 						                     (currentValue.lessThan || '');
@@ -216,7 +249,7 @@ export function FilterAggregateFilter({
 								key={comp}
 								sx={{
 									display: 'flex',
-									borderBottom: index < comparators.length - 1 ? (theme) => `1px solid ${theme.palette.divider}` : 'none',
+									borderBottom: idx < comparators.length - 1 ? (theme) => `1px solid ${theme.palette.divider}` : 'none',
 								}}
 							>
 								<Box
@@ -237,7 +270,7 @@ export function FilterAggregateFilter({
 								<TextField
 									size="small"
 									type={isDateInput ? "date" : undefined}
-									label={filter.primaryFilter.label}
+									label={idx === 0 ? filter.primaryFilter.label : ""}
 									placeholder={isDateInput ? undefined : (filter.primaryFilter.placeholder || "0")}
 									value={displayValue}
 									InputLabelProps={isDateInput ? { shrink: true } : undefined}
@@ -271,7 +304,7 @@ export function FilterAggregateFilter({
 									}}
 								/>
 								
-								{index === 0 && (
+								{idx === 0 && (
 									<Box sx={{ display: 'flex' }}>
 										{filter.collapsible && (
 											<IconButton
@@ -309,7 +342,7 @@ export function FilterAggregateFilter({
 					{filter.expandedFilters.length > 0 && (
 						<>
 							<Divider sx={{ borderColor: 'divider' }} />
-							<Box sx={{ p: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 								{filter.expandedFilters.map((subFilter) => renderExpandedFilter(subFilter))}
 							</Box>
 						</>

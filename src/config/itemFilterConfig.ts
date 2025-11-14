@@ -117,7 +117,7 @@ export const initialItemFilterState: ItemFilterState = {
 	stock_amount: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
 	price: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
 	price_with_vat: false,
-	price_groups: [1, 2, 3, 4],
+	price_groups: [],
 };
 
 export const defaultVisibleColumnsItem = [

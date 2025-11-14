@@ -12,7 +12,7 @@ export const dateDueFilter: FilterAggregateFilterDef = {
 		type: "date-comparator",  // CHANGED
 		label: "Datum splatnosti",
 		field: "date_due",
-		width: 150,
+		width: 135,
 	},
 	expandedFilters: [],
 };
@@ -21,15 +21,15 @@ export const dateDueFilter: FilterAggregateFilterDef = {
 export const dateTaxFilter: FilterAggregateFilterDef = {
 	id: "date_tax_aggregate",
 	type: "filter-aggregate",
-	label: "Datum zdanění",
+	label: "Datum zdanitelného plnění",
 	columnId: "date_tax",
 	collapsible: true,
 	primaryFilter: {
 		id: "date_tax",
 		type: "date-comparator",  // CHANGED
-		label: "Datum zdanění",
+		label: "Datum zdanitelného plnění",
 		field: "date_tax",
-		width: 150,
+		width: 135,
 	},
 	expandedFilters: [],
 };
@@ -47,7 +47,7 @@ export const invoiceFilterConfig: FilterConfig = {
 				{ field: "variable_symbol" }
 			],
 			columnId: null,
-			width: 200,
+			width: 150,
 		},
 
 		{
@@ -65,7 +65,7 @@ export const invoiceFilterConfig: FilterConfig = {
 				field: "total_amount",
 				placeholder: "0",
 				allowNegative: false,
-				width: 120,
+				width: 80,
 			},
 			expandedFilters: [
 				{
@@ -88,23 +88,23 @@ export const invoiceFilterConfig: FilterConfig = {
 			primaryFilter: {
 				id: "date_issue",
 				type: "date-comparator",  // CHANGED
-				label: "Datum",
+				label: "Datum vystavení",
 				field: "date_issue",
-				width: 150,
+				width: 135,
 			},
 			expandedFilters: [
+				{
+					id: "add_date_tax_btn",
+					type: "action-button",
+					label: "Datum zdanitelného plnění",
+					actionId: "add_date_tax_filter",
+					variant: "outlined",
+				},
 				{
 					id: "add_date_due_btn",
 					type: "action-button",
 					label: "Datum splatnosti",
 					actionId: "add_date_due_filter",
-					variant: "outlined",
-				},
-				{
-					id: "add_date_tax_btn",
-					type: "action-button",
-					label: "Datum zdanění",
-					actionId: "add_date_tax_filter",
 					variant: "outlined",
 				},
 			],
