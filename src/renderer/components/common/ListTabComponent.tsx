@@ -37,6 +37,7 @@ interface ListTabComponentProps<TData, TFilter extends FilterState> {
 	tabKey: "contacts" | "invoices" | "inventory";
 	filterActions?: FilterAction[]; // Actions for filter buttons (add dynamic filters)
 	onRemoveDynamicFilter?: (filterId: string) => void; // Callback to remove dynamic filters
+	customFilterElements?: React.ReactNode;
 }
 
 export function ListTabComponent<TData extends Record<string, any>, TFilter extends FilterState>({
@@ -54,6 +55,7 @@ export function ListTabComponent<TData extends Record<string, any>, TFilter exte
 	tabKey,
 	filterActions = [],
 	onRemoveDynamicFilter,
+	customFilterElements = []
 }: ListTabComponentProps<TData, TFilter>) {
 	const { getFilterState, setFilterState } = useTabPersistence();
 	const initialFilters = (getFilterState(tabKey) as TFilter) || initialFilterState;
@@ -154,6 +156,7 @@ export function ListTabComponent<TData extends Record<string, any>, TFilter exte
 							onRemoveDynamicFilter={onRemoveDynamicFilter}
 							orderBy={orderBy}
 							onOrderByChange={setOrderBy}
+							customFilterElements={customFilterElements}
 						/>
 					</Box>
 				</Box>

@@ -36,6 +36,7 @@ interface FilterBarProps {
 	orderBy?: OrderByConfig;
 	onOrderByChange?: (orderBy: OrderByConfig) => void;
 	hideColumnPicker?: boolean;
+	customFilterElements: ReactNode;
 }
 
 export interface FilterBarRef {
@@ -59,6 +60,7 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 			orderBy,
 			onOrderByChange,
 			hideColumnPicker = false,
+			customFilterElements = {}
 		},
 		ref,
 	) => {
@@ -299,8 +301,13 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 							flex: 1,
 						}}
 					>
-						{visibleFilters.map(renderFilter)}
+						{visibleFilters.slice(0, 2).map(renderFilter)}
+						{customFilterElements}
+						{visibleFilters.slice(2, visibleFilters.length).map(renderFilter)}
+
+
 					</Box>
+
 
 					<Box
 						sx={{

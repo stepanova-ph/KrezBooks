@@ -45,7 +45,6 @@ export const invoiceFilterConfig: FilterConfig = {
 				{ field: "company_name" },
 				{ field: "number" },
 				{ field: "prefix" },
-				// Computed field: prefix + number
 				{ 
 					field: "prefixNumber",
 					match: (invoice: any, query: string) => {
@@ -57,11 +56,10 @@ export const invoiceFilterConfig: FilterConfig = {
 			columnId: null,
 			width: 180,
 		},
-
 		{
 			id: "type",
 			type: "multiselect",
-			label: "Typ dokladu",
+			label: "Typ",
 			field: "type",
 			columnId: "type",
 			placeholder: "Všechny typy",
@@ -72,18 +70,8 @@ export const invoiceFilterConfig: FilterConfig = {
 				{ value: 4, label: "Prodej (faktura)" },
 				{ value: 5, label: "Korekce skladu" },
 			],
-			width: 220,
+			width: 100,
 		},
-
-		{
-			id: "contact_picker",
-			type: "action-button",
-			label: "IČO",
-			columnId: "ico",
-			actionId: "open_contact_picker",
-			variant: "outlined",
-		},
-
 		{
 			id: "total_amount_aggregate",
 			type: "filter-aggregate",
@@ -99,7 +87,7 @@ export const invoiceFilterConfig: FilterConfig = {
 				field: "total_amount",
 				placeholder: "0",
 				allowNegative: false,
-				width: 120,
+				width: 80,
 			},
 			expandedFilters: [
 				{
@@ -149,8 +137,7 @@ export const invoiceFilterConfig: FilterConfig = {
 export const initialInvoiceFilterState: InvoiceFilterState = {
 	search: "",
 	type: [],
-	ico: "",
-	modifier: undefined,
+	selectedContacts: [],
 	total_amount: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
 	total_amount_with_vat: false,
 	date_issue: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },

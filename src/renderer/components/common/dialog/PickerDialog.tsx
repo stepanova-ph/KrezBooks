@@ -22,6 +22,7 @@ interface PickerDialogProps<T> {
 	searchPlaceholder?: string;
 	filterValue: string;
 	onFilterChange: (value: string) => void;
+	keepOpenOnSelect?: boolean;
 }
 
 export function PickerDialog<T>({
@@ -37,6 +38,7 @@ export function PickerDialog<T>({
 	searchPlaceholder = "Hledat...",
 	filterValue,
 	onFilterChange,
+	keepOpenOnSelect = false,
 }: PickerDialogProps<T>) {
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [focusedItem, setFocusedItem] = useState<T | null>(null);

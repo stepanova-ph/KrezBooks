@@ -13,7 +13,8 @@ import {
 interface ContactPickerDialogProps {
 	open: boolean;
 	onClose: () => void;
-	onSelect: (contact: Contact) => void;
+	onToggleSelect: (contact: Contact) => void;
+	selectedContacts: Array<{ ico: string; modifier: number }>;
 }
 
 const pickerColumns: Column[] = [
@@ -27,7 +28,8 @@ const pickerColumns: Column[] = [
 export function ContactPickerDialog({
 	open,
 	onClose,
-	onSelect,
+	onToggleSelect,
+	selectedContacts,
 }: ContactPickerDialogProps) {
 	const { data: allContacts = [] } = useContacts();
 	const [filters, setFilters] = useState<{ search: string }>(
@@ -40,11 +42,19 @@ export function ContactPickerDialog({
 		contactPickerFilterConfig,
 	);
 
+	const isContactSelected = (contact: Contact) => {
+		return selectedContacts.some(
+			c => c.ico === contact.ico && c.modifier === contact.modifier
+		);
+	};
+
 	const renderRow = (
 		contact: Contact,
 		visibleColumns: Column[],
 		isFocused: boolean,
 	) => {
+		const isSelected = isContactSelected(contact);
+		
 		return visibleColumns.map((col) => {
 			let content;
 			switch (col.id) {
@@ -68,7 +78,14 @@ export function ContactPickerDialog({
 			}
 
 			return (
-				<TableCell key={col.id} align={col.align}>
+				<TableCell 
+					key={col.id} 
+					align={col.align}
+					sx={{
+						bgcolor: isSelected ? "action.selected" : undefined,
+						fontWeight: isSelected ? "bold" : undefined,
+					}}
+				>
 					{content}
 				</TableCell>
 			);
@@ -79,8 +96,8 @@ export function ContactPickerDialog({
 		<PickerDialog
 			open={open}
 			onClose={onClose}
-			onSelect={onSelect}
-			title="Vybrat kontakt"
+			onSelect={onToggleSelect}
+			title="Vybrat kontakty"
 			columns={pickerColumns}
 			data={filteredContacts}
 			getRowKey={(contact) => `${contact.ico}-${contact.modifier}`}
@@ -89,6 +106,7 @@ export function ContactPickerDialog({
 			searchPlaceholder="IČO, název, DIČ..."
 			filterValue={filters.search || ""}
 			onFilterChange={(value) => setFilters({ ...filters, search: value })}
+			keepOpenOnSelect={true}
 		/>
 	);
 }

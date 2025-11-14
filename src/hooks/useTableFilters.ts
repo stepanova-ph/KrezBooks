@@ -163,10 +163,12 @@ export function useTableFilters<T extends Record<string, any>>(
 				if (!filters.type.includes(item.type)) return false;
 			}
 
-			// Invoice: ICO and modifier filter
-			if (filters.ico && filters.ico.trim() !== "") {
-				const itemICO = String(item.ico || "");
-				if (!itemICO.startsWith(filters.ico.trim())) return false;
+			// Invoice: Multiple contacts filter (OR logic)
+			if (filters.selectedContacts && Array.isArray(filters.selectedContacts) && filters.selectedContacts.length > 0) {
+				const matchesAnyContact = filters.selectedContacts.some(contact => 
+					item.ico === contact.ico && item.modifier === contact.modifier
+				);
+				if (!matchesAnyContact) return false;
 			}
 
 			if (filters.modifier !== undefined && filters.modifier !== null && filters.modifier !== "") {

@@ -13,6 +13,8 @@ import { FilterConfig, FilterState } from "../../../types/filter";
 import { useState, useCallback } from "react";
 import { ContactPickerDialog } from "../invoice/new/ContactPickerDialog";
 import type { Contact } from "../../../types/database";
+import { IconButton, Badge } from "@mui/material";
+import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 
 function InvoicesTab() {
 	const { data: invoices = [], isLoading } = useInvoices();
@@ -22,17 +24,16 @@ function InvoicesTab() {
 
 	const dynamicFilterConfig = useCallback(
 		(baseConfig: FilterConfig) => {
-			const filters = [...baseConfig.filters];
+			const configFilters = [...baseConfig.filters];
 
-			// Add dynamic filters if they're in the list
 			if (dynamicFilters.includes("date_due_aggregate")) {
-				filters.push(dateDueFilter);
+				configFilters.push(dateDueFilter);
 			}
 			if (dynamicFilters.includes("date_tax_aggregate")) {
-				filters.push(dateTaxFilter);
+				configFilters.push(dateTaxFilter);
 			}
 
-			return { filters };
+			return { filters: configFilters };
 		},
 		[dynamicFilters],
 	);
@@ -47,19 +48,39 @@ function InvoicesTab() {
 		setDynamicFilters(prev => prev.filter((id) => id !== filterId));
 	}, []);
 
-	const handleSelectContact = (contact: Contact) => {
-		setFilters(prev => ({
-			...prev,
-			ico: contact.ico,
-			modifier: contact.modifier,
-		}));
-		setContactPickerOpen(false);
+	const handleToggleContact = (contact: Contact) => {
+		setFilters(prev => {
+			const selectedContacts = prev.selectedContacts || [];
+			const contactKey = { ico: contact.ico, modifier: contact.modifier };
+			
+			// Check if contact is already selected
+			const existingIndex = selectedContacts.findIndex(
+				c => c.ico === contactKey.ico && c.modifier === contactKey.modifier
+			);
+
+			if (existingIndex !== -1) {
+				// Remove contact
+				return {
+					...prev,
+					selectedContacts: selectedContacts.filter((_, i) => i !== existingIndex)
+				};
+			} else {
+				// Add contact
+				return {
+					...prev,
+					selectedContacts: [...selectedContacts, contactKey]
+				};
+			}
+		});
 	};
+
+	const selectedContacts = filters.selectedContacts || [];
+	const hasContactFilter = selectedContacts.length > 0;
 
 	return (
 		<>
 			<ListTabComponent
-				storageKey="COLUMN_ORDER_INVENTORY"
+				storageKey="COLUMN_ORDER_INVOICES"
 				tabKey="invoices"
 				data={invoices}
 				isLoading={isLoading}
@@ -70,11 +91,6 @@ function InvoicesTab() {
 				columns={invoiceColumns}
 				dynamicFilterConfig={dynamicFilterConfig}
 				filterActions={[
-					{
-						id: "open_contact_picker",
-						label: "IČO",
-						onClick: () => setContactPickerOpen(true),
-					},
 					{
 						id: "add_date_due_filter",
 						label: "Datum splatnosti",
@@ -97,6 +113,30 @@ function InvoicesTab() {
 						},
 					},
 				]}
+				customFilterElements={
+					<Badge 
+						badgeContent={selectedContacts.length} 
+						color="primary"
+						sx={{
+							'& .MuiBadge-badge': {
+								right: -3,
+								top: 3,
+							}
+						}}
+					>
+						<IconButton
+							size="small"
+							onClick={() => setContactPickerOpen(true)}
+							color={hasContactFilter ? "primary" : "default"}
+							sx={{
+								border: (theme) => `1px solid ${theme.palette.divider}`,
+								borderRadius: 1,
+							}}
+						>
+							<PersonSearchIcon />
+						</IconButton>
+					</Badge>
+				}
 				renderList={({
 					data,
 					visibleColumnIds,
@@ -119,7 +159,8 @@ function InvoicesTab() {
 			<ContactPickerDialog
 				open={contactPickerOpen}
 				onClose={() => setContactPickerOpen(false)}
-				onSelect={handleSelectContact}
+				onToggleSelect={handleToggleContact}
+				selectedContacts={selectedContacts}
 			/>
 		</>
 	);

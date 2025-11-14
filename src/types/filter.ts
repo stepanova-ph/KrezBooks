@@ -175,8 +175,7 @@ export interface ContactFilterState {
 export interface InvoiceFilterState {
 	search: string;
 	type?: number[];
-	ico?: string;
-	modifier?: number;
+	selectedContacts?: Array<{ ico: string; modifier: number }>;  // NEW: array of contacts
 	total_amount?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
 	total_amount_with_vat?: boolean;
 	date_issue?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
