@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { InvoiceType } from "./database";
 
 /**
  * Filter types supported by the FilterBar component
@@ -173,7 +174,10 @@ export interface ContactFilterState {
  */
 export interface InvoiceFilterState {
 	search: string;
-	total_amount?: { value: string; comparator: '>' | '=' | '<' };
+	type?: number[];
+	ico?: string;
+	modifier?: number;
+	total_amount?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
 	total_amount_with_vat?: boolean;
 	date_issue?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
 	date_due?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };

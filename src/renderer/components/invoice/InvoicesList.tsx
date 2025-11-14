@@ -25,7 +25,14 @@ export const invoiceColumns: Column[] = [
 	{ id: "number", label: "Číslo dokladu", minWidth: 120 },
 	{ id: "type", label: "Typ", minWidth: 150 },
 	{ id: "date_issue", label: "Datum vystavení", minWidth: 120 },
-	{ id: "company_name", label: "Obchodní partner", minWidth: 200 },
+	{ 
+		id: "company_name", 
+		label: "Obchodní partner", 
+		minWidth: 200,
+		subColumns: [
+			{ id: "ico", label: "", minWidth: 90 }
+		]
+	},
 	{
 		id: "total",
 		label: "Celková částka",
@@ -108,6 +115,8 @@ function InvoicesList({
 				return invoice.date_issue;
 			case "company_name":
 				return invoice.company_name || "-";
+			case "ico":
+				return invoice.ico || "-";
 			case "total":
 				return (invoice.total_with_vat?.toFixed(2) || "0.00") + " Kč";
 

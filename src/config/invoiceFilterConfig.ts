@@ -1,4 +1,4 @@
-import { FilterConfig, FilterAggregateFilterDef } from "../types/filter";
+import { FilterConfig, FilterAggregateFilterDef, InvoiceFilterState } from "../types/filter";
 
 // Dynamic filter definitions that can be added on demand
 export const dateDueFilter: FilterAggregateFilterDef = {
@@ -9,27 +9,26 @@ export const dateDueFilter: FilterAggregateFilterDef = {
 	collapsible: true,
 	primaryFilter: {
 		id: "date_due",
-		type: "date-comparator",  // CHANGED
+		type: "date-comparator",
 		label: "Datum splatnosti",
 		field: "date_due",
-		width: 135,
+		width: 150,
 	},
 	expandedFilters: [],
 };
 
-
 export const dateTaxFilter: FilterAggregateFilterDef = {
 	id: "date_tax_aggregate",
 	type: "filter-aggregate",
-	label: "Datum zdanitelného plnění",
+	label: "Datum zdanění",
 	columnId: "date_tax",
 	collapsible: true,
 	primaryFilter: {
 		id: "date_tax",
-		type: "date-comparator",  // CHANGED
-		label: "Datum zdanitelného plnění",
+		type: "date-comparator",
+		label: "Datum zdanění",
 		field: "date_tax",
-		width: 135,
+		width: 150,
 	},
 	expandedFilters: [],
 };
@@ -40,14 +39,49 @@ export const invoiceFilterConfig: FilterConfig = {
 			id: "search",
 			type: "text-search",
 			label: "Hledat",
-			placeholder: "Číslo dokladu, firma...",
+			placeholder: "Číslo, firma, IČO...",
 			searchFields: [
-				{ field: "number" },
+				{ field: "ico" },
 				{ field: "company_name" },
-				{ field: "variable_symbol" }
+				{ field: "number" },
+				{ field: "prefix" },
+				// Computed field: prefix + number
+				{ 
+					field: "prefixNumber",
+					match: (invoice: any, query: string) => {
+						const combined = `${invoice.prefix || ""}${invoice.number}`;
+						return combined.toLowerCase().includes(query.toLowerCase());
+					}
+				},
 			],
 			columnId: null,
-			width: 150,
+			width: 180,
+		},
+
+		{
+			id: "type",
+			type: "multiselect",
+			label: "Typ dokladu",
+			field: "type",
+			columnId: "type",
+			placeholder: "Všechny typy",
+			options: [
+				{ value: 1, label: "Nákup (hotovost)" },
+				{ value: 2, label: "Nákup (faktura)" },
+				{ value: 3, label: "Prodej (hotovost)" },
+				{ value: 4, label: "Prodej (faktura)" },
+				{ value: 5, label: "Korekce skladu" },
+			],
+			width: 220,
+		},
+
+		{
+			id: "contact_picker",
+			type: "action-button",
+			label: "IČO",
+			columnId: "ico",
+			actionId: "open_contact_picker",
+			variant: "outlined",
 		},
 
 		{
@@ -65,7 +99,7 @@ export const invoiceFilterConfig: FilterConfig = {
 				field: "total_amount",
 				placeholder: "0",
 				allowNegative: false,
-				width: 80,
+				width: 120,
 			},
 			expandedFilters: [
 				{
@@ -87,19 +121,12 @@ export const invoiceFilterConfig: FilterConfig = {
 			lockPrimaryWhenExpanded: true,
 			primaryFilter: {
 				id: "date_issue",
-				type: "date-comparator",  // CHANGED
-				label: "Datum vystavení",
+				type: "date-comparator",
+				label: "Datum",
 				field: "date_issue",
-				width: 135,
+				width: 150,
 			},
 			expandedFilters: [
-				{
-					id: "add_date_tax_btn",
-					type: "action-button",
-					label: "Datum zdanitelného plnění",
-					actionId: "add_date_tax_filter",
-					variant: "outlined",
-				},
 				{
 					id: "add_date_due_btn",
 					type: "action-button",
@@ -107,18 +134,28 @@ export const invoiceFilterConfig: FilterConfig = {
 					actionId: "add_date_due_filter",
 					variant: "outlined",
 				},
+				{
+					id: "add_date_tax_btn",
+					type: "action-button",
+					label: "Datum zdanění",
+					actionId: "add_date_tax_filter",
+					variant: "outlined",
+				},
 			],
 		},
 	],
 };
 
-export const initialInvoiceFilterState = {
+export const initialInvoiceFilterState: InvoiceFilterState = {
 	search: "",
+	type: [],
+	ico: "",
+	modifier: undefined,
 	total_amount: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
 	total_amount_with_vat: false,
 	date_issue: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
-	date_due: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },  // ADD
-	date_tax: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },  // ADD
+	date_due: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
+	date_tax: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
 	_dynamicFilters: [],
 };
 

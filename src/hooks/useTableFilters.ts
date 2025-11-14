@@ -158,6 +158,21 @@ export function useTableFilters<T extends Record<string, any>>(
 				}
 			}
 
+			// Invoice: Type multiselect filter
+			if (filters.type && Array.isArray(filters.type) && filters.type.length > 0) {
+				if (!filters.type.includes(item.type)) return false;
+			}
+
+			// Invoice: ICO and modifier filter
+			if (filters.ico && filters.ico.trim() !== "") {
+				const itemICO = String(item.ico || "");
+				if (!itemICO.startsWith(filters.ico.trim())) return false;
+			}
+
+			if (filters.modifier !== undefined && filters.modifier !== null && filters.modifier !== "") {
+				if (item.modifier !== filters.modifier) return false;
+			}
+
 			// Item: Price filter with VAT checkbox and price groups
 			if (filters.price) {
 			const useVat = filters.price_with_vat === true;
