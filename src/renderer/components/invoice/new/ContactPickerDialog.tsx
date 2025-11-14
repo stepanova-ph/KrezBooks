@@ -13,8 +13,10 @@ import {
 interface ContactPickerDialogProps {
 	open: boolean;
 	onClose: () => void;
-	onToggleSelect: (contact: Contact) => void;
-	selectedContacts: Array<{ ico: string; modifier: number }>;
+	onToggleSelect?: (contact: Contact) => void;
+	onSelect?: (contact: Contact) => void;
+	selectedContacts?: Array<{ ico: string; modifier: number }>;
+	singleSelect?: boolean;
 }
 
 const pickerColumns: Column[] = [
@@ -29,7 +31,9 @@ export function ContactPickerDialog({
 	open,
 	onClose,
 	onToggleSelect,
-	selectedContacts,
+	onSelect,
+	selectedContacts = [],
+	singleSelect = false,
 }: ContactPickerDialogProps) {
 	const { data: allContacts = [] } = useContacts();
 	const [filters, setFilters] = useState<{ search: string }>(
@@ -48,12 +52,27 @@ export function ContactPickerDialog({
 		);
 	};
 
+	const handleSelect = (contact: Contact) => {
+		if (singleSelect) {
+			// Single select mode: call onSelect and close
+			if (onSelect) {
+				onSelect(contact);
+			}
+			onClose();
+		} else {
+			// Multi-select mode: toggle selection
+			if (onToggleSelect) {
+				onToggleSelect(contact);
+			}
+		}
+	};
+
 	const renderRow = (
 		contact: Contact,
 		visibleColumns: Column[],
 		isFocused: boolean,
 	) => {
-		const isSelected = isContactSelected(contact);
+		const isSelected = !singleSelect && isContactSelected(contact);
 		
 		return visibleColumns.map((col) => {
 			let content;
@@ -96,8 +115,8 @@ export function ContactPickerDialog({
 		<PickerDialog
 			open={open}
 			onClose={onClose}
-			onSelect={onToggleSelect}
-			title="Vybrat kontakty"
+			onSelect={handleSelect}
+			title={singleSelect ? "Vybrat kontakt" : "Vybrat kontakty"}
 			columns={pickerColumns}
 			data={filteredContacts}
 			getRowKey={(contact) => `${contact.ico}-${contact.modifier}`}
@@ -106,7 +125,7 @@ export function ContactPickerDialog({
 			searchPlaceholder="IČO, název, DIČ..."
 			filterValue={filters.search || ""}
 			onFilterChange={(value) => setFilters({ ...filters, search: value })}
-			keepOpenOnSelect={true}
+			keepOpenOnSelect={!singleSelect}
 		/>
 	);
 }

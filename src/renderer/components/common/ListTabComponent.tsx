@@ -26,7 +26,6 @@ interface ListTabComponentProps<TData, TFilter extends FilterState> {
 		visibleColumnIds: Set<string>;
 		columnOrder: string[];
 		onColumnOrderChange: (newOrder: string[]) => void;
-		/** NEW: provide current orderBy to list renderer */
 		orderBy: OrderByConfig | undefined;
 	}) => ReactNode;
 	dynamicFilterConfig?: (
@@ -35,9 +34,11 @@ interface ListTabComponentProps<TData, TFilter extends FilterState> {
 	) => FilterConfig;
 	storageKey: keyof typeof ORDER_STORAGE_KEYS;
 	tabKey: "contacts" | "invoices" | "inventory";
-	filterActions?: FilterAction[]; // Actions for filter buttons (add dynamic filters)
-	onRemoveDynamicFilter?: (filterId: string) => void; // Callback to remove dynamic filters
+	filterActions?: FilterAction[];
+	onRemoveDynamicFilter?: (filterId: string) => void;
 	customFilterElements?: React.ReactNode;
+	filters?: TFilter;
+	onFiltersChange?: (filters: TFilter) => void;
 }
 
 export function ListTabComponent<TData extends Record<string, any>, TFilter extends FilterState>({
@@ -55,11 +56,17 @@ export function ListTabComponent<TData extends Record<string, any>, TFilter exte
 	tabKey,
 	filterActions = [],
 	onRemoveDynamicFilter,
-	customFilterElements = []
+	customFilterElements,
+	filters: externalFilters,
+	onFiltersChange: externalOnFiltersChange,
 }: ListTabComponentProps<TData, TFilter>) {
 	const { getFilterState, setFilterState } = useTabPersistence();
 	const initialFilters = (getFilterState(tabKey) as TFilter) || initialFilterState;
-	const [filters, setFilters] = useState<TFilter>(initialFilters);
+	const [internalFilters, setInternalFilters] = useState<TFilter>(initialFilters);
+
+	// Use external filters if provided, otherwise use internal
+	const filters = externalFilters ?? internalFilters;
+	const setFilters = externalOnFiltersChange ?? setInternalFilters;
 
 	const [orderBy, setOrderBy] = useState<OrderByConfig | undefined>(undefined);
 
@@ -73,95 +80,60 @@ export function ListTabComponent<TData extends Record<string, any>, TFilter exte
 	const filterBarRef = useRef<FilterBarRef>(null);
 
 	useEffect(() => {
-		setFilterState(tabKey, filters);
-	}, [filters, tabKey, setFilterState]);
+		if (!externalFilters) {
+			setFilterState(tabKey, internalFilters);
+		}
+	}, [internalFilters, tabKey, setFilterState, externalFilters]);
 
 	useAutoSearchFocus({
 		filterBarRef: filterBarRef,
 		disabled: false,
 	});
 
-	const finalFilterConfig = useMemo(() => {
-		if (dynamicFilterConfig) {
-			return dynamicFilterConfig(filterConfig, data);
-		}
-		return filterConfig;
-	}, [dynamicFilterConfig, filterConfig, data]);
+	const finalFilterConfig = useMemo(
+		() =>
+			dynamicFilterConfig
+				? dynamicFilterConfig(filterConfig, data)
+				: filterConfig,
+		[dynamicFilterConfig, filterConfig, data],
+	);
 
-	const filteredData = useTableFilters<TData>(data, filters, finalFilterConfig);
+	// Apply filtering
+	const filteredData = useTableFilters(data, filters, filterConfig);
 
 	if (isLoading) {
-		return (
-			<Box
-				sx={{
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					minHeight: "100%",
-					height: "100%",
-				}}
-			>
-				<Loading size="large" text={loadingText} />
-			</Box>
-		);
+		return <Loading text={loadingText} fullScreen />;
 	}
 
 	return (
-		<>
-			<AppBar
-				position="sticky"
+		<Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+			<AppBar position="static" color="default" elevation={0}>
+				<FilterBar
+					ref={filterBarRef}
+					config={finalFilterConfig}
+					filters={filters}
+					onFiltersChange={setFilters}
+					actions={actions}
+					orderBy={orderBy}
+					onOrderByChange={setOrderBy}
+					onVisibleColumnsChange={handleVisibleColumnsChange}
+					columns={columns}
+					defaultVisibleColumns={defaultVisibleColumns}
+					visibleColumnIds={visibleColumnIds}
+					filterActions={filterActions}
+					onRemoveDynamicFilter={onRemoveDynamicFilter}
+					customFilterElements={customFilterElements}
+				/>
+			</AppBar>
+
+			<Box
 				sx={{
-					bgcolor: "transparent",
-					backgroundImage: "none",
-					boxShadow: "none",
-					m: 0,
-					height: "auto",
-					"&::before": { display: "none" }, // kills the colored underline pseudo-element
+					flex: 1,
+					display: "flex",
+					flexDirection: "column",
+					overflow: "hidden",
 				}}
 			>
-				<Box
-					sx={{
-						position: "sticky",
-						top: 0,
-						zIndex: (t) => t.zIndex.appBar, // same layer as sticky filters
-						m: 0,
-						p: 0,
-						// the gradient lives behind the FilterBar
-						"&::before": {
-							content: '""',
-							position: "absolute",
-							top: -70,
-							left: 0,
-							right: 0,
-							height: 80, // adjust fade depth as you like
-							background:
-								"linear-gradient(to bottom, rgba(255,255,255,1), rgba(255, 255, 255, 0.45))",
-							pointerEvents: "none",
-							zIndex: 0, // behind the bar
-						},
-					}}
-				>
-					<Box sx={{ position: "relative", zIndex: 1 }}>
-						<FilterBar
-							ref={filterBarRef}
-							config={finalFilterConfig}
-							filters={filters}
-							onFiltersChange={setFilters as (filters: FilterState) => void}
-							columns={columns}
-							visibleColumnIds={visibleColumnIds}
-							onVisibleColumnsChange={handleVisibleColumnsChange}
-							defaultColumnIds={defaultVisibleColumns}
-							actions={actions}
-							filterActions={filterActions}
-							onRemoveDynamicFilter={onRemoveDynamicFilter}
-							orderBy={orderBy}
-							onOrderByChange={setOrderBy}
-							customFilterElements={customFilterElements}
-						/>
-					</Box>
-				</Box>
-			</AppBar>
-			<Box sx={{ p: 3, pt: 1 }}>
 				{renderList({
 					data: filteredData,
 					visibleColumnIds,
@@ -170,6 +142,6 @@ export function ListTabComponent<TData extends Record<string, any>, TFilter exte
 					orderBy,
 				})}
 			</Box>
-		</>
+		</Box>
 	);
 }

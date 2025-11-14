@@ -380,6 +380,7 @@ function NewInvoiceTab() {
 				open={dialogs.contactPicker.open}
 				onClose={dialogs.contactPicker.closeDialog}
 				onSelect={handleSelectContact}
+				singleSelect={true}
 			/>
 
 			<AlertDialog
