@@ -229,7 +229,6 @@ export function FilterAggregateFilter({
 										borderRight: (theme) => `1px solid ${theme.palette.divider}`,
 										fontSize: '1rem',
 										fontWeight: 'bold',
-										bgcolor: 'action.disabledBackground',
 										color: 'text.disabled',
 									}}
 								>

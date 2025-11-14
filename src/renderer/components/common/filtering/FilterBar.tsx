@@ -70,7 +70,10 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 		}));
 
 		const visibleFilters = config.filters.filter(
-			(f) => !f.columnId || visibleColumnIds.has(f.columnId),
+			(f) => 
+				!f.columnId 
+				|| visibleColumnIds.has(f.columnId) 
+				|| f.id.includes("_aggregate"),
 		);
 
 		const isDynamicFilter = (filterId: string): boolean => {

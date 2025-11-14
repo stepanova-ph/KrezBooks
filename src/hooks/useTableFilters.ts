@@ -6,6 +6,7 @@ import {
 } from "src/types/filter";
 
 import { applyDateComparatorFilter, applyNumberComparatorFilter } from "../utils/comparatorUtils";
+import { VAT_RATES } from "../config/constants";
 /**
  * Hook to filter table data based on filter state
  *
@@ -159,26 +160,28 @@ export function useTableFilters<T extends Record<string, any>>(
 
 			// Item: Price filter with VAT checkbox and price groups
 			if (filters.price) {
-				const useVat = filters.price_with_vat === true;
-				const selectedGroups = filters.price_groups || [1, 2, 3, 4];
+			const useVat = filters.price_with_vat === true;
 
-				// Check if item matches ANY selected price group
-				const matchesAnyGroup = selectedGroups.some((groupNum: number) => {
-					const priceField = `sale_price_group${groupNum}`;
-					let itemPrice = parseFloat(item[priceField]) || 0;
+			// If none are selected → treat as all groups
+			const selectedGroups =
+				filters.price_groups?.length > 0 ? filters.price_groups : [1, 2, 3, 4];
 
-					// Apply VAT if checkbox is checked
-					if (useVat && item.vat_rate !== undefined) {
-						const vatRates = [0, 21, 12]; // 0%, 21%, 12%
-						const vatRate = vatRates[item.vat_rate] || 0;
-						itemPrice = itemPrice * (1 + vatRate / 100);
-					}
+			// AND logic: item must satisfy the comparator for EVERY selected group
+			const matchesAllGroups = selectedGroups.some((groupNum: number) => {
+				const priceField = `sale_price_group${groupNum}`;
+				let itemPrice = parseFloat(item[priceField]) || 0;
 
-					return applyNumberComparatorFilter(itemPrice, filters.price);
-				});
+				if (useVat && item.vat_rate !== undefined) {
+					const vatRates = VAT_RATES.map((rate) => rate.percentage);
+					const vatRate = vatRates[item.vat_rate] || 0;
+					itemPrice = itemPrice * (1 + vatRate / 100);
+				}
 
-				if (!matchesAnyGroup) return false;
-			}
+				return applyNumberComparatorFilter(itemPrice, filters.price);
+			});
+
+			if (!matchesAllGroups) return false;
+		}
 
 
 			return true;
