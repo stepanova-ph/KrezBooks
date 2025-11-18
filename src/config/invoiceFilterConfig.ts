@@ -1,4 +1,5 @@
 import { FilterConfig, FilterAggregateFilterDef, InvoiceFilterState } from "../types/filter";
+import { INVOICE_TYPES } from "./constants";
 
 // Dynamic filter definitions that can be added on demand
 export const dateDueFilter: FilterAggregateFilterDef = {
@@ -63,13 +64,7 @@ export const invoiceFilterConfig: FilterConfig = {
 			field: "type",
 			columnId: "type",
 			placeholder: "Všechny typy",
-			options: [
-				{ value: 1, label: "Nákup (hotovost)" },
-				{ value: 2, label: "Nákup (faktura)" },
-				{ value: 3, label: "Prodej (hotovost)" },
-				{ value: 4, label: "Prodej (faktura)" },
-				{ value: 5, label: "Korekce skladu" },
-			],
+			options: INVOICE_TYPES.map(t => ({ value: t.value, label: t.label })),
 			width: 100,
 		},
 		{

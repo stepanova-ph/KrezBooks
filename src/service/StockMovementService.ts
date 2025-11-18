@@ -18,12 +18,13 @@ export class StockMovementService {
 	}
 
 	async getOne(
+		invoicePrefix: string,
 		invoiceNumber: string,
 		itemEan: string,
 	): Promise<StockMovement | undefined> {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.getOne);
-		const movement = statement.get(invoiceNumber, itemEan) as any;
+		const movement = statement.get(invoicePrefix, invoiceNumber, itemEan) as any;
 		if (!movement) return undefined;
 		return {
 			...movement,
@@ -31,10 +32,10 @@ export class StockMovementService {
 		};
 	}
 
-	async getByInvoice(invoiceNumber: string): Promise<StockMovement[]> {
+	async getByInvoice(invoicePrefix: string, invoiceNumber: string): Promise<StockMovement[]> {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.getByInvoice);
-		const movements = statement.all(invoiceNumber) as any[];
+		const movements = statement.all(invoicePrefix, invoiceNumber) as any[];
 		return movements.map((m) => ({
 			...m,
 			reset_point: sqliteIntegerToBoolean(m.reset_point),
@@ -48,6 +49,7 @@ export class StockMovementService {
 		const statement = db.prepare(stockMovementQueries.create);
 
 		const movementData = {
+			invoice_prefix: movement.invoice_prefix,
 			invoice_number: movement.invoice_number,
 			item_ean: movement.item_ean,
 			amount: movement.amount,
@@ -64,6 +66,7 @@ export class StockMovementService {
 	}
 
 	async update(
+		invoicePrefix: string,
 		invoiceNumber: string,
 		itemEan: string,
 		updates: Partial<StockMovement>,
@@ -72,7 +75,7 @@ export class StockMovementService {
 
 		const fieldsToUpdate = Object.keys(updates).filter(
 			(key) =>
-				key !== "invoice_number" && key !== "item_ean" && key !== "created_at",
+				key !== "invoice_prefix" && key !== "invoice_number" && key !== "item_ean" && key !== "created_at",
 		);
 
 		if (fieldsToUpdate.length === 0) {
@@ -83,6 +86,7 @@ export class StockMovementService {
 		const statement = db.prepare(sql);
 
 		const updateData: any = {
+			invoice_prefix: invoicePrefix,
 			invoice_number: invoiceNumber,
 			item_ean: itemEan,
 		};
@@ -106,12 +110,13 @@ export class StockMovementService {
 	}
 
 	async delete(
+		invoicePrefix: string,
 		invoiceNumber: string,
 		itemEan: string,
 	): Promise<{ changes: number }> {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.delete);
-		const result = statement.run(invoiceNumber, itemEan);
+		const result = statement.run(invoicePrefix, invoiceNumber, itemEan);
 
 		if (result.changes === 0) {
 			throw new Error("Stock movement not found");
@@ -120,10 +125,10 @@ export class StockMovementService {
 		return { changes: result.changes };
 	}
 
-	async deleteByInvoice(invoiceNumber: string): Promise<{ changes: number }> {
+	async deleteByInvoice(invoicePrefix: string, invoiceNumber: string): Promise<{ changes: number }> {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.deleteByInvoice);
-		const result = statement.run(invoiceNumber);
+		const result = statement.run(invoicePrefix, invoiceNumber);
 
 		return { changes: result.changes };
 	}
@@ -143,7 +148,7 @@ export class StockMovementService {
 		return `
       UPDATE ${tableName}
       SET ${setClause}
-      WHERE invoice_number = @invoice_number AND item_ean = @item_ean
+      WHERE invoice_prefix = @invoice_prefix AND invoice_number = @invoice_number AND item_ean = @item_ean
     `;
 	}
 

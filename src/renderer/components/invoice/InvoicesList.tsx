@@ -12,6 +12,7 @@ import { useDeleteInvoice } from "../../../hooks/useInvoices";
 import { ViewInvoiceDialog } from "./ViewInvoiceDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { useState } from "react";
+import { INVOICE_TYPES } from "../../../config/constants";
 
 interface InvoicesListProps {
 	invoices: Invoice[];
@@ -102,14 +103,8 @@ function InvoicesList({
 			case "number":
 				return `${invoice.prefix || ""}${invoice.number}`;
 			case "type": {
-				const types: Record<number, string> = {
-					1: "Nákup (hotovost)",
-					2: "Nákup (faktura)",
-					3: "Prodej (hotovost)",
-					4: "Prodej (faktura)",
-					5: "Korekce skladu",
-				};
-				return types[invoice.type] || "Neznámý";
+				const typeObj = INVOICE_TYPES.find(t => t.value === invoice.type);
+				return typeObj?.label || "Neznámý";
 			}
 			case "date_issue":
 				return invoice.date_issue;

@@ -4,6 +4,7 @@
  */
 
 import { StockMovement, VatRate } from "src/types/database";
+import { INVOICE_TYPES } from "../../config/constants";
 import { exampleItems } from "./items";
 
 export const exampleStockMovements: Array<StockMovement> = [
@@ -11,6 +12,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 	// TYPE 5 – Initial stock corrections
 	// ─────────────────────────────
 	{
+		invoice_prefix: INVOICE_TYPES[4].prefix,
 		invoice_number: "0001",
 		item_ean: exampleItems[0].ean, // Ponorné čerpadlo 0.5 HP
 		amount: 20,
@@ -19,6 +21,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[4].prefix,
 		invoice_number: "0001",
 		item_ean: exampleItems[1].ean,
 		amount: 15,
@@ -27,6 +30,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[4].prefix,
 		invoice_number: "0002",
 		item_ean: exampleItems[5].ean, // Kalová čerpadla
 		amount: 25,
@@ -35,6 +39,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[4].prefix,
 		invoice_number: "0003",
 		item_ean: exampleItems[10].ean, // Zahradní čerpadla
 		amount: 30,
@@ -43,6 +48,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[4].prefix,
 		invoice_number: "0004",
 		item_ean: exampleItems[15].ean, // Tlaková čerpadla
 		amount: 25,
@@ -51,6 +57,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[4].prefix,
 		invoice_number: "0005",
 		item_ean: exampleItems[20].ean, // Cirkulační čerpadla
 		amount: 20,
@@ -59,6 +66,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[4].prefix,
 		invoice_number: "0006",
 		item_ean: exampleItems[25].ean, // Hadice
 		amount: 100,
@@ -67,6 +75,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[4].prefix,
 		invoice_number: "0007",
 		item_ean: exampleItems[32].ean, // Spínače
 		amount: 50,
@@ -75,6 +84,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[4].prefix,
 		invoice_number: "0008",
 		item_ean: exampleItems[36].ean, // Nádoby
 		amount: 30,
@@ -83,6 +93,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[4].prefix,
 		invoice_number: "0009",
 		item_ean: exampleItems[39].ean, // Měřidla
 		amount: 40,
@@ -95,6 +106,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 	// TYPE 1 – Buy Cash Invoices
 	// ─────────────────────────────
 	{
+		invoice_prefix: INVOICE_TYPES[0].prefix,
 		invoice_number: "0011",
 		item_ean: exampleItems[0].ean,
 		amount: 5,
@@ -103,6 +115,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[0].prefix,
 		invoice_number: "0011",
 		item_ean: exampleItems[2].ean,
 		amount: 3,
@@ -111,6 +124,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[0].prefix,
 		invoice_number: "0012",
 		item_ean: exampleItems[6].ean,
 		amount: 4,
@@ -119,6 +133,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[0].prefix,
 		invoice_number: "0012",
 		item_ean: exampleItems[8].ean,
 		amount: 2,
@@ -127,6 +142,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[0].prefix,
 		invoice_number: "0013",
 		item_ean: exampleItems[26].ean,
 		amount: 30,
@@ -135,6 +151,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[0].prefix,
 		invoice_number: "0013",
 		item_ean: exampleItems[28].ean,
 		amount: 25,
@@ -143,6 +160,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[0].prefix,
 		invoice_number: "0014",
 		item_ean: exampleItems[11].ean,
 		amount: 10,
@@ -151,6 +169,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[0].prefix,
 		invoice_number: "0014",
 		item_ean: exampleItems[12].ean,
 		amount: 8,
@@ -159,6 +178,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[0].prefix,
 		invoice_number: "0015",
 		item_ean: exampleItems[22].ean,
 		amount: 4,
@@ -167,6 +187,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[0].prefix,
 		invoice_number: "0015",
 		item_ean: exampleItems[23].ean,
 		amount: 6,
@@ -179,6 +200,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 	// TYPE 2 – Buy Invoices (Bank)
 	// ─────────────────────────────
 	{
+		invoice_prefix: INVOICE_TYPES[1].prefix,
 		invoice_number: "0021",
 		item_ean: exampleItems[13].ean,
 		amount: 12,
@@ -187,6 +209,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[1].prefix,
 		invoice_number: "0021",
 		item_ean: exampleItems[15].ean,
 		amount: 6,
@@ -195,6 +218,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[1].prefix,
 		invoice_number: "0022",
 		item_ean: exampleItems[9].ean,
 		amount: 8,
@@ -203,6 +227,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[1].prefix,
 		invoice_number: "0022",
 		item_ean: exampleItems[10].ean,
 		amount: 10,
@@ -211,6 +236,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[1].prefix,
 		invoice_number: "0023",
 		item_ean: exampleItems[4].ean,
 		amount: 4,
@@ -219,6 +245,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[1].prefix,
 		invoice_number: "0023",
 		item_ean: exampleItems[7].ean,
 		amount: 6,
@@ -227,6 +254,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[1].prefix,
 		invoice_number: "0024",
 		item_ean: exampleItems[16].ean,
 		amount: 5,
@@ -235,6 +263,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[1].prefix,
 		invoice_number: "0024",
 		item_ean: exampleItems[17].ean,
 		amount: 5,
@@ -247,6 +276,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 	// TYPE 3 – Sell Cash Invoices
 	// ─────────────────────────────
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0031",
 		item_ean: exampleItems[0].ean,
 		amount: 2,
@@ -255,6 +285,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0031",
 		item_ean: exampleItems[1].ean,
 		amount: 3,
@@ -263,6 +294,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0032",
 		item_ean: exampleItems[5].ean,
 		amount: 4,
@@ -271,6 +303,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0032",
 		item_ean: exampleItems[6].ean,
 		amount: 2,
@@ -279,6 +312,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0033",
 		item_ean: exampleItems[10].ean,
 		amount: 2,
@@ -287,6 +321,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0033",
 		item_ean: exampleItems[12].ean,
 		amount: 1,
@@ -295,6 +330,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0034",
 		item_ean: exampleItems[22].ean,
 		amount: 5,
@@ -303,6 +339,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0034",
 		item_ean: exampleItems[23].ean,
 		amount: 2,
@@ -311,6 +348,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0035",
 		item_ean: exampleItems[26].ean,
 		amount: 10,
@@ -319,6 +357,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0035",
 		item_ean: exampleItems[27].ean,
 		amount: 8,
@@ -327,6 +366,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0036",
 		item_ean: exampleItems[29].ean,
 		amount: 3,
@@ -335,6 +375,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0036",
 		item_ean: exampleItems[30].ean,
 		amount: 2,
@@ -343,6 +384,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0037",
 		item_ean: exampleItems[32].ean,
 		amount: 5,
@@ -351,6 +393,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0037",
 		item_ean: exampleItems[34].ean,
 		amount: 2,
@@ -359,6 +402,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0038",
 		item_ean: exampleItems[36].ean,
 		amount: 3,
@@ -367,6 +411,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0038",
 		item_ean: exampleItems[37].ean,
 		amount: 1,
@@ -375,6 +420,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0039",
 		item_ean: exampleItems[39].ean,
 		amount: 4,
@@ -383,6 +429,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0039",
 		item_ean: exampleItems[40].ean,
 		amount: 3,
@@ -391,6 +438,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0040",
 		item_ean: exampleItems[15].ean,
 		amount: 2,
@@ -399,6 +447,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[2].prefix,
 		invoice_number: "0040",
 		item_ean: exampleItems[16].ean,
 		amount: 1,
@@ -411,6 +460,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 	// TYPE 4 – Sell Invoice (Bank)
 	// ─────────────────────────────
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0041",
 		item_ean: exampleItems[0].ean,
 		amount: 2,
@@ -419,6 +469,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0041",
 		item_ean: exampleItems[3].ean,
 		amount: 1,
@@ -427,6 +478,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0042",
 		item_ean: exampleItems[8].ean,
 		amount: 3,
@@ -435,6 +487,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0042",
 		item_ean: exampleItems[9].ean,
 		amount: 2,
@@ -443,6 +496,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0043",
 		item_ean: exampleItems[13].ean,
 		amount: 1,
@@ -451,6 +505,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0043",
 		item_ean: exampleItems[14].ean,
 		amount: 1,
@@ -459,6 +514,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0044",
 		item_ean: exampleItems[17].ean,
 		amount: 2,
@@ -467,6 +523,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0044",
 		item_ean: exampleItems[18].ean,
 		amount: 1,
@@ -475,6 +532,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0045",
 		item_ean: exampleItems[20].ean,
 		amount: 2,
@@ -483,6 +541,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0045",
 		item_ean: exampleItems[21].ean,
 		amount: 2,
@@ -491,6 +550,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0046",
 		item_ean: exampleItems[25].ean,
 		amount: 8,
@@ -499,6 +559,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0046",
 		item_ean: exampleItems[28].ean,
 		amount: 6,
@@ -507,6 +568,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0047",
 		item_ean: exampleItems[31].ean,
 		amount: 4,
@@ -515,6 +577,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0047",
 		item_ean: exampleItems[32].ean,
 		amount: 3,
@@ -523,6 +586,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0048",
 		item_ean: exampleItems[36].ean,
 		amount: 2,
@@ -531,6 +595,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0048",
 		item_ean: exampleItems[38].ean,
 		amount: 1,
@@ -539,6 +604,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0049",
 		item_ean: exampleItems[40].ean,
 		amount: 3,
@@ -548,6 +614,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 	},
 	{
 		// FIXED: changed from exampleItems[40] to exampleItems[39] to avoid duplicate pair
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0049",
 		item_ean: exampleItems[39].ean,
 		amount: 2,
@@ -556,6 +623,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0050",
 		item_ean: exampleItems[27].ean,
 		amount: 5,
@@ -564,6 +632,7 @@ export const exampleStockMovements: Array<StockMovement> = [
 		reset_point: false,
 	},
 	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
 		invoice_number: "0050",
 		item_ean: exampleItems[29].ean,
 		amount: 3,

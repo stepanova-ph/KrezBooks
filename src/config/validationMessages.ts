@@ -68,6 +68,9 @@ export const validationMessages = {
 		priceMin: "Cena musí být číslo větší nebo rovno nule.",
 	},
 	stockMovement: {
+		invoicePrefixRequired: "Prefix faktury je povinný.",
+		invoicePrefixMaxLength: "Prefix faktury je příliš dlouhý.",
+
 		invoiceNumberRequired: "Číslo faktury je povinné.",
 		invoiceNumberMaxLength: "Číslo faktury je příliš dlouhé.",
 

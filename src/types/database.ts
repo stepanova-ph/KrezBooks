@@ -82,6 +82,7 @@ export type UpdateItemInput = UpdateInput<
  * StockMovement
  */
 export interface StockMovement {
+	invoice_prefix: string;
 	invoice_number: string;
 	item_ean: string;
 	amount: number;
@@ -96,7 +97,7 @@ export type CreateStockMovementInput = CreateInput<StockMovement, "created_at">;
 export type UpdateStockMovementInput = UpdateInput<
 	StockMovement,
 	"created_at",
-	"invoice_number" | "item_ean"
+	"invoice_prefix" | "invoice_number" | "item_ean"
 >;
 
 /**

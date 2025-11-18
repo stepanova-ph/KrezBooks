@@ -119,6 +119,7 @@ export function fillTestData(db: Database.Database): FillResult {
 	for (const movement of exampleStockMovements) {
 		try {
 			insertStockMovement.run({
+				invoice_prefix: movement.invoice_prefix,
 				invoice_number: movement.invoice_number,
 				item_ean: movement.item_ean,
 				amount: movement.amount,
@@ -129,7 +130,7 @@ export function fillTestData(db: Database.Database): FillResult {
 			stockMovementsAdded++;
 		} catch (error: any) {
 			errors.push(
-				`Stock movement ${movement.invoice_number}: ${error.message}`,
+				`Stock movement ${movement.invoice_prefix}-${movement.invoice_number}: ${error.message}`,
 			);
 		}
 	}

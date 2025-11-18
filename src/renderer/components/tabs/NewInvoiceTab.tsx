@@ -20,7 +20,7 @@ import {
 	calculateTotalWithVat,
 } from "../../../utils/formUtils";
 import { InvoiceTotals } from "../invoice/InvoiceTotals";
-import { INVOICE_PREFIX_DEFAULTS } from "../../../config/constants";
+import { INVOICE_TYPES } from "../../../config/constants";
 
 function NewInvoiceTab() {
 	const form = useInvoiceForm();
@@ -39,7 +39,8 @@ function NewInvoiceTab() {
 
 	// Auto-populate prefix when type changes
 	useEffect(() => {
-		const defaultPrefix = INVOICE_PREFIX_DEFAULTS[form.formData.type as number];
+		const invoiceType = INVOICE_TYPES.find(t => t.value === form.formData.type);
+		const defaultPrefix = invoiceType?.prefix;
 		if (defaultPrefix && form.formData.prefix !== defaultPrefix) {
 			form.handleChange("prefix", defaultPrefix);
 		}
