@@ -66,6 +66,7 @@ export const invoiceFilterConfig: FilterConfig = {
 			placeholder: "Všechny typy",
 			options: INVOICE_TYPES.map(t => ({ value: t.value, label: t.label })),
 			width: 100,
+			useShortLabels: true,
 		},
 		{
 			id: "total_amount_aggregate",
@@ -105,7 +106,7 @@ export const invoiceFilterConfig: FilterConfig = {
 			primaryFilter: {
 				id: "date_issue",
 				type: "date-comparator",
-				label: "Datum",
+				label: "Datum vystavení",
 				field: "date_issue",
 				width: 150,
 			},

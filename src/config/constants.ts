@@ -22,8 +22,8 @@ export const PAYMENT_METHOD_TYPES = [
 
 export const INVOICE_TYPES = [
 	{ value: 1, label: "Nákup (hotovost)", 	shortLabel: "NH", prefix: "NH" },
-	{ value: 2, label: "Nákup (faktura)", 	shortLabel: "NH", prefix: "NF" },
-	{ value: 3, label: "Prodej (hotovost)", shortLabel: "NH", prefix: "PH" },
-	{ value: 4, label: "Prodej (faktura)", 	shortLabel: "NH", prefix: "PF" },
-	{ value: 5, label: "Korekce skladu", 	shortLabel: "NH", prefix: "K"  },
+	{ value: 2, label: "Nákup (faktura)", 	shortLabel: "NF", prefix: "NF" },
+	{ value: 3, label: "Prodej (hotovost)", shortLabel: "PH", prefix: "PH" },
+	{ value: 4, label: "Prodej (faktura)", 	shortLabel: "PF", prefix: "PF" },
+	{ value: 5, label: "Korekce skladu", 	shortLabel: "K", prefix: "K"  },
 ] as const;

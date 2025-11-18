@@ -85,6 +85,7 @@ export interface SelectFilterDef extends BaseFilterDef {
 	field: string;
 	options: Array<{ value: string | number; label: string }>;
 	placeholder?: string;
+	useShortLabels?: boolean;
 }
 
 /**
@@ -95,6 +96,7 @@ export interface MultiSelectFilterDef extends BaseFilterDef {
 	field: string;
 	options: Array<{ value: string | number; label: string }>;
 	placeholder?: string;
+	useShortLabels?: boolean;
 }
 
 /**

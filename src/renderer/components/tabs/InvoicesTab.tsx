@@ -125,7 +125,7 @@ function InvoicesTab() {
 						}}
 					>
 						<IconButton
-							size="small"
+							size="medium"
 							onClick={() => setContactPickerOpen(true)}
 							color={hasContactFilter ? "primary" : "default"}
 							sx={{

@@ -139,7 +139,6 @@ export function FilterAggregateFilter({
 					borderRadius: 1,
 					bgcolor: 'background.default',
 					visibility: isExpanded ? 'hidden' : 'visible',
-					
 				}}
 			>
 				<Button
@@ -148,7 +147,7 @@ export function FilterAggregateFilter({
 					variant="text"
 					sx={{
 						minWidth: 40,
-						height: 37,
+						height: 35,
 						borderTopRightRadius: 0,
 						borderBottomRightRadius: 0,
 						fontSize: '1rem',
@@ -189,6 +188,7 @@ export function FilterAggregateFilter({
 						'& .MuiOutlinedInput-root': {
 							'& fieldset': { border: 'none' },
 						},
+						height: 35,
 					}}
 				/>
 				<Box sx={{ display: 'flex' }}>
@@ -197,7 +197,7 @@ export function FilterAggregateFilter({
 							size="small"
 							onClick={onToggleExpanded}
 							sx={{
-								height: 37,
+								height: 35,
 								borderLeft: (theme) => `1px solid ${theme.palette.divider}`,
 								borderRadius: 0,
 							}}
@@ -210,7 +210,7 @@ export function FilterAggregateFilter({
 							size="small"
 							onClick={onRemove}
 							sx={{ 
-								height: 37,
+								height: 35,
 								borderLeft: (theme) => `1px solid ${theme.palette.divider}`,
 								borderRadius: 0,
 							}}
@@ -255,7 +255,7 @@ export function FilterAggregateFilter({
 								<Box
 									sx={{
 										minWidth: 40,
-										height: 37,
+										height: 35,
 										display: 'flex',
 										alignItems: 'center',
 										justifyContent: 'center',
@@ -301,6 +301,7 @@ export function FilterAggregateFilter({
 										'& .MuiOutlinedInput-root': {
 											'& fieldset': { border: 'none' },
 										},
+										height: 35,
 									}}
 								/>
 								
@@ -311,7 +312,7 @@ export function FilterAggregateFilter({
 												size="small"
 												onClick={onToggleExpanded}
 												sx={{
-													height: 37,
+													height: 35,
 													borderLeft: (theme) => `1px solid ${theme.palette.divider}`,
 													borderRadius: 0,
 												}}
@@ -324,7 +325,7 @@ export function FilterAggregateFilter({
 												size="small"
 												onClick={onRemove}
 												sx={{ 
-													height: 37,
+													height: 35,
 													borderLeft: (theme) => `1px solid ${theme.palette.divider}`,
 													borderRadius: 0,
 												}}
@@ -342,7 +343,7 @@ export function FilterAggregateFilter({
 					{filter.expandedFilters.length > 0 && (
 						<>
 							<Divider sx={{ borderColor: 'divider' }} />
-							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, p:1 }}>
 								{filter.expandedFilters.map((subFilter) => renderExpandedFilter(subFilter))}
 							</Box>
 						</>

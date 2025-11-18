@@ -1,6 +1,7 @@
 // filters/MultiSelectFilter.tsx
 import { FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, Box, SelectChangeEvent } from "@mui/material";
-import type { MultiSelectFilterDef } from "src/types/filter";
+import { INVOICE_TYPES } from "../../../../../config/constants";
+import type { MultiSelectFilterDef } from "../../../../../types/filter";
 
 interface MultiSelectFilterProps {
 	filter: MultiSelectFilterDef;
@@ -31,20 +32,25 @@ export function MultiSelectFilter({
 				}
 				input={<OutlinedInput label={filter.label} />}
 				renderValue={(selected) => (
-					<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-						{selected.map((value: any) => {
-							const option = filter.options.find(
-								(o: any) => o.value === value,
-							);
-							return (
-								<Chip
-									key={value}
-									label={option?.label || value}
-									size="small"
-								/>
-							);
-						})}
-					</Box>
+				<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+					{selected.map((value: any) => {
+					const option = filter.options.find(
+						(o: any) => o.value === value,
+					);
+					const invoiceType = INVOICE_TYPES.find(t => t.value === value);
+					const label = filter.useShortLabels && invoiceType?.shortLabel 
+						? invoiceType.shortLabel 
+						: (option?.label || value);
+					
+					return (
+						<Chip
+						key={value}
+						label={label}
+						size="small"
+						/>
+					);
+					})}
+				</Box>
 				)}
 			>
 				{filter.options.map((option: any) => (
@@ -53,6 +59,6 @@ export function MultiSelectFilter({
 					</MenuItem>
 				))}
 			</Select>
-		</FormControl>
+		</FormControl>	
 	);
 }
