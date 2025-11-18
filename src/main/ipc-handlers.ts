@@ -248,6 +248,16 @@ export function registerIpcHandlers() {
 		return handleIpcRequest(() => invoiceService.delete(number));
 	});
 
+	ipcMain.handle('db:invoice:getMaxNumber', async (_, type: number) => {
+		try {
+			const maxNumber = await invoiceService.getMaxNumberByType(type);
+			return maxNumber;
+		} catch (error) {
+			logger.error('Failed to get max invoice number:', error);
+			throw error;
+		}
+	});
+
 	logger.info("✓ IPC handlers registered");
 }
 

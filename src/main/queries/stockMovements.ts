@@ -1,6 +1,7 @@
 export const stockMovementQueries = {
 	createTable: `
     CREATE TABLE IF NOT EXISTS stock_movements (
+      invoice_prefix TEXT NOT NULL,
       invoice_number TEXT NOT NULL,
       item_ean TEXT NOT NULL,
       amount TEXT NOT NULL,
@@ -9,7 +10,7 @@ export const stockMovementQueries = {
       reset_point INTEGER NOT NULL DEFAULT 0,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (invoice_number, item_ean),
-      FOREIGN KEY (invoice_number) REFERENCES invoices(number) ON DELETE CASCADE,
+      FOREIGN KEY (invoice_prefix, invoice_number) REFERENCES invoices(prefix, number) ON DELETE CASCADE,
       FOREIGN KEY (item_ean) REFERENCES items(ean) ON DELETE RESTRICT
     )
   `,
@@ -32,6 +33,7 @@ export const stockMovementQueries = {
 
 	create: `
     INSERT INTO stock_movements (
+      invoice_prefix,
       invoice_number,
       item_ean,
       amount,

@@ -60,7 +60,7 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 			orderBy,
 			onOrderByChange,
 			hideColumnPicker = false,
-			customFilterElements = {}
+			customFilterElements = []
 		},
 		ref,
 	) => {

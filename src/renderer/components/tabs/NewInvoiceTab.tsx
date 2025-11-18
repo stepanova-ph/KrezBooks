@@ -11,7 +11,7 @@ import { ContactPickerDialog } from "../invoice/new/ContactPickerDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { useInvoiceForm } from "../../../hooks/useInvoiceForm";
 import { useInvoiceDialogs } from "../../../hooks/useInvoiceDialogs";
-import { useCreateInvoice } from "../../../hooks/useInvoices";
+import { useCreateInvoice, useMaxInvoiceNumber } from "../../../hooks/useInvoices";
 import { useCreateStockMovement } from "../../../hooks/useStockMovement";
 import type { Item, Contact } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
@@ -27,6 +27,7 @@ function NewInvoiceTab() {
 	const dialogs = useInvoiceDialogs();
 	const createInvoice = useCreateInvoice();
 	const createStockMovement = useCreateStockMovement();
+	const { data: maxNumber = 0 } = useMaxInvoiceNumber(form.formData.type ?? 1);
 
 	const [alertDialog, setAlertDialog] = useState<{
 		open: boolean;
@@ -43,6 +44,16 @@ function NewInvoiceTab() {
 			form.handleChange("prefix", defaultPrefix);
 		}
 	}, [form.formData.type]);
+
+	// Auto-increment invoice number based on type
+	useEffect(() => {
+		if (maxNumber !== undefined) {
+			const nextNumber = String(maxNumber + 1).padStart(4, '0');
+			if (form.formData.number !== nextNumber) {
+				form.handleChange('number', nextNumber);
+			}
+		}
+	}, [maxNumber, form.formData.type]);
 
 	const handleSelectItem = (item: Item) => {
 		const existingIndex = form.invoiceItems.findIndex(

@@ -127,4 +127,17 @@ export class InvoiceService {
       WHERE number = @number
     `;
 	}
+
+	/**
+	 * Get the maximum invoice number for a specific invoice type
+	 * Used for auto-incrementing invoice numbers
+	 */
+	async getMaxNumberByType(type: number): Promise<number> {
+		const db = getDatabase();
+		
+		const statement = db.prepare(invoiceQueries.getMaxNumberByType);
+		const result = statement.get(type) as { max_num: number | null } | undefined;
+		
+		return result?.max_num ?? 0;
+	}
 }

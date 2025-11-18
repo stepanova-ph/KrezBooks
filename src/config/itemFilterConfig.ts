@@ -9,9 +9,9 @@ export const itemFilterConfig: FilterConfig = {
 			id: "search",
 			type: "text-search",
 			label: "Hledat",
-			placeholder: "Název, poznámka...",
-			searchFields: [{ field: "name" }, { field: "note" }],
-			columnId: null, // Always visible
+			placeholder: "EAN, název...",
+			searchFields: [{ field: "name" }, { field: "ean" }],
+			columnId: null,
 		},
 
 		{

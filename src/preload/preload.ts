@@ -74,6 +74,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 			ipcRenderer.invoke("db:invoices:update", number, updates),
 		delete: (number: string) =>
 			ipcRenderer.invoke("db:invoices:delete", number),
+		getMaxNumber: (type: number) => ipcRenderer.invoke('db:invoice:getMaxNumber', type),
 	},
 
 	stockMovements: {

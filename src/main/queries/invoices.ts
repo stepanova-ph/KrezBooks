@@ -3,8 +3,8 @@ import { vatRateCaseStatement } from "../../utils/queryUtils";
 export const invoiceQueries = {
 	createTable: `
     CREATE TABLE IF NOT EXISTS invoices (
-      number TEXT PRIMARY KEY NOT NULL,
-      prefix TEXT,
+      number TEXT NOT NULL,
+      prefix TEXT NOT NULL,
       type INTEGER NOT NULL,
       payment_method INTEGER,
       date_issue TEXT NOT NULL,
@@ -24,6 +24,8 @@ export const invoiceQueries = {
       email TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+      PRIMARY KEY (number, prefix),
       CONSTRAINT check_type CHECK (type BETWEEN 1 AND 5),
       CONSTRAINT check_payment_method CHECK (payment_method IN (0, 1) OR payment_method IS NULL)
     )
@@ -104,5 +106,12 @@ export const invoiceQueries = {
 	delete: `
     DELETE FROM invoices 
     WHERE number = ?
+  `,
+
+  getMaxNumberByType: `
+    SELECT COALESCE(MAX(CAST(number AS INTEGER)), 0) as max_num
+    FROM invoices
+    WHERE type = ?
+      AND number GLOB '[0-9]*'
   `,
 };

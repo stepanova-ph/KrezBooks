@@ -74,3 +74,16 @@ export function useDeleteInvoice() {
 		},
 	});
 }
+
+/**
+ * Hook to get the maximum invoice number for a specific type
+ * Used for auto-incrementing invoice numbers in the form
+ */
+export function useMaxInvoiceNumber(type: number) {
+	return useQuery({
+		queryKey: ['invoices', 'maxNumber', type],
+		queryFn: () => window.api.invoice.getMaxNumber(type),
+		staleTime: 0, // Always fetch fresh to avoid duplicate numbers
+		enabled: type >= 1 && type <= 5, // Only fetch for valid invoice types
+	});
+}
