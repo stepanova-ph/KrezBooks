@@ -190,6 +190,7 @@ function NewInvoiceTab() {
 					console.log(`Should set reset point for ${item.ean}: ${shouldSetResetPoint}`);
 
 					return createStockMovement.mutateAsync({
+						invoice_prefix: form.formData.prefix || "",
 						invoice_number: form.formData.number,
 						item_ean: item.ean,
 						amount: item.amount.toString(),

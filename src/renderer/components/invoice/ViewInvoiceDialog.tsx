@@ -25,7 +25,7 @@ export function ViewInvoiceDialog({
 	const { data: invoice, isLoading: invoiceLoading } =
 		useInvoice(invoiceNumber);
 	const { data: movements = [], isLoading: movementsLoading } =
-		useStockMovementsByInvoice(invoiceNumber);
+		useStockMovementsByInvoice(invoice?.prefix || "", invoiceNumber);
 	const { data: allItems = [] } = useItems();
 
 	const isLoading = invoiceLoading || movementsLoading;

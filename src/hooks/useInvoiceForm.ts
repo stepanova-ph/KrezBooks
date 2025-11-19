@@ -72,6 +72,22 @@ export function useInvoiceForm() {
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
+	// Track if variable symbol has been manually edited by user
+	const [isVariableSymbolCustom, setIsVariableSymbolCustom] = useState(false);
+
+	// Auto-sync variable symbol with prefix + number (unless user has customized it)
+	useEffect(() => {
+		if (!isVariableSymbolCustom) {
+			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
+			if (formData.variable_symbol !== autoVariableSymbol) {
+				setFormData((prev) => ({
+					...prev,
+					variable_symbol: autoVariableSymbol,
+				}));
+			}
+		}
+	}, [formData.prefix, formData.number, isVariableSymbolCustom]);
+
 	useEffect(() => {
 		setInvoiceFormState({
 			formData,
@@ -81,7 +97,27 @@ export function useInvoiceForm() {
 	}, [formData, invoiceItems, selectedContact, setInvoiceFormState]);
 
 	const handleChange = (field: string, value: string | number) => {
+		// Update form data first
 		setFormData((prev) => ({ ...prev, [field]: value }));
+
+		// Detect manual edit of variable symbol
+		if (field === "variable_symbol") {
+			// Calculate what the auto variable symbol would be with current prefix/number
+			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
+			// If user enters something different than auto, mark as custom
+			if (value !== autoVariableSymbol) {
+				setIsVariableSymbolCustom(true);
+			} else {
+				// If they change it back to match, it's no longer custom
+				setIsVariableSymbolCustom(false);
+			}
+		}
+
+		// When prefix or number changes, allow auto-sync to take over
+		if (field === "prefix" || field === "number") {
+			setIsVariableSymbolCustom(false);
+		}
+
 		if (errors[field]) {
 			setErrors((prev) => ({ ...prev, [field]: "" }));
 		}
@@ -120,6 +156,7 @@ export function useInvoiceForm() {
 		setInvoiceItems([]);
 		setSelectedContact(null);
 		setErrors({});
+		setIsVariableSymbolCustom(false);
 		clearInvoiceFormState();
 	};
 

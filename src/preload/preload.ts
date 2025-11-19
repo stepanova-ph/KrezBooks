@@ -79,16 +79,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
 	stockMovements: {
 		getAll: () => ipcRenderer.invoke("db:stockMovements:getAll"),
-		getOne: (number: string) =>
-			ipcRenderer.invoke("db:stockMovements:getOne", number),
+		getOne: (invoicePrefix: string, invoiceNumber: string, itemEan: string) =>
+			ipcRenderer.invoke("db:stockMovements:getOne", invoicePrefix, invoiceNumber, itemEan),
 		create: (movement: CreateStockMovementInput) =>
 			ipcRenderer.invoke("db:stockMovements:create", movement),
-		update: (number: string, updates: Partial<StockMovement>) =>
-			ipcRenderer.invoke("db:stockMovements:update", number, updates),
-		delete: (number: string) =>
-			ipcRenderer.invoke("db:stockMovements:delete", number),
-		getByInvoice: (invoiceNumber: string) =>
-			ipcRenderer.invoke("db:stockMovements:getByInvoice", invoiceNumber),
+		update: (invoicePrefix: string, invoiceNumber: string, itemEan: string, updates: Partial<StockMovement>) =>
+			ipcRenderer.invoke("db:stockMovements:update", invoicePrefix, invoiceNumber, itemEan, updates),
+		delete: (invoicePrefix: string, invoiceNumber: string, itemEan: string) =>
+			ipcRenderer.invoke("db:stockMovements:delete", invoicePrefix, invoiceNumber, itemEan),
+		getByInvoice: (invoicePrefix: string, invoiceNumber: string) =>
+			ipcRenderer.invoke("db:stockMovements:getByInvoice", invoicePrefix, invoiceNumber),
 
 		getStockAmountByItem: (ean: string) =>
 			ipcRenderer.invoke("db:stockMovements:getStockAmountByItem", ean),

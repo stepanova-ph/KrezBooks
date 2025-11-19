@@ -70,10 +70,12 @@ declare global {
 			stockMovements: {
 				getAll: () => Promise<IpcResponse<StockMovement[]>>;
 				getOne: (
+					invoicePrefix: string,
 					invoiceNumber: string,
 					itemEan: string,
 				) => Promise<IpcResponse<StockMovement>>;
 				getByInvoice: (
+					invoicePrefix: string,
 					invoiceNumber: string,
 				) => Promise<IpcResponse<StockMovement[]>>;
 				getByItem: (itemEan: string) => Promise<IpcResponse<StockMovement[]>>;
@@ -92,15 +94,18 @@ declare global {
 					movement: CreateStockMovementInput,
 				) => Promise<IpcResponse<{ changes: number }>>;
 				update: (
+					invoicePrefix: string,
 					invoiceNumber: string,
 					itemEan: string,
 					updates: Partial<StockMovement>,
 				) => Promise<IpcResponse<{ changes: number }>>;
 				delete: (
+					invoicePrefix: string,
 					invoiceNumber: string,
 					itemEan: string,
 				) => Promise<IpcResponse<{ changes: number }>>;
 				deleteByInvoice: (
+					invoicePrefix: string,
 					invoiceNumber: string,
 				) => Promise<IpcResponse<{ changes: number }>>;
 			};
