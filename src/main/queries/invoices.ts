@@ -35,12 +35,12 @@ export const invoiceQueries = {
     SELECT
       i.*,
       COALESCE(
-        SUM(CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL)),
+        SUM(ABS(CAST(sm.amount AS REAL)) * CAST(sm.price_per_unit AS REAL)),
         0
       ) as total_without_vat,
       COALESCE(
         SUM(
-          CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL) *
+          ABS(CAST(sm.amount AS REAL)) * CAST(sm.price_per_unit AS REAL) *
           (1 + CASE sm.vat_rate
             ${vatRateCaseStatement}
             ELSE 0.0
@@ -54,9 +54,27 @@ export const invoiceQueries = {
     ORDER BY i.date_issue DESC, i.number DESC
   `,
 
-	getOne: `
-    SELECT * FROM invoices 
-    WHERE number = ?
+  getOne: `
+    SELECT
+      i.*,
+      COALESCE(
+        SUM(ABS(CAST(sm.amount AS REAL)) * CAST(sm.price_per_unit AS REAL)),
+        0
+      ) as total_without_vat,
+      COALESCE(
+        SUM(
+          ABS(CAST(sm.amount AS REAL)) * CAST(sm.price_per_unit AS REAL) *
+          (1 + CASE sm.vat_rate
+            ${vatRateCaseStatement}
+            ELSE 0.0
+          END)
+        ),
+        0
+      ) as total_with_vat
+    FROM invoices i
+    LEFT JOIN stock_movements sm ON i.prefix = sm.invoice_prefix AND i.number = sm.invoice_number
+    WHERE i.number = ? AND i.prefix = ?
+    GROUP BY i.prefix, i.number
   `,
 
 	create: `

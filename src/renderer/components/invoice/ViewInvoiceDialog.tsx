@@ -10,6 +10,7 @@ import { InvoiceItemsList } from "./InvoiceItemsList";
 import { Loading } from "../layout/Loading";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 import { InvoiceTotals } from "./InvoiceTotals";
+import { getDisplayAmount } from "../../../utils/typeConverterUtils";
 
 interface ViewInvoiceDialogProps {
 	open: boolean;
@@ -40,9 +41,9 @@ export function ViewInvoiceDialog({
 			category: item?.category || "",
 			unit_of_measure: item?.unit_of_measure || "ks",
 			vat_rate: movement.vat_rate,
-			amount: Number(movement.amount),
+			amount: getDisplayAmount(movement.amount, invoice.type),
 			sale_price: Number(movement.price_per_unit),
-			total: Number(movement.amount) * Number(movement.price_per_unit),
+			total: getDisplayAmount(movement.amount, invoice.type) * Number(movement.price_per_unit),
 			p_group_index: 1,
 			note: item?.note,
 			sale_price_group1: item?.sale_price_group1 || 0,

@@ -110,3 +110,28 @@ export function serializeInvoice(invoice: Partial<Invoice>): any {
 		email: invoice.email ?? null,
 	};
 }
+
+/**
+ * Get the signed amount for stock movement based on invoice type
+ * - Purchase types (1, 2): positive amounts (adds to stock)
+ * - Sale types (3, 4): negative amounts (removes from stock)  
+ * - Correction type (5): as-is from user input
+ */
+export function getSignedAmount(amount: number, invoiceType: number): string {
+	// Sale types should be negative
+	if (invoiceType === 3 || invoiceType === 4) {
+		return (-Math.abs(amount)).toString();
+	}
+	// Purchase types and corrections keep the sign as-is
+	return amount.toString();
+}
+
+export function getDisplayAmount(amount: string | number, invoiceType: number): number {
+	const numAmount = typeof amount === 'string' ? Number(amount) : amount;
+	
+	if (invoiceType === 5) {
+		return numAmount;
+	}
+	
+	return Math.abs(numAmount);
+}

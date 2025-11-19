@@ -21,6 +21,7 @@ import {
 } from "../../../utils/formUtils";
 import { InvoiceTotals } from "../invoice/InvoiceTotals";
 import { INVOICE_TYPES } from "../../../config/constants";
+import { getDisplayAmount, getSignedAmount } from "../../../utils/typeConverterUtils";
 
 function NewInvoiceTab() {
 	const form = useInvoiceForm();
@@ -65,7 +66,7 @@ function NewInvoiceTab() {
 			// Item already exists - open edit dialog
 			const existing = form.invoiceItems[existingIndex];
 			dialogs.amountPrice.openDialog(item, {
-				amount: existing.amount,
+				amount: getDisplayAmount(existing.amount, form.formData.type),
 				price: existing.sale_price,
 				p_group_index: existing.p_group_index,
 				index: existingIndex,
@@ -193,7 +194,7 @@ function NewInvoiceTab() {
 						invoice_prefix: form.formData.prefix || "",
 						invoice_number: form.formData.number,
 						item_ean: item.ean,
-						amount: item.amount.toString(),
+						amount: getSignedAmount(item.amount, form.formData.type),
 						price_per_unit: item.sale_price.toString(),
 						vat_rate: item.vat_rate,
 						reset_point: shouldSetResetPoint,

@@ -80,11 +80,14 @@ export function useInvoiceForm() {
 		if (!isVariableSymbolCustom) {
 			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
 			if (formData.variable_symbol !== autoVariableSymbol) {
+				console.log(`Auto-syncing variable symbol: ${autoVariableSymbol}`);
 				setFormData((prev) => ({
 					...prev,
 					variable_symbol: autoVariableSymbol,
 				}));
 			}
+		} else {
+			console.log('Variable symbol is custom, not auto-syncing');
 		}
 	}, [formData.prefix, formData.number, isVariableSymbolCustom]);
 
@@ -97,26 +100,29 @@ export function useInvoiceForm() {
 	}, [formData, invoiceItems, selectedContact, setInvoiceFormState]);
 
 	const handleChange = (field: string, value: string | number) => {
-		// Update form data first
-		setFormData((prev) => ({ ...prev, [field]: value }));
-
-		// Detect manual edit of variable symbol
+		// Detect manual edit of variable symbol BEFORE updating formData
 		if (field === "variable_symbol") {
 			// Calculate what the auto variable symbol would be with current prefix/number
 			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
 			// If user enters something different than auto, mark as custom
 			if (value !== autoVariableSymbol) {
+				console.log(`User entered custom variable symbol: ${value} (auto would be: ${autoVariableSymbol})`);
 				setIsVariableSymbolCustom(true);
 			} else {
 				// If they change it back to match, it's no longer custom
+				console.log('User changed variable symbol back to auto value');
 				setIsVariableSymbolCustom(false);
 			}
 		}
 
 		// When prefix or number changes, allow auto-sync to take over
 		if (field === "prefix" || field === "number") {
+			console.log(`${field} changed, resetting custom flag`);
 			setIsVariableSymbolCustom(false);
 		}
+
+		// Update form data
+		setFormData((prev) => ({ ...prev, [field]: value }));
 
 		if (errors[field]) {
 			setErrors((prev) => ({ ...prev, [field]: "" }));
