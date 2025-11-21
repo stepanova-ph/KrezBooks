@@ -105,14 +105,15 @@ function ItemForm({
 		VAT_RATES[formData.vat_rate as keyof typeof VAT_RATES]?.percentage ?? 21;
 
 	return (
-		<FormDialog
-			open={open}
-			onClose={onClose}
-			title={title}
-			onSubmit={handleSubmit}
-			isPending={isPending}
-			submitLabel={submitLabel}
-		>
+			<FormDialog
+				open={open}
+				onClose={onClose}
+				title={title}
+				onSubmit={handleSubmit}
+				isPending={isPending}
+				submitLabel={submitLabel}
+				mode={mode}
+			>
 			<FormSection title="Základní informace">
 				<Grid container spacing={2} alignItems="center">
 					<Grid item xs={12} md={3.5}>

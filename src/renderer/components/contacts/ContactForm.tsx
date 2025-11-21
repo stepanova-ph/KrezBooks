@@ -189,14 +189,15 @@ function ContactForm({
 	const submitLabel = mode === "create" ? "Přidat kontakt" : "Uložit změny";
 
 	return (
-		<FormDialog
-			open={open}
-			onClose={onClose}
-			title={title}
-			onSubmit={handleSubmit}
-			isPending={isPending}
-			submitLabel={submitLabel}
-		>
+			<FormDialog
+				open={open}
+				onClose={onClose}
+				title={title}
+				onSubmit={handleSubmit}
+				isPending={isPending}
+				submitLabel={submitLabel}
+				mode={mode}
+			>
 			<FormSection title="Základní údaje">
 				<Grid container spacing={2} alignItems="center">
 					<Grid item md={4.8} mr={-0.5}>

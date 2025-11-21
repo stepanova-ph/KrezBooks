@@ -40,17 +40,29 @@ export function ContactPickerDialog({
 		initialPickerFilterState,
 	);
 
+	const isContactSelected = (contact: Contact) => {
+		return selectedContacts.some(
+			c => c.ico === contact.ico && c.modifier === contact.modifier
+		);
+	};
+	
 	const filteredContacts = useTableFilters(
 		allContacts,
 		filters,
 		contactPickerFilterConfig,
 	);
 
-	const isContactSelected = (contact: Contact) => {
-		return selectedContacts.some(
-			c => c.ico === contact.ico && c.modifier === contact.modifier
-		);
-	};
+	// Sort selected contacts to top
+	const sortedContacts = [...filteredContacts].sort((a, b) => {
+		const aSelected = isContactSelected(a);
+		const bSelected = isContactSelected(b);
+		if (aSelected && !bSelected) return -1;
+		if (!aSelected && bSelected) return 1;
+		return 0;
+	});
+
+
+	
 
 	const handleSelect = (contact: Contact) => {
 		if (singleSelect) {
@@ -118,7 +130,7 @@ export function ContactPickerDialog({
 			onSelect={handleSelect}
 			title={singleSelect ? "Vybrat kontakt" : "Vybrat kontakty"}
 			columns={pickerColumns}
-			data={filteredContacts}
+			data={sortedContacts}
 			getRowKey={(contact) => `${contact.ico}-${contact.modifier}`}
 			renderRow={renderRow}
 			emptyMessage="Žádné kontakty nenalezeny"
