@@ -252,8 +252,8 @@ export function registerIpcHandlers() {
 		},
 	);
 
-	ipcMain.handle("db:invoices:delete", async (_event, number: string) => {
-		return handleIpcRequest(() => invoiceService.delete(number));
+	ipcMain.handle("db:invoices:delete", async (_event, prefix: string, number: string) => {
+		return handleIpcRequest(() => invoiceService.delete(prefix, number));
 	});
 
 	ipcMain.handle('db:invoices:getMaxNumber', async (_, type: number) => {

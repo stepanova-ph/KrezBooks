@@ -121,11 +121,11 @@ export const invoiceQueries = {
     )
   `,
 
-	delete: `
+  delete: `
     DELETE FROM invoices 
-    WHERE number = ?
+    WHERE prefix = ? AND number = ?
   `,
-
+  
   getMaxNumberByType: `
     SELECT COALESCE(MAX(CAST(number AS INTEGER)), 0) as max_num
     FROM invoices

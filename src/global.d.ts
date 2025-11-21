@@ -123,7 +123,7 @@ declare global {
 					number: string,
 					updates: Partial<Invoice>,
 				) => Promise<IpcResponse<{ changes: number }>>;
-				delete: (number: string) => Promise<IpcResponse<{ changes: number }>>;
+				delete: (prefix: string, number: string) => Promise<IpcResponse<{ changes: number }>>;
 				getByInvoice: (
 					invoiceNumber: string,
 				) => Promise<IpcResponse<StockMovement[]>>;

@@ -12,11 +12,11 @@ export function useInvoices() {
 	});
 }
 
-export function useInvoice(number: string) {
+export function useInvoice(prefix: string, number: string) {
 	return useQuery({
-		queryKey: ["invoices", number],
+		queryKey: ["invoices", prefix, number],
 		queryFn: async () => {
-			const result = await window.electronAPI.invoices.getOne(number);
+			const result = await window.electronAPI.invoices.getOne(prefix, number);
 			if (!result.success) throw new Error(result.error);
 			return result.data;
 		},

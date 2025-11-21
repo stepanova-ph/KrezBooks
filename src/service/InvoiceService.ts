@@ -78,10 +78,10 @@ export class InvoiceService {
 		return { changes: result.changes };
 	}
 
-	async delete(number: string): Promise<{ changes: number }> {
+	async delete(prefix: string, number: string): Promise<{ changes: number }> {
 		const db = getDatabase();
 		const statement = db.prepare(invoiceQueries.delete);
-		const result = statement.run(number);
+		const result = statement.run(prefix, number);
 
 		if (result.changes === 0) {
 			throw new Error("Invoice not found");
@@ -124,7 +124,7 @@ export class InvoiceService {
 		return `
       UPDATE ${tableName}
       SET ${setClause}, updated_at = CURRENT_TIMESTAMP
-      WHERE number = @number
+      WHERE prefix = @prefix AND number = @number
     `;
 	}
 
