@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
 	StockMovement,
 	CreateStockMovementInput,
+	StockMovementWithInvoiceInfo,
 } from "../types/database";
 
 export function useStockMovements() {
@@ -136,6 +137,19 @@ export function useLastBuyPriceByItem(itemEan: string) {
 				await window.electronAPI.stockMovements.getLastBuyPriceByItem(itemEan);
 			if (!result.success) throw new Error(result.error);
 			return result.data as number;
+		},
+		enabled: !!itemEan,
+	});
+}
+
+export function useStockMovementsByItem(itemEan: string) {
+	return useQuery({
+		queryKey: ["stockMovements", "item", itemEan],
+		queryFn: async () => {
+			const result =
+				await window.electronAPI.stockMovements.getByItemWithInvoiceInfo(itemEan);
+			if (!result.success) throw new Error(result.error);
+			return result.data as StockMovementWithInvoiceInfo[];
 		},
 		enabled: !!itemEan,
 	});

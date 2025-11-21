@@ -115,11 +115,8 @@ export function useInvoiceForm() {
 			}
 		}
 
-		// When prefix or number changes, allow auto-sync to take over
-		if (field === "prefix" || field === "number") {
-			console.log(`${field} changed, resetting custom flag`);
-			setIsVariableSymbolCustom(false);
-		}
+		// Note: We do NOT reset the custom flag when prefix/number changes
+		// This way, if the user has entered a custom variable symbol, it stays custom
 
 		// Update form data
 		setFormData((prev) => ({ ...prev, [field]: value }));
@@ -130,6 +127,17 @@ export function useInvoiceForm() {
 	};
 
 	const handleBlur = (field: string) => {
+		// If variable symbol is empty after blur, set it to default (prefix + number)
+		if (field === "variable_symbol" && !formData.variable_symbol.trim()) {
+			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
+			console.log(`Variable symbol was empty, setting to default: ${autoVariableSymbol}`);
+			setFormData((prev) => ({
+				...prev,
+				variable_symbol: autoVariableSymbol,
+			}));
+			setIsVariableSymbolCustom(false);
+		}
+
 		const result = invoiceSchema.safeParse(formData);
 		if (!result.success) {
 			const fieldError = result.error.issues.find(

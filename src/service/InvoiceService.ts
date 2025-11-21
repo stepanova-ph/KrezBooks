@@ -10,10 +10,10 @@ export class InvoiceService {
 		return invoices as Invoice[];
 	}
 
-	async getOne(number: string): Promise<Invoice | undefined> {
+	async getOne(prefix: string, number: string): Promise<Invoice | undefined> {
 		const db = getDatabase();
 		const statement = db.prepare(invoiceQueries.getOne);
-		const invoice = statement.get(number);
+		const invoice = statement.get(number, prefix);
 		return invoice as Invoice | undefined;
 	}
 

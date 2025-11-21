@@ -15,16 +15,18 @@ import { getDisplayAmount } from "../../../utils/typeConverterUtils";
 interface ViewInvoiceDialogProps {
 	open: boolean;
 	onClose: () => void;
+	invoicePrefix: string,
 	invoiceNumber: string;
 }
 
 export function ViewInvoiceDialog({
 	open,
 	onClose,
+	invoicePrefix,
 	invoiceNumber,
 }: ViewInvoiceDialogProps) {
 	const { data: invoice, isLoading: invoiceLoading } =
-		useInvoice(invoiceNumber);
+		useInvoice(invoicePrefix, invoiceNumber);
 	const { data: movements = [], isLoading: movementsLoading } =
 		useStockMovementsByInvoice(invoice?.prefix || "", invoiceNumber);
 	const { data: allItems = [] } = useItems();

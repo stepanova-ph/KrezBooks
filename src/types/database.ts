@@ -143,3 +143,9 @@ export type UpdateInvoiceInput = UpdateInput<
 	"created_at" | "updated_at",
 	"number"
 >;
+
+export interface StockMovementWithInvoiceInfo extends StockMovement {
+	date_issue: string;
+	invoice_type: number;
+	contact_ico: string | null;
+}

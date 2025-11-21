@@ -108,11 +108,14 @@ declare global {
 					invoicePrefix: string,
 					invoiceNumber: string,
 				) => Promise<IpcResponse<{ changes: number }>>;
+				getByItemWithInvoiceInfo: (
+					itemEan: string,
+				) => Promise<IpcResponse<StockMovementWithInvoiceInfo[]>>;
 			};
 
 			invoices: {
 				getAll: () => Promise<IpcResponse<Invoice[]>>;
-				getOne: (number: string) => Promise<IpcResponse<Invoice | null>>;
+				getOne: (prefix: string, number: string) => Promise<IpcResponse<Invoice | null>>;
 				create: (
 					invoice: CreateInvoiceInput,
 				) => Promise<IpcResponse<{ changes: number }>>;

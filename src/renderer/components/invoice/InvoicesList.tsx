@@ -130,7 +130,7 @@ function InvoicesList({
 				emptyMessage="Žádné doklady. Klikněte na 'Vytvořit doklad' pro vytvoření nového."
 				columnOrder={columnOrder}
 				onColumnOrderChange={onColumnOrderChange}
-				getRowKey={(invoice) => invoice.number}
+				getRowKey={(invoice) => `${invoice.prefix || ""}-${invoice.number}`}
 				orderBy={orderBy}
 				getCellContent={getCellContent}
 				contextMenuActions={contextMenuActions}
@@ -157,6 +157,7 @@ function InvoicesList({
 				<ViewInvoiceDialog
 					open={!!viewingInvoice}
 					onClose={() => setViewingInvoice(null)}
+					invoicePrefix={viewingInvoice.prefix || ""}
 					invoiceNumber={viewingInvoice.number}
 				/>
 			)}

@@ -312,7 +312,7 @@ function ItemForm({
 									}}
 								>
 									<Chip
-										label={`${stockAmount.toFixed(2)} ${formData.unit_of_measure}`}
+										label={`${stockAmount} ${formData.unit_of_measure}`}
 										color={
 											stockAmount > 0
 												? "success"

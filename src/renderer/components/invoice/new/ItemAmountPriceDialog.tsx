@@ -373,7 +373,7 @@ export function ItemAmountPriceDialog({
 						Aktuální stav:
 					</Typography>
 					<Chip
-						label={`${stockAmount.toFixed(0)} ${item.unit_of_measure}`}
+						label={`${stockAmount} ${item.unit_of_measure}`}
 						color={stockAmount < 0 ? "error" : "default"}
 						size="small"
 						sx={{ fontWeight: 600 }}
@@ -382,7 +382,7 @@ export function ItemAmountPriceDialog({
 						→
 					</Typography>
 					<Chip
-						label={`${projectedStock.toFixed(0)} ${item.unit_of_measure}`}
+						label={`${projectedStock} ${item.unit_of_measure}`}
 						color={
 							projectedStock > 0
 								? "success"

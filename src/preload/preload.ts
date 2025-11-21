@@ -66,15 +66,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
 	invoices: {
 		getAll: () => ipcRenderer.invoke("db:invoices:getAll"),
-		getOne: (number: string) =>
-			ipcRenderer.invoke("db:invoices:getOne", number),
+		getOne: (prefix: string, number: string) =>
+			ipcRenderer.invoke("db:invoices:getOne", prefix, number),
 		create: (invoice: CreateInvoiceInput) =>
 			ipcRenderer.invoke("db:invoices:create", invoice),
 		update: (number: string, updates: Partial<Invoice>) =>
 			ipcRenderer.invoke("db:invoices:update", number, updates),
 		delete: (number: string) =>
 			ipcRenderer.invoke("db:invoices:delete", number),
-		getMaxNumber: (type: number) => ipcRenderer.invoke('db:invoice:getMaxNumber', type),
+		getMaxNumber: (type: number) => ipcRenderer.invoke('db:invoices:getMaxNumber', type),
 	},
 
 	stockMovements: {
@@ -105,5 +105,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 				itemEan,
 				newAmount,
 			),
+
+		getByItemWithInvoiceInfo: (itemEan: string) =>
+			ipcRenderer.invoke("db:stockMovements:getByItemWithInvoiceInfo", itemEan),
 	},
 });

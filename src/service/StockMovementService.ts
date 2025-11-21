@@ -1,6 +1,6 @@
 import { stockMovementQueries } from "../main/queries/stockMovements";
 import { getDatabase } from "../main/database";
-import { StockMovement, CreateStockMovementInput } from "../types/database";
+import { StockMovement, CreateStockMovementInput, StockMovementWithInvoiceInfo } from "../types/database";
 import {
 	booleanToSQLiteInteger,
 	sqliteIntegerToBoolean,
@@ -174,7 +174,7 @@ export class StockMovementService {
 	async getAverageBuyPriceByItem(itemEan: string): Promise<number> {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.getAverageBuyPriceByItem);
-		const result = statement.get(itemEan) as { avg_price: number } | undefined;
+		const result = statement.get(itemEan, itemEan) as { avg_price: number } | undefined;
 		return result?.avg_price || 0;
 	}
 
@@ -195,5 +195,15 @@ export class StockMovementService {
 
 		// Return true if we're crossing from positive to zero or negative
 		return currentStock > 0 && resultingStock <= 0;
+	}
+
+	async getByItemWithInvoiceInfo(itemEan: string): Promise<StockMovementWithInvoiceInfo[]> {
+		const db = getDatabase();
+		const statement = db.prepare(stockMovementQueries.getByItemWithInvoiceInfo);
+		const movements = statement.all(itemEan) as any[];
+		return movements.map((m) => ({
+			...m,
+			reset_point: sqliteIntegerToBoolean(m.reset_point),
+		}));
 	}
 }

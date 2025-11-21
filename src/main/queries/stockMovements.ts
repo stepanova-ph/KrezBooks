@@ -75,14 +75,22 @@ export const stockMovementQueries = {
 
 	getAverageBuyPriceByItem: `
     SELECT COALESCE(
-      SUM(CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL)) /
-      NULLIF(SUM(CAST(sm.amount AS REAL)), 0),
-      0
-    ) as avg_price
-    FROM stock_movements sm
-    JOIN invoices i ON sm.invoice_prefix = i.prefix AND sm.invoice_number = i.number
-    WHERE sm.item_ean = ?
-      AND (i.type = 1 OR i.type = 2)
+        SUM(CAST(sm.amount AS REAL) * CAST(sm.price_per_unit AS REAL)) /
+        NULLIF(SUM(CAST(sm.amount AS REAL)), 0),
+        0
+      ) as avg_price
+      FROM stock_movements sm
+      JOIN invoices i ON sm.invoice_prefix = i.prefix AND sm.invoice_number = i.number
+      WHERE sm.item_ean = ?
+        AND (i.type = 1 OR i.type = 2)
+        AND sm.created_at >= COALESCE(
+          (SELECT created_at 
+          FROM stock_movements 
+          WHERE item_ean = ? AND reset_point = 1 
+          ORDER BY created_at DESC 
+          LIMIT 1),
+          '1970-01-01'
+        )
   `,
 
 	getLastBuyPriceByItem: `
@@ -97,4 +105,23 @@ export const stockMovementQueries = {
       0
     ) as last_price
   `,
+
+	getByItemWithInvoiceInfo: `
+		SELECT 
+			sm.invoice_prefix,
+			sm.invoice_number,
+			sm.item_ean,
+			sm.amount,
+			sm.price_per_unit,
+			sm.vat_rate,
+			sm.reset_point,
+			sm.created_at,
+			i.date_issue,
+			i.type as invoice_type,
+			i.ico as contact_ico
+		FROM stock_movements sm
+		JOIN invoices i ON sm.invoice_prefix = i.prefix AND sm.invoice_number = i.number
+		WHERE sm.item_ean = ?
+		ORDER BY i.date_issue DESC, sm.created_at DESC
+	`,
 };
