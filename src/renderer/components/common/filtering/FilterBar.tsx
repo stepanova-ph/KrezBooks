@@ -17,6 +17,7 @@ import { NumberComparatorFilter } from "./components/NumberComparatorFilter";
 import { FilterAggregateFilter } from "./components";
 import { clear } from "console";
 import { DateComparatorFilter } from "./components/DateComparatorFilter";
+import React from "react";
 
 // Import filter components
 
@@ -154,7 +155,9 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 		};
 
 		const renderFilter = (filter: FilterDef): ReactNode => {
-			switch (filter.type) {
+
+			const rendered = (() => {
+				switch (filter.type) {
 				case "text-search":
 					return (
 						<TextSearchFilter
@@ -273,7 +276,10 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 
 				default:
 					return null;
-			}
+				}
+			})();
+			
+			return <React.Fragment key={filter.id}>{rendered}</React.Fragment>;
 		};
 
 		const activeAction = actions.find((a) => a.id === openActionId);
@@ -304,8 +310,6 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 						{visibleFilters.slice(0, 2).map(renderFilter)}
 						{customFilterElements}
 						{visibleFilters.slice(2, visibleFilters.length).map(renderFilter)}
-
-
 					</Box>
 
 
