@@ -1,11 +1,13 @@
-import { Box, Typography, Grid, TableCell } from "@mui/material";
+import { Box, Grid, TableCell, IconButton, Collapse } from "@mui/material";
 import { Dialog } from "../common/dialog/Dialog";
 import { FormSection } from "../common/form/FormSection";
 import { Loading } from "../layout/Loading";
 import { DataTable, Column, ContextMenuAction } from "../common/table/DataTable";
 import { VatPriceField } from "../common/inputs/VatPriceField";
 import { StockAmountDisplay } from "../common/StockAmountDisplay";
+import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {
 	useStockMovementsByItem,
 	useAverageBuyPriceByItem,
@@ -32,6 +34,8 @@ interface ItemCardDialogProps {
 	open: boolean;
 	onClose: () => void;
 	itemEan: string;
+	/** If true, left panel is collapsed by default */
+	defaultCollapsed?: boolean;
 }
 
 const movementColumns: Column[] = [
@@ -47,6 +51,7 @@ export function ItemCardDialog({
 	open,
 	onClose,
 	itemEan,
+	defaultCollapsed = false,
 }: ItemCardDialogProps) {
 	const { data: item, isLoading: itemLoading } = useItem(itemEan);
 	const { data: movements = [], isLoading: movementsLoading } =
@@ -54,6 +59,7 @@ export function ItemCardDialog({
 	const { data: avgBuyPrice = 0 } = useAverageBuyPriceByItem(itemEan);
 	const { data: lastBuyPrice = 0 } = useLastBuyPriceByItem(itemEan);
 
+	const [showDetails, setShowDetails] = useState(!defaultCollapsed);
 	const [viewingInvoice, setViewingInvoice] = useState<{
 		prefix: string;
 		number: string;
@@ -125,168 +131,162 @@ export function ItemCardDialog({
 					<Loading text="Načítám kartu položky..." />
 				) : (
 					<Box sx={{ height: "70vh", display: "flex", overflow: "hidden" }}>
-						{/* Left Column - Item Info */}
-						<Box
-							sx={{
-								width: 380,
-								flexShrink: 0,
-								p: 3,
-								overflowY: "auto",
-								borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-							}}
-						>
-							{/* Basic Info */}
-							<FormSection title="Základní informace">
-								<Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-									<Box>
-										<Typography
-											variant="caption"
-											color="text.secondary"
-											sx={{ display: "block" }}
+						{/* Left Column - Item Info (Collapsible) */}
+						<Collapse in={showDetails} orientation="horizontal">
+							<Box
+								sx={{
+									width: 380,
+									flexShrink: 0,
+									p: 3,
+									overflowY: "auto",
+									borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+									height: "100%",
+								}}
+							>
+								{/* Basic Info */}
+								<FormSection
+									title="Základní informace"
+									actions={
+										<IconButton
+											size="small"
+											onClick={() => setShowDetails(false)}
+											title="Skrýt detaily"
 										>
-											EAN
-										</Typography>
-										<Typography variant="body2" sx={{ fontWeight: 500 }}>
-											{item.ean}
-										</Typography>
-									</Box>
-									<Box>
-										<Typography
-											variant="caption"
-											color="text.secondary"
-											sx={{ display: "block" }}
-										>
-											Název
-										</Typography>
-										<Typography variant="body2" sx={{ fontWeight: 500 }}>
-											{item.name}
-										</Typography>
-									</Box>
-									<Box sx={{ display: "flex", gap: 3 }}>
-										<Box sx={{ flex: 1 }}>
-											<Typography
-												variant="caption"
-												color="text.secondary"
-												sx={{ display: "block" }}
-											>
-												Kategorie
-											</Typography>
-											<Typography variant="body2">
-												{item.category || "-"}
-											</Typography>
-										</Box>
-										<Box>
-											<Typography
-												variant="caption"
-												color="text.secondary"
-												sx={{ display: "block" }}
-											>
-												DPH
-											</Typography>
-											<Typography variant="body2">
-												{formatVatRateShort(item.vat_rate)}
-											</Typography>
-										</Box>
-									</Box>
-								</Box>
-							</FormSection>
+											<VisibilityOffIcon fontSize="small" />
+										</IconButton>
+									}
+								>
+									<Grid container spacing={2}>
+										<Grid item xs={12}>
+											<ValidatedTextField
+												label="EAN"
+												value={item.ean}
+												disabled
+												fullWidth
+												size="small"
+											/>
+										</Grid>
+										<Grid item xs={12}>
+											<ValidatedTextField
+												label="Název"
+												value={item.name}
+												disabled
+												fullWidth
+												size="small"
+											/>
+										</Grid>
+										<Grid item xs={8}>
+											<ValidatedTextField
+												label="Kategorie"
+												value={item.category || "-"}
+												disabled
+												fullWidth
+												size="small"
+											/>
+										</Grid>
+										<Grid item xs={4}>
+											<ValidatedTextField
+												label="DPH"
+												value={formatVatRateShort(item.vat_rate)}
+												disabled
+												fullWidth
+												size="small"
+											/>
+										</Grid>
+									</Grid>
+								</FormSection>
 
-							{/* Buy Prices */}
-							<FormSection title="Nákupní ceny" my={2}>
-								<Box sx={{ display: "flex", gap: 2 }}>
-									<Box sx={{ flex: 1 }}>
-										<Typography
-											variant="caption"
-											color="text.secondary"
-											sx={{ display: "block" }}
-										>
-											Průměrná
-										</Typography>
-										<Typography variant="body2" sx={{ fontWeight: 500 }}>
-											{formatPrice(avgBuyPrice)}
-										</Typography>
-									</Box>
-									<Box sx={{ flex: 1 }}>
-										<Typography
-											variant="caption"
-											color="text.secondary"
-											sx={{ display: "block" }}
-										>
-											Poslední
-										</Typography>
-										<Typography variant="body2" sx={{ fontWeight: 500 }}>
-											{formatPrice(lastBuyPrice)}
-										</Typography>
-									</Box>
-								</Box>
-							</FormSection>
+								{/* Buy Prices */}
+								<FormSection title="Nákupní ceny" my={2}>
+									<Grid container spacing={2}>
+										<Grid item xs={6}>
+											<ValidatedTextField
+												label="Průměrná"
+												value={formatPrice(avgBuyPrice)}
+												disabled
+												fullWidth
+												size="small"
+											/>
+										</Grid>
+										<Grid item xs={6}>
+											<ValidatedTextField
+												label="Poslední"
+												value={formatPrice(lastBuyPrice)}
+												disabled
+												fullWidth
+												size="small"
+											/>
+										</Grid>
+									</Grid>
+								</FormSection>
 
-							{/* Sale Prices */}
-							<FormSection title="Prodejní ceny" my={2}>
-								<Grid container spacing={1.5}>
-									<Grid item xs={12}>
-										<VatPriceField
-											size="small"
-											label="Skupina 1"
-											name="sale_price_group1"
-											value={item.sale_price_group1}
-											vatRate={vatPercentage}
-											onChange={() => {}}
-											precision={2}
-											min={0}
-											readonly
-										/>
+								{/* Sale Prices */}
+								<FormSection title="Prodejní ceny" my={2}>
+									<Grid container spacing={1.5}>
+										<Grid item xs={12}>
+											<VatPriceField
+												size="small"
+												label="Skupina 1"
+												name="sale_price_group1"
+												value={item.sale_price_group1}
+												vatRate={vatPercentage}
+												onChange={() => {}}
+												precision={2}
+												min={0}
+												readonly
+											/>
+										</Grid>
+										<Grid item xs={12}>
+											<VatPriceField
+												size="small"
+												label="Skupina 2"
+												name="sale_price_group2"
+												value={item.sale_price_group2}
+												vatRate={vatPercentage}
+												onChange={() => {}}
+												precision={2}
+												min={0}
+												readonly
+											/>
+										</Grid>
+										<Grid item xs={12}>
+											<VatPriceField
+												size="small"
+												label="Skupina 3"
+												name="sale_price_group3"
+												value={item.sale_price_group3}
+												vatRate={vatPercentage}
+												onChange={() => {}}
+												precision={2}
+												min={0}
+												readonly
+											/>
+										</Grid>
+										<Grid item xs={12}>
+											<VatPriceField
+												size="small"
+												label="Skupina 4"
+												name="sale_price_group4"
+												value={item.sale_price_group4}
+												vatRate={vatPercentage}
+												onChange={() => {}}
+												precision={2}
+												min={0}
+												readonly
+											/>
+										</Grid>
 									</Grid>
-									<Grid item xs={12}>
-										<VatPriceField
-											size="small"
-											label="Skupina 2"
-											name="sale_price_group2"
-											value={item.sale_price_group2}
-											vatRate={vatPercentage}
-											onChange={() => {}}
-											precision={2}
-											min={0}
-											readonly
-										/>
-									</Grid>
-									<Grid item xs={12}>
-										<VatPriceField
-											size="small"
-											label="Skupina 3"
-											name="sale_price_group3"
-											value={item.sale_price_group3}
-											vatRate={vatPercentage}
-											onChange={() => {}}
-											precision={2}
-											min={0}
-											readonly
-										/>
-									</Grid>
-									<Grid item xs={12}>
-										<VatPriceField
-											size="small"
-											label="Skupina 4"
-											name="sale_price_group4"
-											value={item.sale_price_group4}
-											vatRate={vatPercentage}
-											onChange={() => {}}
-											precision={2}
-											min={0}
-											readonly
-										/>
-									</Grid>
-								</Grid>
-							</FormSection>
+								</FormSection>
 
-							{/* Stock Amount */}
-							<FormSection title="Stav skladu" my={2}>
-								<StockAmountDisplay
-									amount={item.stock_amount ?? 0}
-									unit={item.unit_of_measure}
-								/>
-							</FormSection>
-						</Box>
+								{/* Stock Amount */}
+								<FormSection title="Stav skladu" my={2}>
+									<StockAmountDisplay
+										amount={item.stock_amount ?? 0}
+										unit={item.unit_of_measure}
+									/>
+								</FormSection>
+							</Box>
+						</Collapse>
 
 						{/* Right Column - Stock Movements */}
 						<Box
@@ -307,7 +307,21 @@ export function ItemCardDialog({
 									overflowY: "scroll",
 								}}
 							>
-								<FormSection title="Pohyby skladu" hideDivider>
+								<FormSection
+									title="Pohyby skladu"
+									hideDivider
+									actions={
+										!showDetails ? (
+											<IconButton
+												size="small"
+												onClick={() => setShowDetails(true)}
+												title="Zobrazit detaily"
+											>
+												<VisibilityIcon fontSize="small" />
+											</IconButton>
+										) : undefined
+									}
+								>
 									<Box
 										sx={{
 											height: "100%",

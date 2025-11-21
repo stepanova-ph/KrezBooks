@@ -15,17 +15,17 @@ export function StockAmountDisplay({
 	unit,
 }: StockAmountDisplayProps) {
 	return (
-		<Box
-			sx={{
-				border: (theme) => `1px solid ${theme.palette.divider}`,
-				borderRadius: 1,
-				p: 1.5,
-				display: "flex",
-				flexDirection: "column",
-				gap: 0.5,
-			}}
-		>
-			<Box sx={{ display: "flex", justifyContent: "center" }}>
+			<Box
+				sx={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					p: 3,
+					bgcolor: "background.default",
+					borderRadius: 1,
+					border: (theme) => `1px solid ${theme.palette.divider}`,
+				}}
+			>
 				<Chip
 					label={`${amount} ${unit}`}
 					color={
@@ -35,13 +35,36 @@ export function StockAmountDisplay({
 								? "error"
 								: "default"
 					}
-					sx={{
-						fontWeight: 600,
-						fontSize: "0.875rem",
-						minWidth: 70,
-					}}
+					sx={{ fontWeight: 600, fontSize: "1rem" }}
 				/>
 			</Box>
-		</Box>
+		// <Box
+		// 	sx={{
+		// 		border: (theme) => `1px solid ${theme.palette.divider}`,
+		// 		borderRadius: 1,
+		// 		p: 1.5,
+		// 		display: "flex",
+		// 		flexDirection: "column",
+		// 		gap: 0.5,
+		// 	}}
+		// >
+		// 	<Box sx={{ display: "flex", justifyContent: "center" }}>
+		// 		<Chip
+		// 			label={`${amount} ${unit}`}
+		// 			color={
+		// 				amount > 0
+		// 					? "success"
+		// 					: amount < 0
+		// 						? "error"
+		// 						: "default"
+		// 			}
+		// 			sx={{
+		// 				fontWeight: 600,
+		// 				fontSize: "0.875rem",
+		// 				minWidth: 70,
+		// 			}}
+		// 		/>
+		// 	</Box>
+		// </Box>
 	);
 }
