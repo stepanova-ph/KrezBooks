@@ -1,6 +1,7 @@
 import { TableCell, Box } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import BadgeIcon from "@mui/icons-material/Badge";
 import {
 	DataTable,
 	Column,
@@ -14,6 +15,7 @@ interface InvoiceItemsListProps {
 	items: InvoiceItem[];
 	onEditItem: (item: InvoiceItem) => void;
 	onDeleteItem: (item: InvoiceItem) => void;
+	onOpenItemCard?: (item: InvoiceItem) => void;
 	readOnly?: boolean;
 	maxHeight?: string;
 }
@@ -21,9 +23,7 @@ interface InvoiceItemsListProps {
 export const invoiceItemColumns: Column[] = [
 	{ id: "ean", label: "EAN", minWidth: 120 },
 	{ id: "name", label: "Název", minWidth: 200 },
-	// { id: "category", label: "Kategorie", minWidth: 120 },
 	{ id: "amount", label: "Množství", minWidth: 100, align: "right" },
-	// { id: "unit_of_measure", label: "Jednotka", minWidth: 80, align: "center" },
 	{ id: "sale_price", label: "Cena", minWidth: 100, align: "right" },
 	{ id: "vat_rate", label: "DPH %", minWidth: 70, align: "right" },
 	{ id: "total", label: "Celkem s DPH", minWidth: 120, align: "right" },
@@ -33,13 +33,35 @@ export function InvoiceItemsList({
 	items,
 	onEditItem,
 	onDeleteItem,
+	onOpenItemCard,
 	visibleColumnIds = new Set(invoiceItemColumns.map((c) => c.id)),
 	readOnly = false,
 	maxHeight,
-}: InvoiceItemsListProps) {
+}: InvoiceItemsListProps & { visibleColumnIds?: Set<string> }) {
 	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = readOnly
-		? [] // No actions in read-only mode
+		? [
+				...(onOpenItemCard
+					? [
+							{
+								id: "card",
+								label: "Otevřít kartu položky",
+								icon: <BadgeIcon fontSize="small" />,
+								onClick: onOpenItemCard,
+							},
+					  ]
+					: []),
+		  ]
 		: [
+				...(onOpenItemCard
+					? [
+							{
+								id: "card",
+								label: "Otevřít kartu položky",
+								icon: <BadgeIcon fontSize="small" />,
+								onClick: onOpenItemCard,
+							},
+					  ]
+					: []),
 				{
 					id: "edit",
 					label: "Upravit množství/cenu",
@@ -56,7 +78,7 @@ export function InvoiceItemsList({
 						`Opravdu chcete odebrat "${item.name}" z dokladu?`,
 					divider: true,
 				},
-			];
+		  ];
 
 	const getCellContent = (item: InvoiceItem, columnId: string) => {
 		switch (columnId) {
@@ -75,7 +97,7 @@ export function InvoiceItemsList({
 			case "sale_price":
 				return `${item.sale_price.toFixed(2)} Kč`;
 			case "total":
-				return calculateTotalWithVat([item]).toFixed(2)
+				return calculateTotalWithVat([item]).toFixed(2);
 			default:
 				return "";
 		}

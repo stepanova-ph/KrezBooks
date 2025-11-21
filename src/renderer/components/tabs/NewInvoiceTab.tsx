@@ -22,6 +22,7 @@ import {
 import { InvoiceTotals } from "../invoice/InvoiceTotals";
 import { INVOICE_TYPES } from "../../../config/constants";
 import { getDisplayAmount, getSignedAmount } from "../../../utils/typeConverterUtils";
+import { ItemCardDialog } from "../items/ItemCardDialog";
 
 function NewInvoiceTab() {
 	const form = useInvoiceForm();
@@ -30,6 +31,7 @@ function NewInvoiceTab() {
 	const createStockMovement = useCreateStockMovement();
 	const { data: maxNumber = 0 } = useMaxInvoiceNumber(form.formData.type ?? 1);
 
+	const [viewingItemEan, setViewingItemEan] = useState<string | null>(null);
 	const [alertDialog, setAlertDialog] = useState<{
 		open: boolean;
 		title: string;
@@ -329,6 +331,7 @@ function NewInvoiceTab() {
 								items={form.invoiceItems}
 								onEditItem={handleEditItem}
 								onDeleteItem={form.handleDeleteItem}
+								onOpenItemCard={(item) => setViewingItemEan(item.ean)}
 							/>
 						</Box>
 					</FormSection>
@@ -403,6 +406,14 @@ function NewInvoiceTab() {
 				message={alertDialog?.message || ""}
 				onConfirm={() => setAlertDialog(null)}
 			/>
+
+			{viewingItemEan && (
+				<ItemCardDialog
+					open={!!viewingItemEan}
+					onClose={() => setViewingItemEan(null)}
+					itemEan={viewingItemEan}
+				/>
+			)}
 		</Box>
 	);
 }
