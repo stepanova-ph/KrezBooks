@@ -273,6 +273,7 @@ export function DataTableContent<T>({
 					border: (theme) => `1px solid ${theme.palette.divider}`,
 					overflow: "auto",
 					position: "relative",
+					// Fixed height is required for virtualization
 					maxHeight: "calc(100vh - 165px)",
 				}}
 			>
@@ -285,7 +286,7 @@ export function DataTableContent<T>({
 						restrictToFirstScrollableAncestor,
 					]}
 				>
-					<Table stickyHeader size="small" sx={{ tableLayout: "fixed" }}>
+					<Table stickyHeader size="small">
 						<TableHead>
 							<TableRow>
 								<SortableContext
