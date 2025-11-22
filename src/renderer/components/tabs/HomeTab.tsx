@@ -170,6 +170,46 @@ function HomeTab() {
 		}
 	}	
 
+	const handleImportContacts = async () => {
+		setLoading(true);
+		setMessage(null);
+		try {
+			const result = await window.electronAPI.importExport.importLegacyContacts();
+			if (result.success) {
+				setMessage({ type: "success", text: "Kontakty byly importovány" });
+			} else {
+				setMessage({
+					type: "error",
+					text: result.error || "Chyba při importu kontaktů",
+				});
+			}
+		} catch (error) {
+			setMessage({ type: "error", text: "Chyba při importu kontaktů" });
+		} finally {
+			setLoading(false);
+		}
+	}
+
+	const handleImportItems = async () => {
+		setLoading(true);
+		setMessage(null);
+		try {
+			const result = await window.electronAPI.importExport.importLegacyItems();
+			if (result.success) {
+				setMessage({ type: "success", text: "Položky byly importovány" });
+			} else {
+				setMessage({
+					type: "error",
+					text: result.error || "Chyba při importu položek",
+				});
+			}
+		} catch (error) {
+			setMessage({ type: "error", text: "Chyba při importu položek" });
+		} finally {
+			setLoading(false);
+		}
+	}
+
 
 
 	return (
@@ -269,7 +309,6 @@ function HomeTab() {
 					
 					<Button
 						variant="contained"
-						color="error"
 						startIcon={
 							loading ? <CircularProgress size={20} /> : <DeleteSweepIcon />
 						}
@@ -277,6 +316,26 @@ function HomeTab() {
 						disabled={loading}
 					>
 						Exportovat data
+					</Button>
+					<Button
+						variant="contained"
+						startIcon={
+							loading ? <CircularProgress size={20} /> : <DeleteSweepIcon />
+						}
+						onClick={handleImportContacts}
+						disabled={loading}
+					>
+						Importovat adresář
+					</Button>
+					<Button
+						variant="contained"
+						startIcon={
+							loading ? <CircularProgress size={20} /> : <DeleteSweepIcon />
+						}
+						onClick={handleImportItems}
+						disabled={loading}
+					>
+						Importovat sklad
 					</Button>
 				</Box>
 			</Paper>
