@@ -67,6 +67,11 @@ declare global {
 				recreateTables: () => Promise<IpcResponse<{}>>;
 			};
 
+			importExport: {
+				exportData: () => Promise<IpcResponse<{}>>;
+				// importData: () => Promise<IpcResponse<{}>>;
+			}
+
 			stockMovements: {
 				getAll: () => Promise<IpcResponse<StockMovement[]>>;
 				getOne: (

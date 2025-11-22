@@ -150,6 +150,28 @@ function HomeTab() {
 		}
 	};
 
+	const handleExportData = async () => {
+		setLoading(true);
+		setMessage(null);
+		try {
+			const result = await window.electronAPI.importExport.exportData();
+			if (result.success) {
+				setMessage({ type: "success", text: "Databáze byla exportována" });
+			} else {
+				setMessage({
+					type: "error",
+					text: result.error || "Chyba při exportu databáze",
+				});
+			}
+		} catch (error) {
+			setMessage({ type: "error", text: "Chyba při exportu databáze" });
+		} finally {
+			setLoading(false);
+		}
+	}	
+
+
+
 	return (
 		<Box sx={{ p: 3 }}>
 			<Typography variant="h4" gutterBottom>
@@ -243,6 +265,18 @@ function HomeTab() {
 						disabled={loading}
 					>
 						Smazat všechna data
+					</Button>
+					
+					<Button
+						variant="contained"
+						color="error"
+						startIcon={
+							loading ? <CircularProgress size={20} /> : <DeleteSweepIcon />
+						}
+						onClick={handleExportData}
+						disabled={loading}
+					>
+						Exportovat data
 					</Button>
 				</Box>
 			</Paper>

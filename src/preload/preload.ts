@@ -9,6 +9,7 @@ import type {
 	CreateInvoiceInput,
 	CreateStockMovementInput,
 } from "../types/database";
+import { i } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -62,6 +63,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		clearDb: () => ipcRenderer.invoke("db:clearDatabase"),
 		fillTestData: () => ipcRenderer.invoke("db:fillTestData"),
 		recreateTables: () => ipcRenderer.invoke("db:recreateTables"),
+	},
+	
+	importExport: {
+		exportData: () => ipcRenderer.invoke("db:exportData"),
 	},
 
 	invoices: {
