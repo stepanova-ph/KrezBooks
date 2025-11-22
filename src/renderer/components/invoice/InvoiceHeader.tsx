@@ -3,6 +3,7 @@ import { FormSection } from "../common/form/FormSection";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import { INVOICE_TYPES, PAYMENT_METHOD_TYPES } from "../../../config/constants";
 import type { InvoiceType, PaymentMethodType } from "../../../types/database";
+import ValidatedDateField from "../common/inputs/ValidatedDatefield";
 
 interface InvoiceHeaderProps {
 	number: string;
@@ -105,27 +106,17 @@ function headerType5({
 				</Grid>
 
 				<Grid item xs={3.1}>
-					<ValidatedTextField
-						required
-						fullWidth
+					<ValidatedDateField
 						label="Datum vystavení"
 						name="date_issue"
-						type="date"
 						value={dateIssue}
-						disabled={disabled}
+						onChange={(value) => onChange("date_issue", value)}
+						onBlur={() => onBlur("date_issue")}
 						error={errors?.date_issue}
-						InputLabelProps={{ shrink: true }}
-						onChange={(e: { target: { value: string | number } }) => {
-							if (onChange) {
-								onChange("date_issue", e.target.value);
-							}
-						}}
-						onBlur={() => {
-							if (onBlur) {
-								onBlur("date_issue");
-							}
-						}}
-					/>
+						required
+						disabled={disabled}
+						fullWidth
+						/>
 				</Grid>
 			</Grid>
 		</FormSection>
@@ -227,75 +218,48 @@ export function InvoiceHeader({
 				</Grid>
 
 				<Grid item xs={showDateDue ? 4 : 6}>
-					<ValidatedTextField
+					<ValidatedDateField
 						label="Datum vystavení"
 						name="date_issue"
-						type="date"
 						value={dateIssue}
-						onChange={(e: { target: { value: string | number } }) =>
-							onChange("date_issue", e.target.value)
-						}
+						onChange={(value) => onChange("date_issue", value)}
 						onBlur={() => onBlur("date_issue")}
 						error={errors.date_issue}
 						required
 						disabled={disabled}
 						fullWidth
-						InputLabelProps={{ shrink: true }}
-						sx={{
-							".MuiInputBase-input": {
-								fontSize: showDateDue ? "0.74rem" : undefined,
-							},
-						}}
-					/>
+						/>
 				</Grid>
 
 				{showDateTax && (
 					<Grid item xs={showDateDue ? 4 : 6}>
-						<ValidatedTextField
+						<ValidatedDateField
 							label="Datum zdanitelného plnění"
 							name="date_tax"
-							type="date"
 							value={dateTax}
-							onChange={(e: { target: { value: string | number } }) =>
-								onChange("date_tax", e.target.value)
-							}
+							onChange={(value) => onChange("date_tax", value)}
 							onBlur={() => onBlur("date_tax")}
 							error={errors.date_tax}
 							required
 							disabled={disabled}
 							fullWidth
-							InputLabelProps={{ shrink: true }}
-							sx={{
-								".MuiInputBase-input": {
-									fontSize: showDateDue ? "0.74rem" : undefined,
-								},
-							}}
-						/>
+							/>
 					</Grid>
 				)}
 
 				{showDateDue && (
 					<Grid item xs={4}>
-						<ValidatedTextField
+						<ValidatedDateField
 							label="Datum splatnosti"
 							name="date_due"
-							type="date"
 							value={dateDue}
-							onChange={(e: { target: { value: string | number } }) =>
-								onChange("date_due", e.target.value)
-							}
+							onChange={(value) => onChange("date_due", value)}
 							onBlur={() => onBlur("date_due")}
 							error={errors.date_due}
 							required
 							disabled={disabled}
 							fullWidth
-							InputLabelProps={{ shrink: true }}
-							sx={{
-								".MuiInputBase-input": {
-									fontSize: showDateDue ? "0.74rem" : undefined,
-								},
-							}}
-						/>
+							/>
 					</Grid>
 				)}
 

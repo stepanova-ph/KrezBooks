@@ -1,7 +1,8 @@
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
-import { SxProps, Theme } from "@mui/material";
+import { InputAdornment, SxProps, Theme, Tooltip } from "@mui/material";
 import { useState, useRef } from "react";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 interface DateFieldProps {
 	label?: string;
@@ -17,6 +18,8 @@ interface DateFieldProps {
 	hideBorder?: boolean;
 	hideIcon?: boolean;
 	openOnFocus?: boolean;
+	showErrorIcon?: boolean;
+	showErrorTooltip?: boolean;
 }
 
 export function DateField({
@@ -33,13 +36,14 @@ export function DateField({
 	hideBorder = false,
 	hideIcon = false,
 	openOnFocus = false,
+	showErrorIcon = false,
+	showErrorTooltip = true,
 }: DateFieldProps) {
 	const [open, setOpen] = useState(false);
 	const shouldOpenOnFocus = useRef(true);
 
 	const handleChange = (date: Dayjs | null) => {
 		const newValue = date?.format("YYYY-MM-DD") || "";
-		console.log("DateField onChange:", newValue); // Debug
 		onChange(newValue);
 	};
 
@@ -61,15 +65,15 @@ export function DateField({
 	const hasError = typeof error === "string" ? !!error : !!error;
 	const errorMessage = typeof error === "string" ? error : undefined;
 
-const textFieldSx: SxProps<Theme> = {
-	...(hideBorder && {
-		"& .MuiPickersOutlinedInput-root": {
-			"& fieldset": { border: "none" },
-			"&.Mui-focused fieldset": { border: "none" },
-		},
-	}),
-	...(typeof sx === "object" && sx !== null ? sx : {}),
-};
+	const textFieldSx: SxProps<Theme> = {
+		...(hideBorder && {
+			"& .MuiPickersOutlinedInput-root": {
+				"& fieldset": { border: "none" },
+				"&.Mui-focused fieldset": { border: "none" },
+			},
+		}),
+		...(typeof sx === "object" && sx !== null ? sx : {}),
+	};
 
 	// Only control open state if openOnFocus is true
 	const openProps = openOnFocus
@@ -79,6 +83,26 @@ const textFieldSx: SxProps<Theme> = {
 				onClose: handleClose,
 			}
 		: {};
+
+	// Build InputProps with optional error icon
+	const inputProps =
+		showErrorIcon && hasError
+			? {
+					endAdornment: (
+						<InputAdornment position="end">
+							{showErrorTooltip && errorMessage ? (
+								<Tooltip title={errorMessage} arrow placement="top">
+									<ErrorOutlineIcon
+										sx={{ color: "error.main", fontSize: 20, cursor: "help" }}
+									/>
+								</Tooltip>
+							) : (
+								<ErrorOutlineIcon sx={{ color: "error.main", fontSize: 20 }} />
+							)}
+						</InputAdornment>
+					),
+				}
+			: undefined;
 
 	return (
 		<DatePicker
@@ -95,12 +119,13 @@ const textFieldSx: SxProps<Theme> = {
 					fullWidth,
 					required,
 					error: hasError,
-					helperText: errorMessage,
+					helperText: showErrorIcon ? undefined : errorMessage,
 					onFocus: openOnFocus ? handleFocus : undefined,
 					onBlur: openOnFocus ? undefined : onBlur,
 					sx: textFieldSx,
+					InputProps: inputProps,
 				},
-				
+
 				openPickerButton: hideIcon ? { sx: { display: "none" } } : undefined,
 				popper: {
 					sx: {
