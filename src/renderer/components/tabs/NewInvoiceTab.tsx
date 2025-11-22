@@ -358,7 +358,7 @@ function NewInvoiceTab() {
 						}}
 					>
 						<Button variant="outlined" onClick={form.handleReset} size="large">
-							Zrušit
+							Vymazat formulář
 						</Button>
 						<Button
 							variant="contained"
