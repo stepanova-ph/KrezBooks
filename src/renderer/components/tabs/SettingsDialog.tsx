@@ -1,7 +1,7 @@
 import { Dialog } from "../common/dialog/Dialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { FormSection } from "../common/form/FormSection";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
 	Box,
 	TextField,
@@ -16,6 +16,7 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import InfoIcon from "@mui/icons-material/Info";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import DatasetIcon from "@mui/icons-material/Dataset";
+import { useDataImportExport } from "../../../hooks/useDataImportExport";
 
 interface SettingsDialogProps {
 	open: boolean;
@@ -56,47 +57,37 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 		text: string;
 	} | null>(null);
 
-	// Listen for completion events
-	useEffect(() => {
-		const unsubscribeImport = window.electronAPI.importExport.onImportComplete(
-			(result) => {
-				setImportInProgress(false);
-				if (result.success) {
-					setImportMessage({
-						type: "success",
-						text: "Import dokončen úspěšně",
-					});
-				} else {
-					setImportMessage({
-						type: "error",
-						text: result.error || "Import selhal",
-					});
-				}
-			},
-		);
-
-		const unsubscribeExport = window.electronAPI.importExport.onExportComplete(
-			(result) => {
-				setExportInProgress(false);
-				if (result.success) {
-					setExportMessage({
-						type: "success",
-						text: `Export dokončen úspěšně do: ${result.path}`,
-					});
-				} else {
-					setExportMessage({
-						type: "error",
-						text: result.error || "Export selhal",
-					});
-				}
-			},
-		);
-
-		return () => {
-			unsubscribeImport();
-			unsubscribeExport();
-		};
-	}, []);
+	// Use custom hook for import/export with automatic query invalidation
+	const { invalidateAllQueries } = useDataImportExport(
+		(result) => {
+			setImportInProgress(false);
+			if (result.success) {
+				setImportMessage({
+					type: "success",
+					text: "Import dokončen úspěšně",
+				});
+			} else {
+				setImportMessage({
+					type: "error",
+					text: result.error || "Import selhal",
+				});
+			}
+		},
+		(result) => {
+			setExportInProgress(false);
+			if (result.success) {
+				setExportMessage({
+					type: "success",
+					text: `Export dokončen úspěšně do: ${result.path}`,
+				});
+			} else {
+				setExportMessage({
+					type: "error",
+					text: result.error || "Export selhal",
+				});
+			}
+		},
+	);
 
 	const handleSelectImportDirectory = async () => {
 		const result = await window.electronAPI.dialog.selectDirectory(
@@ -229,6 +220,8 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 					type: "success",
 					text: "Databáze byla úspěšně vymazána",
 				});
+				// Invalidate all queries to refresh the UI
+				invalidateAllQueries();
 			} else {
 				setAdminMessage({
 					type: "error",
@@ -252,6 +245,8 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 					type: "success",
 					text: `Přidáno ${result.data.contactsAdded} kontaktů a ${result.data.itemsAdded} položek`,
 				});
+				// Invalidate all queries to refresh the UI
+				invalidateAllQueries();
 				// Refresh stats if they're shown
 				if (stats) {
 					const statsResult = await window.electronAPI.admin.getDbStats();
