@@ -360,7 +360,7 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 				</Box>
 			</FormSection>
 
-			<FormSection title="Admin (Dev)">
+			<FormSection title="Pokročilé nástroje" hideDivider>
 				<Box sx={{ display: "flex", flexDirection: "column", gap: 2, px: 2 }}>
 					{stats && (
 						<Box
@@ -370,9 +370,6 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 								borderRadius: 1,
 							}}
 						>
-							<Typography variant="body2" fontWeight={600} gutterBottom>
-								Aktuální stav databáze:
-							</Typography>
 							<Typography variant="body2">
 								Kontakty: <strong>{stats.contacts}</strong>
 							</Typography>
@@ -397,7 +394,7 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 								startIcon={stats ? <VisibilityOffIcon /> : <InfoIcon />}
 								fullWidth
 							>
-								{stats ? "Skrýt statistiky" : "Zobrazit statistiky"}
+								{stats ? "Skrýt statistiku" : "Zobrazit statistiku"}
 							</Button>
 							<Button
 								variant="outlined"

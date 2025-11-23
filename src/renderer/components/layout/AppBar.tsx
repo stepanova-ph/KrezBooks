@@ -5,7 +5,7 @@ import { ImportExportProgress } from "./ImportExportProgress";
 import React from "react";
 import { SettingsDialog } from "../tabs/SettingsDialog";
 
-export type AppPage = "domu" | "adresar" | "sklad" | "novy_doklad" | "doklady";
+export type AppPage = "adresar" | "sklad" | "novy_doklad" | "doklady";
 
 interface AppBarProps {
 	currentPage: AppPage;
@@ -60,11 +60,6 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 					WebkitAppRegion: "no-drag",
 				}}
 			>
-				<AppBarButton
-					label="Domů"
-					active={currentPage === "domu"}
-					onClick={() => onPageChange("domu")}
-				/>
 				<AppBarButton
 					label="Nový doklad"
 					active={currentPage === "novy_doklad"}
