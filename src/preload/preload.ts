@@ -9,7 +9,6 @@ import type {
 	CreateInvoiceInput,
 	CreateStockMovementInput,
 } from "../types/database";
-import { i } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -34,6 +33,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		},
 	},
 	testDatabase: () => ipcRenderer.invoke("db:test"),
+
+	dialog: {
+		selectDirectory: (title?: string) => ipcRenderer.invoke("dialog:selectDirectory", title),
+	},
 
 	contacts: {
 		getAll: () => ipcRenderer.invoke("db:contacts:getAll"),
@@ -66,10 +69,31 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	},
 	
 	importExport: {
-		exportData: () => ipcRenderer.invoke("db:exportData"),
-		importLegacyItems: () => ipcRenderer.invoke("db:importLegacyItems"),
-		importLegacyContacts: () => ipcRenderer.invoke("db:importLegacyContacts"),
-		importData: () => ipcRenderer.invoke("db:importData"),
+		exportData: (directoryPath: string) => ipcRenderer.invoke("db:exportData", directoryPath),
+		importLegacyData: (directoryPath: string) => ipcRenderer.invoke("db:importLegacyData", directoryPath),
+		importData: (directoryPath: string) => ipcRenderer.invoke("db:importData", directoryPath),
+		// Progress event listeners
+		onExportProgress: (callback: (data: { message: string; progress: number }) => void) => {
+			const listener = (_event: any, data: { message: string; progress: number }) => callback(data);
+			ipcRenderer.on("export:progress", listener);
+			return () => ipcRenderer.removeListener("export:progress", listener);
+		},
+		onImportProgress: (callback: (data: { message: string; progress: number }) => void) => {
+			const listener = (_event: any, data: { message: string; progress: number }) => callback(data);
+			ipcRenderer.on("import:progress", listener);
+			return () => ipcRenderer.removeListener("import:progress", listener);
+		},
+		// Completion event listeners
+		onExportComplete: (callback: (data: any) => void) => {
+			const listener = (_event: any, data: any) => callback(data);
+			ipcRenderer.on("export:complete", listener);
+			return () => ipcRenderer.removeListener("export:complete", listener);
+		},
+		onImportComplete: (callback: (data: any) => void) => {
+			const listener = (_event: any, data: any) => callback(data);
+			ipcRenderer.on("import:complete", listener);
+			return () => ipcRenderer.removeListener("import:complete", listener);
+		},
 	},
 
 	invoices: {

@@ -50,10 +50,12 @@ function registerAdminHandlers() {
 		try {
 			const db = getDatabase();
 
-			db.prepare("DELETE FROM items").run();
-			db.prepare("DELETE FROM contacts").run();
+			// Delete in correct order to respect foreign key constraints
+			// (child tables first, then parent tables)
 			db.prepare("DELETE FROM stock_movements").run();
 			db.prepare("DELETE FROM invoices").run();
+			db.prepare("DELETE FROM items").run();
+			db.prepare("DELETE FROM contacts").run();
 
 			logger.info("Database cleared successfully");
 			return { success: true };

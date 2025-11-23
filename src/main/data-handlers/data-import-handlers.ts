@@ -1,4 +1,4 @@
-import { ipcMain, dialog, BrowserWindow } from "electron";
+import { ipcMain } from "electron";
 import { getDatabase } from "../database";
 import { logger } from "../logger";
 import fs from "fs";
@@ -428,7 +428,10 @@ function importStockMovementsTable(
 // MAIN IMPORT FUNCTION
 // =============================================================================
 
-async function performImport(folderPath: string): Promise<ImportResult> {
+async function performImport(
+	folderPath: string,
+	progressCallback?: (message: string, progress: number) => void,
+): Promise<ImportResult> {
 	const contactsFile = path.join(folderPath, "contacts.csv");
 	const itemsFile = path.join(folderPath, "items.csv");
 	const invoicesFile = path.join(folderPath, "invoices.csv");
@@ -468,9 +471,15 @@ async function performImport(folderPath: string): Promise<ImportResult> {
 	const imported = { contacts: 0, items: 0, invoices: 0, stock_movements: 0 };
 	const skipped = { contacts: 0, items: 0, invoices: 0, stock_movements: 0 };
 
+	const totalSteps = [hasContacts, hasItems, hasInvoices, hasStockMovements].filter(Boolean).length;
+	let currentStep = 0;
+
 	// Import in order (respecting foreign keys)
 	// 1. Contacts (no dependencies)
 	if (hasContacts) {
+		currentStep++;
+		const progress = Math.round((currentStep / totalSteps) * 100);
+		progressCallback?.(`Importuji kontakty...`, progress);
 		logger.info("Importing contacts...");
 		const result = importContactsTable(contactsFile);
 		imported.contacts = result.imported;
@@ -481,6 +490,9 @@ async function performImport(folderPath: string): Promise<ImportResult> {
 
 	// 2. Items (no dependencies)
 	if (hasItems) {
+		currentStep++;
+		const progress = Math.round((currentStep / totalSteps) * 100);
+		progressCallback?.(`Importuji položky...`, progress);
 		logger.info("Importing items...");
 		const result = importItemsTable(itemsFile);
 		imported.items = result.imported;
@@ -491,6 +503,9 @@ async function performImport(folderPath: string): Promise<ImportResult> {
 
 	// 3. Invoices (optional reference to contacts)
 	if (hasInvoices) {
+		currentStep++;
+		const progress = Math.round((currentStep / totalSteps) * 100);
+		progressCallback?.(`Importuji doklady...`, progress);
 		logger.info("Importing invoices...");
 		const result = importInvoicesTable(invoicesFile);
 		imported.invoices = result.imported;
@@ -501,6 +516,9 @@ async function performImport(folderPath: string): Promise<ImportResult> {
 
 	// 4. Stock movements (references invoices and items)
 	if (hasStockMovements) {
+		currentStep++;
+		const progress = Math.round((currentStep / totalSteps) * 100);
+		progressCallback?.(`Importuji pohyby skladu...`, progress);
 		logger.info("Importing stock movements...");
 		const result = importStockMovementsTable(stockMovementsFile);
 		imported.stock_movements = result.imported;
@@ -518,6 +536,8 @@ async function performImport(folderPath: string): Promise<ImportResult> {
 		logger.info(`Error log written to: ${logFile}`);
 	}
 
+	progressCallback?.(`Import dokončen`, 100);
+
 	return {
 		success: true,
 		imported,
@@ -531,26 +551,44 @@ async function performImport(folderPath: string): Promise<ImportResult> {
 // =============================================================================
 
 function registerDataImportHandlers() {
-	ipcMain.handle("db:importData", async (event) => {
+	ipcMain.handle("db:importData", async (event, directoryPath: string) => {
 		try {
-			const window = BrowserWindow.fromWebContents(event.sender);
-
-			const result = await dialog.showOpenDialog(window!, {
-				title: "Vyberte složku s exportovanými daty",
-				properties: ["openDirectory"],
-				buttonLabel: "Importovat",
-			});
-
-			if (result.canceled || result.filePaths.length === 0) {
-				return { success: false, canceled: true };
+			if (!directoryPath) {
+				return { success: false, error: "Nebyla vybrána složka" };
 			}
 
-			const folderPath = result.filePaths[0];
-			logger.info(`Importing data from: ${folderPath}`);
+			// Validate directory exists
+			if (!fs.existsSync(directoryPath)) {
+				return { success: false, error: "Vybraná složka neexistuje" };
+			}
 
-			return await performImport(folderPath);
+			logger.info(`Importing data from: ${directoryPath}`);
+
+			// Progress callback
+			const progressCallback = (message: string, progress: number) => {
+				event.sender.send("import:progress", { message, progress });
+			};
+
+			// Start import asynchronously (don't await)
+			performImport(directoryPath, progressCallback)
+				.then((result) => {
+					event.sender.send("import:complete", result);
+				})
+				.catch((error) => {
+					event.sender.send("import:complete", {
+						success: false,
+						error: error.message || "Import selhal",
+					});
+				});
+
+			// Return immediately to indicate import has started
+			return { success: true, started: true };
 		} catch (error: any) {
 			logger.error("Import failed:", error);
+			event.sender.send("import:progress", {
+				message: `Import selhal: ${error.message}`,
+				progress: 0
+			});
 			return {
 				success: false,
 				error: error.message || "Import selhal",

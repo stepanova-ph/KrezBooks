@@ -7,6 +7,7 @@ import { logger } from "./logger";
 import { registerLegacyImportHandlers } from "./data-handlers/data-import-legacy-handlers";
 import { registerDataExportHandlers } from "./data-handlers/data-export-handlers";
 import { registerDataImportHandlers } from "./data-handlers/data-import-handlers";
+import { registerDialogHandlers } from "./dialog-handlers";
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -52,6 +53,7 @@ app.whenReady().then(async () => {
 	registerDataExportHandlers();
 	registerLegacyImportHandlers();
 	registerDataImportHandlers();
+	registerDialogHandlers();
 
 	createWindow();
 });

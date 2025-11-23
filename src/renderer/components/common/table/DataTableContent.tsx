@@ -42,7 +42,7 @@ import type { Column, ContextMenuAction } from "./DataTable";
 import type { OrderByConfig } from "../filtering/ColumnPickerButton";
 
 const ROW_HEIGHT = 30; // Estimated row height in pixels
-const OVERSCAN = 15; // Extra rows to render above/below viewport
+const OVERSCAN = 30; // Extra rows to render above/below viewport
 
 interface DataTableContentProps<T> {
 	columns: Column[];

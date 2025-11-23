@@ -6,6 +6,7 @@ interface AppBarButtonProps extends Omit<ButtonProps, "variant" | "color"> {
 	label: string;
 	disabled?: boolean;
 	onClick?: () => void;
+	variant?: "default" | "contained";
 }
 
 export function AppBarButton({
@@ -13,6 +14,7 @@ export function AppBarButton({
 	label,
 	disabled = false,
 	onClick,
+	variant = "default",
 	...props
 }: AppBarButtonProps) {
 	const theme = useTheme();
@@ -31,7 +33,7 @@ export function AppBarButton({
 			{...props}
 			onClick={handleClick}
 			disabled={disabled}
-			disableRipple // Disable default ripple
+			disableRipple
 			tabIndex={-1}
 			sx={{
 				minWidth: 100,

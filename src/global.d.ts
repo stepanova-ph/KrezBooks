@@ -51,6 +51,15 @@ declare global {
 				delete: (ean: string) => Promise<IpcResponse<{ changes: number }>>;
 			};
 
+			dialog: {
+				selectDirectory: (title?: string) => Promise<{
+					success: boolean;
+					canceled?: boolean;
+					path?: string;
+					error?: string;
+				}>;
+			};
+
 			admin: {
 				getDbStats: () => Promise<
 					IpcResponse<{
@@ -62,17 +71,41 @@ declare global {
 				>;
 				clearDb: () => Promise<IpcResponse<{ changes: number }>>;
 				fillTestData: () => Promise<
-					IpcResponse<{ contactsAdded: number; itemsAdded: number }>
+					IpcResponse<{
+						contactsAdded: number;
+						itemsAdded: number;
+						invoicesAdded: number;
+						stockMovementsAdded: number;
+					}>
 				>;
 				recreateTables: () => Promise<IpcResponse<{}>>;
 			};
 
 			importExport: {
-				exportData: () => Promise<IpcResponse<{}>>;
-				importLegacyContacts: () => Promise<IpcResponse<{}>>;
-				importLegacyItems: () => Promise<IpcResponse<{}>>;
-				importData: () => Promise<IpcResponse<{}>>;
-			}
+				exportData: (directoryPath: string) => Promise<{
+					success: boolean;
+					started?: boolean;
+					error?: string;
+				}>;
+				importLegacyData: (directoryPath: string) => Promise<{
+					success: boolean;
+					started?: boolean;
+					error?: string;
+				}>;
+				importData: (directoryPath: string) => Promise<{
+					success: boolean;
+					started?: boolean;
+					error?: string;
+				}>;
+				onExportProgress: (
+					callback: (data: { message: string; progress: number }) => void,
+				) => () => void;
+				onImportProgress: (
+					callback: (data: { message: string; progress: number }) => void,
+				) => () => void;
+				onExportComplete: (callback: (data: any) => void) => () => void;
+				onImportComplete: (callback: (data: any) => void) => () => void;
+			};
 
 			stockMovements: {
 				getAll: () => Promise<IpcResponse<StockMovement[]>>;

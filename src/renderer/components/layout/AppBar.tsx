@@ -1,6 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import { AppBarButton } from "./AppBarButton";
 import { WindowControls } from "./WindowControls";
+import { ImportExportProgress } from "./ImportExportProgress";
+import React from "react";
+import { SettingsDialog } from "../tabs/SettingsDialog";
 
 export type AppPage = "domu" | "adresar" | "sklad" | "novy_doklad" | "doklady";
 
@@ -10,6 +13,8 @@ interface AppBarProps {
 }
 
 export function AppBar({ currentPage, onPageChange }: AppBarProps) {
+	const [settingsDialogOpen, setSettingsDialogOpen] = React.useState(false);
+
 	return (
 		<Box
 			sx={{
@@ -80,6 +85,10 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 					active={currentPage === "doklady"}
 					onClick={() => onPageChange("doklady")}
 				/>
+				<AppBarButton
+					label="Nastavení"
+					onClick={() => setSettingsDialogOpen(true)}
+				/>
 			</Box>
 
 			<Box
@@ -87,11 +96,18 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 					display: "flex",
 					alignItems: "center",
 					height: "100%",
+					gap: 2,
 					WebkitAppRegion: "no-drag",
 				}}
 			>
+				<ImportExportProgress />
 				<WindowControls />
 			</Box>
+
+			<SettingsDialog
+				open={settingsDialogOpen}
+				onClose={() => setSettingsDialogOpen(false)}
+			/>
 		</Box>
 	);
 }

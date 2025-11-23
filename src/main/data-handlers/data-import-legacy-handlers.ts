@@ -1,4 +1,4 @@
-import { ipcMain, dialog, BrowserWindow } from "electron";
+import { ipcMain } from "electron";
 import { getDatabase } from "../database";
 import { logger } from "../logger";
 import fs from "fs";
@@ -404,63 +404,145 @@ async function importLegacyContacts(filePath: string): Promise<ImportResult> {
 }
 
 // =============================================================================
+// UNIFIED LEGACY IMPORT
+// =============================================================================
+
+interface LegacyImportResult {
+	success: boolean;
+	canceled?: boolean;
+	imported?: {
+		contacts: number;
+		items: number;
+	};
+	skipped?: {
+		contacts: number;
+		items: number;
+	};
+	logFiles?: string[];
+	error?: string;
+}
+
+async function importLegacyData(
+	directoryPath: string,
+	progressCallback?: (message: string, progress: number) => void,
+): Promise<LegacyImportResult> {
+	const itemsFile = path.join(directoryPath, "items.tsv");
+	const contactsFile = path.join(directoryPath, "contacts.tsv");
+
+	const hasItems = fs.existsSync(itemsFile);
+	const hasContacts = fs.existsSync(contactsFile);
+
+	// Check if at least one file exists
+	if (!hasItems && !hasContacts) {
+		return {
+			success: false,
+			error: "Složka neobsahuje žádné TSV soubory k importu (items.tsv, contacts.tsv)",
+		};
+	}
+
+	const imported = { contacts: 0, items: 0 };
+	const skipped = { contacts: 0, items: 0 };
+	const logFiles: string[] = [];
+
+	const totalSteps = [hasContacts, hasItems].filter(Boolean).length;
+	let currentStep = 0;
+
+	// Import contacts first
+	if (hasContacts) {
+		currentStep++;
+		const progress = Math.round((currentStep / totalSteps) * 100);
+		progressCallback?.(`Importuji kontakty (legacy)...`, progress);
+		logger.info(`Importing legacy contacts from: ${contactsFile}`);
+
+		const result = await importLegacyContacts(contactsFile);
+		if (!result.success) {
+			return {
+				success: false,
+				error: result.error || "Import kontaktů selhal",
+			};
+		}
+		imported.contacts = result.imported || 0;
+		skipped.contacts = result.skipped || 0;
+		if (result.logFile) {
+			logFiles.push(result.logFile);
+		}
+	}
+
+	// Import items
+	if (hasItems) {
+		currentStep++;
+		const progress = Math.round((currentStep / totalSteps) * 100);
+		progressCallback?.(`Importuji položky (legacy)...`, progress);
+		logger.info(`Importing legacy items from: ${itemsFile}`);
+
+		const result = await importLegacyItems(itemsFile);
+		if (!result.success) {
+			return {
+				success: false,
+				error: result.error || "Import položek selhal",
+			};
+		}
+		imported.items = result.imported || 0;
+		skipped.items = result.skipped || 0;
+		if (result.logFile) {
+			logFiles.push(result.logFile);
+		}
+	}
+
+	progressCallback?.(`Import dokončen`, 100);
+
+	return {
+		success: true,
+		imported,
+		skipped,
+		logFiles: logFiles.length > 0 ? logFiles : undefined,
+	};
+}
+
+// =============================================================================
 // IPC HANDLER REGISTRATION
 // =============================================================================
 
 function registerLegacyImportHandlers() {
-	ipcMain.handle("db:importLegacyItems", async (event) => {
+	// Unified handler for importing legacy data from directory
+	ipcMain.handle("db:importLegacyData", async (event, directoryPath: string) => {
 		try {
-			const window = BrowserWindow.fromWebContents(event.sender);
-
-			const result = await dialog.showOpenDialog(window!, {
-				title: "Vyberte soubor s položkami (TSV)",
-				filters: [
-					{ name: "TSV soubory", extensions: ["tsv", "txt"] },
-					{ name: "Všechny soubory", extensions: ["*"] },
-				],
-				properties: ["openFile"],
-			});
-
-			if (result.canceled || result.filePaths.length === 0) {
-				return { success: false, canceled: true };
+			if (!directoryPath) {
+				return { success: false, error: "Nebyla vybrána složka" };
 			}
 
-			const filePath = result.filePaths[0];
-			logger.info(`Importing legacy items from: ${filePath}`);
+			// Validate directory exists
+			if (!fs.existsSync(directoryPath)) {
+				return { success: false, error: "Vybraná složka neexistuje" };
+			}
 
-			return await importLegacyItems(filePath);
-		} catch (error: any) {
-			logger.error("Legacy items import failed:", error);
-			return {
-				success: false,
-				error: error.message || "Import selhal",
+			logger.info(`Importing legacy data from: ${directoryPath}`);
+
+			// Progress callback
+			const progressCallback = (message: string, progress: number) => {
+				event.sender.send("import:progress", { message, progress });
 			};
-		}
-	});
 
-	ipcMain.handle("db:importLegacyContacts", async (event) => {
-		try {
-			const window = BrowserWindow.fromWebContents(event.sender);
+			// Start import asynchronously (don't await)
+			importLegacyData(directoryPath, progressCallback)
+				.then((result) => {
+					event.sender.send("import:complete", result);
+				})
+				.catch((error) => {
+					event.sender.send("import:complete", {
+						success: false,
+						error: error.message || "Import selhal",
+					});
+				});
 
-			const result = await dialog.showOpenDialog(window!, {
-				title: "Vyberte soubor s kontakty (TSV)",
-				filters: [
-					{ name: "TSV soubory", extensions: ["tsv", "txt"] },
-					{ name: "Všechny soubory", extensions: ["*"] },
-				],
-				properties: ["openFile"],
-			});
-
-			if (result.canceled || result.filePaths.length === 0) {
-				return { success: false, canceled: true };
-			}
-
-			const filePath = result.filePaths[0];
-			logger.info(`Importing legacy contacts from: ${filePath}`);
-
-			return await importLegacyContacts(filePath);
+			// Return immediately to indicate import has started
+			return { success: true, started: true };
 		} catch (error: any) {
-			logger.error("Legacy contacts import failed:", error);
+			logger.error("Legacy import failed:", error);
+			event.sender.send("import:progress", {
+				message: `Import selhal: ${error.message}`,
+				progress: 0
+			});
 			return {
 				success: false,
 				error: error.message || "Import selhal",

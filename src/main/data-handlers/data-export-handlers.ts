@@ -1,4 +1,4 @@
-import { ipcMain, dialog, BrowserWindow } from "electron";
+import { ipcMain } from "electron";
 import { getDatabase } from "../database";
 import { logger } from "../logger";
 import fs from "fs";
@@ -66,11 +66,19 @@ function formatDate(date: Date): string {
 
 async function performExport(
 	exportPath: string,
+	progressCallback?: (message: string, progress: number) => void,
 ): Promise<{ success: boolean; error?: string; path?: string }> {
 	const createdFiles: string[] = [];
 
 	try {
-		for (const tableName of TABLES) {
+		const totalTables = TABLES.length;
+
+		for (let i = 0; i < TABLES.length; i++) {
+			const tableName = TABLES[i];
+			const progress = Math.round(((i + 1) / totalTables) * 100);
+
+			progressCallback?.(`Exportuji tabulku ${tableName}...`, progress);
+
 			const csvContent = exportTable(tableName);
 			const filePath = path.join(exportPath, `${tableName}.csv`);
 
@@ -80,10 +88,12 @@ async function performExport(
 			logger.info(`Exported ${tableName} to ${filePath}`);
 		}
 
+		progressCallback?.(`Export dokončen`, 100);
 		logger.info(`Export completed to ${exportPath}`);
 		return { success: true, path: exportPath };
 	} catch (error: any) {
 		// Cleanup on failure
+		progressCallback?.(`Export selhal: ${error.message}`, 0);
 		logger.error("Export failed, cleaning up:", error);
 
 		for (const file of createdFiles) {
@@ -113,40 +123,58 @@ async function performExport(
 }
 
 function registerDataExportHandlers() {
-	ipcMain.handle("db:exportData", async (event) => {
+	ipcMain.handle("db:exportData", async (event, directoryPath: string) => {
 		try {
-			const window = BrowserWindow.fromWebContents(event.sender);
-
-			const result = await dialog.showOpenDialog(window!, {
-				title: "Vyberte složku pro export",
-				properties: ["openDirectory", "createDirectory"],
-				buttonLabel: "Exportovat sem",
-			});
-
-			if (result.canceled || result.filePaths.length === 0) {
-				return { success: false, canceled: true };
+			if (!directoryPath) {
+				return { success: false, error: "Nebyla vybrána složka" };
 			}
 
-			const basePath = result.filePaths[0];
+			// Validate directory exists
+			if (!fs.existsSync(directoryPath)) {
+				return { success: false, error: "Vybraná složka neexistuje" };
+			}
+
 			const exportFolderName = `krezbooks-export-${formatDate(new Date())}`;
-			const exportPath = path.join(basePath, exportFolderName);
+			const exportPath = path.join(directoryPath, exportFolderName);
 
 			// Create export directory
+			let finalExportPath = exportPath;
 			if (fs.existsSync(exportPath)) {
 				// Add timestamp if folder already exists
 				const timestamp = Date.now();
-				const uniqueExportPath = path.join(
-					basePath,
+				finalExportPath = path.join(
+					directoryPath,
 					`${exportFolderName}-${timestamp}`,
 				);
-				fs.mkdirSync(uniqueExportPath, { recursive: true });
-				return await performExport(uniqueExportPath);
 			}
 
-			fs.mkdirSync(exportPath, { recursive: true });
-			return await performExport(exportPath);
+			fs.mkdirSync(finalExportPath, { recursive: true });
+
+			// Progress callback
+			const progressCallback = (message: string, progress: number) => {
+				event.sender.send("export:progress", { message, progress });
+			};
+
+			// Start export asynchronously (don't await)
+			performExport(finalExportPath, progressCallback)
+				.then((result) => {
+					event.sender.send("export:complete", result);
+				})
+				.catch((error) => {
+					event.sender.send("export:complete", {
+						success: false,
+						error: error.message || "Export selhal",
+					});
+				});
+
+			// Return immediately to indicate export has started
+			return { success: true, started: true };
 		} catch (error: any) {
 			logger.error("Export failed:", error);
+			event.sender.send("export:progress", {
+				message: `Export selhal: ${error.message}`,
+				progress: 0
+			});
 			return {
 				success: false,
 				error: error.message || "Export selhal",
