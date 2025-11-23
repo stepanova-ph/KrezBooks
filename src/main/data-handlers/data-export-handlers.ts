@@ -173,7 +173,7 @@ function registerDataExportHandlers() {
 			logger.error("Export failed:", error);
 			event.sender.send("export:progress", {
 				message: `Export selhal: ${error.message}`,
-				progress: 0
+				progress: 0,
 			});
 			return {
 				success: false,

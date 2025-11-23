@@ -120,7 +120,12 @@ export function registerIpcHandlers() {
 
 	ipcMain.handle(
 		"db:stockMovements:getOne",
-		async (_event, invoicePrefix: string, invoiceNumber: string, itemEan: string) => {
+		async (
+			_event,
+			invoicePrefix: string,
+			invoiceNumber: string,
+			itemEan: string,
+		) => {
 			return handleIpcRequest(() =>
 				stockMovementService.getOne(invoicePrefix, invoiceNumber, itemEan),
 			);
@@ -153,14 +158,24 @@ export function registerIpcHandlers() {
 			updates: Partial<StockMovement>,
 		) => {
 			return handleIpcRequest(() =>
-				stockMovementService.update(invoicePrefix, invoiceNumber, itemEan, updates),
+				stockMovementService.update(
+					invoicePrefix,
+					invoiceNumber,
+					itemEan,
+					updates,
+				),
 			);
 		},
 	);
 
 	ipcMain.handle(
 		"db:stockMovements:delete",
-		async (_event, invoicePrefix: string, invoiceNumber: string, itemEan: string) => {
+		async (
+			_event,
+			invoicePrefix: string,
+			invoiceNumber: string,
+			itemEan: string,
+		) => {
 			return handleIpcRequest(() =>
 				stockMovementService.delete(invoicePrefix, invoiceNumber, itemEan),
 			);
@@ -222,7 +237,9 @@ export function registerIpcHandlers() {
 	ipcMain.handle(
 		"db:stockMovements:getByItemWithInvoiceInfo",
 		async (_event, itemEan: string) => {
-			return handleIpcRequest(() => stockMovementService.getByItemWithInvoiceInfo(itemEan));
+			return handleIpcRequest(() =>
+				stockMovementService.getByItemWithInvoiceInfo(itemEan),
+			);
 		},
 	);
 
@@ -234,9 +251,12 @@ export function registerIpcHandlers() {
 		return handleIpcRequest(() => invoiceService.getAll());
 	});
 
-	ipcMain.handle("db:invoices:getOne", async (_event, prefix: string, number: string) => {
-		return handleIpcRequest(() => invoiceService.getOne(prefix, number));
-	});
+	ipcMain.handle(
+		"db:invoices:getOne",
+		async (_event, prefix: string, number: string) => {
+			return handleIpcRequest(() => invoiceService.getOne(prefix, number));
+		},
+	);
 
 	ipcMain.handle(
 		"db:invoices:create",
@@ -252,16 +272,19 @@ export function registerIpcHandlers() {
 		},
 	);
 
-	ipcMain.handle("db:invoices:delete", async (_event, prefix: string, number: string) => {
-		return handleIpcRequest(() => invoiceService.delete(prefix, number));
-	});
+	ipcMain.handle(
+		"db:invoices:delete",
+		async (_event, prefix: string, number: string) => {
+			return handleIpcRequest(() => invoiceService.delete(prefix, number));
+		},
+	);
 
-	ipcMain.handle('db:invoices:getMaxNumber', async (_, type: number) => {
+	ipcMain.handle("db:invoices:getMaxNumber", async (_, type: number) => {
 		try {
 			const maxNumber = await invoiceService.getMaxNumberByType(type);
 			return maxNumber;
 		} catch (error) {
-			logger.error('Failed to get max invoice number:', error);
+			logger.error("Failed to get max invoice number:", error);
 			throw error;
 		}
 	});

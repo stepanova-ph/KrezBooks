@@ -348,9 +348,7 @@ export function DataTableContent<T>({
 												onMouseEnter={() =>
 													handleRowMouseEnter(virtualRow.index)
 												}
-												onClick={() =>
-													handleRowClick(item, virtualRow.index)
-												}
+												onClick={() => handleRowClick(item, virtualRow.index)}
 												onDoubleClick={() =>
 													handleRowDoubleClick(item, virtualRow.index)
 												}

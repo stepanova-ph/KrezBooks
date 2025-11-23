@@ -20,7 +20,9 @@ function InvoicesTab() {
 	const { data: invoices = [], isLoading } = useInvoices();
 	const [dynamicFilters, setDynamicFilters] = useState<string[]>([]);
 	const [contactPickerOpen, setContactPickerOpen] = useState(false);
-	const [filters, setFilters] = useState<FilterState>(initialInvoiceFilterState);
+	const [filters, setFilters] = useState<FilterState>(
+		initialInvoiceFilterState,
+	);
 
 	const dynamicFilterConfig = useCallback(
 		(baseConfig: FilterConfig) => {
@@ -45,30 +47,32 @@ function InvoicesTab() {
 	};
 
 	const removeDynamicFilter = useCallback((filterId: string) => {
-		setDynamicFilters(prev => prev.filter((id) => id !== filterId));
+		setDynamicFilters((prev) => prev.filter((id) => id !== filterId));
 	}, []);
 
 	const handleToggleContact = (contact: Contact) => {
-		setFilters(prev => {
+		setFilters((prev) => {
 			const selectedContacts = prev.selectedContacts || [];
 			const contactKey = { ico: contact.ico, modifier: contact.modifier };
-			
+
 			// Check if contact is already selected
 			const existingIndex = selectedContacts.findIndex(
-				c => c.ico === contactKey.ico && c.modifier === contactKey.modifier
+				(c) => c.ico === contactKey.ico && c.modifier === contactKey.modifier,
 			);
 
 			if (existingIndex !== -1) {
 				// Remove contact
 				return {
 					...prev,
-					selectedContacts: selectedContacts.filter((_, i) => i !== existingIndex)
+					selectedContacts: selectedContacts.filter(
+						(_, i) => i !== existingIndex,
+					),
 				};
 			} else {
 				// Add contact
 				return {
 					...prev,
-					selectedContacts: [...selectedContacts, contactKey]
+					selectedContacts: [...selectedContacts, contactKey],
 				};
 			}
 		});
@@ -114,14 +118,14 @@ function InvoicesTab() {
 					},
 				]}
 				customFilterElements={
-					<Badge 
-						badgeContent={selectedContacts.length} 
+					<Badge
+						badgeContent={selectedContacts.length}
 						color="primary"
 						sx={{
-							'& .MuiBadge-badge': {
+							"& .MuiBadge-badge": {
 								right: -3,
 								top: 3,
-							}
+							},
 						}}
 					>
 						<IconButton

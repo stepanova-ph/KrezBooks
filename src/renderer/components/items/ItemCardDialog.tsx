@@ -2,7 +2,11 @@ import { Box, Grid, TableCell, IconButton, Collapse } from "@mui/material";
 import { Dialog } from "../common/dialog/Dialog";
 import { FormSection } from "../common/form/FormSection";
 import { Loading } from "../layout/Loading";
-import { DataTable, Column, ContextMenuAction } from "../common/table/DataTable";
+import {
+	DataTable,
+	Column,
+	ContextMenuAction,
+} from "../common/table/DataTable";
 import { VatPriceField } from "../common/inputs/VatPriceField";
 import { StockAmountDisplay } from "../common/StockAmountDisplay";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
@@ -74,26 +78,29 @@ export function ItemCardDialog({
 		});
 	};
 
-	const contextMenuActions: ContextMenuAction<StockMovementWithInvoiceInfo>[] = [
-		{
-			id: "view",
-			label: "Zobrazit doklad",
-			icon: <VisibilityIcon fontSize="small" />,
-			onClick: handleRowDoubleClick,
-		},
-	];
+	const contextMenuActions: ContextMenuAction<StockMovementWithInvoiceInfo>[] =
+		[
+			{
+				id: "view",
+				label: "Zobrazit doklad",
+				icon: <VisibilityIcon fontSize="small" />,
+				onClick: handleRowDoubleClick,
+			},
+		];
 
 	const getCellContent = (
 		movement: StockMovementWithInvoiceInfo,
-		columnId: string
+		columnId: string,
 	) => {
 		// Convert string values to numbers
-		const amount = typeof movement.amount === "string"
-			? parseFloat(movement.amount)
-			: Number(movement.amount);
-		const pricePerUnit = typeof movement.price_per_unit === "string"
-			? parseFloat(movement.price_per_unit)
-			: Number(movement.price_per_unit);
+		const amount =
+			typeof movement.amount === "string"
+				? parseFloat(movement.amount)
+				: Number(movement.amount);
+		const pricePerUnit =
+			typeof movement.price_per_unit === "string"
+				? parseFloat(movement.price_per_unit)
+				: Number(movement.price_per_unit);
 
 		switch (columnId) {
 			case "invoice":

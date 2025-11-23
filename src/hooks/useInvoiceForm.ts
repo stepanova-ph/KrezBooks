@@ -87,7 +87,7 @@ export function useInvoiceForm() {
 				}));
 			}
 		} else {
-			console.log('Variable symbol is custom, not auto-syncing');
+			console.log("Variable symbol is custom, not auto-syncing");
 		}
 	}, [formData.prefix, formData.number, isVariableSymbolCustom]);
 
@@ -106,11 +106,13 @@ export function useInvoiceForm() {
 			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
 			// If user enters something different than auto, mark as custom
 			if (value !== autoVariableSymbol) {
-				console.log(`User entered custom variable symbol: ${value} (auto would be: ${autoVariableSymbol})`);
+				console.log(
+					`User entered custom variable symbol: ${value} (auto would be: ${autoVariableSymbol})`,
+				);
 				setIsVariableSymbolCustom(true);
 			} else {
 				// If they change it back to match, it's no longer custom
-				console.log('User changed variable symbol back to auto value');
+				console.log("User changed variable symbol back to auto value");
 				setIsVariableSymbolCustom(false);
 			}
 		}
@@ -130,7 +132,9 @@ export function useInvoiceForm() {
 		// If variable symbol is empty after blur, set it to default (prefix + number)
 		if (field === "variable_symbol" && !formData.variable_symbol.trim()) {
 			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
-			console.log(`Variable symbol was empty, setting to default: ${autoVariableSymbol}`);
+			console.log(
+				`Variable symbol was empty, setting to default: ${autoVariableSymbol}`,
+			);
 			setFormData((prev) => ({
 				...prev,
 				variable_symbol: autoVariableSymbol,

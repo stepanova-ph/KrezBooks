@@ -8,15 +8,13 @@ interface NumberInputFilterProps {
 	onUpdate: (value: string) => void;
 }
 
-export function NumberInputFilter({ 
-	filter, 
-	value, 
-	onUpdate 
+export function NumberInputFilter({
+	filter,
+	value,
+	onUpdate,
 }: NumberInputFilterProps) {
-	const validation = filter.validate
-		? filter.validate(value)
-		: { valid: true };
-		
+	const validation = filter.validate ? filter.validate(value) : { valid: true };
+
 	return (
 		<TextField
 			key={filter.id}
@@ -26,8 +24,7 @@ export function NumberInputFilter({
 			value={value || ""}
 			onChange={(e) => {
 				const newValue = e.target.value.replace(/\D/g, "");
-				if (filter.maxLength && newValue.length > filter.maxLength)
-					return;
+				if (filter.maxLength && newValue.length > filter.maxLength) return;
 				onUpdate(newValue);
 			}}
 			error={!validation.valid}

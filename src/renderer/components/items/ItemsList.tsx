@@ -133,7 +133,9 @@ function ItemsList({
 				return formatVatRateShort(item.vat_rate);
 
 			case "stock_amount":
-				return item.stock_amount !== undefined ? String(item.stock_amount) : "0";
+				return item.stock_amount !== undefined
+					? String(item.stock_amount)
+					: "0";
 
 			case "sale_price_group1":
 				return formatPrice(item.sale_price_group1);

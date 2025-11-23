@@ -16,12 +16,17 @@ export function useStockMovements() {
 	});
 }
 
-export function useStockMovementsByInvoice(invoicePrefix: string, invoiceNumber: string) {
+export function useStockMovementsByInvoice(
+	invoicePrefix: string,
+	invoiceNumber: string,
+) {
 	return useQuery({
 		queryKey: ["stockMovements", "invoice", invoicePrefix, invoiceNumber],
 		queryFn: async () => {
-			const result =
-				await window.electronAPI.stockMovements.getByInvoice(invoicePrefix, invoiceNumber);
+			const result = await window.electronAPI.stockMovements.getByInvoice(
+				invoicePrefix,
+				invoiceNumber,
+			);
 			if (!result.success) throw new Error(result.error);
 			return result.data as StockMovement[];
 		},
@@ -147,7 +152,9 @@ export function useStockMovementsByItem(itemEan: string) {
 		queryKey: ["stockMovements", "item", itemEan],
 		queryFn: async () => {
 			const result =
-				await window.electronAPI.stockMovements.getByItemWithInvoiceInfo(itemEan);
+				await window.electronAPI.stockMovements.getByItemWithInvoiceInfo(
+					itemEan,
+				);
 			if (!result.success) throw new Error(result.error);
 			return result.data as StockMovementWithInvoiceInfo[];
 		},

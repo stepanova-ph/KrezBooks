@@ -3,7 +3,11 @@ import Database from "better-sqlite3";
 import { invoiceQueries } from "../../main/queries/invoices";
 import { stockMovementQueries } from "../../main/queries/stockMovements";
 import { itemQueries } from "../../main/queries/items";
-import { serializeInvoice, serializeStockMovement, serializeItem } from "../../utils/typeConverterUtils";
+import {
+	serializeInvoice,
+	serializeStockMovement,
+	serializeItem,
+} from "../../utils/typeConverterUtils";
 
 describe("Invoice Calculations", () => {
 	let db: Database.Database;
@@ -16,7 +20,7 @@ describe("Invoice Calculations", () => {
 
 		// Create test items with different VAT rates
 		const insertItem = db.prepare(itemQueries.create);
-		
+
 		// 0% VAT item
 		insertItem.run(
 			serializeItem({

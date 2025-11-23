@@ -134,10 +134,12 @@ export class InvoiceService {
 	 */
 	async getMaxNumberByType(type: number): Promise<number> {
 		const db = getDatabase();
-		
+
 		const statement = db.prepare(invoiceQueries.getMaxNumberByType);
-		const result = statement.get(type) as { max_num: number | null } | undefined;
-		
+		const result = statement.get(type) as
+			| { max_num: number | null }
+			| undefined;
+
 		return result?.max_num ?? 0;
 	}
 }

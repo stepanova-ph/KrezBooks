@@ -11,7 +11,10 @@ import { ContactPickerDialog } from "../invoice/new/ContactPickerDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { useInvoiceForm } from "../../../hooks/useInvoiceForm";
 import { useInvoiceDialogs } from "../../../hooks/useInvoiceDialogs";
-import { useCreateInvoice, useMaxInvoiceNumber } from "../../../hooks/useInvoices";
+import {
+	useCreateInvoice,
+	useMaxInvoiceNumber,
+} from "../../../hooks/useInvoices";
 import { useCreateStockMovement } from "../../../hooks/useStockMovement";
 import type { Item, Contact } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
@@ -21,7 +24,10 @@ import {
 } from "../../../utils/formUtils";
 import { InvoiceTotals } from "../invoice/InvoiceTotals";
 import { INVOICE_TYPES } from "../../../config/constants";
-import { getDisplayAmount, getSignedAmount } from "../../../utils/typeConverterUtils";
+import {
+	getDisplayAmount,
+	getSignedAmount,
+} from "../../../utils/typeConverterUtils";
 import { ItemCardDialog } from "../items/ItemCardDialog";
 
 function NewInvoiceTab() {
@@ -42,7 +48,9 @@ function NewInvoiceTab() {
 
 	// Auto-populate prefix when type changes
 	useEffect(() => {
-		const invoiceType = INVOICE_TYPES.find(t => t.value === form.formData.type);
+		const invoiceType = INVOICE_TYPES.find(
+			(t) => t.value === form.formData.type,
+		);
 		const defaultPrefix = invoiceType?.prefix;
 		if (defaultPrefix && form.formData.prefix !== defaultPrefix) {
 			form.handleChange("prefix", defaultPrefix);
@@ -52,9 +60,9 @@ function NewInvoiceTab() {
 	// Auto-increment invoice number based on type
 	useEffect(() => {
 		if (maxNumber !== undefined) {
-			const nextNumber = String(maxNumber + 1).padStart(4, '0');
+			const nextNumber = String(maxNumber + 1).padStart(4, "0");
 			if (form.formData.number !== nextNumber) {
-				form.handleChange('number', nextNumber);
+				form.handleChange("number", nextNumber);
 			}
 		}
 	}, [maxNumber, form.formData.type]);
@@ -190,7 +198,9 @@ function NewInvoiceTab() {
 							item.ean,
 							item.amount.toString(),
 						);
-					console.log(`Should set reset point for ${item.ean}: ${shouldSetResetPoint}`);
+					console.log(
+						`Should set reset point for ${item.ean}: ${shouldSetResetPoint}`,
+					);
 
 					return createStockMovement.mutateAsync({
 						invoice_prefix: form.formData.prefix || "",

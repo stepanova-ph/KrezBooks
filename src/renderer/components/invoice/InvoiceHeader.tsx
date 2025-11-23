@@ -79,7 +79,9 @@ function headerType5({
 								onBlur("prefix");
 							}
 						}}
-						inputProps={{ style: { textTransform: "uppercase", textAlign: "right" } }}
+						inputProps={{
+							style: { textTransform: "uppercase", textAlign: "right" },
+						}}
 					/>
 				</Grid>
 
@@ -116,7 +118,7 @@ function headerType5({
 						required
 						disabled={disabled}
 						fullWidth
-						/>
+					/>
 				</Grid>
 			</Grid>
 		</FormSection>
@@ -228,7 +230,7 @@ export function InvoiceHeader({
 						required
 						disabled={disabled}
 						fullWidth
-						/>
+					/>
 				</Grid>
 
 				{showDateTax && (
@@ -243,7 +245,7 @@ export function InvoiceHeader({
 							required
 							disabled={disabled}
 							fullWidth
-							/>
+						/>
 					</Grid>
 				)}
 
@@ -259,7 +261,7 @@ export function InvoiceHeader({
 							required
 							disabled={disabled}
 							fullWidth
-							/>
+						/>
 					</Grid>
 				)}
 

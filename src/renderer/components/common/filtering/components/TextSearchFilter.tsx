@@ -9,11 +9,11 @@ interface TextSearchFilterProps {
 	searchInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-export function TextSearchFilter({ 
-	filter, 
-	value, 
+export function TextSearchFilter({
+	filter,
+	value,
 	onUpdate,
-	searchInputRef 
+	searchInputRef,
 }: TextSearchFilterProps) {
 	return (
 		<TextField

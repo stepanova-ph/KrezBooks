@@ -40,7 +40,7 @@ export function PickerDialog<T>({
 	filterValue,
 	onFilterChange,
 	keepOpenOnSelect = false,
-	filterActions
+	filterActions,
 }: PickerDialogProps<T>) {
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [focusedItem, setFocusedItem] = useState<T | null>(null);
@@ -120,7 +120,7 @@ export function PickerDialog<T>({
 					value={filterValue}
 					onChange={(e) => onFilterChange(e.target.value)}
 					inputRef={searchInputRef}
-					sx={{width: 250}}
+					sx={{ width: 250 }}
 				/>
 				{filterActions}
 			</Box>

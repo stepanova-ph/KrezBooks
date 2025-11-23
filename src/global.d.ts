@@ -155,7 +155,10 @@ declare global {
 
 			invoices: {
 				getAll: () => Promise<IpcResponse<Invoice[]>>;
-				getOne: (prefix: string, number: string) => Promise<IpcResponse<Invoice | null>>;
+				getOne: (
+					prefix: string,
+					number: string,
+				) => Promise<IpcResponse<Invoice | null>>;
 				create: (
 					invoice: CreateInvoiceInput,
 				) => Promise<IpcResponse<{ changes: number }>>;
@@ -163,7 +166,10 @@ declare global {
 					number: string,
 					updates: Partial<Invoice>,
 				) => Promise<IpcResponse<{ changes: number }>>;
-				delete: (prefix: string, number: string) => Promise<IpcResponse<{ changes: number }>>;
+				delete: (
+					prefix: string,
+					number: string,
+				) => Promise<IpcResponse<{ changes: number }>>;
 				getByInvoice: (
 					invoiceNumber: string,
 				) => Promise<IpcResponse<StockMovement[]>>;

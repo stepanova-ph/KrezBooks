@@ -75,7 +75,10 @@ declare global {
 			};
 			contacts: {
 				getAll: () => Promise<IpcResponse<Contact[]>>;
-				getOne: (ico: string, modifier: number) => Promise<IpcResponse<Contact>>;
+				getOne: (
+					ico: string,
+					modifier: number,
+				) => Promise<IpcResponse<Contact>>;
 				create: (contact: CreateContactInput) => Promise<IpcResponse<Contact>>;
 				update: (
 					ico: string,
@@ -89,7 +92,10 @@ declare global {
 				getOne: (ean: string) => Promise<IpcResponse<Item>>;
 				getCategories: () => Promise<IpcResponse<string[]>>;
 				create: (item: CreateItemInput) => Promise<IpcResponse<Item>>;
-				update: (ean: string, updates: Partial<Item>) => Promise<IpcResponse<Item>>;
+				update: (
+					ean: string,
+					updates: Partial<Item>,
+				) => Promise<IpcResponse<Item>>;
 				delete: (ean: string) => Promise<IpcResponse>;
 			};
 			admin: {
@@ -113,9 +119,15 @@ declare global {
 				recreateTables: () => Promise<IpcResponse>;
 			};
 			importExport: {
-				exportData: (directoryPath: string) => Promise<{ success: boolean; started?: boolean; error?: string }>;
-				importLegacyData: (directoryPath: string) => Promise<{ success: boolean; started?: boolean; error?: string }>;
-				importData: (directoryPath: string) => Promise<{ success: boolean; started?: boolean; error?: string }>;
+				exportData: (
+					directoryPath: string,
+				) => Promise<{ success: boolean; started?: boolean; error?: string }>;
+				importLegacyData: (
+					directoryPath: string,
+				) => Promise<{ success: boolean; started?: boolean; error?: string }>;
+				importData: (
+					directoryPath: string,
+				) => Promise<{ success: boolean; started?: boolean; error?: string }>;
 				onExportProgress: (
 					callback: (data: { message: string; progress: number }) => void,
 				) => () => void;
@@ -131,7 +143,10 @@ declare global {
 			};
 			invoices: {
 				getAll: () => Promise<IpcResponse<Invoice[]>>;
-				getOne: (prefix: string, number: string) => Promise<IpcResponse<Invoice>>;
+				getOne: (
+					prefix: string,
+					number: string,
+				) => Promise<IpcResponse<Invoice>>;
 				create: (invoice: CreateInvoiceInput) => Promise<IpcResponse<Invoice>>;
 				update: (
 					number: string,

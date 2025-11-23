@@ -49,7 +49,7 @@ function AggregateInput({
 	allowNegative?: boolean;
 	showBorder?: boolean;
 }) {
-if (isDateInput) {
+	if (isDateInput) {
 		return (
 			<DateField
 				label={label}
@@ -123,7 +123,7 @@ export function FilterAggregateFilter({
 	const collapsedRef = useRef<HTMLDivElement>(null);
 	const expandedRef = useRef<HTMLDivElement>(null);
 	const [collapsedWidth, setCollapsedWidth] = useState<number | undefined>(
-		undefined
+		undefined,
 	);
 
 	// Measure collapsed width when not expanded
@@ -139,16 +139,16 @@ export function FilterAggregateFilter({
 
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as HTMLElement;
-			
+
 			// Ignore clicks on DatePicker popper (calendar popup)
-			if (target.closest('.MuiPopper-root') || target.closest('.MuiPickersPopper-root')) {
+			if (
+				target.closest(".MuiPopper-root") ||
+				target.closest(".MuiPickersPopper-root")
+			) {
 				return;
 			}
-			
-			if (
-				expandedRef.current &&
-				!expandedRef.current.contains(target)
-			) {
+
+			if (expandedRef.current && !expandedRef.current.contains(target)) {
 				onToggleExpanded();
 			}
 		};
@@ -339,7 +339,8 @@ export function FilterAggregateFilter({
 										display: "flex",
 										alignItems: "center",
 										justifyContent: "center",
-										borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+										borderRight: (theme) =>
+											`1px solid ${theme.palette.divider}`,
 										fontSize: "1rem",
 										fontWeight: "bold",
 										color: "text.disabled",
@@ -411,7 +412,7 @@ export function FilterAggregateFilter({
 								sx={{ display: "flex", flexDirection: "column", gap: 1, p: 1 }}
 							>
 								{filter.expandedFilters.map((subFilter) =>
-									renderExpandedFilter(subFilter)
+									renderExpandedFilter(subFilter),
 								)}
 							</Box>
 						</>

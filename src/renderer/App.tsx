@@ -19,7 +19,7 @@ import { TabPersistenceProvider } from "../context/TabPersistanceContext";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import 'dayjs/locale/cs';
+import "dayjs/locale/cs";
 
 function App() {
 	const [currentPage, setCurrentPage] = useState<AppPage>("novy_doklad");

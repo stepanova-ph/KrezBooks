@@ -1,4 +1,10 @@
-import { Box, LinearProgress, IconButton, Collapse, Typography } from "@mui/material";
+import {
+	Box,
+	LinearProgress,
+	IconButton,
+	Collapse,
+	Typography,
+} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useState, useEffect } from "react";
@@ -17,18 +23,22 @@ export function ImportExportProgress() {
 
 	useEffect(() => {
 		// Listen for import progress
-		const unsubscribeImport = window.electronAPI.importExport.onImportProgress((data) => {
-			setIsActive(true);
-			setCurrentProgress(data.progress);
-			setLogs((prev) => [...prev, { ...data, timestamp: new Date() }]);
-		});
+		const unsubscribeImport = window.electronAPI.importExport.onImportProgress(
+			(data) => {
+				setIsActive(true);
+				setCurrentProgress(data.progress);
+				setLogs((prev) => [...prev, { ...data, timestamp: new Date() }]);
+			},
+		);
 
 		// Listen for export progress
-		const unsubscribeExport = window.electronAPI.importExport.onExportProgress((data) => {
-			setIsActive(true);
-			setCurrentProgress(data.progress);
-			setLogs((prev) => [...prev, { ...data, timestamp: new Date() }]);
-		});
+		const unsubscribeExport = window.electronAPI.importExport.onExportProgress(
+			(data) => {
+				setIsActive(true);
+				setCurrentProgress(data.progress);
+				setLogs((prev) => [...prev, { ...data, timestamp: new Date() }]);
+			},
+		);
 
 		return () => {
 			unsubscribeImport();
@@ -83,12 +93,25 @@ export function ImportExportProgress() {
 						padding: 0.5,
 					}}
 				>
-					{isExpanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+					{isExpanded ? (
+						<ExpandLessIcon fontSize="small" />
+					) : (
+						<ExpandMoreIcon fontSize="small" />
+					)}
 				</IconButton>
 			</Box>
 
 			{/* Collapsible Console */}
-			<Collapse in={isExpanded} sx={{ width: "100%", position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
+			<Collapse
+				in={isExpanded}
+				sx={{
+					width: "100%",
+					position: "absolute",
+					top: "100%",
+					left: 0,
+					zIndex: 1000,
+				}}
+			>
 				<Box
 					sx={{
 						backgroundColor: "background.paper",

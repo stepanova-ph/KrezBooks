@@ -26,13 +26,11 @@ export const invoiceColumns: Column[] = [
 	{ id: "number", label: "Číslo dokladu", minWidth: 120 },
 	{ id: "type", label: "Typ", minWidth: 150 },
 	{ id: "date_issue", label: "Datum vystavení", minWidth: 120 },
-	{ 
-		id: "company_name", 
-		label: "Obchodní partner", 
+	{
+		id: "company_name",
+		label: "Obchodní partner",
 		minWidth: 200,
-		subColumns: [
-			{ id: "ico", label: "", minWidth: 90 }
-		]
+		subColumns: [{ id: "ico", label: "", minWidth: 90 }],
 	},
 	{
 		id: "total",
@@ -103,7 +101,7 @@ function InvoicesList({
 			case "number":
 				return `${invoice.prefix || ""}${invoice.number}`;
 			case "type": {
-				const typeObj = INVOICE_TYPES.find(t => t.value === invoice.type);
+				const typeObj = INVOICE_TYPES.find((t) => t.value === invoice.type);
 				return typeObj?.label || "Neznámý";
 			}
 			case "date_issue":

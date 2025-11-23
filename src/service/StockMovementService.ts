@@ -1,6 +1,10 @@
 import { stockMovementQueries } from "../main/queries/stockMovements";
 import { getDatabase } from "../main/database";
-import { StockMovement, CreateStockMovementInput, StockMovementWithInvoiceInfo } from "../types/database";
+import {
+	StockMovement,
+	CreateStockMovementInput,
+	StockMovementWithInvoiceInfo,
+} from "../types/database";
 import {
 	booleanToSQLiteInteger,
 	sqliteIntegerToBoolean,
@@ -24,7 +28,11 @@ export class StockMovementService {
 	): Promise<StockMovement | undefined> {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.getOne);
-		const movement = statement.get(invoicePrefix, invoiceNumber, itemEan) as any;
+		const movement = statement.get(
+			invoicePrefix,
+			invoiceNumber,
+			itemEan,
+		) as any;
 		if (!movement) return undefined;
 		return {
 			...movement,
@@ -32,7 +40,10 @@ export class StockMovementService {
 		};
 	}
 
-	async getByInvoice(invoicePrefix: string, invoiceNumber: string): Promise<StockMovement[]> {
+	async getByInvoice(
+		invoicePrefix: string,
+		invoiceNumber: string,
+	): Promise<StockMovement[]> {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.getByInvoice);
 		const movements = statement.all(invoicePrefix, invoiceNumber) as any[];
@@ -75,7 +86,10 @@ export class StockMovementService {
 
 		const fieldsToUpdate = Object.keys(updates).filter(
 			(key) =>
-				key !== "invoice_prefix" && key !== "invoice_number" && key !== "item_ean" && key !== "created_at",
+				key !== "invoice_prefix" &&
+				key !== "invoice_number" &&
+				key !== "item_ean" &&
+				key !== "created_at",
 		);
 
 		if (fieldsToUpdate.length === 0) {
@@ -125,7 +139,10 @@ export class StockMovementService {
 		return { changes: result.changes };
 	}
 
-	async deleteByInvoice(invoicePrefix: string, invoiceNumber: string): Promise<{ changes: number }> {
+	async deleteByInvoice(
+		invoicePrefix: string,
+		invoiceNumber: string,
+	): Promise<{ changes: number }> {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.deleteByInvoice);
 		const result = statement.run(invoicePrefix, invoiceNumber);
@@ -174,7 +191,9 @@ export class StockMovementService {
 	async getAverageBuyPriceByItem(itemEan: string): Promise<number> {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.getAverageBuyPriceByItem);
-		const result = statement.get(itemEan, itemEan) as { avg_price: number } | undefined;
+		const result = statement.get(itemEan, itemEan) as
+			| { avg_price: number }
+			| undefined;
 		return result?.avg_price || 0;
 	}
 
@@ -197,7 +216,9 @@ export class StockMovementService {
 		return currentStock > 0 && resultingStock <= 0;
 	}
 
-	async getByItemWithInvoiceInfo(itemEan: string): Promise<StockMovementWithInvoiceInfo[]> {
+	async getByItemWithInvoiceInfo(
+		itemEan: string,
+	): Promise<StockMovementWithInvoiceInfo[]> {
 		const db = getDatabase();
 		const statement = db.prepare(stockMovementQueries.getByItemWithInvoiceInfo);
 		const movements = statement.all(itemEan) as any[];

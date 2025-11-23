@@ -168,7 +168,10 @@ function parseValue(value: string): unknown {
 	return value;
 }
 
-function rowToDbObject(row: string[], headers: string[]): Record<string, unknown> {
+function rowToDbObject(
+	row: string[],
+	headers: string[],
+): Record<string, unknown> {
 	const obj: Record<string, unknown> = {};
 	for (let i = 0; i < headers.length; i++) {
 		obj[headers[i]] = parseValue(row[i] || "");
@@ -180,9 +183,7 @@ function rowToDbObject(row: string[], headers: string[]): Record<string, unknown
 // TABLE IMPORTERS
 // =============================================================================
 
-function importContactsTable(
-	filePath: string,
-): TableImportResult {
+function importContactsTable(filePath: string): TableImportResult {
 	const db = getDatabase();
 	const content = fs.readFileSync(filePath, "utf-8");
 	const { headers, rows } = parseCSV(content);
@@ -219,13 +220,18 @@ function importContactsTable(
 			imported++;
 		} catch (dbError: any) {
 			const errorMessage = dbError.message || "Unknown database error";
-			if (errorMessage.includes("UNIQUE constraint failed") || errorMessage.includes("PRIMARY KEY")) {
+			if (
+				errorMessage.includes("UNIQUE constraint failed") ||
+				errorMessage.includes("PRIMARY KEY")
+			) {
 				const obj = rowToObject(row, headers);
 				errors.push({
 					table: "contacts",
 					rowNumber,
 					rawRow,
-					issues: [`Duplicate contact: ICO ${obj.ico}, modifier ${obj.modifier}`],
+					issues: [
+						`Duplicate contact: ICO ${obj.ico}, modifier ${obj.modifier}`,
+					],
 				});
 			} else {
 				errors.push({
@@ -241,9 +247,7 @@ function importContactsTable(
 	return { imported, skipped: errors.length, errors };
 }
 
-function importItemsTable(
-	filePath: string,
-): TableImportResult {
+function importItemsTable(filePath: string): TableImportResult {
 	const db = getDatabase();
 	const content = fs.readFileSync(filePath, "utf-8");
 	const { headers, rows } = parseCSV(content);
@@ -278,7 +282,10 @@ function importItemsTable(
 			imported++;
 		} catch (dbError: any) {
 			const errorMessage = dbError.message || "Unknown database error";
-			if (errorMessage.includes("UNIQUE constraint failed") || errorMessage.includes("PRIMARY KEY")) {
+			if (
+				errorMessage.includes("UNIQUE constraint failed") ||
+				errorMessage.includes("PRIMARY KEY")
+			) {
 				const obj = rowToObject(row, headers);
 				errors.push({
 					table: "items",
@@ -300,9 +307,7 @@ function importItemsTable(
 	return { imported, skipped: errors.length, errors };
 }
 
-function importInvoicesTable(
-	filePath: string,
-): TableImportResult {
+function importInvoicesTable(filePath: string): TableImportResult {
 	const db = getDatabase();
 	const content = fs.readFileSync(filePath, "utf-8");
 	const { headers, rows } = parseCSV(content);
@@ -337,13 +342,18 @@ function importInvoicesTable(
 			imported++;
 		} catch (dbError: any) {
 			const errorMessage = dbError.message || "Unknown database error";
-			if (errorMessage.includes("UNIQUE constraint failed") || errorMessage.includes("PRIMARY KEY")) {
+			if (
+				errorMessage.includes("UNIQUE constraint failed") ||
+				errorMessage.includes("PRIMARY KEY")
+			) {
 				const obj = rowToObject(row, headers);
 				errors.push({
 					table: "invoices",
 					rowNumber,
 					rawRow,
-					issues: [`Duplicate invoice: prefix ${obj.prefix}, number ${obj.number}`],
+					issues: [
+						`Duplicate invoice: prefix ${obj.prefix}, number ${obj.number}`,
+					],
 				});
 			} else {
 				errors.push({
@@ -359,9 +369,7 @@ function importInvoicesTable(
 	return { imported, skipped: errors.length, errors };
 }
 
-function importStockMovementsTable(
-	filePath: string,
-): TableImportResult {
+function importStockMovementsTable(filePath: string): TableImportResult {
 	const db = getDatabase();
 	const content = fs.readFileSync(filePath, "utf-8");
 	const { headers, rows } = parseCSV(content);
@@ -394,13 +402,18 @@ function importStockMovementsTable(
 			imported++;
 		} catch (dbError: any) {
 			const errorMessage = dbError.message || "Unknown database error";
-			if (errorMessage.includes("UNIQUE constraint failed") || errorMessage.includes("PRIMARY KEY")) {
+			if (
+				errorMessage.includes("UNIQUE constraint failed") ||
+				errorMessage.includes("PRIMARY KEY")
+			) {
 				const obj = rowToObject(row, headers);
 				errors.push({
 					table: "stock_movements",
 					rowNumber,
 					rawRow,
-					issues: [`Duplicate stock movement: invoice ${obj.invoice_prefix}-${obj.invoice_number}, item ${obj.item_ean}`],
+					issues: [
+						`Duplicate stock movement: invoice ${obj.invoice_prefix}-${obj.invoice_number}, item ${obj.item_ean}`,
+					],
 				});
 			} else if (errorMessage.includes("FOREIGN KEY constraint failed")) {
 				const obj = rowToObject(row, headers);
@@ -408,7 +421,9 @@ function importStockMovementsTable(
 					table: "stock_movements",
 					rowNumber,
 					rawRow,
-					issues: [`Foreign key error: invoice ${obj.invoice_prefix}-${obj.invoice_number} or item ${obj.item_ean} does not exist`],
+					issues: [
+						`Foreign key error: invoice ${obj.invoice_prefix}-${obj.invoice_number} or item ${obj.item_ean} does not exist`,
+					],
 				});
 			} else {
 				errors.push({
@@ -463,7 +478,8 @@ async function performImport(
 	if (!hasContacts && !hasItems && !hasInvoices && !hasStockMovements) {
 		return {
 			success: false,
-			error: "Složka neobsahuje žádné CSV soubory k importu (contacts.csv, items.csv, invoices.csv, stock_movements.csv)",
+			error:
+				"Složka neobsahuje žádné CSV soubory k importu (contacts.csv, items.csv, invoices.csv, stock_movements.csv)",
 		};
 	}
 
@@ -471,7 +487,12 @@ async function performImport(
 	const imported = { contacts: 0, items: 0, invoices: 0, stock_movements: 0 };
 	const skipped = { contacts: 0, items: 0, invoices: 0, stock_movements: 0 };
 
-	const totalSteps = [hasContacts, hasItems, hasInvoices, hasStockMovements].filter(Boolean).length;
+	const totalSteps = [
+		hasContacts,
+		hasItems,
+		hasInvoices,
+		hasStockMovements,
+	].filter(Boolean).length;
 	let currentStep = 0;
 
 	// Import in order (respecting foreign keys)
@@ -485,7 +506,9 @@ async function performImport(
 		imported.contacts = result.imported;
 		skipped.contacts = result.skipped;
 		allErrors.push(...result.errors);
-		logger.info(`Contacts: ${result.imported} imported, ${result.skipped} skipped`);
+		logger.info(
+			`Contacts: ${result.imported} imported, ${result.skipped} skipped`,
+		);
 	}
 
 	// 2. Items (no dependencies)
@@ -498,7 +521,9 @@ async function performImport(
 		imported.items = result.imported;
 		skipped.items = result.skipped;
 		allErrors.push(...result.errors);
-		logger.info(`Items: ${result.imported} imported, ${result.skipped} skipped`);
+		logger.info(
+			`Items: ${result.imported} imported, ${result.skipped} skipped`,
+		);
 	}
 
 	// 3. Invoices (optional reference to contacts)
@@ -511,7 +536,9 @@ async function performImport(
 		imported.invoices = result.imported;
 		skipped.invoices = result.skipped;
 		allErrors.push(...result.errors);
-		logger.info(`Invoices: ${result.imported} imported, ${result.skipped} skipped`);
+		logger.info(
+			`Invoices: ${result.imported} imported, ${result.skipped} skipped`,
+		);
 	}
 
 	// 4. Stock movements (references invoices and items)
@@ -524,7 +551,9 @@ async function performImport(
 		imported.stock_movements = result.imported;
 		skipped.stock_movements = result.skipped;
 		allErrors.push(...result.errors);
-		logger.info(`Stock movements: ${result.imported} imported, ${result.skipped} skipped`);
+		logger.info(
+			`Stock movements: ${result.imported} imported, ${result.skipped} skipped`,
+		);
 	}
 
 	// Write error log if needed
@@ -587,7 +616,7 @@ function registerDataImportHandlers() {
 			logger.error("Import failed:", error);
 			event.sender.send("import:progress", {
 				message: `Import selhal: ${error.message}`,
-				progress: 0
+				progress: 0,
 			});
 			return {
 				success: false,

@@ -32,7 +32,8 @@ export function combineBankAccount(
 
 export const calculateTotalWithVat = (items) => {
 	return items.reduce((sum, item) => {
-		const totalWithVat = item.total * (1 + VAT_RATES[item.vat_rate].percentage / 100);
+		const totalWithVat =
+			item.total * (1 + VAT_RATES[item.vat_rate].percentage / 100);
 		return sum + totalWithVat;
 	}, 0);
 };

@@ -10,21 +10,19 @@ interface CheckboxFilterProps {
 	canUncheck: boolean;
 }
 
-export function CheckboxFilter({ 
-	filter, 
-	value, 
+export function CheckboxFilter({
+	filter,
+	value,
 	onUpdate,
-	canUncheck 
+	canUncheck,
 }: CheckboxFilterProps) {
 	const checked = !!value;
-	
+
 	return (
 		<FormControlLabel
 			sx={{
 				color: (theme) =>
-					checked
-						? theme.palette.primary.main
-						: theme.palette.text.secondary,
+					checked ? theme.palette.primary.main : theme.palette.text.secondary,
 			}}
 			key={filter.id}
 			control={

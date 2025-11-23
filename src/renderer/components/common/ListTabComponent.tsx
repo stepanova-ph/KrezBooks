@@ -41,7 +41,10 @@ interface ListTabComponentProps<TData, TFilter extends FilterState> {
 	onFiltersChange?: (filters: TFilter) => void;
 }
 
-export function ListTabComponent<TData extends Record<string, any>, TFilter extends FilterState>({
+export function ListTabComponent<
+	TData extends Record<string, any>,
+	TFilter extends FilterState,
+>({
 	data,
 	isLoading,
 	loadingText,
@@ -61,8 +64,10 @@ export function ListTabComponent<TData extends Record<string, any>, TFilter exte
 	onFiltersChange: externalOnFiltersChange,
 }: ListTabComponentProps<TData, TFilter>) {
 	const { getFilterState, setFilterState } = useTabPersistence();
-	const initialFilters = (getFilterState(tabKey) as TFilter) || initialFilterState;
-	const [internalFilters, setInternalFilters] = useState<TFilter>(initialFilters);
+	const initialFilters =
+		(getFilterState(tabKey) as TFilter) || initialFilterState;
+	const [internalFilters, setInternalFilters] =
+		useState<TFilter>(initialFilters);
 
 	// Use external filters if provided, otherwise use internal
 	const filters = externalFilters ?? internalFilters;

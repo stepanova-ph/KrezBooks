@@ -6,30 +6,30 @@
  */
 export function applyNumberComparatorFilter(
 	itemValue: number,
-	filterValue: any
+	filterValue: any,
 ): boolean {
 	if (!filterValue) return true;
 
 	const { greaterThan, equals, lessThan } = filterValue;
-	
+
 	// Check greater than
-	if (greaterThan && greaterThan.trim() !== '') {
+	if (greaterThan && greaterThan.trim() !== "") {
 		const gtValue = parseFloat(greaterThan);
 		if (!(itemValue > gtValue)) return false;
 	}
-	
+
 	// Check equals
-	if (equals && equals.trim() !== '') {
+	if (equals && equals.trim() !== "") {
 		const eqValue = parseFloat(equals);
 		if (itemValue !== eqValue) return false;
 	}
-	
+
 	// Check less than
-	if (lessThan && lessThan.trim() !== '') {
+	if (lessThan && lessThan.trim() !== "") {
 		const ltValue = parseFloat(lessThan);
 		if (!(itemValue < ltValue)) return false;
 	}
-	
+
 	return true;
 }
 
@@ -39,24 +39,24 @@ export function applyNumberComparatorFilter(
  */
 export function applyDateComparatorFilter(
 	itemValue: string,
-	filterValue: any
+	filterValue: any,
 ): boolean {
 	if (!filterValue) return true;
 
 	const { greaterThan, equals, lessThan } = filterValue;
-	
+
 	// Check equals
-	if (equals && equals.trim() !== '') {
+	if (equals && equals.trim() !== "") {
 		return itemValue === equals;
 	}
 
-	if (greaterThan && greaterThan.trim() !== '') {
+	if (greaterThan && greaterThan.trim() !== "") {
 		if (!(itemValue > greaterThan)) return false;
 	}
-	
-	if (lessThan && lessThan.trim() !== '') {
+
+	if (lessThan && lessThan.trim() !== "") {
 		if (!(itemValue < lessThan)) return false;
 	}
-	
+
 	return true;
 }

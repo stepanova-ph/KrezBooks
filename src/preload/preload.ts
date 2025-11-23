@@ -35,7 +35,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	testDatabase: () => ipcRenderer.invoke("db:test"),
 
 	dialog: {
-		selectDirectory: (title?: string) => ipcRenderer.invoke("dialog:selectDirectory", title),
+		selectDirectory: (title?: string) =>
+			ipcRenderer.invoke("dialog:selectDirectory", title),
 	},
 
 	contacts: {
@@ -67,19 +68,32 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		fillTestData: () => ipcRenderer.invoke("db:fillTestData"),
 		recreateTables: () => ipcRenderer.invoke("db:recreateTables"),
 	},
-	
+
 	importExport: {
-		exportData: (directoryPath: string) => ipcRenderer.invoke("db:exportData", directoryPath),
-		importLegacyData: (directoryPath: string) => ipcRenderer.invoke("db:importLegacyData", directoryPath),
-		importData: (directoryPath: string) => ipcRenderer.invoke("db:importData", directoryPath),
+		exportData: (directoryPath: string) =>
+			ipcRenderer.invoke("db:exportData", directoryPath),
+		importLegacyData: (directoryPath: string) =>
+			ipcRenderer.invoke("db:importLegacyData", directoryPath),
+		importData: (directoryPath: string) =>
+			ipcRenderer.invoke("db:importData", directoryPath),
 		// Progress event listeners
-		onExportProgress: (callback: (data: { message: string; progress: number }) => void) => {
-			const listener = (_event: any, data: { message: string; progress: number }) => callback(data);
+		onExportProgress: (
+			callback: (data: { message: string; progress: number }) => void,
+		) => {
+			const listener = (
+				_event: any,
+				data: { message: string; progress: number },
+			) => callback(data);
 			ipcRenderer.on("export:progress", listener);
 			return () => ipcRenderer.removeListener("export:progress", listener);
 		},
-		onImportProgress: (callback: (data: { message: string; progress: number }) => void) => {
-			const listener = (_event: any, data: { message: string; progress: number }) => callback(data);
+		onImportProgress: (
+			callback: (data: { message: string; progress: number }) => void,
+		) => {
+			const listener = (
+				_event: any,
+				data: { message: string; progress: number },
+			) => callback(data);
 			ipcRenderer.on("import:progress", listener);
 			return () => ipcRenderer.removeListener("import:progress", listener);
 		},
@@ -106,21 +120,47 @@ contextBridge.exposeInMainWorld("electronAPI", {
 			ipcRenderer.invoke("db:invoices:update", number, updates),
 		delete: (prefix: string, number: string) =>
 			ipcRenderer.invoke("db:invoices:delete", number),
-		getMaxNumber: (type: number) => ipcRenderer.invoke('db:invoices:getMaxNumber', type),
+		getMaxNumber: (type: number) =>
+			ipcRenderer.invoke("db:invoices:getMaxNumber", type),
 	},
 
 	stockMovements: {
 		getAll: () => ipcRenderer.invoke("db:stockMovements:getAll"),
 		getOne: (invoicePrefix: string, invoiceNumber: string, itemEan: string) =>
-			ipcRenderer.invoke("db:stockMovements:getOne", invoicePrefix, invoiceNumber, itemEan),
+			ipcRenderer.invoke(
+				"db:stockMovements:getOne",
+				invoicePrefix,
+				invoiceNumber,
+				itemEan,
+			),
 		create: (movement: CreateStockMovementInput) =>
 			ipcRenderer.invoke("db:stockMovements:create", movement),
-		update: (invoicePrefix: string, invoiceNumber: string, itemEan: string, updates: Partial<StockMovement>) =>
-			ipcRenderer.invoke("db:stockMovements:update", invoicePrefix, invoiceNumber, itemEan, updates),
+		update: (
+			invoicePrefix: string,
+			invoiceNumber: string,
+			itemEan: string,
+			updates: Partial<StockMovement>,
+		) =>
+			ipcRenderer.invoke(
+				"db:stockMovements:update",
+				invoicePrefix,
+				invoiceNumber,
+				itemEan,
+				updates,
+			),
 		delete: (invoicePrefix: string, invoiceNumber: string, itemEan: string) =>
-			ipcRenderer.invoke("db:stockMovements:delete", invoicePrefix, invoiceNumber, itemEan),
+			ipcRenderer.invoke(
+				"db:stockMovements:delete",
+				invoicePrefix,
+				invoiceNumber,
+				itemEan,
+			),
 		getByInvoice: (invoicePrefix: string, invoiceNumber: string) =>
-			ipcRenderer.invoke("db:stockMovements:getByInvoice", invoicePrefix, invoiceNumber),
+			ipcRenderer.invoke(
+				"db:stockMovements:getByInvoice",
+				invoicePrefix,
+				invoiceNumber,
+			),
 
 		getStockAmountByItem: (ean: string) =>
 			ipcRenderer.invoke("db:stockMovements:getStockAmountByItem", ean),

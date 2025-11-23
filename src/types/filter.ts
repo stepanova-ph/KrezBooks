@@ -11,7 +11,7 @@ export type FilterType =
 	| "select" // Single selection dropdown
 	| "multiselect" // Multiple selection dropdown
 	| "number-comparator" // Number with comparator (>, =, <)
-	| "date-comparator" // Date with comparator (>, =, <)	
+	| "date-comparator" // Date with comparator (>, =, <)
 	| "filter-aggregate" // Groups multiple filters with collapsible UI
 	| "action-button"; // Clickable button that triggers FilterAction
 
@@ -176,12 +176,32 @@ export interface ContactFilterState {
 export interface InvoiceFilterState {
 	search: string;
 	type?: number[];
-	selectedContacts?: Array<{ ico: string; modifier: number }>;  // NEW: array of contacts
-	total_amount?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
+	selectedContacts?: Array<{ ico: string; modifier: number }>; // NEW: array of contacts
+	total_amount?: {
+		greaterThan?: string;
+		equals?: string;
+		lessThan?: string;
+		comparator: ">" | "=" | "<";
+	};
 	total_amount_with_vat?: boolean;
-	date_issue?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
-	date_due?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
-	date_tax?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
+	date_issue?: {
+		greaterThan?: string;
+		equals?: string;
+		lessThan?: string;
+		comparator: ">" | "=" | "<";
+	};
+	date_due?: {
+		greaterThan?: string;
+		equals?: string;
+		lessThan?: string;
+		comparator: ">" | "=" | "<";
+	};
+	date_tax?: {
+		greaterThan?: string;
+		equals?: string;
+		lessThan?: string;
+		comparator: ">" | "=" | "<";
+	};
 	_dynamicFilters?: string[];
 }
 
@@ -193,8 +213,18 @@ export interface ItemFilterState {
 	vat_rate: number[];
 	unit_of_measure: string;
 	category: string[];
-	stock_amount?: { greaterThan: string; equals: string; lessThan: string; comparator: '>' | '=' | '<' }; // Number comparator
-	price?: { greaterThan: string; equals: string; lessThan: string; comparator: '>' | '=' | '<' }; // Number comparator
+	stock_amount?: {
+		greaterThan: string;
+		equals: string;
+		lessThan: string;
+		comparator: ">" | "=" | "<";
+	}; // Number comparator
+	price?: {
+		greaterThan: string;
+		equals: string;
+		lessThan: string;
+		comparator: ">" | "=" | "<";
+	}; // Number comparator
 	price_with_vat?: boolean;
 	price_groups?: number[];
 }
@@ -221,4 +251,3 @@ export type FilterAction = {
 	onClick?: () => void;
 	renderDialog?: (props: { open: boolean; onClose: () => void }) => ReactNode; // if you want FilterBar to open a modal for you
 };
-

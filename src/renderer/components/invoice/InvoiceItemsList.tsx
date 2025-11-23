@@ -48,9 +48,9 @@ export function InvoiceItemsList({
 								icon: <BadgeIcon fontSize="small" />,
 								onClick: onOpenItemCard,
 							},
-					  ]
+						]
 					: []),
-		  ]
+			]
 		: [
 				...(onOpenItemCard
 					? [
@@ -60,7 +60,7 @@ export function InvoiceItemsList({
 								icon: <BadgeIcon fontSize="small" />,
 								onClick: onOpenItemCard,
 							},
-					  ]
+						]
 					: []),
 				{
 					id: "edit",
@@ -78,7 +78,7 @@ export function InvoiceItemsList({
 						`Opravdu chcete odebrat "${item.name}" z dokladu?`,
 					divider: true,
 				},
-		  ];
+			];
 
 	const getCellContent = (item: InvoiceItem, columnId: string) => {
 		switch (columnId) {

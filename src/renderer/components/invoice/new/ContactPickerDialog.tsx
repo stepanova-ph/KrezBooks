@@ -42,10 +42,10 @@ export function ContactPickerDialog({
 
 	const isContactSelected = (contact: Contact) => {
 		return selectedContacts.some(
-			c => c.ico === contact.ico && c.modifier === contact.modifier
+			(c) => c.ico === contact.ico && c.modifier === contact.modifier,
 		);
 	};
-	
+
 	const filteredContacts = useTableFilters(
 		allContacts,
 		filters,
@@ -60,9 +60,6 @@ export function ContactPickerDialog({
 		if (!aSelected && bSelected) return 1;
 		return 0;
 	});
-
-
-	
 
 	const handleSelect = (contact: Contact) => {
 		if (singleSelect) {
@@ -85,7 +82,7 @@ export function ContactPickerDialog({
 		isFocused: boolean,
 	) => {
 		const isSelected = !singleSelect && isContactSelected(contact);
-		
+
 		return visibleColumns.map((col) => {
 			let content;
 			switch (col.id) {
@@ -109,8 +106,8 @@ export function ContactPickerDialog({
 			}
 
 			return (
-				<TableCell 
-					key={col.id} 
+				<TableCell
+					key={col.id}
 					align={col.align}
 					sx={{
 						bgcolor: isSelected ? "action.selected" : undefined,

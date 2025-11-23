@@ -1,10 +1,4 @@
-import {
-	Select,
-	MenuItem,
-	FormControl,
-	InputLabel,
-	Grid,
-} from "@mui/material";
+import { Select, MenuItem, FormControl, InputLabel, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { CreateContactInput, Contact } from "../../../types/database";
 import { contactSchema } from "../../../validation/contactSchema";
@@ -189,15 +183,15 @@ function ContactForm({
 	const submitLabel = mode === "create" ? "Přidat kontakt" : "Uložit změny";
 
 	return (
-			<FormDialog
-				open={open}
-				onClose={onClose}
-				title={title}
-				onSubmit={handleSubmit}
-				isPending={isPending}
-				submitLabel={submitLabel}
-				mode={mode}
-			>
+		<FormDialog
+			open={open}
+			onClose={onClose}
+			title={title}
+			onSubmit={handleSubmit}
+			isPending={isPending}
+			submitLabel={submitLabel}
+			mode={mode}
+		>
 			<FormSection title="Základní údaje">
 				<Grid container spacing={2} alignItems="center">
 					<Grid item md={4.8} mr={-0.5}>

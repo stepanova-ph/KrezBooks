@@ -21,7 +21,6 @@ import React from "react";
 
 // Import filter components
 
-
 interface FilterBarProps {
 	config: FilterConfig;
 	filters: FilterState;
@@ -61,7 +60,7 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 			orderBy,
 			onOrderByChange,
 			hideColumnPicker = false,
-			customFilterElements = []
+			customFilterElements = [],
 		},
 		ref,
 	) => {
@@ -73,14 +72,17 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 		}));
 
 		const visibleFilters = config.filters.filter(
-			(f) => 
-				!f.columnId 
-				|| visibleColumnIds.has(f.columnId) 
-				|| f.id.includes("_aggregate"),
+			(f) =>
+				!f.columnId ||
+				visibleColumnIds.has(f.columnId) ||
+				f.id.includes("_aggregate"),
 		);
 
 		const isDynamicFilter = (filterId: string): boolean => {
-			return filterId.includes("_aggregate") && (filterId === "date_due_aggregate" || filterId === "date_tax_aggregate");
+			return (
+				filterId.includes("_aggregate") &&
+				(filterId === "date_due_aggregate" || filterId === "date_tax_aggregate")
+			);
 		};
 
 		const updateFilter = (filterId: string, value: any) => {
@@ -113,14 +115,19 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 						break;
 					case "filter-aggregate":
 						clearFilter(filter.primaryFilter);
-						filter.expandedFilters.forEach(subFilter => {
+						filter.expandedFilters.forEach((subFilter) => {
 							if (subFilter.type !== "action-button") {
 								clearFilter(subFilter);
 							}
 						});
 						break;
 					case "date-comparator":
-						cleared[filter.id] = { greaterThan: "", equals: "", lessThan: "", comparator: ">" };
+						cleared[filter.id] = {
+							greaterThan: "",
+							equals: "",
+							lessThan: "",
+							comparator: ">",
+						};
 						break;
 					case "action-button":
 						break;
@@ -155,130 +162,152 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 		};
 
 		const renderFilter = (filter: FilterDef): ReactNode => {
-
 			const rendered = (() => {
 				switch (filter.type) {
-				case "text-search":
-					return (
-						<TextSearchFilter
-							filter={filter}
-							value={filters[filter.id] || ""}
-							onUpdate={(value) => updateFilter(filter.id, value)}
-							searchInputRef={filter.id === "search" ? searchInputRef : undefined}
-						/>
-					);
+					case "text-search":
+						return (
+							<TextSearchFilter
+								filter={filter}
+								value={filters[filter.id] || ""}
+								onUpdate={(value) => updateFilter(filter.id, value)}
+								searchInputRef={
+									filter.id === "search" ? searchInputRef : undefined
+								}
+							/>
+						);
 
-				case "checkbox": {
-					const canUncheck = validateRequiredGroup(filter.id, false);
-					return (
-						<CheckboxFilter
-							filter={filter}
-							value={!!filters[filter.id]}
-							onUpdate={(value) => updateFilter(filter.id, value)}
-							canUncheck={canUncheck}
-						/>
-					);
-				}
-
-				case "number-input":
-					return (
-						<NumberInputFilter
-							filter={filter}
-							value={filters[filter.id] || ""}
-							onUpdate={(value) => updateFilter(filter.id, value)}
-						/>
-					);
-
-				// case "number-with-prefix":
-				// 	return (
-				// 		<NumberWithPrefixFilter
-				// 			filter={filter}
-				// 			value={filters[filter.id] || { prefix: null, value: "" }}
-				// 			onUpdate={(value) => updateFilter(filter.id, value)}
-				// 		/>
-				// 	);
-
-				case "select":
-					return (
-						<SelectFilter
-							filter={filter}
-							value={filters[filter.id] ?? null}
-							onUpdate={(value) => updateFilter(filter.id, value)}
-						/>
-					);
-
-				case "multiselect":
-					return (
-						<MultiSelectFilter
-							filter={filter}
-							value={filters[filter.id] || []}
-							onUpdate={(value) => updateFilter(filter.id, value)}
-						/>
-					);
-
-				case "number-comparator":
-					return (
-						<NumberComparatorFilter
-							filter={filter}
-							value={filters[filter.id] || { value: "", comparator: ">" }}
-							onUpdate={(value) => updateFilter(filter.id, value)}
-						/>
-					);
-				
-				case "date-comparator":
-					return (
-						<DateComparatorFilter
-							filter={filter}
-							value={filters[filter.id] || { greaterThan: "", equals: "", lessThan: "", comparator: ">" }}
-							onUpdate={(value) => updateFilter(filter.id, value)}
-						/>
-					);
-
-				case "action-button":
-					return (
-						<ActionButtonFilter
-							filter={filter}
-							actions={actions}
-							filterActions={filterActions}
-							onOpenAction={(actionId) => setOpenActionId(actionId)}
-						/>
-					);
-
-				case "filter-aggregate": {
-					const isExpanded = filters._aggregateExpanded?.[filter.id] ?? filter.defaultExpanded ?? false;
-					const isRemovable = isDynamicFilter(filter.id);
-					
-					let defaultValue: any;
-					if (filter.primaryFilter.type === 'date-comparator') {
-						defaultValue = { greaterThan: "", equals: "", lessThan: "", comparator: ">" };
-					} else {
-						defaultValue = { value: "", comparator: ">" };
+					case "checkbox": {
+						const canUncheck = validateRequiredGroup(filter.id, false);
+						return (
+							<CheckboxFilter
+								filter={filter}
+								value={!!filters[filter.id]}
+								onUpdate={(value) => updateFilter(filter.id, value)}
+								canUncheck={canUncheck}
+							/>
+						);
 					}
 
-					return (
-						<FilterAggregateFilter
-							filter={filter}
-							value={filters[filter.primaryFilter.id] || defaultValue}
-							onUpdate={(value) => updateFilter(filter.primaryFilter.id, value)}
-							isExpanded={isExpanded}
-							onToggleExpanded={() => {
-								updateFilter("_aggregateExpanded", {
-									...(filters._aggregateExpanded || {}),
-									[filter.id]: !isExpanded,
-								});
-							}}
-							isRemovable={isRemovable}
-							onRemove={isRemovable && onRemoveDynamicFilter ? () => onRemoveDynamicFilter(filter.id) : undefined}
-							renderExpandedFilter={(subFilter) => renderFilter(subFilter)}
-						/>
-					);
-				}
+					case "number-input":
+						return (
+							<NumberInputFilter
+								filter={filter}
+								value={filters[filter.id] || ""}
+								onUpdate={(value) => updateFilter(filter.id, value)}
+							/>
+						);
 
-				default:
-					return null;
+					// case "number-with-prefix":
+					// 	return (
+					// 		<NumberWithPrefixFilter
+					// 			filter={filter}
+					// 			value={filters[filter.id] || { prefix: null, value: "" }}
+					// 			onUpdate={(value) => updateFilter(filter.id, value)}
+					// 		/>
+					// 	);
+
+					case "select":
+						return (
+							<SelectFilter
+								filter={filter}
+								value={filters[filter.id] ?? null}
+								onUpdate={(value) => updateFilter(filter.id, value)}
+							/>
+						);
+
+					case "multiselect":
+						return (
+							<MultiSelectFilter
+								filter={filter}
+								value={filters[filter.id] || []}
+								onUpdate={(value) => updateFilter(filter.id, value)}
+							/>
+						);
+
+					case "number-comparator":
+						return (
+							<NumberComparatorFilter
+								filter={filter}
+								value={filters[filter.id] || { value: "", comparator: ">" }}
+								onUpdate={(value) => updateFilter(filter.id, value)}
+							/>
+						);
+
+					case "date-comparator":
+						return (
+							<DateComparatorFilter
+								filter={filter}
+								value={
+									filters[filter.id] || {
+										greaterThan: "",
+										equals: "",
+										lessThan: "",
+										comparator: ">",
+									}
+								}
+								onUpdate={(value) => updateFilter(filter.id, value)}
+							/>
+						);
+
+					case "action-button":
+						return (
+							<ActionButtonFilter
+								filter={filter}
+								actions={actions}
+								filterActions={filterActions}
+								onOpenAction={(actionId) => setOpenActionId(actionId)}
+							/>
+						);
+
+					case "filter-aggregate": {
+						const isExpanded =
+							filters._aggregateExpanded?.[filter.id] ??
+							filter.defaultExpanded ??
+							false;
+						const isRemovable = isDynamicFilter(filter.id);
+
+						let defaultValue: any;
+						if (filter.primaryFilter.type === "date-comparator") {
+							defaultValue = {
+								greaterThan: "",
+								equals: "",
+								lessThan: "",
+								comparator: ">",
+							};
+						} else {
+							defaultValue = { value: "", comparator: ">" };
+						}
+
+						return (
+							<FilterAggregateFilter
+								filter={filter}
+								value={filters[filter.primaryFilter.id] || defaultValue}
+								onUpdate={(value) =>
+									updateFilter(filter.primaryFilter.id, value)
+								}
+								isExpanded={isExpanded}
+								onToggleExpanded={() => {
+									updateFilter("_aggregateExpanded", {
+										...(filters._aggregateExpanded || {}),
+										[filter.id]: !isExpanded,
+									});
+								}}
+								isRemovable={isRemovable}
+								onRemove={
+									isRemovable && onRemoveDynamicFilter
+										? () => onRemoveDynamicFilter(filter.id)
+										: undefined
+								}
+								renderExpandedFilter={(subFilter) => renderFilter(subFilter)}
+							/>
+						);
+					}
+
+					default:
+						return null;
 				}
 			})();
-			
+
 			return <React.Fragment key={filter.id}>{rendered}</React.Fragment>;
 		};
 
@@ -311,7 +340,6 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
 						{customFilterElements}
 						{visibleFilters.slice(2, visibleFilters.length).map(renderFilter)}
 					</Box>
-
 
 					<Box
 						sx={{

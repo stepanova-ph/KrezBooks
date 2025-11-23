@@ -1,5 +1,11 @@
 // filters/SelectFilter.tsx
-import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import {
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem,
+	SelectChangeEvent,
+} from "@mui/material";
 import type { SelectFilterDef } from "src/types/filter";
 
 interface SelectFilterProps {
@@ -8,11 +14,7 @@ interface SelectFilterProps {
 	onUpdate: (value: string | number | null) => void;
 }
 
-export function SelectFilter({ 
-	filter, 
-	value, 
-	onUpdate 
-}: SelectFilterProps) {
+export function SelectFilter({ filter, value, onUpdate }: SelectFilterProps) {
 	return (
 		<FormControl
 			key={filter.id}
@@ -23,9 +25,7 @@ export function SelectFilter({
 			<Select
 				value={value ?? ""}
 				label={filter.label}
-				onChange={(e: SelectChangeEvent) =>
-					onUpdate(e.target.value || null)
-				}
+				onChange={(e: SelectChangeEvent) => onUpdate(e.target.value || null)}
 			>
 				<MenuItem value="">
 					<em>{filter.placeholder || "Vše"}</em>

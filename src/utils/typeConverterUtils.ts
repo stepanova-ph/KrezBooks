@@ -5,7 +5,9 @@ import { Contact, Invoice, Item, StockMovement } from "src/types/database";
  * SQLite doesn't have a native boolean type, so we use integers
  */
 export function booleanToSQLiteInteger(value: boolean): number {
-	console.log(`Converting boolean to SQLite integer: ${value} = ${value ? 1 : 0}`);
+	console.log(
+		`Converting boolean to SQLite integer: ${value} = ${value ? 1 : 0}`,
+	);
 	return value ? 1 : 0;
 }
 
@@ -114,7 +116,7 @@ export function serializeInvoice(invoice: Partial<Invoice>): any {
 /**
  * Get the signed amount for stock movement based on invoice type
  * - Purchase types (1, 2): positive amounts (adds to stock)
- * - Sale types (3, 4): negative amounts (removes from stock)  
+ * - Sale types (3, 4): negative amounts (removes from stock)
  * - Correction type (5): as-is from user input
  */
 export function getSignedAmount(amount: number, invoiceType: number): string {
@@ -126,12 +128,15 @@ export function getSignedAmount(amount: number, invoiceType: number): string {
 	return amount.toString();
 }
 
-export function getDisplayAmount(amount: string | number, invoiceType: number): number {
-	const numAmount = typeof amount === 'string' ? Number(amount) : amount;
-	
+export function getDisplayAmount(
+	amount: string | number,
+	invoiceType: number,
+): number {
+	const numAmount = typeof amount === "string" ? Number(amount) : amount;
+
 	if (invoiceType === 5) {
 		return numAmount;
 	}
-	
+
 	return Math.abs(numAmount);
 }

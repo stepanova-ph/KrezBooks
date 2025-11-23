@@ -34,27 +34,28 @@ export function AlertDialog({
 		},
 	);
 
-	const actions = cancelLabel && onCancel
-		? [
-				{
-					label: cancelLabel,
-					onClick: onCancel,
-					variant: "outlined" as const,
-				},
-				{
-					label: confirmLabel,
-					onClick: onConfirm,
-					variant: "contained" as const,
-					color: "error" as const,
-				},
-		  ]
-		: [
-				{
-					label: confirmLabel,
-					onClick: onConfirm,
-					variant: "contained" as const,
-				},
-		  ];
+	const actions =
+		cancelLabel && onCancel
+			? [
+					{
+						label: cancelLabel,
+						onClick: onCancel,
+						variant: "outlined" as const,
+					},
+					{
+						label: confirmLabel,
+						onClick: onConfirm,
+						variant: "contained" as const,
+						color: "error" as const,
+					},
+				]
+			: [
+					{
+						label: confirmLabel,
+						onClick: onConfirm,
+						variant: "contained" as const,
+					},
+				];
 
 	return (
 		<Dialog

@@ -1,4 +1,8 @@
-import { FilterConfig, FilterAggregateFilterDef, InvoiceFilterState } from "../types/filter";
+import {
+	FilterConfig,
+	FilterAggregateFilterDef,
+	InvoiceFilterState,
+} from "../types/filter";
 import { INVOICE_TYPES } from "./constants";
 
 // Dynamic filter definitions that can be added on demand
@@ -46,12 +50,12 @@ export const invoiceFilterConfig: FilterConfig = {
 				{ field: "company_name" },
 				{ field: "number" },
 				{ field: "prefix" },
-				{ 
+				{
 					field: "prefixNumber",
 					match: (invoice: any, query: string) => {
 						const combined = `${invoice.prefix || ""}${invoice.number}`;
 						return combined.toLowerCase().includes(query.toLowerCase());
-					}
+					},
 				},
 			],
 			columnId: null,
@@ -64,7 +68,7 @@ export const invoiceFilterConfig: FilterConfig = {
 			field: "type",
 			columnId: "type",
 			placeholder: "Všechny typy",
-			options: INVOICE_TYPES.map(t => ({ value: t.value, label: t.label })),
+			options: INVOICE_TYPES.map((t) => ({ value: t.value, label: t.label })),
 			width: 100,
 			useShortLabels: true,
 		},

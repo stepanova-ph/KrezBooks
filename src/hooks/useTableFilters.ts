@@ -5,7 +5,10 @@ import {
 	TextSearchFilterDef,
 } from "src/types/filter";
 
-import { applyDateComparatorFilter, applyNumberComparatorFilter } from "../utils/comparatorUtils";
+import {
+	applyDateComparatorFilter,
+	applyNumberComparatorFilter,
+} from "../utils/comparatorUtils";
 import { VAT_RATES } from "../config/constants";
 /**
  * Hook to filter table data based on filter state
@@ -117,7 +120,7 @@ export function useTableFilters<T extends Record<string, any>>(
 			if (filters.stock_amount) {
 				const itemValue = parseFloat(item.stock_amount) || 0;
 
-				if (!applyNumberComparatorFilter(itemValue, filters.stock_amount)){
+				if (!applyNumberComparatorFilter(itemValue, filters.stock_amount)) {
 					return false;
 				}
 			}
@@ -159,47 +162,61 @@ export function useTableFilters<T extends Record<string, any>>(
 			}
 
 			// Invoice: Type multiselect filter
-			if (filters.type && Array.isArray(filters.type) && filters.type.length > 0) {
+			if (
+				filters.type &&
+				Array.isArray(filters.type) &&
+				filters.type.length > 0
+			) {
 				if (!filters.type.includes(item.type)) return false;
 			}
 
 			// Invoice: Multiple contacts filter (OR logic)
-			if (filters.selectedContacts && Array.isArray(filters.selectedContacts) && filters.selectedContacts.length > 0) {
-				const matchesAnyContact = filters.selectedContacts.some(contact => 
-					item.ico === contact.ico && item.modifier === contact.modifier
+			if (
+				filters.selectedContacts &&
+				Array.isArray(filters.selectedContacts) &&
+				filters.selectedContacts.length > 0
+			) {
+				const matchesAnyContact = filters.selectedContacts.some(
+					(contact) =>
+						item.ico === contact.ico && item.modifier === contact.modifier,
 				);
 				if (!matchesAnyContact) return false;
 			}
 
-			if (filters.modifier !== undefined && filters.modifier !== null && filters.modifier !== "") {
+			if (
+				filters.modifier !== undefined &&
+				filters.modifier !== null &&
+				filters.modifier !== ""
+			) {
 				if (item.modifier !== filters.modifier) return false;
 			}
 
 			// Item: Price filter with VAT checkbox and price groups
 			if (filters.price) {
-			const useVat = filters.price_with_vat === true;
+				const useVat = filters.price_with_vat === true;
 
-			// If none are selected → treat as all groups
-			const selectedGroups =
-				filters.price_groups?.length > 0 ? filters.price_groups : [1, 2, 3, 4];
+				// If none are selected → treat as all groups
+				const selectedGroups =
+					filters.price_groups?.length > 0
+						? filters.price_groups
+						: [1, 2, 3, 4];
 
-			// AND logic: item must satisfy the comparator for EVERY selected group
-			const matchesAllGroups = selectedGroups.some((groupNum: number) => {
-				const priceField = `sale_price_group${groupNum}`;
-				let itemPrice = parseFloat(item[priceField]) || 0;
+				// AND logic: item must satisfy the comparator for EVERY selected group
+				const matchesAllGroups = selectedGroups.some((groupNum: number) => {
+					const priceField = `sale_price_group${groupNum}`;
+					let itemPrice = parseFloat(item[priceField]) || 0;
 
-				if (useVat && item.vat_rate !== undefined) {
-					const vatRates = VAT_RATES.map((rate) => rate.percentage);
-					const vatRate = vatRates[item.vat_rate] || 0;
-					itemPrice = itemPrice * (1 + vatRate / 100);
-				}
+					if (useVat && item.vat_rate !== undefined) {
+						const vatRates = VAT_RATES.map((rate) => rate.percentage);
+						const vatRate = vatRates[item.vat_rate] || 0;
+						itemPrice = itemPrice * (1 + vatRate / 100);
+					}
 
-				return applyNumberComparatorFilter(itemPrice, filters.price);
-			});
+					return applyNumberComparatorFilter(itemPrice, filters.price);
+				});
 
-			if (!matchesAllGroups) return false;
-		}
-
+				if (!matchesAllGroups) return false;
+			}
 
 			return true;
 		});

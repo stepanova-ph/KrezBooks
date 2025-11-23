@@ -3,7 +3,10 @@ const normalizePhone = (digits: string | null | undefined) => {
 	return digits.replace(/^(\+420|420||00420|421|00421)/, "").replace(/\D/g, "");
 };
 
-export function matchPhone(value: string | null | undefined, query: string): boolean {
+export function matchPhone(
+	value: string | null | undefined,
+	query: string,
+): boolean {
 	if (!value || !query) return false;
 
 	const normalizedValue = normalizePhone(value);

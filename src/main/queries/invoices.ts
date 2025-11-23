@@ -54,7 +54,7 @@ export const invoiceQueries = {
     ORDER BY i.date_issue DESC, i.number DESC
   `,
 
-  getOne: `
+	getOne: `
     SELECT
       i.*,
       COALESCE(
@@ -121,12 +121,12 @@ export const invoiceQueries = {
     )
   `,
 
-  delete: `
+	delete: `
     DELETE FROM invoices 
     WHERE prefix = ? AND number = ?
   `,
-  
-  getMaxNumberByType: `
+
+	getMaxNumberByType: `
     SELECT COALESCE(MAX(CAST(number AS INTEGER)), 0) as max_num
     FROM invoices
     WHERE type = ?

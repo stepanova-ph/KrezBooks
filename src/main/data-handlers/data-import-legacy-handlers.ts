@@ -59,11 +59,14 @@ function parseVatRate(value: string): number | null {
 	return null;
 }
 
-function parseContactType(value: string): { is_supplier: number; is_customer: number } | null {
+function parseContactType(
+	value: string,
+): { is_supplier: number; is_customer: number } | null {
 	const trimmed = value.trim().toUpperCase();
 	if (trimmed === "O") return { is_supplier: 0, is_customer: 1 };
 	if (trimmed === "DO") return { is_supplier: 1, is_customer: 0 };
-	if (trimmed === "ODO" || trimmed === "DOO") return { is_supplier: 1, is_customer: 1 };
+	if (trimmed === "ODO" || trimmed === "DOO")
+		return { is_supplier: 1, is_customer: 1 };
 	return null;
 }
 
@@ -71,7 +74,10 @@ function stripPSCSpaces(value: string): string {
 	return value.replace(/\s/g, "");
 }
 
-function combineBankAccount(accountNumber: string, bankCode: string): string | null {
+function combineBankAccount(
+	accountNumber: string,
+	bankCode: string,
+): string | null {
 	const account = accountNumber?.trim();
 	const code = bankCode?.trim();
 
@@ -109,7 +115,11 @@ function getColumnIndex(headers: string[], columnName: string): number {
 	return headers.findIndex((h) => h.trim() === columnName);
 }
 
-function getColumnValue(row: string[], headers: string[], columnName: string): string {
+function getColumnValue(
+	row: string[],
+	headers: string[],
+	columnName: string,
+): string {
 	const index = getColumnIndex(headers, columnName);
 	return index >= 0 ? (row[index] || "").trim() : "";
 }
@@ -155,10 +165,14 @@ function processLegacyItemRow(
 	const salePriceGroup3 = parseDecimalToHellers(salePriceGroup3Raw);
 	const salePriceGroup4 = parseDecimalToHellers(salePriceGroup4Raw);
 
-	if (salePriceGroup1 === null) issues.push(`Invalid price Prodej 1: "${salePriceGroup1Raw}"`);
-	if (salePriceGroup2 === null) issues.push(`Invalid price Prodej 2: "${salePriceGroup2Raw}"`);
-	if (salePriceGroup3 === null) issues.push(`Invalid price Prodej 3: "${salePriceGroup3Raw}"`);
-	if (salePriceGroup4 === null) issues.push(`Invalid price Prodej 4: "${salePriceGroup4Raw}"`);
+	if (salePriceGroup1 === null)
+		issues.push(`Invalid price Prodej 1: "${salePriceGroup1Raw}"`);
+	if (salePriceGroup2 === null)
+		issues.push(`Invalid price Prodej 2: "${salePriceGroup2Raw}"`);
+	if (salePriceGroup3 === null)
+		issues.push(`Invalid price Prodej 3: "${salePriceGroup3Raw}"`);
+	if (salePriceGroup4 === null)
+		issues.push(`Invalid price Prodej 4: "${salePriceGroup4Raw}"`);
 
 	if (issues.length > 0) {
 		return { data: null, issues };
@@ -222,10 +236,21 @@ async function importLegacyItems(filePath: string): Promise<ImportResult> {
 			imported++;
 		} catch (dbError: any) {
 			const errorMessage = dbError.message || "Unknown database error";
-			if (errorMessage.includes("UNIQUE constraint failed") || errorMessage.includes("PRIMARY KEY")) {
-				errors.push({ rowNumber, rawRow, issues: [`Duplicate EAN: ${data.ean}`] });
+			if (
+				errorMessage.includes("UNIQUE constraint failed") ||
+				errorMessage.includes("PRIMARY KEY")
+			) {
+				errors.push({
+					rowNumber,
+					rawRow,
+					issues: [`Duplicate EAN: ${data.ean}`],
+				});
 			} else {
-				errors.push({ rowNumber, rawRow, issues: [`Database error: ${errorMessage}`] });
+				errors.push({
+					rowNumber,
+					rawRow,
+					issues: [`Database error: ${errorMessage}`],
+				});
 			}
 		}
 	}
@@ -376,10 +401,23 @@ async function importLegacyContacts(filePath: string): Promise<ImportResult> {
 			imported++;
 		} catch (dbError: any) {
 			const errorMessage = dbError.message || "Unknown database error";
-			if (errorMessage.includes("UNIQUE constraint failed") || errorMessage.includes("PRIMARY KEY")) {
-				errors.push({ rowNumber, rawRow, issues: [`Duplicate contact: ICO ${data.ico}, modifier ${data.modifier}`] });
+			if (
+				errorMessage.includes("UNIQUE constraint failed") ||
+				errorMessage.includes("PRIMARY KEY")
+			) {
+				errors.push({
+					rowNumber,
+					rawRow,
+					issues: [
+						`Duplicate contact: ICO ${data.ico}, modifier ${data.modifier}`,
+					],
+				});
 			} else {
-				errors.push({ rowNumber, rawRow, issues: [`Database error: ${errorMessage}`] });
+				errors.push({
+					rowNumber,
+					rawRow,
+					issues: [`Database error: ${errorMessage}`],
+				});
 			}
 		}
 	}
@@ -436,7 +474,8 @@ async function importLegacyData(
 	if (!hasItems && !hasContacts) {
 		return {
 			success: false,
-			error: "Složka neobsahuje žádné TSV soubory k importu (items.tsv, contacts.tsv)",
+			error:
+				"Složka neobsahuje žádné TSV soubory k importu (items.tsv, contacts.tsv)",
 		};
 	}
 
@@ -505,50 +544,53 @@ async function importLegacyData(
 
 function registerLegacyImportHandlers() {
 	// Unified handler for importing legacy data from directory
-	ipcMain.handle("db:importLegacyData", async (event, directoryPath: string) => {
-		try {
-			if (!directoryPath) {
-				return { success: false, error: "Nebyla vybrána složka" };
-			}
+	ipcMain.handle(
+		"db:importLegacyData",
+		async (event, directoryPath: string) => {
+			try {
+				if (!directoryPath) {
+					return { success: false, error: "Nebyla vybrána složka" };
+				}
 
-			// Validate directory exists
-			if (!fs.existsSync(directoryPath)) {
-				return { success: false, error: "Vybraná složka neexistuje" };
-			}
+				// Validate directory exists
+				if (!fs.existsSync(directoryPath)) {
+					return { success: false, error: "Vybraná složka neexistuje" };
+				}
 
-			logger.info(`Importing legacy data from: ${directoryPath}`);
+				logger.info(`Importing legacy data from: ${directoryPath}`);
 
-			// Progress callback
-			const progressCallback = (message: string, progress: number) => {
-				event.sender.send("import:progress", { message, progress });
-			};
+				// Progress callback
+				const progressCallback = (message: string, progress: number) => {
+					event.sender.send("import:progress", { message, progress });
+				};
 
-			// Start import asynchronously (don't await)
-			importLegacyData(directoryPath, progressCallback)
-				.then((result) => {
-					event.sender.send("import:complete", result);
-				})
-				.catch((error) => {
-					event.sender.send("import:complete", {
-						success: false,
-						error: error.message || "Import selhal",
+				// Start import asynchronously (don't await)
+				importLegacyData(directoryPath, progressCallback)
+					.then((result) => {
+						event.sender.send("import:complete", result);
+					})
+					.catch((error) => {
+						event.sender.send("import:complete", {
+							success: false,
+							error: error.message || "Import selhal",
+						});
 					});
-				});
 
-			// Return immediately to indicate import has started
-			return { success: true, started: true };
-		} catch (error: any) {
-			logger.error("Legacy import failed:", error);
-			event.sender.send("import:progress", {
-				message: `Import selhal: ${error.message}`,
-				progress: 0
-			});
-			return {
-				success: false,
-				error: error.message || "Import selhal",
-			};
-		}
-	});
+				// Return immediately to indicate import has started
+				return { success: true, started: true };
+			} catch (error: any) {
+				logger.error("Legacy import failed:", error);
+				event.sender.send("import:progress", {
+					message: `Import selhal: ${error.message}`,
+					progress: 0,
+				});
+				return {
+					success: false,
+					error: error.message || "Import selhal",
+				};
+			}
+		},
+	);
 }
 
 export { registerLegacyImportHandlers };

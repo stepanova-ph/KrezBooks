@@ -86,12 +86,17 @@ export function isFilterEmpty(value: any): boolean {
 	return false;
 }
 
-export type FilterComparator = '>' | '=' | '<';
+export type FilterComparator = ">" | "=" | "<";
 
-export const getNextComparator = (current: FilterComparator): FilterComparator => {
-  switch (current) {
-    case '>': return '=';
-    case '=': return '<';
-    case '<': return '>';
-  }
+export const getNextComparator = (
+	current: FilterComparator,
+): FilterComparator => {
+	switch (current) {
+		case ">":
+			return "=";
+		case "=":
+			return "<";
+		case "<":
+			return ">";
+	}
 };

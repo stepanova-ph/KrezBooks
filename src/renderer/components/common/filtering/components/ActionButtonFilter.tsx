@@ -9,11 +9,11 @@ interface ActionButtonFilterProps {
 	onOpenAction: (actionId: string) => void;
 }
 
-export function ActionButtonFilter({ 
-	filter, 
+export function ActionButtonFilter({
+	filter,
 	actions,
 	filterActions,
-	onOpenAction
+	onOpenAction,
 }: ActionButtonFilterProps) {
 	return (
 		<Button
@@ -21,7 +21,9 @@ export function ActionButtonFilter({
 			variant={filter.variant || "outlined"}
 			size="small"
 			onClick={() => {
-				const action = [...filterActions, ...actions].find(a => a.id === filter.actionId);
+				const action = [...filterActions, ...actions].find(
+					(a) => a.id === filter.actionId,
+				);
 				if (action?.renderDialog) {
 					onOpenAction(action.id);
 				} else {

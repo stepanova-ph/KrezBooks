@@ -58,35 +58,39 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 
 	// Listen for completion events
 	useEffect(() => {
-		const unsubscribeImport = window.electronAPI.importExport.onImportComplete((result) => {
-			setImportInProgress(false);
-			if (result.success) {
-				setImportMessage({
-					type: "success",
-					text: "Import dokončen úspěšně",
-				});
-			} else {
-				setImportMessage({
-					type: "error",
-					text: result.error || "Import selhal",
-				});
-			}
-		});
+		const unsubscribeImport = window.electronAPI.importExport.onImportComplete(
+			(result) => {
+				setImportInProgress(false);
+				if (result.success) {
+					setImportMessage({
+						type: "success",
+						text: "Import dokončen úspěšně",
+					});
+				} else {
+					setImportMessage({
+						type: "error",
+						text: result.error || "Import selhal",
+					});
+				}
+			},
+		);
 
-		const unsubscribeExport = window.electronAPI.importExport.onExportComplete((result) => {
-			setExportInProgress(false);
-			if (result.success) {
-				setExportMessage({
-					type: "success",
-					text: `Export dokončen úspěšně do: ${result.path}`,
-				});
-			} else {
-				setExportMessage({
-					type: "error",
-					text: result.error || "Export selhal",
-				});
-			}
-		});
+		const unsubscribeExport = window.electronAPI.importExport.onExportComplete(
+			(result) => {
+				setExportInProgress(false);
+				if (result.success) {
+					setExportMessage({
+						type: "success",
+						text: `Export dokončen úspěšně do: ${result.path}`,
+					});
+				} else {
+					setExportMessage({
+						type: "error",
+						text: result.error || "Export selhal",
+					});
+				}
+			},
+		);
 
 		return () => {
 			unsubscribeImport();
@@ -96,7 +100,9 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 
 	const handleSelectImportDirectory = async () => {
 		const result = await window.electronAPI.dialog.selectDirectory(
-			isLegacyImport ? "Vyberte složku s TSV soubory" : "Vyberte složku s CSV soubory"
+			isLegacyImport
+				? "Vyberte složku s TSV soubory"
+				: "Vyberte složku s CSV soubory",
 		);
 
 		if (result.success && result.path) {
@@ -105,7 +111,9 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 	};
 
 	const handleSelectExportDirectory = async () => {
-		const result = await window.electronAPI.dialog.selectDirectory("Vyberte složku pro export");
+		const result = await window.electronAPI.dialog.selectDirectory(
+			"Vyberte složku pro export",
+		);
 
 		if (result.success && result.path) {
 			setExportPath(result.path);
@@ -119,7 +127,10 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 		}
 
 		setImportInProgress(true);
-		setImportMessage({ type: "info", text: "Import probíhá... (můžete zavřít tento dialog)" });
+		setImportMessage({
+			type: "info",
+			text: "Import probíhá... (můžete zavřít tento dialog)",
+		});
 
 		try {
 			const result = isLegacyImport
@@ -150,10 +161,14 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 		}
 
 		setExportInProgress(true);
-		setExportMessage({ type: "info", text: "Export probíhá... (můžete zavřít tento dialog)" });
+		setExportMessage({
+			type: "info",
+			text: "Export probíhá... (můžete zavřít tento dialog)",
+		});
 
 		try {
-			const result = await window.electronAPI.importExport.exportData(exportPath);
+			const result =
+				await window.electronAPI.importExport.exportData(exportPath);
 
 			if (!result.success) {
 				setExportInProgress(false);
@@ -193,7 +208,10 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 				});
 			}
 		} catch (error) {
-			setAdminMessage({ type: "error", text: "Chyba při komunikaci s databází" });
+			setAdminMessage({
+				type: "error",
+				text: "Chyba při komunikaci s databází",
+			});
 		} finally {
 			setAdminLoading(false);
 		}
@@ -207,7 +225,10 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 			const result = await window.electronAPI.admin.clearDb();
 			if (result.success) {
 				setStats({ contacts: 0, items: 0, stockMovements: 0, invoices: 0 });
-				setAdminMessage({ type: "success", text: "Databáze byla úspěšně vymazána" });
+				setAdminMessage({
+					type: "success",
+					text: "Databáze byla úspěšně vymazána",
+				});
 			} else {
 				setAdminMessage({
 					type: "error",
@@ -245,7 +266,10 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 				});
 			}
 		} catch (error) {
-			setAdminMessage({ type: "error", text: "Chyba při naplňování testovacími daty" });
+			setAdminMessage({
+				type: "error",
+				text: "Chyba při naplňování testovacími daty",
+			});
 		} finally {
 			setAdminLoading(false);
 		}
@@ -271,7 +295,6 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 				}
 			>
 				<Box sx={{ display: "flex", flexDirection: "column", gap: 2, px: 2 }}>
-
 					<Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
 						<TextField
 							fullWidth

@@ -26,7 +26,7 @@ export function ValidatedDateField({
 			hideIcon
 			showErrorIcon
 			showErrorTooltip={showToolTip}
-            openOnFocus
+			openOnFocus
 		/>
 	);
 }

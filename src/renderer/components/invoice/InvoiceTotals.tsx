@@ -40,7 +40,11 @@ function calculateTotals(items: InvoiceItem[]) {
 	let totalWithVat = 0;
 
 	items.forEach((item) => {
-		const { basePrice, vatAmount, totalWithVat: itemTotal } = calculateItemTotals(item);
+		const {
+			basePrice,
+			vatAmount,
+			totalWithVat: itemTotal,
+		} = calculateItemTotals(item);
 		totalWithoutVat += basePrice;
 		totalVat += vatAmount;
 		totalWithVat += itemTotal;
@@ -73,11 +77,7 @@ export function InvoiceTotals({ items }: InvoiceTotalsProps) {
 				}}
 			>
 				<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-					<Typography
-						variant="body1"
-						fontWeight={500}
-						color="text.secondary"
-					>
+					<Typography variant="body1" fontWeight={500} color="text.secondary">
 						Celkem bez DPH:
 					</Typography>
 					<Typography variant="h6" fontWeight={700}>
@@ -85,34 +85,18 @@ export function InvoiceTotals({ items }: InvoiceTotalsProps) {
 					</Typography>
 				</Box>
 				<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-					<Typography
-						variant="body1"
-						fontWeight={500}
-						color="text.secondary"
-					>
+					<Typography variant="body1" fontWeight={500} color="text.secondary">
 						DPH:
 					</Typography>
-					<Typography
-						variant="h6"
-						fontWeight={700}
-						color="text.primary"
-					>
+					<Typography variant="h6" fontWeight={700} color="text.primary">
 						{totalVat.toFixed(2)} Kč
 					</Typography>
 				</Box>
 				<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-					<Typography
-						variant="body1"
-						fontWeight={500}
-						color="text.secondary"
-					>
+					<Typography variant="body1" fontWeight={500} color="text.secondary">
 						Celkem s DPH:
 					</Typography>
-					<Typography
-						variant="h6"
-						fontWeight={700}
-						color="primary.main"
-					>
+					<Typography variant="h6" fontWeight={700} color="primary.main">
 						{totalWithVat.toFixed(2)} Kč
 					</Typography>
 				</Box>

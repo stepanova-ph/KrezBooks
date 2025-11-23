@@ -15,7 +15,7 @@ import { getDisplayAmount } from "../../../utils/typeConverterUtils";
 interface ViewInvoiceDialogProps {
 	open: boolean;
 	onClose: () => void;
-	invoicePrefix: string,
+	invoicePrefix: string;
 	invoiceNumber: string;
 }
 
@@ -25,8 +25,10 @@ export function ViewInvoiceDialog({
 	invoicePrefix,
 	invoiceNumber,
 }: ViewInvoiceDialogProps) {
-	const { data: invoice, isLoading: invoiceLoading } =
-		useInvoice(invoicePrefix, invoiceNumber);
+	const { data: invoice, isLoading: invoiceLoading } = useInvoice(
+		invoicePrefix,
+		invoiceNumber,
+	);
 	const { data: movements = [], isLoading: movementsLoading } =
 		useStockMovementsByInvoice(invoice?.prefix || "", invoiceNumber);
 	const { data: allItems = [] } = useItems();
@@ -45,7 +47,9 @@ export function ViewInvoiceDialog({
 			vat_rate: movement.vat_rate,
 			amount: getDisplayAmount(movement.amount, invoice.type),
 			sale_price: Number(movement.price_per_unit),
-			total: getDisplayAmount(movement.amount, invoice.type) * Number(movement.price_per_unit),
+			total:
+				getDisplayAmount(movement.amount, invoice.type) *
+				Number(movement.price_per_unit),
 			p_group_index: 1,
 			note: item?.note,
 			sale_price_group1: item?.sale_price_group1 || 0,
