@@ -24,13 +24,10 @@ interface TableControlsContextValue<T> {
 	moveToBottom: () => void;
 	enter: () => void;
 
-	// Row ref management
-	setRowRef: (index: number) => (el: HTMLTableRowElement | null) => void;
-
 	// Data management
 	setData: (data: T[], getKey: (item: T) => string | number) => void;
 
-	// Callbacks - USE REF INSTEAD OF STATE
+	// Callbacks
 	setOnEnterPress: (callback: (() => void) | undefined) => void;
 }
 
@@ -57,7 +54,6 @@ export function TableControlsProvider<T>({
 	const getKeyRef = useRef<(item: T) => string | number>(
 		(item: any) => item.id,
 	);
-	const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
 
 	// Update focused item when index changes
 	useEffect(() => {
@@ -71,16 +67,6 @@ export function TableControlsProvider<T>({
 			setFocusedItem(null);
 		}
 	}, [focusedIndex]);
-
-	// Auto-scroll to focused row
-	useEffect(() => {
-		if (!disabled && rowRefs.current[focusedIndex]) {
-			rowRefs.current[focusedIndex]?.scrollIntoView({
-				behavior: "smooth",
-				block: "nearest",
-			});
-		}
-	}, [focusedIndex, disabled]);
 
 	const setFocusedIndex = useCallback((index: number) => {
 		const maxIndex = Math.max(0, dataRef.current.length - 1);
@@ -123,12 +109,6 @@ export function TableControlsProvider<T>({
 		onEnterPressRef.current?.();
 	}, [disabled]);
 
-	const setRowRef = useCallback((index: number) => {
-		return (el: HTMLTableRowElement | null) => {
-			rowRefs.current[index] = el;
-		};
-	}, []);
-
 	const setData = useCallback(
 		(data: T[], getKey: (item: T) => string | number) => {
 			dataRef.current = data;
@@ -162,7 +142,6 @@ export function TableControlsProvider<T>({
 		moveToTop,
 		moveToBottom,
 		enter,
-		setRowRef,
 		setData,
 		setOnEnterPress,
 	};

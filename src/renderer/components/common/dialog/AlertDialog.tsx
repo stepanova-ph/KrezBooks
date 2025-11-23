@@ -7,7 +7,9 @@ interface AlertDialogProps {
 	title: string;
 	message: string;
 	confirmLabel?: string;
+	cancelLabel?: string;
 	onConfirm: () => void;
+	onCancel?: () => void;
 }
 
 export function AlertDialog({
@@ -15,12 +17,16 @@ export function AlertDialog({
 	title,
 	message,
 	confirmLabel = "OK",
+	cancelLabel,
 	onConfirm,
+	onCancel,
 }: AlertDialogProps) {
+	const handleClose = onCancel || onConfirm;
+
 	useKeyboardShortcuts(
 		{
 			Enter: onConfirm,
-			Escape: onConfirm,
+			Escape: handleClose,
 		},
 		{
 			disabled: !open,
@@ -28,20 +34,36 @@ export function AlertDialog({
 		},
 	);
 
+	const actions = cancelLabel && onCancel
+		? [
+				{
+					label: cancelLabel,
+					onClick: onCancel,
+					variant: "outlined" as const,
+				},
+				{
+					label: confirmLabel,
+					onClick: onConfirm,
+					variant: "contained" as const,
+					color: "error" as const,
+				},
+		  ]
+		: [
+				{
+					label: confirmLabel,
+					onClick: onConfirm,
+					variant: "contained" as const,
+				},
+		  ];
+
 	return (
 		<Dialog
 			noCloseButton
 			open={open}
-			onClose={onConfirm}
+			onClose={handleClose}
 			title={title}
 			maxWidth="xs"
-			actions={[
-				{
-					label: confirmLabel,
-					onClick: onConfirm,
-					variant: "contained",
-				},
-			]}
+			actions={actions}
 		>
 			<Box
 				sx={{

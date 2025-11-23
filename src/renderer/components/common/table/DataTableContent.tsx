@@ -14,7 +14,8 @@ import {
 	ListItemText,
 	Divider,
 } from "@mui/material";
-import { useState, MouseEvent, useMemo } from "react";
+import { useState, MouseEvent, useMemo, useRef, useEffect } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
 	DndContext,
 	closestCenter,
@@ -39,6 +40,9 @@ import { useTableControls } from "../../../../context/TableControlsContext";
 import { ConfirmDialog } from "../dialog/ConfirmDialog";
 import type { Column, ContextMenuAction } from "./DataTable";
 import type { OrderByConfig } from "../filtering/ColumnPickerButton";
+
+const ROW_HEIGHT = 30; // Estimated row height in pixels
+const OVERSCAN = 30; // Extra rows to render above/below viewport
 
 interface DataTableContentProps<T> {
 	columns: Column[];
@@ -78,6 +82,7 @@ export function DataTableContent<T>({
 	disableDrag,
 }: DataTableContentProps<T>) {
 	const controls = useTableControls<T>();
+	const tableContainerRef = useRef<HTMLDivElement>(null);
 
 	const visibleColumns = columns.filter((col) => visibleColumnIds.has(col.id));
 
@@ -129,6 +134,24 @@ export function DataTableContent<T>({
 
 		return sorted;
 	}, [data, orderBy, getCellContent]);
+
+	// Virtualizer setup
+	const rowVirtualizer = useVirtualizer({
+		count: sortedData.length,
+		getScrollElement: () => tableContainerRef.current,
+		estimateSize: () => ROW_HEIGHT,
+		overscan: OVERSCAN,
+	});
+
+	// Scroll to focused row when focusedIndex changes
+	useEffect(() => {
+		if (controls.focusedIndex >= 0 && sortedData.length > 0) {
+			rowVirtualizer.scrollToIndex(controls.focusedIndex, {
+				align: "auto",
+				behavior: "auto",
+			});
+		}
+	}, [controls.focusedIndex, rowVirtualizer, sortedData.length]);
 
 	const [contextMenu, setContextMenu] = useState<{
 		mouseX: number;
@@ -238,15 +261,20 @@ export function DataTableContent<T>({
 		return message || "Opravdu chcete provést tuto akci?";
 	};
 
+	const virtualItems = rowVirtualizer.getVirtualItems();
+
 	return (
 		<Box>
 			<TableContainer
 				component={Paper}
+				ref={tableContainerRef}
 				sx={{
 					boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
 					border: (theme) => `1px solid ${theme.palette.divider}`,
 					overflow: "auto",
 					position: "relative",
+					// Fixed height is required for virtualization
+					maxHeight: "calc(100vh - 165px)",
 				}}
 			>
 				<DndContext
@@ -295,40 +323,74 @@ export function DataTableContent<T>({
 									</TableCell>
 								</TableRow>
 							) : (
-								sortedData.map((item, index) => {
-									const key = getRowKey(item);
-									const isFocused = controls.focusedIndex === index;
+								<>
+									{/* Top spacer row */}
+									{virtualItems.length > 0 && (
+										<tr
+											style={{
+												height: virtualItems[0].start,
+											}}
+										/>
+									)}
 
-									return (
-										<TableRow
-											key={key}
-											ref={controls.setRowRef(index)}
-											hover
-											onMouseEnter={() => handleRowMouseEnter(index)}
-											onClick={() => handleRowClick(item, index)}
-											onDoubleClick={() => handleRowDoubleClick(item, index)}
-											onContextMenu={(e) => handleContextMenu(e, item, index)}
-											sx={{
-												cursor:
-													contextMenuActions.length > 0 ||
-													onRowClick ||
-													onRowDoubleClick
-														? "pointer"
-														: "default",
-												bgcolor: isFocused
-													? "action.selected"
-													: "background.paper",
-												"&:hover": {
+									{/* Virtualized rows */}
+									{virtualItems.map((virtualRow) => {
+										const item = sortedData[virtualRow.index];
+										const key = getRowKey(item);
+										const isFocused =
+											controls.focusedIndex === virtualRow.index;
+
+										return (
+											<TableRow
+												key={key}
+												data-index={virtualRow.index}
+												hover
+												onMouseEnter={() =>
+													handleRowMouseEnter(virtualRow.index)
+												}
+												onClick={() =>
+													handleRowClick(item, virtualRow.index)
+												}
+												onDoubleClick={() =>
+													handleRowDoubleClick(item, virtualRow.index)
+												}
+												onContextMenu={(e) =>
+													handleContextMenu(e, item, virtualRow.index)
+												}
+												sx={{
+													cursor:
+														contextMenuActions.length > 0 ||
+														onRowClick ||
+														onRowDoubleClick
+															? "pointer"
+															: "default",
 													bgcolor: isFocused
 														? "action.selected"
-														: "action.hover",
-												},
+														: "background.paper",
+													"&:hover": {
+														bgcolor: isFocused
+															? "action.selected"
+															: "action.hover",
+													},
+													height: ROW_HEIGHT,
+												}}
+											>
+												{renderRow(item, orderedColumns, isFocused)}
+											</TableRow>
+										);
+									})}
+
+									{/* Bottom spacer row */}
+									{virtualItems.length > 0 && (
+										<tr
+											style={{
+												height:
+													rowVirtualizer.getTotalSize() -
+													(virtualItems[virtualItems.length - 1]?.end ?? 0),
 											}}
-										>
-											{renderRow(item, orderedColumns, isFocused)}
-										</TableRow>
-									);
-								})
+										/>
+									)}
+								</>
 							)}
 						</TableBody>
 					</Table>

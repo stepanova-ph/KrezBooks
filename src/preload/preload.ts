@@ -34,6 +34,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	},
 	testDatabase: () => ipcRenderer.invoke("db:test"),
 
+	dialog: {
+		selectDirectory: (title?: string) => ipcRenderer.invoke("dialog:selectDirectory", title),
+	},
+
 	contacts: {
 		getAll: () => ipcRenderer.invoke("db:contacts:getAll"),
 		getOne: (ico: string, modifier: number) =>
@@ -62,6 +66,34 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		clearDb: () => ipcRenderer.invoke("db:clearDatabase"),
 		fillTestData: () => ipcRenderer.invoke("db:fillTestData"),
 		recreateTables: () => ipcRenderer.invoke("db:recreateTables"),
+	},
+	
+	importExport: {
+		exportData: (directoryPath: string) => ipcRenderer.invoke("db:exportData", directoryPath),
+		importLegacyData: (directoryPath: string) => ipcRenderer.invoke("db:importLegacyData", directoryPath),
+		importData: (directoryPath: string) => ipcRenderer.invoke("db:importData", directoryPath),
+		// Progress event listeners
+		onExportProgress: (callback: (data: { message: string; progress: number }) => void) => {
+			const listener = (_event: any, data: { message: string; progress: number }) => callback(data);
+			ipcRenderer.on("export:progress", listener);
+			return () => ipcRenderer.removeListener("export:progress", listener);
+		},
+		onImportProgress: (callback: (data: { message: string; progress: number }) => void) => {
+			const listener = (_event: any, data: { message: string; progress: number }) => callback(data);
+			ipcRenderer.on("import:progress", listener);
+			return () => ipcRenderer.removeListener("import:progress", listener);
+		},
+		// Completion event listeners
+		onExportComplete: (callback: (data: any) => void) => {
+			const listener = (_event: any, data: any) => callback(data);
+			ipcRenderer.on("export:complete", listener);
+			return () => ipcRenderer.removeListener("export:complete", listener);
+		},
+		onImportComplete: (callback: (data: any) => void) => {
+			const listener = (_event: any, data: any) => callback(data);
+			ipcRenderer.on("import:complete", listener);
+			return () => ipcRenderer.removeListener("import:complete", listener);
+		},
 	},
 
 	invoices: {
