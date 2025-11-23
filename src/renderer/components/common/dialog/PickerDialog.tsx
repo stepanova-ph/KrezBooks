@@ -22,6 +22,8 @@ interface PickerDialogProps<T> {
 	searchPlaceholder?: string;
 	filterValue: string;
 	onFilterChange: (value: string) => void;
+	keepOpenOnSelect?: boolean;
+	filterActions?: ReactNode;
 }
 
 export function PickerDialog<T>({
@@ -37,6 +39,8 @@ export function PickerDialog<T>({
 	searchPlaceholder = "Hledat...",
 	filterValue,
 	onFilterChange,
+	keepOpenOnSelect = false,
+	filterActions
 }: PickerDialogProps<T>) {
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [focusedItem, setFocusedItem] = useState<T | null>(null);
@@ -116,8 +120,9 @@ export function PickerDialog<T>({
 					value={filterValue}
 					onChange={(e) => onFilterChange(e.target.value)}
 					inputRef={searchInputRef}
-					fullWidth
+					sx={{width: 250}}
 				/>
+				{filterActions}
 			</Box>
 
 			<Box sx={{ maxHeight: "60vh", overflow: "auto" }}>

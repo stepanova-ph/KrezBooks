@@ -13,7 +13,9 @@ import {
 } from "../common/table/DataTable";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import BadgeIcon from "@mui/icons-material/Badge";
 import EditItemForm from "./EditItemForm";
+import { ItemCardDialog } from "./ItemCardDialog";
 import type { OrderByConfig } from "../common/filtering/ColumnPickerButton";
 
 interface ItemsListProps {
@@ -21,7 +23,6 @@ interface ItemsListProps {
 	visibleColumnIds: Set<string>;
 	columnOrder?: string[];
 	onColumnOrderChange?: (newOrder: string[]) => void;
-	/** NEW: applied by DataTable for sorting */
 	orderBy?: OrderByConfig;
 }
 
@@ -35,7 +36,13 @@ export const itemColumns: Column[] = [
 		align: "center" as const,
 	},
 	{ id: "unit", label: "Jednotka", minWidth: 0, align: "center" as const },
-	{ id: "vat", label: "DPH", minWidth: 15, align: "center" as const },
+	{ id: "vat", label: "DPH", minWidth: 55, align: "center" as const },
+	{
+		id: "stock_amount",
+		label: "Sklad",
+		minWidth: 55,
+		align: "center" as const,
+	},
 	{
 		id: "sale_price_group1",
 		label: "Cena (Sk. 1)",
@@ -72,6 +79,7 @@ function ItemsList({
 }: ItemsListProps) {
 	const deleteItem = useDeleteItem();
 	const [editingItem, setEditingItem] = useState<Item | null>(null);
+	const [viewingItemEan, setViewingItemEan] = useState<string | null>(null);
 
 	const handleDelete = async (item: Item) => {
 		try {
@@ -84,10 +92,17 @@ function ItemsList({
 
 	const contextMenuActions: ContextMenuAction<Item>[] = [
 		{
+			id: "card",
+			label: "Otevřít kartu položky",
+			icon: <BadgeIcon fontSize="small" />,
+			onClick: (item) => setViewingItemEan(item.ean),
+		},
+		{
 			id: "edit",
 			label: "Upravit",
 			icon: <EditIcon fontSize="small" />,
 			onClick: (item) => setEditingItem(item),
+			divider: true,
 		},
 		{
 			id: "delete",
@@ -116,6 +131,9 @@ function ItemsList({
 
 			case "vat":
 				return formatVatRateShort(item.vat_rate);
+
+			case "stock_amount":
+				return item.stock_amount !== undefined ? String(item.stock_amount) : "0";
 
 			case "sale_price_group1":
 				return formatPrice(item.sale_price_group1);
@@ -150,8 +168,8 @@ function ItemsList({
 				columnOrder={columnOrder}
 				onColumnOrderChange={onColumnOrderChange}
 				orderBy={orderBy}
-				onEnterAction={(item) => setEditingItem(item)}
-				onRowDoubleClick={(item) => setEditingItem(item)}
+				onEnterAction={(item) => setViewingItemEan(item.ean)}
+				onRowDoubleClick={(item) => setViewingItemEan(item.ean)}
 				renderRow={(item, visibleColumns) => (
 					<>
 						{visibleColumns
@@ -196,11 +214,20 @@ function ItemsList({
 					</>
 				)}
 			/>
+
 			{editingItem && (
 				<EditItemForm
 					open={!!editingItem}
 					onClose={() => setEditingItem(null)}
 					item={editingItem}
+				/>
+			)}
+
+			{viewingItemEan && (
+				<ItemCardDialog
+					open={!!viewingItemEan}
+					onClose={() => setViewingItemEan(null)}
+					itemEan={viewingItemEan}
 				/>
 			)}
 		</>

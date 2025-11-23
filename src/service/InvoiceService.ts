@@ -10,10 +10,10 @@ export class InvoiceService {
 		return invoices as Invoice[];
 	}
 
-	async getOne(number: string): Promise<Invoice | undefined> {
+	async getOne(prefix: string, number: string): Promise<Invoice | undefined> {
 		const db = getDatabase();
 		const statement = db.prepare(invoiceQueries.getOne);
-		const invoice = statement.get(number);
+		const invoice = statement.get(number, prefix);
 		return invoice as Invoice | undefined;
 	}
 
@@ -23,6 +23,7 @@ export class InvoiceService {
 
 		const invoiceData = {
 			number: invoice.number,
+			prefix: invoice.prefix || null,
 			type: invoice.type,
 			payment_method: invoice.payment_method ?? null,
 			date_issue: invoice.date_issue,
@@ -77,10 +78,10 @@ export class InvoiceService {
 		return { changes: result.changes };
 	}
 
-	async delete(number: string): Promise<{ changes: number }> {
+	async delete(prefix: string, number: string): Promise<{ changes: number }> {
 		const db = getDatabase();
 		const statement = db.prepare(invoiceQueries.delete);
-		const result = statement.run(number);
+		const result = statement.run(prefix, number);
 
 		if (result.changes === 0) {
 			throw new Error("Invoice not found");
@@ -91,6 +92,7 @@ export class InvoiceService {
 
 	private buildUpdateQuery(tableName: string, fields: string[]): string {
 		const allowedFields = new Set([
+			"prefix",
 			"type",
 			"payment_method",
 			"date_issue",
@@ -122,7 +124,20 @@ export class InvoiceService {
 		return `
       UPDATE ${tableName}
       SET ${setClause}, updated_at = CURRENT_TIMESTAMP
-      WHERE number = @number
+      WHERE prefix = @prefix AND number = @number
     `;
+	}
+
+	/**
+	 * Get the maximum invoice number for a specific invoice type
+	 * Used for auto-incrementing invoice numbers
+	 */
+	async getMaxNumberByType(type: number): Promise<number> {
+		const db = getDatabase();
+		
+		const statement = db.prepare(invoiceQueries.getMaxNumberByType);
+		const result = statement.get(type) as { max_num: number | null } | undefined;
+		
+		return result?.max_num ?? 0;
 	}
 }

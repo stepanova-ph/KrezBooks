@@ -120,18 +120,18 @@ export function registerIpcHandlers() {
 
 	ipcMain.handle(
 		"db:stockMovements:getOne",
-		async (_event, invoiceNumber: string, itemEan: string) => {
+		async (_event, invoicePrefix: string, invoiceNumber: string, itemEan: string) => {
 			return handleIpcRequest(() =>
-				stockMovementService.getOne(invoiceNumber, itemEan),
+				stockMovementService.getOne(invoicePrefix, invoiceNumber, itemEan),
 			);
 		},
 	);
 
 	ipcMain.handle(
 		"db:stockMovements:getByInvoice",
-		async (_event, invoiceNumber: string) => {
+		async (_event, invoicePrefix: string, invoiceNumber: string) => {
 			return handleIpcRequest(() =>
-				stockMovementService.getByInvoice(invoiceNumber),
+				stockMovementService.getByInvoice(invoicePrefix, invoiceNumber),
 			);
 		},
 	);
@@ -147,30 +147,31 @@ export function registerIpcHandlers() {
 		"db:stockMovements:update",
 		async (
 			_event,
+			invoicePrefix: string,
 			invoiceNumber: string,
 			itemEan: string,
 			updates: Partial<StockMovement>,
 		) => {
 			return handleIpcRequest(() =>
-				stockMovementService.update(invoiceNumber, itemEan, updates),
+				stockMovementService.update(invoicePrefix, invoiceNumber, itemEan, updates),
 			);
 		},
 	);
 
 	ipcMain.handle(
 		"db:stockMovements:delete",
-		async (_event, invoiceNumber: string, itemEan: string) => {
+		async (_event, invoicePrefix: string, invoiceNumber: string, itemEan: string) => {
 			return handleIpcRequest(() =>
-				stockMovementService.delete(invoiceNumber, itemEan),
+				stockMovementService.delete(invoicePrefix, invoiceNumber, itemEan),
 			);
 		},
 	);
 
 	ipcMain.handle(
 		"db:stockMovements:deleteByInvoice",
-		async (_event, invoiceNumber: string) => {
+		async (_event, invoicePrefix: string, invoiceNumber: string) => {
 			return handleIpcRequest(() =>
-				stockMovementService.deleteByInvoice(invoiceNumber),
+				stockMovementService.deleteByInvoice(invoicePrefix, invoiceNumber),
 			);
 		},
 	);
@@ -209,6 +210,22 @@ export function registerIpcHandlers() {
 		},
 	);
 
+	ipcMain.handle(
+		"db:stockMovements:shouldSetResetPoint",
+		async (_event, itemEan: string, newAmount: string) => {
+			return handleIpcRequest(() =>
+				stockMovementService.shouldSetResetPoint(itemEan, newAmount),
+			);
+		},
+	);
+
+	ipcMain.handle(
+		"db:stockMovements:getByItemWithInvoiceInfo",
+		async (_event, itemEan: string) => {
+			return handleIpcRequest(() => stockMovementService.getByItemWithInvoiceInfo(itemEan));
+		},
+	);
+
 	// --------------------------------------------------------------------------
 	// INVOICES HANDLERS
 	// --------------------------------------------------------------------------
@@ -217,8 +234,8 @@ export function registerIpcHandlers() {
 		return handleIpcRequest(() => invoiceService.getAll());
 	});
 
-	ipcMain.handle("db:invoices:getOne", async (_event, number: string) => {
-		return handleIpcRequest(() => invoiceService.getOne(number));
+	ipcMain.handle("db:invoices:getOne", async (_event, prefix: string, number: string) => {
+		return handleIpcRequest(() => invoiceService.getOne(prefix, number));
 	});
 
 	ipcMain.handle(
@@ -235,8 +252,18 @@ export function registerIpcHandlers() {
 		},
 	);
 
-	ipcMain.handle("db:invoices:delete", async (_event, number: string) => {
-		return handleIpcRequest(() => invoiceService.delete(number));
+	ipcMain.handle("db:invoices:delete", async (_event, prefix: string, number: string) => {
+		return handleIpcRequest(() => invoiceService.delete(prefix, number));
+	});
+
+	ipcMain.handle('db:invoices:getMaxNumber', async (_, type: number) => {
+		try {
+			const maxNumber = await invoiceService.getMaxNumberByType(type);
+			return maxNumber;
+		} catch (error) {
+			logger.error('Failed to get max invoice number:', error);
+			throw error;
+		}
 	});
 
 	logger.info("✓ IPC handlers registered");

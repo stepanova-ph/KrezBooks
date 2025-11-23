@@ -12,6 +12,7 @@ export interface InvoiceItem extends Item {
 
 export interface InvoiceFormData {
 	number: string;
+	prefix: string;
 	type: InvoiceType;
 	payment_method: number | undefined;
 	date_issue: string;
@@ -33,6 +34,7 @@ export interface InvoiceFormData {
 
 const defaultFormData: InvoiceFormData = {
 	number: "",
+	prefix: "",
 	type: 1,
 	payment_method: undefined,
 	date_issue: new Date().toISOString().split("T")[0],
@@ -70,6 +72,25 @@ export function useInvoiceForm() {
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
+	// Track if variable symbol has been manually edited by user
+	const [isVariableSymbolCustom, setIsVariableSymbolCustom] = useState(false);
+
+	// Auto-sync variable symbol with prefix + number (unless user has customized it)
+	useEffect(() => {
+		if (!isVariableSymbolCustom) {
+			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
+			if (formData.variable_symbol !== autoVariableSymbol) {
+				console.log(`Auto-syncing variable symbol: ${autoVariableSymbol}`);
+				setFormData((prev) => ({
+					...prev,
+					variable_symbol: autoVariableSymbol,
+				}));
+			}
+		} else {
+			console.log('Variable symbol is custom, not auto-syncing');
+		}
+	}, [formData.prefix, formData.number, isVariableSymbolCustom]);
+
 	useEffect(() => {
 		setInvoiceFormState({
 			formData,
@@ -79,13 +100,44 @@ export function useInvoiceForm() {
 	}, [formData, invoiceItems, selectedContact, setInvoiceFormState]);
 
 	const handleChange = (field: string, value: string | number) => {
+		// Detect manual edit of variable symbol BEFORE updating formData
+		if (field === "variable_symbol") {
+			// Calculate what the auto variable symbol would be with current prefix/number
+			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
+			// If user enters something different than auto, mark as custom
+			if (value !== autoVariableSymbol) {
+				console.log(`User entered custom variable symbol: ${value} (auto would be: ${autoVariableSymbol})`);
+				setIsVariableSymbolCustom(true);
+			} else {
+				// If they change it back to match, it's no longer custom
+				console.log('User changed variable symbol back to auto value');
+				setIsVariableSymbolCustom(false);
+			}
+		}
+
+		// Note: We do NOT reset the custom flag when prefix/number changes
+		// This way, if the user has entered a custom variable symbol, it stays custom
+
+		// Update form data
 		setFormData((prev) => ({ ...prev, [field]: value }));
+
 		if (errors[field]) {
 			setErrors((prev) => ({ ...prev, [field]: "" }));
 		}
 	};
 
 	const handleBlur = (field: string) => {
+		// If variable symbol is empty after blur, set it to default (prefix + number)
+		if (field === "variable_symbol" && !formData.variable_symbol.trim()) {
+			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
+			console.log(`Variable symbol was empty, setting to default: ${autoVariableSymbol}`);
+			setFormData((prev) => ({
+				...prev,
+				variable_symbol: autoVariableSymbol,
+			}));
+			setIsVariableSymbolCustom(false);
+		}
+
 		const result = invoiceSchema.safeParse(formData);
 		if (!result.success) {
 			const fieldError = result.error.issues.find(
@@ -118,6 +170,7 @@ export function useInvoiceForm() {
 		setInvoiceItems([]);
 		setSelectedContact(null);
 		setErrors({});
+		setIsVariableSymbolCustom(false);
 		clearInvoiceFormState();
 	};
 

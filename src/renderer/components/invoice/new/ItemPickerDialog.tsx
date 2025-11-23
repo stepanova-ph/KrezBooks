@@ -1,4 +1,4 @@
-import { TableCell } from "@mui/material";
+import { TableCell, Box, FormControlLabel, Checkbox } from "@mui/material";
 import { useState } from "react";
 import { useItems } from "../../../../hooks/useItems";
 import { Item } from "../../../../types/database";
@@ -36,12 +36,18 @@ export function ItemPickerDialog({
 	const [filters, setFilters] = useState<{ search: string }>(
 		initialPickerFilterState,
 	);
+	const [hideSelected, setHideSelected] = useState(false);
 
 	const filteredItems = useTableFilters(
 		allItems,
 		filters,
 		itemPickerFilterConfig,
 	);
+
+	// Apply hide selected filter
+	const displayItems = hideSelected
+		? filteredItems.filter((item) => !selectedItemEans?.has(item.ean))
+		: filteredItems;
 
 	const renderRow = (item: Item, visibleColumns: Column[]) => {
 		const isSelected = selectedItemEans?.has(item.ean) || false;
@@ -89,13 +95,26 @@ export function ItemPickerDialog({
 			onSelect={onSelect}
 			title="Vybrat položku"
 			columns={pickerColumns}
-			data={filteredItems}
+			data={displayItems}
 			getRowKey={(item) => item.ean}
 			renderRow={renderRow}
 			emptyMessage="Žádné položky nenalezeny"
 			searchPlaceholder="EAN, název, kategorie..."
 			filterValue={filters.search || ""}
 			onFilterChange={(value) => setFilters({ ...filters, search: value })}
+			filterActions={
+				<FormControlLabel
+					control={
+						<Checkbox
+							checked={hideSelected}
+							onChange={(e) => setHideSelected(e.target.checked)}
+							size="small"
+						/>
+					}
+					label="Skrýt vybrané"
+					sx={{ ml: 1, mr: 0 }}
+				/>
+			}
 		/>
 	);
 }

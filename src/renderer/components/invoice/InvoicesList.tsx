@@ -12,7 +12,7 @@ import { useDeleteInvoice } from "../../../hooks/useInvoices";
 import { ViewInvoiceDialog } from "./ViewInvoiceDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { useState } from "react";
-import { useTotalByInvoiceNumberVat } from "../../../hooks/useStockMovement";
+import { INVOICE_TYPES } from "../../../config/constants";
 
 interface InvoicesListProps {
 	invoices: Invoice[];
@@ -26,7 +26,14 @@ export const invoiceColumns: Column[] = [
 	{ id: "number", label: "Číslo dokladu", minWidth: 120 },
 	{ id: "type", label: "Typ", minWidth: 150 },
 	{ id: "date_issue", label: "Datum vystavení", minWidth: 120 },
-	{ id: "company_name", label: "Obchodní partner", minWidth: 200 },
+	{ 
+		id: "company_name", 
+		label: "Obchodní partner", 
+		minWidth: 200,
+		subColumns: [
+			{ id: "ico", label: "", minWidth: 90 }
+		]
+	},
 	{
 		id: "total",
 		label: "Celková částka",
@@ -94,21 +101,17 @@ function InvoicesList({
 	const getCellContent = (invoice: Invoice, columnId: string) => {
 		switch (columnId) {
 			case "number":
-				return invoice.number;
+				return `${invoice.prefix || ""}${invoice.number}`;
 			case "type": {
-				const types: Record<number, string> = {
-					1: "Nákup (hotovost)",
-					2: "Nákup (faktura)",
-					3: "Prodej (hotovost)",
-					4: "Prodej (faktura)",
-					5: "Korekce skladu",
-				};
-				return types[invoice.type] || "Neznámý";
+				const typeObj = INVOICE_TYPES.find(t => t.value === invoice.type);
+				return typeObj?.label || "Neznámý";
 			}
 			case "date_issue":
 				return invoice.date_issue;
 			case "company_name":
 				return invoice.company_name || "-";
+			case "ico":
+				return invoice.ico || "-";
 			case "total":
 				return (invoice.total_with_vat?.toFixed(2) || "0.00") + " Kč";
 
@@ -127,7 +130,7 @@ function InvoicesList({
 				emptyMessage="Žádné doklady. Klikněte na 'Vytvořit doklad' pro vytvoření nového."
 				columnOrder={columnOrder}
 				onColumnOrderChange={onColumnOrderChange}
-				getRowKey={(invoice) => invoice.number}
+				getRowKey={(invoice) => `${invoice.prefix || ""}-${invoice.number}`}
 				orderBy={orderBy}
 				getCellContent={getCellContent}
 				contextMenuActions={contextMenuActions}
@@ -154,6 +157,7 @@ function InvoicesList({
 				<ViewInvoiceDialog
 					open={!!viewingInvoice}
 					onClose={() => setViewingInvoice(null)}
+					invoicePrefix={viewingInvoice.prefix || ""}
 					invoiceNumber={viewingInvoice.number}
 				/>
 			)}

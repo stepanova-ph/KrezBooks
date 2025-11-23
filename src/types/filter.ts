@@ -7,9 +7,13 @@ export type FilterType =
 	| "text-search" // Global search across multiple fields
 	| "checkbox" // Boolean toggle
 	| "number-input" // Number-only input with autocomplete
-	| "number-with-prefix" // Special: number with country prefix selector (DIC)
+	| "number-with-prefix" // Number with country prefix selector (DIC)
 	| "select" // Single selection dropdown
-	| "multiselect"; // Multiple selection dropdown
+	| "multiselect" // Multiple selection dropdown
+	| "number-comparator" // Number with comparator (>, =, <)
+	| "date-comparator" // Date with comparator (>, =, <)	
+	| "filter-aggregate" // Groups multiple filters with collapsible UI
+	| "action-button"; // Clickable button that triggers FilterAction
 
 /**
  * Base filter definition
@@ -18,8 +22,8 @@ export interface BaseFilterDef {
 	id: string;
 	type: FilterType;
 	label: string;
-	columnId?: string | null; // Which column this filter is tied to (null = always visible)
-	width?: number; // Custom width in pixels (optional)
+	columnId?: string | null; // columnId the filter is tied to (null = always visible)
+	width?: number;
 }
 
 /**
@@ -39,9 +43,9 @@ export interface TextSearchFilterDef extends BaseFilterDef {
  */
 export interface CheckboxFilterDef extends BaseFilterDef {
 	type: "checkbox";
-	field: string; // Field name in data object
-	group?: string; // Group name for required validation
-	required?: boolean; // If true, at least one in group must be checked
+	field: string;
+	group?: string;
+	required?: boolean;
 }
 
 /**
@@ -51,7 +55,7 @@ export interface NumberInputFilterDef extends BaseFilterDef {
 	type: "number-input";
 	field: string;
 	placeholder?: string;
-	autocomplete?: boolean; // If true, allows partial matching
+	autocomplete?: boolean; // allow partial matching
 	maxLength?: number;
 	validate?: (value: string) => { valid: boolean; error?: string };
 }
@@ -62,10 +66,10 @@ export interface NumberInputFilterDef extends BaseFilterDef {
 export interface NumberWithPrefixFilterDef extends BaseFilterDef {
 	type: "number-with-prefix";
 	field: string;
-	prefixes: string[]; // e.g., ['CZ', 'SK', 'vlastní']
-	prefixWidth?: number; // Custom width for prefix dropdown (optional)
+	prefixes: string[];
+	prefixWidth?: number;
 	placeholder?: string;
-	customPlaceholder?: string; // Placeholder when "vlastní" is selected
+	customPlaceholder?: string;
 	autocomplete?: boolean;
 	validate?: (
 		prefix: string | null,
@@ -81,6 +85,7 @@ export interface SelectFilterDef extends BaseFilterDef {
 	field: string;
 	options: Array<{ value: string | number; label: string }>;
 	placeholder?: string;
+	useShortLabels?: boolean;
 }
 
 /**
@@ -91,6 +96,44 @@ export interface MultiSelectFilterDef extends BaseFilterDef {
 	field: string;
 	options: Array<{ value: string | number; label: string }>;
 	placeholder?: string;
+	useShortLabels?: boolean;
+}
+
+/**
+ * Number comparator filter (for amount filtering with >, =, <)
+ */
+export interface NumberComparatorFilterDef extends BaseFilterDef {
+	type: "number-comparator";
+	field: string;
+	placeholder?: string;
+	allowNegative?: boolean;
+}
+
+export interface DateComparatorFilterDef extends BaseFilterDef {
+	type: "date-comparator";
+	field: string;
+}
+
+/**
+ * Action button filter - clickable button that triggers FilterAction
+ */
+export interface ActionButtonFilterDef extends BaseFilterDef {
+	type: "action-button";
+	actionId: string; // FilterAction.id
+	variant?: "text" | "outlined" | "contained";
+}
+
+/**
+ * Filter aggregate - groups multiple filters with collapsible UI
+ * Primary filter shown when collapsed, additional controls when expanded
+ */
+export interface FilterAggregateFilterDef extends BaseFilterDef {
+	type: "filter-aggregate";
+	collapsible: boolean;
+	defaultExpanded?: boolean;
+	primaryFilter: FilterDef;
+	expandedFilters: Array<FilterDef | ActionButtonFilterDef>;
+	lockPrimaryWhenExpanded?: boolean;
 }
 
 /**
@@ -102,7 +145,11 @@ export type FilterDef =
 	| NumberInputFilterDef
 	| NumberWithPrefixFilterDef
 	| SelectFilterDef
-	| MultiSelectFilterDef;
+	| MultiSelectFilterDef
+	| NumberComparatorFilterDef
+	| DateComparatorFilterDef
+	| FilterAggregateFilterDef
+	| ActionButtonFilterDef;
 
 /**
  * Filter configuration for a table
@@ -120,7 +167,22 @@ export interface ContactFilterState {
 	is_customer: boolean;
 	ico: string;
 	dic: string;
-	price_group: string | null;
+	price_group: string[];
+}
+
+/**
+ * Filter state for invoices
+ */
+export interface InvoiceFilterState {
+	search: string;
+	type?: number[];
+	selectedContacts?: Array<{ ico: string; modifier: number }>;  // NEW: array of contacts
+	total_amount?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
+	total_amount_with_vat?: boolean;
+	date_issue?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
+	date_due?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
+	date_tax?: { greaterThan?: string; equals?: string; lessThan?: string; comparator: '>' | '=' | '<' };
+	_dynamicFilters?: string[];
 }
 
 /**
@@ -128,15 +190,25 @@ export interface ContactFilterState {
  */
 export interface ItemFilterState {
 	search: string;
-	vat_rate: number[]; // Multiple selection
-	unit_of_measure: string; // Text search
-	category: string[]; // Text search
+	vat_rate: number[];
+	unit_of_measure: string;
+	category: string[];
+	stock_amount?: { greaterThan: string; equals: string; lessThan: string; comparator: '>' | '=' | '<' }; // Number comparator
+	price?: { greaterThan: string; equals: string; lessThan: string; comparator: '>' | '=' | '<' }; // Number comparator
+	price_with_vat?: boolean;
+	price_groups?: number[];
 }
 
 /**
  * Generic filter state
  */
-export type FilterState = Record<string, any>;
+export type FilterState = {
+	[filterId: string]: any;
+	_aggregateExpanded?: {
+		[aggregateId: string]: boolean;
+	};
+	_dynamicFilters?: string[];
+};
 
 /**
  * Filter action button definition
@@ -146,6 +218,7 @@ export type FilterAction = {
 	label: string;
 	variant?: "contained" | "outlined" | "text";
 	startIcon?: ReactNode;
-	onClick?: () => void; // if you want to handle it in parent
+	onClick?: () => void;
 	renderDialog?: (props: { open: boolean; onClose: () => void }) => ReactNode; // if you want FilterBar to open a modal for you
 };
+

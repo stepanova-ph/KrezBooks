@@ -12,11 +12,11 @@ export function useInvoices() {
 	});
 }
 
-export function useInvoice(number: string) {
+export function useInvoice(prefix: string, number: string) {
 	return useQuery({
-		queryKey: ["invoices", number],
+		queryKey: ["invoices", prefix, number],
 		queryFn: async () => {
-			const result = await window.electronAPI.invoices.getOne(number);
+			const result = await window.electronAPI.invoices.getOne(prefix, number);
 			if (!result.success) throw new Error(result.error);
 			return result.data;
 		},
@@ -72,5 +72,18 @@ export function useDeleteInvoice() {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["invoices"] });
 		},
+	});
+}
+
+/**
+ * Hook to get the maximum invoice number for a specific type
+ * Used for auto-incrementing invoice numbers in the form
+ */
+export function useMaxInvoiceNumber(type: number) {
+	return useQuery({
+		queryKey: ['invoices', 'maxNumber', type],
+		queryFn: () => window.electronAPI.invoices.getMaxNumber(type),
+		staleTime: 0, // Always fetch fresh to avoid duplicate numbers
+		enabled: type >= 1 && type <= 5, // Only fetch for valid invoice types
 	});
 }

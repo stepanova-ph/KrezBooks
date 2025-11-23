@@ -2,6 +2,11 @@ import { z } from "zod";
 import { validationMessages } from "../config/validationMessages";
 
 export const stockMovementSchema = z.object({
+	invoice_prefix: z
+		.string()
+		.min(1, validationMessages.stockMovement.invoicePrefixRequired)
+		.max(10, validationMessages.stockMovement.invoicePrefixMaxLength),
+
 	invoice_number: z
 		.string()
 		.min(1, validationMessages.stockMovement.invoiceNumberRequired)

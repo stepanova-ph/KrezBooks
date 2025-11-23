@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
 	StockMovement,
 	CreateStockMovementInput,
+	StockMovementWithInvoiceInfo,
 } from "../types/database";
 
 export function useStockMovements() {
@@ -15,16 +16,16 @@ export function useStockMovements() {
 	});
 }
 
-export function useStockMovementsByInvoice(invoiceNumber: string) {
+export function useStockMovementsByInvoice(invoicePrefix: string, invoiceNumber: string) {
 	return useQuery({
-		queryKey: ["stockMovements", "invoice", invoiceNumber],
+		queryKey: ["stockMovements", "invoice", invoicePrefix, invoiceNumber],
 		queryFn: async () => {
 			const result =
-				await window.electronAPI.stockMovements.getByInvoice(invoiceNumber);
+				await window.electronAPI.stockMovements.getByInvoice(invoicePrefix, invoiceNumber);
 			if (!result.success) throw new Error(result.error);
 			return result.data as StockMovement[];
 		},
-		enabled: !!invoiceNumber,
+		enabled: !!invoicePrefix && !!invoiceNumber,
 	});
 }
 
@@ -48,15 +49,18 @@ export function useUpdateStockMovement() {
 
 	return useMutation({
 		mutationFn: async ({
+			invoicePrefix,
 			invoiceNumber,
 			itemEan,
 			updates,
 		}: {
+			invoicePrefix: string;
 			invoiceNumber: string;
 			itemEan: string;
 			updates: Partial<StockMovement>;
 		}) => {
 			const result = await window.electronAPI.stockMovements.update(
+				invoicePrefix,
 				invoiceNumber,
 				itemEan,
 				updates,
@@ -75,13 +79,16 @@ export function useDeleteStockMovement() {
 
 	return useMutation({
 		mutationFn: async ({
+			invoicePrefix,
 			invoiceNumber,
 			itemEan,
 		}: {
+			invoicePrefix: string;
 			invoiceNumber: string;
 			itemEan: string;
 		}) => {
 			const result = await window.electronAPI.stockMovements.delete(
+				invoicePrefix,
 				invoiceNumber,
 				itemEan,
 			);
@@ -130,6 +137,19 @@ export function useLastBuyPriceByItem(itemEan: string) {
 				await window.electronAPI.stockMovements.getLastBuyPriceByItem(itemEan);
 			if (!result.success) throw new Error(result.error);
 			return result.data as number;
+		},
+		enabled: !!itemEan,
+	});
+}
+
+export function useStockMovementsByItem(itemEan: string) {
+	return useQuery({
+		queryKey: ["stockMovements", "item", itemEan],
+		queryFn: async () => {
+			const result =
+				await window.electronAPI.stockMovements.getByItemWithInvoiceInfo(itemEan);
+			if (!result.success) throw new Error(result.error);
+			return result.data as StockMovementWithInvoiceInfo[];
 		},
 		enabled: !!itemEan,
 	});

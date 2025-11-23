@@ -3,9 +3,11 @@ import { FormSection } from "../common/form/FormSection";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import { INVOICE_TYPES, PAYMENT_METHOD_TYPES } from "../../../config/constants";
 import type { InvoiceType, PaymentMethodType } from "../../../types/database";
+import ValidatedDateField from "../common/inputs/ValidatedDatefield";
 
 interface InvoiceHeaderProps {
 	number: string;
+	prefix: string;
 	type: InvoiceType;
 	paymentMethod?: PaymentMethodType;
 	dateIssue: string;
@@ -20,6 +22,7 @@ interface InvoiceHeaderProps {
 
 function headerType5({
 	number,
+	prefix,
 	dateIssue,
 	errors,
 	disabled,
@@ -29,7 +32,7 @@ function headerType5({
 	return (
 		<FormSection title="Hlavička" my={2}>
 			<Grid container spacing={2}>
-				<Grid item xs={4.5}>
+				<Grid item xs={3.8}>
 					<ValidatedTextField
 						select
 						required
@@ -58,7 +61,29 @@ function headerType5({
 					</ValidatedTextField>
 				</Grid>
 
-				<Grid item xs={4}>
+				<Grid item xs={2}>
+					<ValidatedTextField
+						fullWidth
+						label="Prefix"
+						name="prefix"
+						value={prefix}
+						error={errors?.prefix}
+						disabled={disabled}
+						onChange={(e: { target: { value: string | number } }) => {
+							if (onChange) {
+								onChange("prefix", e.target.value);
+							}
+						}}
+						onBlur={() => {
+							if (onBlur) {
+								onBlur("prefix");
+							}
+						}}
+						inputProps={{ style: { textTransform: "uppercase", textAlign: "right" } }}
+					/>
+				</Grid>
+
+				<Grid item xs={3.1}>
 					<ValidatedTextField
 						required
 						fullWidth
@@ -80,28 +105,18 @@ function headerType5({
 					/>
 				</Grid>
 
-				<Grid item xs={3.5}>
-					<ValidatedTextField
-						required
-						fullWidth
+				<Grid item xs={3.1}>
+					<ValidatedDateField
 						label="Datum vystavení"
 						name="date_issue"
-						type="date"
 						value={dateIssue}
-						disabled={disabled}
+						onChange={(value) => onChange("date_issue", value)}
+						onBlur={() => onBlur("date_issue")}
 						error={errors?.date_issue}
-						InputLabelProps={{ shrink: true }}
-						onChange={(e: { target: { value: string | number } }) => {
-							if (onChange) {
-								onChange("date_issue", e.target.value);
-							}
-						}}
-						onBlur={() => {
-							if (onBlur) {
-								onBlur("date_issue");
-							}
-						}}
-					/>
+						required
+						disabled={disabled}
+						fullWidth
+						/>
 				</Grid>
 			</Grid>
 		</FormSection>
@@ -110,6 +125,7 @@ function headerType5({
 
 export function InvoiceHeader({
 	number,
+	prefix,
 	type, // 1: nákup hotovost, 2: nákup faktura, 3: prodej hotovost, 4: prodej faktura, 5: korekce
 	paymentMethod,
 	dateIssue,
@@ -130,6 +146,7 @@ export function InvoiceHeader({
 	if (isType5) {
 		return headerType5({
 			number,
+			prefix,
 			dateIssue,
 			errors,
 			disabled,
@@ -141,7 +158,7 @@ export function InvoiceHeader({
 	return (
 		<FormSection title="Hlavička" my={2}>
 			<Grid container spacing={2}>
-				<Grid item xs={6}>
+				<Grid item xs={5.3}>
 					<ValidatedTextField
 						label="Typ dokladu"
 						name="type"
@@ -169,7 +186,22 @@ export function InvoiceHeader({
 					</ValidatedTextField>
 				</Grid>
 
-				<Grid item xs={6}>
+				<Grid item xs={2.4}>
+					<ValidatedTextField
+						label="Prefix"
+						name="prefix"
+						value={prefix}
+						onChange={(e: { target: { value: string | number } }) =>
+							onChange("prefix", e.target.value)
+						}
+						onBlur={() => onBlur("prefix")}
+						error={errors.prefix}
+						disabled={disabled}
+						fullWidth
+					/>
+				</Grid>
+
+				<Grid item xs={4.3}>
 					<ValidatedTextField
 						label="Číslo dokladu"
 						name="number"
@@ -186,75 +218,48 @@ export function InvoiceHeader({
 				</Grid>
 
 				<Grid item xs={showDateDue ? 4 : 6}>
-					<ValidatedTextField
+					<ValidatedDateField
 						label="Datum vystavení"
 						name="date_issue"
-						type="date"
 						value={dateIssue}
-						onChange={(e: { target: { value: string | number } }) =>
-							onChange("date_issue", e.target.value)
-						}
+						onChange={(value) => onChange("date_issue", value)}
 						onBlur={() => onBlur("date_issue")}
 						error={errors.date_issue}
 						required
 						disabled={disabled}
 						fullWidth
-						InputLabelProps={{ shrink: true }}
-						sx={{
-							".MuiInputBase-input": {
-								fontSize: showDateDue ? "0.74rem" : undefined,
-							},
-						}}
-					/>
+						/>
 				</Grid>
 
 				{showDateTax && (
 					<Grid item xs={showDateDue ? 4 : 6}>
-						<ValidatedTextField
+						<ValidatedDateField
 							label="Datum zdanitelného plnění"
 							name="date_tax"
-							type="date"
 							value={dateTax}
-							onChange={(e: { target: { value: string | number } }) =>
-								onChange("date_tax", e.target.value)
-							}
+							onChange={(value) => onChange("date_tax", value)}
 							onBlur={() => onBlur("date_tax")}
 							error={errors.date_tax}
 							required
 							disabled={disabled}
 							fullWidth
-							InputLabelProps={{ shrink: true }}
-							sx={{
-								".MuiInputBase-input": {
-									fontSize: showDateDue ? "0.74rem" : undefined,
-								},
-							}}
-						/>
+							/>
 					</Grid>
 				)}
 
 				{showDateDue && (
 					<Grid item xs={4}>
-						<ValidatedTextField
+						<ValidatedDateField
 							label="Datum splatnosti"
 							name="date_due"
-							type="date"
 							value={dateDue}
-							onChange={(e: { target: { value: string | number } }) =>
-								onChange("date_due", e.target.value)
-							}
+							onChange={(value) => onChange("date_due", value)}
 							onBlur={() => onBlur("date_due")}
 							error={errors.date_due}
 							required
 							disabled={disabled}
 							fullWidth
-							InputLabelProps={{ shrink: true }}
-							sx={{
-								".MuiInputBase-input": {
-									fontSize: showDateDue ? "0.74rem" : undefined,
-								},
-							}}
-						/>
+							/>
 					</Grid>
 				)}
 

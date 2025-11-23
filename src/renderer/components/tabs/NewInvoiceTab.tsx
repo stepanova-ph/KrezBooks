@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, IconButton, Tooltip, Button, Typography } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { InvoiceHeader } from "../invoice/InvoiceHeader";
@@ -11,7 +11,7 @@ import { ContactPickerDialog } from "../invoice/new/ContactPickerDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { useInvoiceForm } from "../../../hooks/useInvoiceForm";
 import { useInvoiceDialogs } from "../../../hooks/useInvoiceDialogs";
-import { useCreateInvoice } from "../../../hooks/useInvoices";
+import { useCreateInvoice, useMaxInvoiceNumber } from "../../../hooks/useInvoices";
 import { useCreateStockMovement } from "../../../hooks/useStockMovement";
 import type { Item, Contact } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
@@ -19,13 +19,19 @@ import {
 	calculateTotalWithoutVat,
 	calculateTotalWithVat,
 } from "../../../utils/formUtils";
+import { InvoiceTotals } from "../invoice/InvoiceTotals";
+import { INVOICE_TYPES } from "../../../config/constants";
+import { getDisplayAmount, getSignedAmount } from "../../../utils/typeConverterUtils";
+import { ItemCardDialog } from "../items/ItemCardDialog";
 
 function NewInvoiceTab() {
 	const form = useInvoiceForm();
 	const dialogs = useInvoiceDialogs();
 	const createInvoice = useCreateInvoice();
 	const createStockMovement = useCreateStockMovement();
+	const { data: maxNumber = 0 } = useMaxInvoiceNumber(form.formData.type ?? 1);
 
+	const [viewingItemEan, setViewingItemEan] = useState<string | null>(null);
 	const [alertDialog, setAlertDialog] = useState<{
 		open: boolean;
 		title: string;
@@ -33,6 +39,25 @@ function NewInvoiceTab() {
 	} | null>(null);
 
 	const isType5 = form.formData.type === 5;
+
+	// Auto-populate prefix when type changes
+	useEffect(() => {
+		const invoiceType = INVOICE_TYPES.find(t => t.value === form.formData.type);
+		const defaultPrefix = invoiceType?.prefix;
+		if (defaultPrefix && form.formData.prefix !== defaultPrefix) {
+			form.handleChange("prefix", defaultPrefix);
+		}
+	}, [form.formData.type]);
+
+	// Auto-increment invoice number based on type
+	useEffect(() => {
+		if (maxNumber !== undefined) {
+			const nextNumber = String(maxNumber + 1).padStart(4, '0');
+			if (form.formData.number !== nextNumber) {
+				form.handleChange('number', nextNumber);
+			}
+		}
+	}, [maxNumber, form.formData.type]);
 
 	const handleSelectItem = (item: Item) => {
 		const existingIndex = form.invoiceItems.findIndex(
@@ -43,7 +68,7 @@ function NewInvoiceTab() {
 			// Item already exists - open edit dialog
 			const existing = form.invoiceItems[existingIndex];
 			dialogs.amountPrice.openDialog(item, {
-				amount: existing.amount,
+				amount: getDisplayAmount(existing.amount, form.formData.type),
 				price: existing.sale_price,
 				p_group_index: existing.p_group_index,
 				index: existingIndex,
@@ -137,6 +162,7 @@ function NewInvoiceTab() {
 		try {
 			await createInvoice.mutateAsync({
 				number: form.formData.number,
+				prefix: form.formData.prefix || undefined,
 				type: form.formData.type,
 				payment_method: form.formData.payment_method,
 				date_issue: form.formData.date_issue,
@@ -157,15 +183,25 @@ function NewInvoiceTab() {
 			});
 
 			await Promise.all(
-				form.invoiceItems.map((item) =>
-					createStockMovement.mutateAsync({
+				form.invoiceItems.map(async (item) => {
+					// Check if we should set reset point for this item
+					const shouldSetResetPoint =
+						await window.electronAPI.stockMovements.shouldSetResetPoint(
+							item.ean,
+							item.amount.toString(),
+						);
+					console.log(`Should set reset point for ${item.ean}: ${shouldSetResetPoint}`);
+
+					return createStockMovement.mutateAsync({
+						invoice_prefix: form.formData.prefix || "",
 						invoice_number: form.formData.number,
 						item_ean: item.ean,
-						amount: item.amount.toString(),
+						amount: getSignedAmount(item.amount, form.formData.type),
 						price_per_unit: item.sale_price.toString(),
 						vat_rate: item.vat_rate,
-					}),
-				),
+						reset_point: shouldSetResetPoint,
+					});
+				}),
 			);
 
 			form.handleReset();
@@ -191,7 +227,7 @@ function NewInvoiceTab() {
 			{/* Left Column - Header & Contact Info */}
 			<Box
 				sx={{
-					width: isType5 ? 0 : 450,
+					width: isType5 ? 0 : 480,
 					flexShrink: 0,
 					p: 3,
 					overflowY: "auto",
@@ -203,6 +239,7 @@ function NewInvoiceTab() {
 					<InvoiceHeader
 						type={form.formData.type}
 						number={form.formData.number}
+						prefix={form.formData.prefix}
 						paymentMethod={form.formData.payment_method}
 						dateIssue={form.formData.date_issue}
 						dateTax={form.formData.date_tax}
@@ -248,6 +285,7 @@ function NewInvoiceTab() {
 						<InvoiceHeader
 							type={form.formData.type}
 							number={form.formData.number}
+							prefix={form.formData.prefix}
 							paymentMethod={form.formData.payment_method}
 							dateIssue={form.formData.date_issue}
 							dateTax={form.formData.date_tax}
@@ -293,6 +331,7 @@ function NewInvoiceTab() {
 								items={form.invoiceItems}
 								onEditItem={handleEditItem}
 								onDeleteItem={form.handleDeleteItem}
+								onOpenItemCard={(item) => setViewingItemEan(item.ean)}
 							/>
 						</Box>
 					</FormSection>
@@ -306,41 +345,7 @@ function NewInvoiceTab() {
 					}}
 				>
 					{/* Totals */}
-					<Box
-						sx={{
-							px: 4,
-							py: 2.5,
-							display: "flex",
-							justifyContent: "flex-end",
-							gap: 8,
-							borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-						}}
-					>
-						<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-							<Typography
-								variant="body1"
-								fontWeight={500}
-								color="text.secondary"
-							>
-								Celkem bez DPH:
-							</Typography>
-							<Typography variant="h6" fontWeight={700}>
-								{calculateTotalWithoutVat(form.invoiceItems).toFixed(2)} Kč
-							</Typography>
-						</Box>
-						<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-							<Typography
-								variant="body1"
-								fontWeight={500}
-								color="text.secondary"
-							>
-								Celkem s DPH:
-							</Typography>
-							<Typography variant="h6" fontWeight={700} color="primary.main">
-								{calculateTotalWithVat(form.invoiceItems).toFixed(2)} Kč
-							</Typography>
-						</Box>
-					</Box>
+					<InvoiceTotals items={form.invoiceItems} />
 
 					{/* Buttons */}
 					<Box
@@ -353,7 +358,7 @@ function NewInvoiceTab() {
 						}}
 					>
 						<Button variant="outlined" onClick={form.handleReset} size="large">
-							Zrušit
+							Vymazat formulář
 						</Button>
 						<Button
 							variant="contained"
@@ -392,6 +397,7 @@ function NewInvoiceTab() {
 				open={dialogs.contactPicker.open}
 				onClose={dialogs.contactPicker.closeDialog}
 				onSelect={handleSelectContact}
+				singleSelect={true}
 			/>
 
 			<AlertDialog
@@ -400,6 +406,14 @@ function NewInvoiceTab() {
 				message={alertDialog?.message || ""}
 				onConfirm={() => setAlertDialog(null)}
 			/>
+
+			{viewingItemEan && (
+				<ItemCardDialog
+					open={!!viewingItemEan}
+					onClose={() => setViewingItemEan(null)}
+					itemEan={viewingItemEan}
+				/>
+			)}
 		</Box>
 	);
 }

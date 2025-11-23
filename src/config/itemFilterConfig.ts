@@ -9,9 +9,9 @@ export const itemFilterConfig: FilterConfig = {
 			id: "search",
 			type: "text-search",
 			label: "Hledat",
-			placeholder: "Název, poznámka...",
-			searchFields: [{ field: "name" }, { field: "note" }],
-			columnId: null, // Always visible
+			placeholder: "EAN, název...",
+			searchFields: [{ field: "name" }, { field: "ean" }],
+			columnId: null,
 		},
 
 		{
@@ -44,6 +44,65 @@ export const itemFilterConfig: FilterConfig = {
 			placeholder: "Všechny kategorie",
 			options: [],
 		},
+		{
+			id: "stock_amount_aggregate",
+			type: "filter-aggregate",
+			label: "Množství",
+			columnId: "stock_amount",
+			collapsible: true,
+			defaultExpanded: false,
+			lockPrimaryWhenExpanded: true,
+			primaryFilter: {
+				id: "stock_amount",
+				type: "number-comparator",
+				label: "Množství",
+				field: "stock_amount",
+				placeholder: "0",
+				allowNegative: true,
+				width: 100,
+			},
+			expandedFilters: [],
+		},
+		{
+			id: "price_aggregate",
+			type: "filter-aggregate",
+			label: "Cena",
+			columnId: "sale_price_group1",
+			collapsible: true,
+			defaultExpanded: false,
+			lockPrimaryWhenExpanded: true,
+			primaryFilter: {
+				id: "price",
+				type: "number-comparator",
+				label: "Cena",
+				field: "price",
+				placeholder: "0",
+				allowNegative: false,
+				width: 120,
+			},
+			expandedFilters: [
+				{
+					id: "price_with_vat",
+					type: "checkbox",
+					label: "S DPH",
+					field: "price_with_vat",
+				},
+				{
+					id: "price_groups",
+					type: "multiselect",
+					label: "Cenová skupina",
+					field: "price_groups",
+					options: [
+						{ value: 1, label: "1" },
+						{ value: 2, label: "2" },
+						{ value: 3, label: "3" },
+						{ value: 4, label: "4" },
+					],
+					width: 175,
+					placeholder: "Všechny skupiny",
+				},
+			],
+		},
 	],
 };
 
@@ -55,6 +114,10 @@ export const initialItemFilterState: ItemFilterState = {
 	vat_rate: [],
 	unit_of_measure: "",
 	category: [],
+	stock_amount: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
+	price: { greaterThan: "", equals: "", lessThan: "", comparator: ">" },
+	price_with_vat: false,
+	price_groups: [],
 };
 
 export const defaultVisibleColumnsItem = [
@@ -63,6 +126,7 @@ export const defaultVisibleColumnsItem = [
 	"category",
 	"unit",
 	"vat",
+	"stock_amount",
 	"sale_price_group1",
 	"sale_price_group2",
 ];

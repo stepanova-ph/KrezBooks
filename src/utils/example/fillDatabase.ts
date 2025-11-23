@@ -9,6 +9,7 @@ import {
 	stockMovementQueries,
 } from "../../main/queries";
 import { exampleStockMovements } from "./stockMovements";
+import { booleanToSQLiteInteger } from "../typeConverterUtils";
 // import { exampleInvoices } from './invoices';
 // import { exampleStockMovements } from './stockMovements';
 
@@ -87,6 +88,7 @@ export function fillTestData(db: Database.Database): FillResult {
 		try {
 			insertInvoice.run({
 				number: invoice.number,
+				prefix: invoice.prefix || null,
 				type: invoice.type,
 				payment_method: invoice.payment_method,
 				date_issue: invoice.date_issue,
@@ -117,16 +119,18 @@ export function fillTestData(db: Database.Database): FillResult {
 	for (const movement of exampleStockMovements) {
 		try {
 			insertStockMovement.run({
+				invoice_prefix: movement.invoice_prefix,
 				invoice_number: movement.invoice_number,
 				item_ean: movement.item_ean,
 				amount: movement.amount,
 				price_per_unit: movement.price_per_unit,
 				vat_rate: movement.vat_rate,
+				reset_point: booleanToSQLiteInteger(movement.reset_point ?? false),
 			});
 			stockMovementsAdded++;
 		} catch (error: any) {
 			errors.push(
-				`Stock movement ${movement.invoice_number}: ${error.message}`,
+				`Stock movement ${movement.invoice_prefix}-${movement.invoice_number}: ${error.message}`,
 			);
 		}
 	}

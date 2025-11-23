@@ -73,7 +73,7 @@ export function FormSection({
 				</Box>
 			</Box>
 
-			{!hideDivider && <Divider sx={{ mt: 2.5, mb: 0.5 }} />}
+			{!hideDivider && <Divider sx={{ mt: 2.5, mb: 0.5, mx: -4 }} />}
 		</Box>
 	);
 }

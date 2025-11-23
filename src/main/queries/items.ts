@@ -18,13 +18,23 @@ export const itemQueries = {
   `,
 
 	getAll: `
-    SELECT * FROM items 
-    ORDER BY name
+    SELECT
+      items.*,
+      COALESCE(SUM(stock_movements.amount), 0) as stock_amount
+    FROM items
+    LEFT JOIN stock_movements ON items.ean = stock_movements.item_ean
+    GROUP BY items.ean
+    ORDER BY items.name
   `,
 
 	getOne: `
-    SELECT * FROM items 
-    WHERE ean = ?
+    SELECT
+      items.*,
+      COALESCE(SUM(stock_movements.amount), 0) as stock_amount
+    FROM items
+    LEFT JOIN stock_movements ON items.ean = stock_movements.item_ean
+    WHERE items.ean = ?
+    GROUP BY items.ean
   `,
 
 	create: `

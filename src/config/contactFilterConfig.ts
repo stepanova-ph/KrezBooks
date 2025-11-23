@@ -17,7 +17,6 @@ export const contactFilterConfig: FilterConfig = {
 				{ field: "representative_name" },
 				{ field: "city" },
 				{ field: "street" },
-				{ field: "postal_code" },
 				{ field: "phone", match: matchPhone },
 				{ field: "email" },
 				{ field: "website" },
@@ -100,7 +99,7 @@ export const initialContactFilterState: ContactFilterState = {
 	is_customer: false,
 	ico: "",
 	dic: "",
-	price_group: null,
+	price_group: [],
 };
 
 export const defaultVisibleColumnsContact = [

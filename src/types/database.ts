@@ -65,6 +65,7 @@ export interface Item {
 	sale_price_group2: number;
 	sale_price_group3: number;
 	sale_price_group4: number;
+	stock_amount?: number; // Computed field from SUM of stock_movements
 	created_at?: string;
 	updated_at?: string;
 }
@@ -81,11 +82,13 @@ export type UpdateItemInput = UpdateInput<
  * StockMovement
  */
 export interface StockMovement {
+	invoice_prefix: string;
 	invoice_number: string;
 	item_ean: string;
-	amount: string;
-	price_per_unit: string;
+	amount: number;
+	price_per_unit: number;
 	vat_rate: VatRate;
+	reset_point?: boolean;
 	created_at?: string;
 }
 
@@ -94,7 +97,7 @@ export type CreateStockMovementInput = CreateInput<StockMovement, "created_at">;
 export type UpdateStockMovementInput = UpdateInput<
 	StockMovement,
 	"created_at",
-	"invoice_number" | "item_ean"
+	"invoice_prefix" | "invoice_number" | "item_ean"
 >;
 
 /**
@@ -105,6 +108,7 @@ export type UpdateStockMovementInput = UpdateInput<
  */
 export interface Invoice {
 	number: string;
+	prefix?: string;
 	type: InvoiceType;
 	payment_method?: PaymentMethodType;
 	date_issue: string;
@@ -112,6 +116,8 @@ export interface Invoice {
 	date_due?: string;
 	variable_symbol?: string;
 	note?: string;
+	total_without_vat?: number;
+	total_with_vat?: number;
 
 	ico?: string;
 	modifier?: number;
@@ -137,3 +143,9 @@ export type UpdateInvoiceInput = UpdateInput<
 	"created_at" | "updated_at",
 	"number"
 >;
+
+export interface StockMovementWithInvoiceInfo extends StockMovement {
+	date_issue: string;
+	invoice_type: number;
+	contact_ico: string | null;
+}

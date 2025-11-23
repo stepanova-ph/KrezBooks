@@ -179,6 +179,9 @@ const theme = createTheme({
 				containedPrimary: {
 					backgroundImage: "var(--gradient-primary)",
 					color: "#fff",
+					"&.Mui-disabled": {
+						color: "#a5a5a5ff",
+					},
 				},
 			},
 		},

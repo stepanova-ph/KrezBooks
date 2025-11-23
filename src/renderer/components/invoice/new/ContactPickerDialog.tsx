@@ -13,7 +13,10 @@ import {
 interface ContactPickerDialogProps {
 	open: boolean;
 	onClose: () => void;
-	onSelect: (contact: Contact) => void;
+	onToggleSelect?: (contact: Contact) => void;
+	onSelect?: (contact: Contact) => void;
+	selectedContacts?: Array<{ ico: string; modifier: number }>;
+	singleSelect?: boolean;
 }
 
 const pickerColumns: Column[] = [
@@ -27,24 +30,62 @@ const pickerColumns: Column[] = [
 export function ContactPickerDialog({
 	open,
 	onClose,
+	onToggleSelect,
 	onSelect,
+	selectedContacts = [],
+	singleSelect = false,
 }: ContactPickerDialogProps) {
 	const { data: allContacts = [] } = useContacts();
 	const [filters, setFilters] = useState<{ search: string }>(
 		initialPickerFilterState,
 	);
 
+	const isContactSelected = (contact: Contact) => {
+		return selectedContacts.some(
+			c => c.ico === contact.ico && c.modifier === contact.modifier
+		);
+	};
+	
 	const filteredContacts = useTableFilters(
 		allContacts,
 		filters,
 		contactPickerFilterConfig,
 	);
 
+	// Sort selected contacts to top
+	const sortedContacts = [...filteredContacts].sort((a, b) => {
+		const aSelected = isContactSelected(a);
+		const bSelected = isContactSelected(b);
+		if (aSelected && !bSelected) return -1;
+		if (!aSelected && bSelected) return 1;
+		return 0;
+	});
+
+
+	
+
+	const handleSelect = (contact: Contact) => {
+		if (singleSelect) {
+			// Single select mode: call onSelect and close
+			if (onSelect) {
+				onSelect(contact);
+			}
+			onClose();
+		} else {
+			// Multi-select mode: toggle selection
+			if (onToggleSelect) {
+				onToggleSelect(contact);
+			}
+		}
+	};
+
 	const renderRow = (
 		contact: Contact,
 		visibleColumns: Column[],
 		isFocused: boolean,
 	) => {
+		const isSelected = !singleSelect && isContactSelected(contact);
+		
 		return visibleColumns.map((col) => {
 			let content;
 			switch (col.id) {
@@ -68,7 +109,14 @@ export function ContactPickerDialog({
 			}
 
 			return (
-				<TableCell key={col.id} align={col.align}>
+				<TableCell 
+					key={col.id} 
+					align={col.align}
+					sx={{
+						bgcolor: isSelected ? "action.selected" : undefined,
+						fontWeight: isSelected ? "bold" : undefined,
+					}}
+				>
 					{content}
 				</TableCell>
 			);
@@ -79,16 +127,17 @@ export function ContactPickerDialog({
 		<PickerDialog
 			open={open}
 			onClose={onClose}
-			onSelect={onSelect}
-			title="Vybrat kontakt"
+			onSelect={handleSelect}
+			title={singleSelect ? "Vybrat kontakt" : "Vybrat kontakty"}
 			columns={pickerColumns}
-			data={filteredContacts}
+			data={sortedContacts}
 			getRowKey={(contact) => `${contact.ico}-${contact.modifier}`}
 			renderRow={renderRow}
 			emptyMessage="Žádné kontakty nenalezeny"
 			searchPlaceholder="IČO, název, DIČ..."
 			filterValue={filters.search || ""}
 			onFilterChange={(value) => setFilters({ ...filters, search: value })}
+			keepOpenOnSelect={!singleSelect}
 		/>
 	);
 }
