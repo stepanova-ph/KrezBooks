@@ -71,6 +71,7 @@ declare global {
 				exportData: () => Promise<IpcResponse<{}>>;
 				importLegacyContacts: () => Promise<IpcResponse<{}>>;
 				importLegacyItems: () => Promise<IpcResponse<{}>>;
+				importData: () => Promise<IpcResponse<{}>>;
 			}
 
 			stockMovements: {

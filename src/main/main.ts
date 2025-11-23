@@ -4,7 +4,9 @@ import { initDatabase, closeDatabase } from "./database";
 import { registerIpcHandlers } from "./ipc-handlers";
 import registerAdminHandlers from "./admin-handlers";
 import { logger } from "./logger";
-import { registerDataTransferHandlers, registerLegacyImportHandlers } from "./data-transfer-handlers";
+import { registerLegacyImportHandlers } from "./data-handlers/data-import-legacy-handlers";
+import { registerDataExportHandlers } from "./data-handlers/data-export-handlers";
+import { registerDataImportHandlers } from "./data-handlers/data-import-handlers";
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -47,8 +49,9 @@ app.whenReady().then(async () => {
 
 	registerIpcHandlers();
 	registerAdminHandlers();
-	registerDataTransferHandlers();
+	registerDataExportHandlers();
 	registerLegacyImportHandlers();
+	registerDataImportHandlers();
 
 	createWindow();
 });

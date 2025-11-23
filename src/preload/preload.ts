@@ -69,6 +69,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		exportData: () => ipcRenderer.invoke("db:exportData"),
 		importLegacyItems: () => ipcRenderer.invoke("db:importLegacyItems"),
 		importLegacyContacts: () => ipcRenderer.invoke("db:importLegacyContacts"),
+		importData: () => ipcRenderer.invoke("db:importData"),
 	},
 
 	invoices: {
