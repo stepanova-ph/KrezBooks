@@ -56,6 +56,7 @@ describe("Invoice and Stock Movement Integration", () => {
 	describe("Invoice Creation", () => {
 		it("should create invoice via IPC wrapper", async () => {
 			const invoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-001",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -71,7 +72,7 @@ describe("Invoice and Stock Movement Integration", () => {
 			expect(response.data?.changes).toBe(1);
 
 			// Verify it's in the database
-			const retrieved = await invoiceService.getOne("INV-001");
+			const retrieved = await invoiceService.getOne("INV", "INV-001");
 			expect(retrieved).toBeDefined();
 			expect(retrieved?.number).toBe("INV-001");
 			expect(retrieved?.type).toBe(1);
@@ -80,6 +81,7 @@ describe("Invoice and Stock Movement Integration", () => {
 
 		it("should create invoice with all optional fields", async () => {
 			const invoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-002",
 				type: 2,
 				payment_method: 1,
@@ -98,8 +100,9 @@ describe("Invoice and Stock Movement Integration", () => {
 
 			expect(response.success).toBe(true);
 
-			const retrieved = await invoiceService.getOne("INV-002");
+			const retrieved = await invoiceService.getOne("INV", "INV-002");
 			expect(retrieved).toMatchObject({
+				prefix: "INV",
 				number: "INV-002",
 				type: 2,
 				payment_method: 1,
@@ -110,6 +113,7 @@ describe("Invoice and Stock Movement Integration", () => {
 
 		it("should fail when creating duplicate invoice", async () => {
 			const invoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-003",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -132,6 +136,7 @@ describe("Invoice and Stock Movement Integration", () => {
 		beforeEach(async () => {
 			// Create invoice for stock movements
 			await invoiceService.create({
+				prefix: "INV",
 				number: "INV-100",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -142,7 +147,8 @@ describe("Invoice and Stock Movement Integration", () => {
 
 		it("should create stock movement via IPC wrapper", async () => {
 			const movement: CreateStockMovementInput = {
-				invoice_number: "INV-100",
+					invoice_prefix: "INV",
+					invoice_number: "INV-100",
 				item_ean: "1234567890123",
 				amount: "10",
 				price_per_unit: "50.00",
@@ -158,6 +164,7 @@ describe("Invoice and Stock Movement Integration", () => {
 
 			// Verify it's in the database
 			const retrieved = await stockMovementService.getOne(
+				"INV",
 				"INV-100",
 				"1234567890123",
 			);
@@ -169,7 +176,8 @@ describe("Invoice and Stock Movement Integration", () => {
 
 		it("should fail when creating movement with non-existent invoice", async () => {
 			const movement: CreateStockMovementInput = {
-				invoice_number: "INV-999",
+					invoice_prefix: "INV",
+					invoice_number: "INV-999",
 				item_ean: "1234567890123",
 				amount: "10",
 				price_per_unit: "50.00",
@@ -186,7 +194,8 @@ describe("Invoice and Stock Movement Integration", () => {
 
 		it("should fail when creating movement with non-existent item", async () => {
 			const movement: CreateStockMovementInput = {
-				invoice_number: "INV-100",
+					invoice_prefix: "INV",
+					invoice_number: "INV-100",
 				item_ean: "9999999999999",
 				amount: "10",
 				price_per_unit: "50.00",
@@ -210,6 +219,7 @@ describe("Invoice and Stock Movement Integration", () => {
 
 			// Create invoice
 			const invoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-200",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -225,6 +235,7 @@ describe("Invoice and Stock Movement Integration", () => {
 			// Create multiple stock movements
 			const movements: CreateStockMovementInput[] = [
 				{
+					invoice_prefix: "INV",
 					invoice_number: "INV-200",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -232,6 +243,7 @@ describe("Invoice and Stock Movement Integration", () => {
 					vat_rate: 2,
 				},
 				{
+					invoice_prefix: "INV",
 					invoice_number: "INV-200",
 					item_ean: "2222222222222",
 					amount: "5",
@@ -239,6 +251,7 @@ describe("Invoice and Stock Movement Integration", () => {
 					vat_rate: 2,
 				},
 				{
+					invoice_prefix: "INV",
 					invoice_number: "INV-200",
 					item_ean: "3333333333333",
 					amount: "15",
@@ -256,7 +269,7 @@ describe("Invoice and Stock Movement Integration", () => {
 
 			// Verify all movements are linked to the invoice
 			const invoiceMovements =
-				await stockMovementService.getByInvoice("INV-200");
+				await stockMovementService.getByInvoice("INV", "INV-200");
 			expect(invoiceMovements).toHaveLength(3);
 			expect(invoiceMovements.map((m) => m.item_ean).sort()).toEqual([
 				"1234567890123",
@@ -268,6 +281,7 @@ describe("Invoice and Stock Movement Integration", () => {
 		it("should delete invoice and cascade delete stock movements", async () => {
 			// Create invoice with movements
 			await invoiceService.create({
+				prefix: "INV",
 				number: "INV-300",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -276,7 +290,8 @@ describe("Invoice and Stock Movement Integration", () => {
 			});
 
 			await stockMovementService.create({
-				invoice_number: "INV-300",
+					invoice_prefix: "INV",
+					invoice_number: "INV-300",
 				item_ean: "1234567890123",
 				amount: "10",
 				price_per_unit: "50.00",
@@ -284,17 +299,17 @@ describe("Invoice and Stock Movement Integration", () => {
 			});
 
 			// Verify movement exists
-			let movements = await stockMovementService.getByInvoice("INV-300");
+			let movements = await stockMovementService.getByInvoice("INV", "INV-300");
 			expect(movements).toHaveLength(1);
 
 			// Delete invoice
 			const deleteResponse = await handleIpcRequest(() =>
-				invoiceService.delete("INV-300"),
+				invoiceService.delete("INV", "INV-300"),
 			);
 			expect(deleteResponse.success).toBe(true);
 
 			// Verify movement is also deleted (due to CASCADE)
-			movements = await stockMovementService.getByInvoice("INV-300");
+			movements = await stockMovementService.getByInvoice("INV", "INV-300");
 			expect(movements).toHaveLength(0);
 		});
 	});
@@ -303,6 +318,7 @@ describe("Invoice and Stock Movement Integration", () => {
 		beforeEach(async () => {
 			// Create multiple invoices with stock movements
 			await invoiceService.create({
+				prefix: "INV",
 				number: "INV-401",
 				type: 1,
 				date_issue: "2024-01-10",
@@ -311,6 +327,7 @@ describe("Invoice and Stock Movement Integration", () => {
 			});
 
 			await invoiceService.create({
+				prefix: "INV",
 				number: "INV-402",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -319,7 +336,8 @@ describe("Invoice and Stock Movement Integration", () => {
 			});
 
 			await stockMovementService.create({
-				invoice_number: "INV-401",
+					invoice_prefix: "INV",
+					invoice_number: "INV-401",
 				item_ean: "1234567890123",
 				amount: "10",
 				price_per_unit: "50.00",
@@ -327,7 +345,8 @@ describe("Invoice and Stock Movement Integration", () => {
 			});
 
 			await stockMovementService.create({
-				invoice_number: "INV-402",
+					invoice_prefix: "INV",
+					invoice_number: "INV-402",
 				item_ean: "1234567890123",
 				amount: "20",
 				price_per_unit: "60.00",
@@ -374,6 +393,7 @@ describe("Invoice and Stock Movement Integration", () => {
 	describe("Update Operations", () => {
 		beforeEach(async () => {
 			await invoiceService.create({
+				prefix: "INV",
 				number: "INV-500",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -382,7 +402,8 @@ describe("Invoice and Stock Movement Integration", () => {
 			});
 
 			await stockMovementService.create({
-				invoice_number: "INV-500",
+					invoice_prefix: "INV",
+					invoice_number: "INV-500",
 				item_ean: "1234567890123",
 				amount: "10",
 				price_per_unit: "50.00",
@@ -397,13 +418,13 @@ describe("Invoice and Stock Movement Integration", () => {
 			};
 
 			const response = await handleIpcRequest(() =>
-				invoiceService.update("INV-500", updates),
+				invoiceService.update("INV", "INV-500", updates),
 			);
 
 			expect(response.success).toBe(true);
 			expect(response.data?.changes).toBe(1);
 
-			const updated = await invoiceService.getOne("INV-500");
+			const updated = await invoiceService.getOne("INV", "INV-500");
 			expect(updated?.note).toBe("Updated note");
 			expect(updated?.variable_symbol).toBe("999999");
 		});
@@ -415,13 +436,14 @@ describe("Invoice and Stock Movement Integration", () => {
 			};
 
 			const response = await handleIpcRequest(() =>
-				stockMovementService.update("INV-500", "1234567890123", updates),
+				stockMovementService.update("INV", "INV-500", "1234567890123", updates),
 			);
 
 			expect(response.success).toBe(true);
 			expect(response.data?.changes).toBe(1);
 
 			const updated = await stockMovementService.getOne(
+				"INV",
 				"INV-500",
 				"1234567890123",
 			);
@@ -433,7 +455,7 @@ describe("Invoice and Stock Movement Integration", () => {
 	describe("Error Handling", () => {
 		it("should handle invoice not found on update", async () => {
 			const response = await handleIpcRequest(() =>
-				invoiceService.update("INV-999", { note: "test" }),
+				invoiceService.update("INV", "INV-999", { note: "test" }),
 			);
 
 			expect(response.success).toBe(false);
@@ -442,7 +464,7 @@ describe("Invoice and Stock Movement Integration", () => {
 
 		it("should handle invoice not found on delete", async () => {
 			const response = await handleIpcRequest(() =>
-				invoiceService.delete("INV-999"),
+				invoiceService.delete("INV", "INV-999"),
 			);
 
 			expect(response.success).toBe(false);
@@ -451,7 +473,7 @@ describe("Invoice and Stock Movement Integration", () => {
 
 		it("should handle stock movement not found on update", async () => {
 			const response = await handleIpcRequest(() =>
-				stockMovementService.update("INV-999", "1234567890123", {
+				stockMovementService.update("INV", "INV-999", "1234567890123", {
 					amount: "10",
 				}),
 			);

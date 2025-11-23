@@ -13,7 +13,7 @@ export class InvoiceService {
 	async getOne(prefix: string, number: string): Promise<Invoice | undefined> {
 		const db = getDatabase();
 		const statement = db.prepare(invoiceQueries.getOne);
-		const invoice = statement.get(number, prefix);
+		const invoice = statement.get(prefix, number);
 		return invoice as Invoice | undefined;
 	}
 
@@ -48,13 +48,14 @@ export class InvoiceService {
 	}
 
 	async update(
+		prefix: string,
 		number: string,
 		updates: Partial<Invoice>,
 	): Promise<{ changes: number }> {
 		const db = getDatabase();
 
 		const fieldsToUpdate = Object.keys(updates).filter(
-			(key) => key !== "number" && key !== "created_at" && key !== "updated_at",
+			(key) => key !== "prefix" && key !== "number" && key !== "created_at" && key !== "updated_at",
 		);
 
 		if (fieldsToUpdate.length === 0) {
@@ -64,7 +65,7 @@ export class InvoiceService {
 		const sql = this.buildUpdateQuery("invoices", fieldsToUpdate);
 		const statement = db.prepare(sql);
 
-		const updateData: any = { number };
+		const updateData: any = { prefix, number };
 		for (const field of fieldsToUpdate) {
 			updateData[field] = (updates as any)[field] ?? null;
 		}
@@ -92,7 +93,6 @@ export class InvoiceService {
 
 	private buildUpdateQuery(tableName: string, fields: string[]): string {
 		const allowedFields = new Set([
-			"prefix",
 			"type",
 			"payment_method",
 			"date_issue",

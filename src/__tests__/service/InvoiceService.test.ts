@@ -29,6 +29,7 @@ describe("InvoiceService", () => {
 	describe("create", () => {
 		it("should create a new invoice", async () => {
 			const invoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-001",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -43,6 +44,7 @@ describe("InvoiceService", () => {
 
 		it("should create invoice with all optional fields", async () => {
 			const invoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-002",
 				type: 2,
 				payment_method: 1,
@@ -67,13 +69,14 @@ describe("InvoiceService", () => {
 
 			expect(result.changes).toBe(1);
 
-			const retrieved = await invoiceService.getOne("INV-002");
+			const retrieved = await invoiceService.getOne("INV", "INV-002");
 			expect(retrieved?.variable_symbol).toBe("123456");
 			expect(retrieved?.note).toBe("Test note");
 		});
 
 		it("should throw error for duplicate invoice number", async () => {
 			const invoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-003",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -89,6 +92,7 @@ describe("InvoiceService", () => {
 		it("should accept all valid invoice types (1-5)", async () => {
 			for (let type = 1; type <= 5; type++) {
 				const invoice: CreateInvoiceInput = {
+					prefix: "INV",
 					number: `INV-TYPE-${type}`,
 					type,
 					date_issue: "2024-01-15",
@@ -111,6 +115,7 @@ describe("InvoiceService", () => {
 
 		it("should return all invoices", async () => {
 			const invoice1: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-010",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -119,6 +124,7 @@ describe("InvoiceService", () => {
 			};
 
 			const invoice2: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-011",
 				type: 3,
 				date_issue: "2024-01-16",
@@ -137,13 +143,14 @@ describe("InvoiceService", () => {
 
 	describe("getOne", () => {
 		it("should return undefined for non-existent invoice", async () => {
-			const invoice = await invoiceService.getOne("NONEXISTENT");
+			const invoice = await invoiceService.getOne("INV", "NONEXISTENT");
 
 			expect(invoice).toBeUndefined();
 		});
 
 		it("should return invoice by number", async () => {
 			const newInvoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-012",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -153,7 +160,7 @@ describe("InvoiceService", () => {
 
 			await invoiceService.create(newInvoice);
 
-			const invoice = await invoiceService.getOne("INV-012");
+			const invoice = await invoiceService.getOne("INV", "INV-012");
 
 			expect(invoice).toBeDefined();
 			expect(invoice?.number).toBe("INV-012");
@@ -164,6 +171,7 @@ describe("InvoiceService", () => {
 	describe("update", () => {
 		it("should update invoice fields", async () => {
 			const original: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-013",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -179,11 +187,11 @@ describe("InvoiceService", () => {
 				variable_symbol: "999999",
 			};
 
-			const result = await invoiceService.update("INV-013", updates);
+			const result = await invoiceService.update("INV", "INV-013", updates);
 
 			expect(result.changes).toBe(1);
 
-			const updated = await invoiceService.getOne("INV-013");
+			const updated = await invoiceService.getOne("INV", "INV-013");
 			expect(updated?.type).toBe(2);
 			expect(updated?.note).toBe("Updated note");
 			expect(updated?.variable_symbol).toBe("999999");
@@ -191,6 +199,7 @@ describe("InvoiceService", () => {
 
 		it("should throw error when no fields to update", async () => {
 			const original: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-014",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -200,7 +209,7 @@ describe("InvoiceService", () => {
 
 			await invoiceService.create(original);
 
-			await expect(invoiceService.update("INV-014", {})).rejects.toThrow(
+			await expect(invoiceService.update("INV", "INV-014", {})).rejects.toThrow(
 				"No fields to update",
 			);
 		});
@@ -209,6 +218,7 @@ describe("InvoiceService", () => {
 	describe("delete", () => {
 		it("should delete existing invoice", async () => {
 			const invoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-015",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -218,11 +228,11 @@ describe("InvoiceService", () => {
 
 			await invoiceService.create(invoice);
 
-			const result = await invoiceService.delete("INV-015");
+			const result = await invoiceService.delete("INV", "INV-015");
 
 			expect(result.changes).toBe(1);
 
-			const deleted = await invoiceService.getOne("INV-015");
+			const deleted = await invoiceService.getOne("INV", "INV-015");
 			expect(deleted).toBeUndefined();
 		});
 	});

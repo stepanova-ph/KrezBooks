@@ -25,6 +25,7 @@ describe("invoiceQueries", () => {
 
 			insert.run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV001",
 					type: 1,
 					date_issue: "2024-01-15",
@@ -33,6 +34,7 @@ describe("invoiceQueries", () => {
 
 			insert.run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV002",
 					type: 1,
 					date_issue: "2024-01-20",
@@ -41,6 +43,7 @@ describe("invoiceQueries", () => {
 
 			insert.run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV003",
 					type: 1,
 					date_issue: "2024-01-20",
@@ -58,7 +61,7 @@ describe("invoiceQueries", () => {
 
 	describe("getOne", () => {
 		it("should return undefined when invoice does not exist", () => {
-			const result = db.prepare(invoiceQueries.getOne).get("INV999");
+			const result = db.prepare(invoiceQueries.getOne).get("INV", "INV999");
 			expect(result).toBeUndefined();
 		});
 
@@ -67,6 +70,7 @@ describe("invoiceQueries", () => {
 
 			insert.run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV001",
 					type: 1,
 					date_issue: "2024-01-15",
@@ -74,7 +78,7 @@ describe("invoiceQueries", () => {
 				}),
 			);
 
-			const result = db.prepare(invoiceQueries.getOne).get("INV001");
+			const result = db.prepare(invoiceQueries.getOne).get("INV", "INV001");
 
 			expect(result).toBeDefined();
 			expect(result.number).toBe("INV001");
@@ -88,6 +92,7 @@ describe("invoiceQueries", () => {
 
 			const result = insert.run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV001",
 					type: 1,
 					payment_method: 1,
@@ -111,7 +116,7 @@ describe("invoiceQueries", () => {
 
 			expect(result.changes).toBe(1);
 
-			const check = db.prepare(invoiceQueries.getOne).get("INV001");
+			const check = db.prepare(invoiceQueries.getOne).get("INV", "INV001");
 			expect(check.number).toBe("INV001");
 			expect(check.company_name).toBe("Test Company");
 			expect(check.email).toBe("test@example.com");
@@ -122,6 +127,7 @@ describe("invoiceQueries", () => {
 
 			const result = insert.run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV001",
 					type: 1,
 					date_issue: "2024-01-15",
@@ -130,7 +136,7 @@ describe("invoiceQueries", () => {
 
 			expect(result.changes).toBe(1);
 
-			const check = db.prepare(invoiceQueries.getOne).get("INV001");
+			const check = db.prepare(invoiceQueries.getOne).get("INV", "INV001");
 			expect(check.number).toBe("INV001");
 			expect(check.type).toBe(1);
 			expect(check.payment_method).toBeNull();
@@ -144,6 +150,7 @@ describe("invoiceQueries", () => {
 
 			insert.run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV001",
 					type: 1,
 					date_issue: "2024-01-15",
@@ -151,17 +158,17 @@ describe("invoiceQueries", () => {
 			);
 
 			const deleteStmt = db.prepare(invoiceQueries.delete);
-			const result = deleteStmt.run("INV001");
+			const result = deleteStmt.run("INV", "INV001");
 
 			expect(result.changes).toBe(1);
 
-			const check = db.prepare(invoiceQueries.getOne).get("INV001");
+			const check = db.prepare(invoiceQueries.getOne).get("INV", "INV001");
 			expect(check).toBeUndefined();
 		});
 
 		it("should return 0 changes when invoice does not exist", () => {
 			const deleteStmt = db.prepare(invoiceQueries.delete);
-			const result = deleteStmt.run("INV999");
+			const result = deleteStmt.run("INV", "INV999");
 
 			expect(result.changes).toBe(0);
 		});
@@ -175,6 +182,7 @@ describe("invoiceQueries", () => {
 				expect(() => {
 					insert.run(
 						serializeInvoice({
+							prefix: "INV",
 							number: `INV00${i}`,
 							type: i,
 							date_issue: "2024-01-15",
@@ -190,6 +198,7 @@ describe("invoiceQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeInvoice({
+						prefix: "INV",
 						number: "INV001",
 						type: 0,
 						date_issue: "2024-01-15",
@@ -200,6 +209,7 @@ describe("invoiceQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeInvoice({
+						prefix: "INV",
 						number: "INV002",
 						type: 6,
 						date_issue: "2024-01-15",
@@ -216,6 +226,7 @@ describe("invoiceQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeInvoice({
+						prefix: "INV",
 						number: "INV001",
 						type: 1,
 						payment_method: 0,
@@ -227,6 +238,7 @@ describe("invoiceQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeInvoice({
+						prefix: "INV",
 						number: "INV002",
 						type: 1,
 						payment_method: 1,
@@ -238,6 +250,7 @@ describe("invoiceQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeInvoice({
+						prefix: "INV",
 						number: "INV003",
 						type: 1,
 						payment_method: undefined,
@@ -253,6 +266,7 @@ describe("invoiceQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeInvoice({
+						prefix: "INV",
 						number: "INV001",
 						type: 1,
 						payment_method: 2,
@@ -264,6 +278,7 @@ describe("invoiceQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeInvoice({
+						prefix: "INV",
 						number: "INV002",
 						type: 1,
 						payment_method: -1,
@@ -280,6 +295,7 @@ describe("invoiceQueries", () => {
 
 			insert.run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV001",
 					type: 1,
 					date_issue: "2024-01-15",
@@ -289,6 +305,7 @@ describe("invoiceQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeInvoice({
+						prefix: "INV",
 						number: "INV001",
 						type: 2,
 						date_issue: "2024-01-20",
@@ -304,6 +321,7 @@ describe("invoiceQueries", () => {
 
 			const result = insert.run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV001",
 					type: 1,
 					date_issue: "2024-01-15",
@@ -314,7 +332,7 @@ describe("invoiceQueries", () => {
 
 			expect(result.changes).toBe(1);
 
-			const check = db.prepare(invoiceQueries.getOne).get("INV001");
+			const check = db.prepare(invoiceQueries.getOne).get("INV", "INV001");
 			expect(check.date_tax).toBeNull();
 			expect(check.date_due).toBeNull();
 		});
@@ -324,6 +342,7 @@ describe("invoiceQueries", () => {
 
 			insert.run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV001",
 					type: 1,
 					date_issue: "2024-01-15",
@@ -332,7 +351,7 @@ describe("invoiceQueries", () => {
 				}),
 			);
 
-			const check = db.prepare(invoiceQueries.getOne).get("INV001");
+			const check = db.prepare(invoiceQueries.getOne).get("INV", "INV001");
 			expect(check.date_tax).toBe("2024-01-16");
 			expect(check.date_due).toBe("2024-02-15");
 		});

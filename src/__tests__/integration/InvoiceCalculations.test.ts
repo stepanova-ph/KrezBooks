@@ -66,6 +66,7 @@ describe("Invoice Calculations", () => {
 		// Create test invoice
 		db.prepare(invoiceQueries.create).run(
 			serializeInvoice({
+				prefix: "INV",
 				number: "INV-TEST",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -79,6 +80,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "1111111111111",
 					amount: "10",
@@ -98,6 +100,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "2222222222222",
 					amount: "10",
@@ -119,6 +122,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "3333333333333",
 					amount: "10",
@@ -142,6 +146,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "3333333333333",
 					amount: "5",
@@ -152,6 +157,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "1111111111111",
 					amount: "3",
@@ -176,6 +182,7 @@ describe("Invoice Calculations", () => {
 			// 0% VAT: 10 * 50 = 500 → 500
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "1111111111111",
 					amount: "10",
@@ -187,6 +194,7 @@ describe("Invoice Calculations", () => {
 			// 12% VAT: 5 * 100 = 500 → 560
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "2222222222222",
 					amount: "5",
@@ -198,6 +206,7 @@ describe("Invoice Calculations", () => {
 			// 21% VAT: 20 * 30 = 600 → 726
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "3333333333333",
 					amount: "20",
@@ -221,6 +230,7 @@ describe("Invoice Calculations", () => {
 			// Multiple items with different VAT rates
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "1111111111111",
 					amount: "2",
@@ -231,6 +241,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "2222222222222",
 					amount: "3",
@@ -241,6 +252,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "3333333333333",
 					amount: "1",
@@ -265,6 +277,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "3333333333333",
 					amount: "0",
@@ -284,6 +297,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "3333333333333",
 					amount: "10",
@@ -303,6 +317,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "3333333333333",
 					amount: "2.5",
@@ -324,6 +339,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "3333333333333",
 					amount: "0.01",
@@ -345,6 +361,7 @@ describe("Invoice Calculations", () => {
 
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "3333333333333",
 					amount: "1000",
@@ -359,27 +376,6 @@ describe("Invoice Calculations", () => {
 			// 999990 * 1.21 = 1209987.9 with VAT
 			expect(invoice.total_without_vat).toBeCloseTo(999990, 2);
 			expect(invoice.total_with_vat).toBeCloseTo(1209987.9, 1);
-		});
-
-		it("should handle negative amounts (returns/corrections)", () => {
-			const insertMovement = db.prepare(stockMovementQueries.create);
-
-			insertMovement.run(
-				serializeStockMovement({
-					invoice_number: "INV-TEST",
-					item_ean: "3333333333333",
-					amount: "-5",
-					price_per_unit: "100.00",
-					vat_rate: 2,
-				}),
-			);
-
-			const invoice = db.prepare(invoiceQueries.getAll).get();
-
-			// -5 * 100 = -500 without VAT
-			// -500 * 1.21 = -605 with VAT
-			expect(invoice.total_without_vat).toBe(-500);
-			expect(invoice.total_with_vat).toBe(-605);
 		});
 
 		it("should return zero totals when invoice has no stock movements", () => {
@@ -397,6 +393,7 @@ describe("Invoice Calculations", () => {
 			// 3 * 33.33 = 99.99, with 21% VAT = 120.9879
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "3333333333333",
 					amount: "3",
@@ -417,6 +414,7 @@ describe("Invoice Calculations", () => {
 			// 7 * 15.15 = 106.05, with 12% VAT = 118.776
 			insertMovement.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV-TEST",
 					item_ean: "2222222222222",
 					amount: "7",

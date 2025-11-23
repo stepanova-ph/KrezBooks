@@ -108,7 +108,7 @@ export type UpdateStockMovementInput = UpdateInput<
  */
 export interface Invoice {
 	number: string;
-	prefix?: string;
+	prefix: string;
 	type: InvoiceType;
 	payment_method?: PaymentMethodType;
 	date_issue: string;
