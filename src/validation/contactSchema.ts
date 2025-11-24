@@ -27,7 +27,11 @@ export const contactSchema = z
 		// validationMessages.contact.dic.invalid,
 		// )
 		modifier: z.preprocess(
-			(v) => Number(v),
+			(v) => {
+				const num = Number(v);
+				// Convert 0 to 1 for imports (legacy data compatibility)
+				return num === 0 ? 1 : num;
+			},
 			z
 				.number()
 				.int()
@@ -98,8 +102,24 @@ export const contactSchema = z
 			validationMessages.contact.bankAccount.invalid,
 		),
 
-		is_supplier: z.boolean(),
-		is_customer: z.boolean(),
+		is_supplier: z.preprocess(
+			(v) => {
+				if (typeof v === "boolean") return v;
+				if (v === "1" || v === 1) return true;
+				if (v === "0" || v === 0) return false;
+				return v;
+			},
+			z.boolean(),
+		),
+		is_customer: z.preprocess(
+			(v) => {
+				if (typeof v === "boolean") return v;
+				if (v === "1" || v === 1) return true;
+				if (v === "0" || v === 0) return false;
+				return v;
+			},
+			z.boolean(),
+		),
 
 		price_group: z.preprocess(
 			(v) => Number(v),

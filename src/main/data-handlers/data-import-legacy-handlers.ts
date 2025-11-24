@@ -23,6 +23,18 @@ interface ImportError {
 	issues: string[];
 }
 
+// =============================================================================
+// HELPER: Async yield to event loop
+// =============================================================================
+
+/**
+ * Yields control back to the event loop to prevent blocking.
+ * Call this periodically in long-running operations.
+ */
+function yieldToEventLoop(): Promise<void> {
+	return new Promise((resolve) => setImmediate(resolve));
+}
+
 function parseTSV(content: string): { headers: string[]; rows: string[][] } {
 	// Remove BOM if present
 	const cleanContent = content.replace(/^\uFEFF/, "");
@@ -197,8 +209,11 @@ function processLegacyItemRow(
 
 async function importLegacyItems(filePath: string): Promise<ImportResult> {
 	const db = getDatabase();
-	const content = fs.readFileSync(filePath, "utf-8");
+	const content = await fs.promises.readFile(filePath, "utf-8");
 	const { headers, rows } = parseTSV(content);
+
+	// Yield after parsing
+	await yieldToEventLoop();
 
 	if (headers.length === 0) {
 		return { success: false, error: "Empty file or invalid format" };
@@ -252,6 +267,11 @@ async function importLegacyItems(filePath: string): Promise<ImportResult> {
 					issues: [`Database error: ${errorMessage}`],
 				});
 			}
+		}
+
+		// Yield to event loop every 10 rows to prevent blocking
+		if (i % 10 === 0 && i > 0) {
+			await yieldToEventLoop();
 		}
 	}
 
@@ -362,8 +382,11 @@ function processLegacyContactRow(
 
 async function importLegacyContacts(filePath: string): Promise<ImportResult> {
 	const db = getDatabase();
-	const content = fs.readFileSync(filePath, "utf-8");
+	const content = await fs.promises.readFile(filePath, "utf-8");
 	const { headers, rows } = parseTSV(content);
+
+	// Yield after parsing
+	await yieldToEventLoop();
 
 	if (headers.length === 0) {
 		return { success: false, error: "Empty file or invalid format" };
@@ -419,6 +442,11 @@ async function importLegacyContacts(filePath: string): Promise<ImportResult> {
 					issues: [`Database error: ${errorMessage}`],
 				});
 			}
+		}
+
+		// Yield to event loop every 10 rows to prevent blocking
+		if (i % 10 === 0 && i > 0) {
+			await yieldToEventLoop();
 		}
 	}
 
