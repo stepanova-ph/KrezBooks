@@ -47,14 +47,14 @@ function tableToCSV(rows: Record<string, unknown>[]): string {
 	return UTF8_BOM + header + "\n" + dataRows.join("\n");
 }
 
-function exportTable(tableName: TableName): string {
+function exportTable(tableName: TableName): { csv: string; count: number } {
 	const db = getDatabase();
 	const rows = db.prepare(`SELECT * FROM ${tableName}`).all() as Record<
 		string,
 		unknown
 	>[];
 
-	return tableToCSV(rows);
+	return { csv: tableToCSV(rows), count: rows.length };
 }
 
 function formatDate(date: Date): string {
@@ -67,8 +67,19 @@ function formatDate(date: Date): string {
 async function performExport(
 	exportPath: string,
 	progressCallback?: (message: string, progress: number) => void,
-): Promise<{ success: boolean; error?: string; path?: string }> {
+): Promise<{
+	success: boolean;
+	error?: string;
+	path?: string;
+	exported?: Record<string, number>;
+}> {
 	const createdFiles: string[] = [];
+	const exported: Record<string, number> = {
+		contacts: 0,
+		items: 0,
+		invoices: 0,
+		stock_movements: 0,
+	};
 
 	try {
 		const totalTables = TABLES.length;
@@ -79,7 +90,9 @@ async function performExport(
 
 			progressCallback?.(`Exportuji tabulku ${tableName}...`, progress);
 
-			const csvContent = exportTable(tableName);
+			const { csv: csvContent, count } = exportTable(tableName);
+			exported[tableName] = count;
+
 			const filePath = path.join(exportPath, `${tableName}.csv`);
 
 			fs.writeFileSync(filePath, csvContent, "utf-8");
@@ -90,7 +103,7 @@ async function performExport(
 
 		progressCallback?.(`Export dokončen`, 100);
 		logger.info(`Export completed to ${exportPath}`);
-		return { success: true, path: exportPath };
+		return { success: true, path: exportPath, exported };
 	} catch (error: any) {
 		// Cleanup on failure
 		progressCallback?.(`Export selhal: ${error.message}`, 0);
@@ -155,9 +168,54 @@ function registerDataExportHandlers() {
 				event.sender.send("export:progress", { message, progress });
 			};
 
+			// Send initial message
+			event.sender.send("export:progress", {
+				message: "Export zahájen",
+				progress: 0,
+			});
+
 			// Start export asynchronously (don't await)
 			performExport(finalExportPath, progressCallback)
 				.then((result) => {
+					// Send statistics messages if export was successful
+					if (result.success && result.exported) {
+						const stats = result.exported;
+
+						// Send detailed statistics
+						if (stats.contacts > 0) {
+							event.sender.send("export:progress", {
+								message: `Kontakty: ${stats.contacts} exportováno`,
+								progress: 100,
+							});
+						}
+						if (stats.items > 0) {
+							event.sender.send("export:progress", {
+								message: `Položky: ${stats.items} exportováno`,
+								progress: 100,
+							});
+						}
+						if (stats.invoices > 0) {
+							event.sender.send("export:progress", {
+								message: `Doklady: ${stats.invoices} exportováno`,
+								progress: 100,
+							});
+						}
+						if (stats.stock_movements > 0) {
+							event.sender.send("export:progress", {
+								message: `Pohyby skladu: ${stats.stock_movements} exportováno`,
+								progress: 100,
+							});
+						}
+
+						// Send export path
+						if (result.path) {
+							event.sender.send("export:progress", {
+								message: `Exportováno do: ${result.path}`,
+								progress: 100,
+							});
+						}
+					}
+
 					event.sender.send("export:complete", result);
 				})
 				.catch((error) => {

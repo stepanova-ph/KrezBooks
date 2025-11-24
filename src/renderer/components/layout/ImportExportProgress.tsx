@@ -4,9 +4,11 @@ import {
 	IconButton,
 	Collapse,
 	Typography,
+	Tooltip,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import { useState, useEffect } from "react";
 
 interface ProgressLog {
@@ -20,6 +22,7 @@ export function ImportExportProgress() {
 	const [currentProgress, setCurrentProgress] = useState(0);
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [isActive, setIsActive] = useState(false);
+	const [hasNewMessages, setHasNewMessages] = useState(false);
 
 	useEffect(() => {
 		// Listen for import progress
@@ -28,6 +31,14 @@ export function ImportExportProgress() {
 				setIsActive(true);
 				setCurrentProgress(data.progress);
 				setLogs((prev) => [...prev, { ...data, timestamp: new Date() }]);
+				// Mark as having new messages if console is collapsed
+				setHasNewMessages((prev) => {
+					// Only set to true if console is currently collapsed
+					if (!isExpanded) {
+						return true;
+					}
+					return prev;
+				});
 			},
 		);
 
@@ -37,6 +48,14 @@ export function ImportExportProgress() {
 				setIsActive(true);
 				setCurrentProgress(data.progress);
 				setLogs((prev) => [...prev, { ...data, timestamp: new Date() }]);
+				// Mark as having new messages if console is collapsed
+				setHasNewMessages((prev) => {
+					// Only set to true if console is currently collapsed
+					if (!isExpanded) {
+						return true;
+					}
+					return prev;
+				});
 			},
 		);
 
@@ -44,7 +63,43 @@ export function ImportExportProgress() {
 			unsubscribeImport();
 			unsubscribeExport();
 		};
-	}, []);
+	}, [isExpanded]);
+
+	// When console is expanded, clear the new messages flag
+	useEffect(() => {
+		if (isExpanded) {
+			setHasNewMessages(false);
+		}
+	}, [isExpanded]);
+
+	const handleClearConsole = () => {
+		setLogs([]);
+		setHasNewMessages(false);
+		setIsActive(false);
+		setCurrentProgress(0);
+		setIsExpanded(false);
+	};
+
+	const formatTimestamp = (date: Date) => {
+		return date.toLocaleTimeString("cs-CZ", {
+			hour: "2-digit",
+			minute: "2-digit",
+			hour12: false,
+		});
+	};
+
+	const formatMessage = (message: string) => {
+		// Check if message is "Import zahájen" or "Import dokončen" or "Export zahájen" or "Export dokončen"
+		if (
+			message.includes("zahájen") ||
+			message.includes("dokončen") ||
+			message.includes("zahájeno") ||
+			message.includes("dokončeno")
+		) {
+			return <strong>{message}</strong>;
+		}
+		return message;
+	};
 
 	// Don't render if there's no activity
 	if (!isActive) {
@@ -59,7 +114,7 @@ export function ImportExportProgress() {
 				alignItems: "center",
 				position: "relative",
 				mx: 2,
-				width: "200px",
+				width: "300px",
 			}}
 		>
 			{/* Progress Bar */}
@@ -85,20 +140,46 @@ export function ImportExportProgress() {
 						},
 					}}
 				/>
-				<IconButton
-					size="small"
-					onClick={() => setIsExpanded(!isExpanded)}
-					sx={{
-						color: "background.paper",
-						padding: 0.5,
-					}}
-				>
-					{isExpanded ? (
-						<ExpandLessIcon fontSize="small" />
-					) : (
-						<ExpandMoreIcon fontSize="small" />
-					)}
-				</IconButton>
+				<Tooltip title={isExpanded ? "Sbalit konzoli" : "Rozbalit konzoli"}>
+					<IconButton
+						size="medium"
+						onClick={() => setIsExpanded(!isExpanded)}
+						sx={{
+							color: hasNewMessages && !isExpanded
+								? "primary.light"
+								: "background.paper",
+							padding: hasNewMessages && !isExpanded ? 0.75 : 0.5,
+							transition: "color 0.3s ease-in-out",
+							animation: hasNewMessages && !isExpanded
+								? "heartbeatGlow 2s ease-in-out infinite"
+								: "none",
+							"@keyframes heartbeatGlow": {
+								"0%, 40%, 80%, 100%": {
+									transform: "scale(1)",
+									filter: "brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0))",
+								},
+								"10%": {
+									transform: "scale(1.20)",
+									filter: "brightness(1.4) drop-shadow(0 0 6px rgba(255, 255, 255, 0.8))",
+								},
+								"20%": {
+									transform: "scale(1)",
+									filter: "brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0))",
+								},
+								"30%": {
+									transform: "scale(1.20)",
+									filter: "brightness(1.4) drop-shadow(0 0 6px rgba(255, 255, 255, 0.8))",
+								},
+							},
+						}}
+					>
+						{isExpanded ? (
+							<ExpandLessIcon fontSize="medium" />
+						) : (
+							<ExpandMoreIcon fontSize="medium" />
+						)}
+					</IconButton>
+				</Tooltip>
 			</Box>
 
 			{/* Collapsible Console */}
@@ -120,28 +201,78 @@ export function ImportExportProgress() {
 						borderRadius: 1,
 						maxHeight: 200,
 						overflowY: "auto",
-						p: 1,
 						mt: 0.5,
 						boxShadow: 2,
 					}}
 				>
-					{logs.map((log, index) => (
+					{/* Console header with clear button */}
+					<Box
+						sx={{
+							display: "flex",
+							justifyContent: "space-between",
+							alignItems: "center",
+							px: 1,
+							pt: 1,
+							pb: 0.5,
+							borderBottom: 1,
+							borderColor: "divider",
+						}}
+					>
 						<Typography
-							key={index}
 							variant="caption"
 							sx={{
-								display: "block",
 								fontFamily: "monospace",
-								fontSize: "0.7rem",
+								fontWeight: "bold",
 								color: "text.secondary",
-								whiteSpace: "nowrap",
-								overflow: "hidden",
-								textOverflow: "ellipsis",
 							}}
 						>
-							[{log.timestamp.toLocaleTimeString()}] {log.message}
+							Konzole
 						</Typography>
-					))}
+						<Tooltip title="Vymazat konzoli">
+							<IconButton
+								size="small"
+								onClick={handleClearConsole}
+								sx={{
+									padding: 0.5,
+									"&:hover": {
+										color: "error.main",
+									},
+								}}
+							>
+								<NotInterestedIcon sx={{ fontSize: "0.9rem" }} />
+							</IconButton>
+						</Tooltip>
+					</Box>
+
+					{/* Console content */}
+					<Box sx={{ p: 1 }}>
+						{logs.map((log, index) => (
+							<Typography
+								key={index}
+								component="div"
+								variant="caption"
+								sx={{
+									fontFamily: "monospace",
+									fontSize: "0.7rem",
+									color: "text.secondary",
+									wordWrap: "break-word",
+									whiteSpace: "pre-wrap",
+									mb: 0.5,
+								}}
+							>
+								<Box
+									component="span"
+									sx={{
+										display: "inline",
+										mr: 0.5,
+									}}
+								>
+									[{formatTimestamp(log.timestamp)}]
+								</Box>
+								{formatMessage(log.message)}
+							</Typography>
+						))}
+					</Box>
 				</Box>
 			</Collapse>
 		</Box>

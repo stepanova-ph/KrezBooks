@@ -34,6 +34,12 @@ function registerDataImportHandlers() {
 				workerData: { folderPath: directoryPath, dbPath },
 			});
 
+			// Send initial message
+			event.sender.send("import:progress", {
+				message: "Import zahájen",
+				progress: 0,
+			});
+
 			// Listen for messages from worker
 			worker.on("message", (msg) => {
 				if (msg.type === "progress") {
@@ -42,6 +48,46 @@ function registerDataImportHandlers() {
 						progress: msg.progress,
 					});
 				} else if (msg.type === "complete") {
+					// Send statistics messages if import was successful
+					if (msg.result.success && msg.result.imported) {
+						const stats = msg.result.imported;
+						const skipped = msg.result.skipped;
+
+						// Send detailed statistics
+						if (stats.contacts > 0 || skipped.contacts > 0) {
+							event.sender.send("import:progress", {
+								message: `Kontakty: ${stats.contacts} importováno, ${skipped.contacts} přeskočeno`,
+								progress: 100,
+							});
+						}
+						if (stats.items > 0 || skipped.items > 0) {
+							event.sender.send("import:progress", {
+								message: `Položky: ${stats.items} importováno, ${skipped.items} přeskočeno`,
+								progress: 100,
+							});
+						}
+						if (stats.invoices > 0 || skipped.invoices > 0) {
+							event.sender.send("import:progress", {
+								message: `Doklady: ${stats.invoices} importováno, ${skipped.invoices} přeskočeno`,
+								progress: 100,
+							});
+						}
+						if (stats.stock_movements > 0 || skipped.stock_movements > 0) {
+							event.sender.send("import:progress", {
+								message: `Pohyby skladu: ${stats.stock_movements} importováno, ${skipped.stock_movements} přeskočeno`,
+								progress: 100,
+							});
+						}
+
+						// Send log file path if errors occurred
+						if (msg.result.logFile) {
+							event.sender.send("import:progress", {
+								message: `Chybový log: ${msg.result.logFile}`,
+								progress: 100,
+							});
+						}
+					}
+
 					event.sender.send("import:complete", msg.result);
 					worker.terminate();
 				}

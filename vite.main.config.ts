@@ -9,9 +9,12 @@ export default defineConfig({
     outDir: 'dist/main',
     emptyOutDir: true,
     lib: {
-      entry: path.resolve(__dirname, 'src/main/main.ts'),
+      entry: {
+        main: path.resolve(__dirname, 'src/main/main.ts'),
+        'workers/import-worker': path.resolve(__dirname, 'src/main/workers/import-worker.ts'),
+      },
       formats: ['cjs'],
-      fileName: () => 'main.js',
+      fileName: (format, entryName) => `${entryName}.js`,
     },
     rollupOptions: {
       external: [
@@ -20,6 +23,7 @@ export default defineConfig({
         'path',
         'fs',
         'url',
+        'worker_threads',
         // Add other Node.js built-ins as needed
       ],
       output: {
