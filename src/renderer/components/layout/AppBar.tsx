@@ -66,9 +66,9 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 					onClick={() => onPageChange("novy_doklad")}
 				/>
 				<AppBarButton
-					label="Adresář"
-					active={currentPage === "adresar"}
-					onClick={() => onPageChange("adresar")}
+					label="Doklady"
+					active={currentPage === "doklady"}
+					onClick={() => onPageChange("doklady")}
 				/>
 				<AppBarButton
 					label="Sklad"
@@ -76,10 +76,12 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 					onClick={() => onPageChange("sklad")}
 				/>
 				<AppBarButton
-					label="Doklady"
-					active={currentPage === "doklady"}
-					onClick={() => onPageChange("doklady")}
+					label="Adresář"
+					active={currentPage === "adresar"}
+					onClick={() => onPageChange("adresar")}
 				/>
+
+
 				<AppBarButton
 					label="Nastavení"
 					onClick={() => setSettingsDialogOpen(true)}
