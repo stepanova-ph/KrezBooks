@@ -13,10 +13,10 @@ export const invoiceSchema = z
 			.min(1, validationMessages.invoice.number.required)
 			.max(50, validationMessages.invoice.number.maxLength),
 
-		prefix: optionalString.refine(
-			(val) => !val || val.length <= 10,
-			"Prefix může mít maximálně 10 znaků",
-		),
+		prefix: z
+			.string()
+			.min(1, validationMessages.invoice.prefix.required)
+			.max(10, validationMessages.invoice.prefix.maxLength),
 
 		type: z.preprocess(
 			(v) => Number(v),
