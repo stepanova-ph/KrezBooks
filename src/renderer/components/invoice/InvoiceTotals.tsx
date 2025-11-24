@@ -1,4 +1,3 @@
-// src/renderer/src/components/invoice/InvoiceTotals.tsx
 import { Box, Typography } from "@mui/material";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 import { VAT_RATES } from "../../../config/constants";

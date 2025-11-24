@@ -70,7 +70,6 @@ export class ContactService {
 	}
 
 	private buildUpdateQuery(tableName: string, fields: string[]): string {
-		// Whitelist allowed fields
 		const allowedFields = new Set([
 			"dic",
 			"company_name",

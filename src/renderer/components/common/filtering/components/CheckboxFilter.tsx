@@ -1,4 +1,3 @@
-// filters/CheckboxFilter.tsx
 import { FormControlLabel } from "@mui/material";
 import { KeyboardCheckbox } from "../../inputs/KeyboardCheckbox";
 import type { CheckboxFilterDef } from "src/types/filter";

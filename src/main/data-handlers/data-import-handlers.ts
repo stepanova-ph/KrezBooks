@@ -4,8 +4,6 @@ import fs from "fs";
 import path from "path";
 import { Worker } from "worker_threads";
 
-// All import logic has been moved to import-worker.ts to run in a separate thread
-
 // =============================================================================
 // IPC HANDLER REGISTRATION
 // =============================================================================
@@ -17,30 +15,25 @@ function registerDataImportHandlers() {
 				return { success: false, error: "Nebyla vybrána složka" };
 			}
 
-			// Validate directory exists
 			if (!fs.existsSync(directoryPath)) {
 				return { success: false, error: "Vybraná složka neexistuje" };
 			}
 
 			logger.info(`Importing data from: ${directoryPath}`);
 
-			// Get database path
 			const userDataPath = app.getPath("userData");
 			const dbPath = path.join(userDataPath, "krezbooks.db");
 
-			// Spawn worker thread
 			const workerPath = path.join(__dirname, "workers/import-worker.js");
 			const worker = new Worker(workerPath, {
 				workerData: { folderPath: directoryPath, dbPath },
 			});
 
-			// Send initial message
 			event.sender.send("import:progress", {
 				message: "Import zahájen",
 				progress: 0,
 			});
 
-			// Listen for messages from worker
 			worker.on("message", (msg) => {
 				if (msg.type === "progress") {
 					event.sender.send("import:progress", {
@@ -48,12 +41,10 @@ function registerDataImportHandlers() {
 						progress: msg.progress,
 					});
 				} else if (msg.type === "complete") {
-					// Send statistics messages if import was successful
 					if (msg.result.success && msg.result.imported) {
 						const stats = msg.result.imported;
 						const skipped = msg.result.skipped;
 
-						// Send detailed statistics
 						if (stats.contacts > 0 || skipped.contacts > 0) {
 							event.sender.send("import:progress", {
 								message: `Kontakty: ${stats.contacts} importováno, ${skipped.contacts} přeskočeno`,
@@ -79,7 +70,6 @@ function registerDataImportHandlers() {
 							});
 						}
 
-						// Send log file path if errors occurred
 						if (msg.result.logFile) {
 							event.sender.send("import:progress", {
 								message: `Chybový log: ${msg.result.logFile}`,
@@ -93,7 +83,6 @@ function registerDataImportHandlers() {
 				}
 			});
 
-			// Handle worker errors
 			worker.on("error", (error) => {
 				logger.error("Import worker error:", error);
 				event.sender.send("import:complete", {
@@ -102,14 +91,12 @@ function registerDataImportHandlers() {
 				});
 			});
 
-			// Handle worker exit
 			worker.on("exit", (code) => {
 				if (code !== 0) {
 					logger.error(`Worker stopped with exit code ${code}`);
 				}
 			});
 
-			// Return immediately to indicate import has started
 			return { success: true, started: true };
 		} catch (error: any) {
 			logger.error("Import failed:", error);

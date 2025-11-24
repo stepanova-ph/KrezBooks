@@ -44,7 +44,6 @@ export function ItemPickerDialog({
 		itemPickerFilterConfig,
 	);
 
-	// Apply hide selected filter
 	const displayItems = hideSelected
 		? filteredItems.filter((item) => !selectedItemEans?.has(item.ean))
 		: filteredItems;

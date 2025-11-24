@@ -21,7 +21,7 @@ export function FormDialog({
 			? [
 					{
 						label: cancelLabel,
-						onClick: onClose, // In create mode, this clears the form
+						onClick: onClose,
 						variant: "outlined" as const,
 					},
 					{

@@ -69,7 +69,6 @@ export function ListTabComponent<
 	const [internalFilters, setInternalFilters] =
 		useState<TFilter>(initialFilters);
 
-	// Use external filters if provided, otherwise use internal
 	const filters = externalFilters ?? internalFilters;
 	const setFilters = externalOnFiltersChange ?? setInternalFilters;
 
@@ -103,7 +102,6 @@ export function ListTabComponent<
 		[dynamicFilterConfig, filterConfig, data],
 	);
 
-	// Apply filtering
 	const filteredData = useTableFilters(data, filters, filterConfig);
 
 	if (isLoading) {

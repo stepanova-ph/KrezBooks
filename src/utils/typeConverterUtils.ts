@@ -123,11 +123,9 @@ export function serializeInvoice(invoice: Partial<Invoice>): any {
  * - Correction type (5): as-is from user input
  */
 export function getSignedAmount(amount: number, invoiceType: number): string {
-	// Sale types should be negative
 	if (invoiceType === 3 || invoiceType === 4) {
 		return (-Math.abs(amount)).toString();
 	}
-	// Purchase types and corrections keep the sign as-is
 	return amount.toString();
 }
 

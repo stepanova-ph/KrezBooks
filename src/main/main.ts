@@ -60,7 +60,6 @@ app.whenReady().then(async () => {
 
 	createWindow();
 
-	// Perform automatic backup on app startup
 	logger.info("Performing automatic backup on app startup...");
 	performAutomaticBackup()
 		.then((result) => {
@@ -81,7 +80,6 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", async (event) => {
-	// Prevent default quit to allow backup to complete
 	event.preventDefault();
 
 	logger.info("Performing automatic backup on app exit...");
@@ -95,7 +93,6 @@ app.on("before-quit", async (event) => {
 	} catch (error) {
 		logger.error("Exit backup error:", error);
 	} finally {
-		// Close database and quit for real
 		closeDatabase();
 		app.exit();
 	}

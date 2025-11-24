@@ -1,4 +1,3 @@
-// filters/SelectFilter.tsx
 import {
 	FormControl,
 	InputLabel,

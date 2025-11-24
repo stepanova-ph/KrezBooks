@@ -98,7 +98,6 @@ export const exampleContacts: Array<Contact> = [
 		price_group: 1,
 	},
 
-	// Customers
 	{
 		ico: generateValidICO("7890123"),
 		modifier: 1,
@@ -268,7 +267,6 @@ export const exampleContacts: Array<Contact> = [
 		price_group: 1,
 	},
 
-	// Mixed (both supplier and customer)
 	{
 		ico: generateValidICO("8901236"),
 		modifier: 1,

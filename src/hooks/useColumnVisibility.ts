@@ -5,11 +5,9 @@ export function useColumnVisibility(
 	defaultColumns: string[],
 	storageKey: keyof typeof ORDER_STORAGE_KEYS,
 ) {
-	// load columnOrder on mount
 	const getInitialColumnOrder = () => {
 		const stored = storage.get<string[]>(ORDER_STORAGE_KEYS[storageKey]);
 		if (stored) {
-			// Validate that stored columns still exist in defaultColumns
 			const valid = stored.filter((id) => defaultColumns.includes(id));
 			if (valid.length > 0) return valid;
 		}
@@ -23,7 +21,6 @@ export function useColumnVisibility(
 		getInitialColumnOrder,
 	);
 
-	// save columnOrder when it changes
 	useEffect(() => {
 		storage.set(ORDER_STORAGE_KEYS[storageKey], columnOrder);
 	}, [columnOrder, storageKey]);

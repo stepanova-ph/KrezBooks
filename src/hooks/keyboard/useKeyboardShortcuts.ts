@@ -27,7 +27,6 @@ export function useKeyboardShortcuts(
 		if (disabled) return;
 
 		const handleKeyDown = (event: KeyboardEvent) => {
-			// skip if we're in an input field and preventInInputs is true
 			if (preventInInputs) {
 				const target = event.target as HTMLElement;
 				const isInput =
@@ -38,7 +37,6 @@ export function useKeyboardShortcuts(
 				if (isInput) return;
 			}
 
-			// check if this key has a handler
 			const handler = shortcuts[event.key];
 
 			if (handler) {

@@ -17,11 +17,9 @@ interface ContactsListProps {
 	visibleColumnIds: Set<string>;
 	columnOrder?: string[];
 	onColumnOrderChange?: (newOrder: string[]) => void;
-	/** NEW: applied by DataTable for sorting */
 	orderBy?: OrderByConfig;
 }
 
-// All available columns - exported for use in parent
 export const contactColumns: Column[] = [
 	{ id: "ico", label: "IČO", minWidth: 75 },
 	{ id: "company_name", label: "Název firmy", minWidth: 180 },
@@ -98,14 +96,12 @@ function ContactsList({
 		},
 	];
 
-	// Render cell content based on column id (also used for sorting)
 	const getCellContent = (contact: Contact, columnId: string) => {
 		switch (columnId) {
 			case "ico":
 				return contact.ico;
 
 			case "company_name":
-				// For sorting, return plain string; for rendering, we still render below
 				return contact.company_name;
 
 			case "modifier":
@@ -136,7 +132,6 @@ function ContactsList({
 				return contact.website || "-";
 
 			case "type": {
-				// Use joined label string for stable sorting (“customer supplier” etc.)
 				const labels: string[] = [];
 				if (contact.is_customer) labels.push("Odběratel");
 				if (contact.is_supplier) labels.push("Dodavatel");

@@ -14,7 +14,7 @@ function CreateItemForm({
 	const handleSubmit = async (data: CreateItemInput) => {
 		try {
 			await createItem.mutateAsync(data);
-			onClose(); // Only close on success
+			onClose();
 		} catch (error) {
 			console.error("Chyba při vytváření položky:", error);
 			throw error;

@@ -65,7 +65,7 @@ export interface Item {
 	sale_price_group2: number;
 	sale_price_group3: number;
 	sale_price_group4: number;
-	stock_amount?: number; // Computed field from SUM of stock_movements
+	stock_amount?: number;
 	created_at?: string;
 	updated_at?: string;
 }

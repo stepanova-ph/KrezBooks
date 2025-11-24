@@ -1,4 +1,3 @@
-// filters/ActionButtonFilter.tsx
 import { Button } from "@mui/material";
 import type { ActionButtonFilterDef, FilterAction } from "src/types/filter";
 

@@ -89,7 +89,7 @@ export function ContactTypeSelector({
 				clickable={!disabled}
 				onClick={disabled ? undefined : handleToggleCustomer}
 				onKeyDown={(e) => !disabled && handleKeyDown(e, "customer")}
-				tabIndex={disabled ? -1 : 0} // make it keyboard-focusable
+				tabIndex={disabled ? -1 : 0}
 				sx={{
 					...commonChipSx,
 					...(disabled
@@ -106,7 +106,7 @@ export function ContactTypeSelector({
 				clickable={!disabled}
 				onClick={disabled ? undefined : handleToggleSupplier}
 				onKeyDown={(e) => !disabled && handleKeyDown(e, "supplier")}
-				tabIndex={disabled ? -1 : 0} // make it keyboard-focusable
+				tabIndex={disabled ? -1 : 0}
 				sx={{
 					...commonChipSx,
 					...(disabled

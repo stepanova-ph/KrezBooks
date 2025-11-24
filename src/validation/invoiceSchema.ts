@@ -2,7 +2,6 @@ import { z } from "zod";
 import { optionalString } from "./optionalString";
 import { validationMessages } from "../config/validationMessages";
 
-// Helpers
 const requiresDateTax = (type: number) => [1, 2, 3, 4].includes(type); // all except 5 (korekce)
 const requiresInvoiceFields = (type: number) => type === 2 || type === 4; // na fakturu
 
@@ -52,7 +51,6 @@ export const invoiceSchema = z
 			validationMessages.invoice.note.maxLength,
 		),
 
-		// Optional fields; requirements enforced in superRefine
 		date_tax: optionalString,
 		date_due: optionalString,
 		variable_symbol: optionalString,

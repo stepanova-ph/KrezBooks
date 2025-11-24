@@ -25,15 +25,12 @@ export function ImportExportProgress() {
 	const [hasNewMessages, setHasNewMessages] = useState(false);
 
 	useEffect(() => {
-		// Listen for import progress
 		const unsubscribeImport = window.electronAPI.importExport.onImportProgress(
 			(data) => {
 				setIsActive(true);
 				setCurrentProgress(data.progress);
 				setLogs((prev) => [...prev, { ...data, timestamp: new Date() }]);
-				// Mark as having new messages if console is collapsed
 				setHasNewMessages((prev) => {
-					// Only set to true if console is currently collapsed
 					if (!isExpanded) {
 						return true;
 					}
@@ -42,15 +39,12 @@ export function ImportExportProgress() {
 			},
 		);
 
-		// Listen for export progress
 		const unsubscribeExport = window.electronAPI.importExport.onExportProgress(
 			(data) => {
 				setIsActive(true);
 				setCurrentProgress(data.progress);
 				setLogs((prev) => [...prev, { ...data, timestamp: new Date() }]);
-				// Mark as having new messages if console is collapsed
 				setHasNewMessages((prev) => {
-					// Only set to true if console is currently collapsed
 					if (!isExpanded) {
 						return true;
 					}
@@ -65,7 +59,6 @@ export function ImportExportProgress() {
 		};
 	}, [isExpanded]);
 
-	// When console is expanded, clear the new messages flag
 	useEffect(() => {
 		if (isExpanded) {
 			setHasNewMessages(false);
@@ -89,7 +82,6 @@ export function ImportExportProgress() {
 	};
 
 	const formatMessage = (message: string) => {
-		// Check if message is "Import zahájen" or "Import dokončen" or "Export zahájen" or "Export dokončen"
 		if (
 			message.includes("zahájen") ||
 			message.includes("dokončen") ||
@@ -101,7 +93,6 @@ export function ImportExportProgress() {
 		return message;
 	};
 
-	// Don't render if there's no activity
 	if (!isActive) {
 		return null;
 	}

@@ -1,4 +1,3 @@
-// filters/NumberComparatorFilter.tsx
 import { Box, Button, TextField } from "@mui/material";
 import type { NumberComparatorFilterDef } from "src/types/filter";
 

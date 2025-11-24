@@ -41,8 +41,8 @@ import { ConfirmDialog } from "../dialog/ConfirmDialog";
 import type { Column, ContextMenuAction } from "./DataTable";
 import type { OrderByConfig } from "../filtering/ColumnPickerButton";
 
-const ROW_HEIGHT = 30; // Estimated row height in pixels
-const OVERSCAN = 30; // Extra rows to render above/below viewport
+const ROW_HEIGHT = 30;
+const OVERSCAN = 30;
 
 interface DataTableContentProps<T> {
 	columns: Column[];
@@ -92,7 +92,6 @@ export function DataTableContent<T>({
 				.filter((col): col is Column => col !== undefined)
 		: visibleColumns;
 
-	// Sort data based on orderBy config
 	const sortedData = useMemo(() => {
 		if (!orderBy || !orderBy.columnId) {
 			return data;
@@ -110,23 +109,19 @@ export function DataTableContent<T>({
 				bValue = (b as any)[orderBy.columnId!];
 			}
 
-			// Handle null/undefined
 			if (aValue == null && bValue == null) return 0;
 			if (aValue == null) return 1;
 			if (bValue == null) return -1;
 
-			// Convert to string for comparison
 			const aStr = String(aValue).toLowerCase();
 			const bStr = String(bValue).toLowerCase();
 
-			// Try numeric comparison if both are numbers
 			const aNum = Number(aValue);
 			const bNum = Number(bValue);
 			if (!isNaN(aNum) && !isNaN(bNum)) {
 				return orderBy.order === "asc" ? aNum - bNum : bNum - aNum;
 			}
 
-			// String comparison
 			if (aStr < bStr) return orderBy.order === "asc" ? -1 : 1;
 			if (aStr > bStr) return orderBy.order === "asc" ? 1 : -1;
 			return 0;
@@ -135,7 +130,6 @@ export function DataTableContent<T>({
 		return sorted;
 	}, [data, orderBy, getCellContent]);
 
-	// Virtualizer setup
 	const rowVirtualizer = useVirtualizer({
 		count: sortedData.length,
 		getScrollElement: () => tableContainerRef.current,
@@ -143,7 +137,6 @@ export function DataTableContent<T>({
 		overscan: OVERSCAN,
 	});
 
-	// Scroll to focused row when focusedIndex changes
 	useEffect(() => {
 		if (controls.focusedIndex >= 0 && sortedData.length > 0) {
 			rowVirtualizer.scrollToIndex(controls.focusedIndex, {
@@ -273,7 +266,6 @@ export function DataTableContent<T>({
 					border: (theme) => `1px solid ${theme.palette.divider}`,
 					overflow: "auto",
 					position: "relative",
-					// Fixed height is required for virtualization
 					maxHeight: "calc(100vh - 165px)",
 				}}
 			>

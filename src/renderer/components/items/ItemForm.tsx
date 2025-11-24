@@ -53,7 +53,6 @@ function ItemForm({
 
 	const { data: existingCategories = [] } = useItemCategories();
 
-	// Fetch stock data for edit mode only
 	const itemEan = mode === "edit" && initialData?.ean ? initialData.ean : "";
 	const { data: stockAmount = 0 } = useStockAmountByItem(itemEan);
 	const { data: avgBuyPrice = 0 } = useAverageBuyPriceByItem(itemEan);

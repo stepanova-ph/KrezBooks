@@ -35,11 +35,9 @@ export function VatPriceField({
 
 	const numericBasePrice = Number(basePrice) || 0;
 
-	// Calculate raw values
 	let calculatedVatAmount = numericBasePrice * (vatRate / 100);
 	let calculatedPriceWithVat = numericBasePrice + calculatedVatAmount;
 
-	// Smart rounding: transfer 1 cent between D and F when F is .99 or .01
 	if (vatRate > 0 && numericBasePrice > 0) {
 		const cents = Math.round((calculatedPriceWithVat % 1) * 100);
 

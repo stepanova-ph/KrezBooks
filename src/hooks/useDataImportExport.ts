@@ -32,7 +32,6 @@ export function useDataImportExport(
 ) {
 	const queryClient = useQueryClient();
 
-	// Provide a function to invalidate queries (for use after clearing database, etc.)
 	const invalidateAllQueries = useCallback(() => {
 		queryClient.invalidateQueries();
 	}, [queryClient]);
@@ -40,16 +39,13 @@ export function useDataImportExport(
 	useEffect(() => {
 		const unsubscribeImport = window.electronAPI.importExport.onImportComplete((result) => {
 			if (result.success) {
-				// Invalidate all queries to refresh data across the app
 				invalidateAllQueries();
 			}
 
-			// Call the callback if provided
 			onImportComplete?.(result);
 		});
 
 		const unsubscribeExport = window.electronAPI.importExport.onExportComplete((result) => {
-			// Call the callback if provided
 			onExportComplete?.(result);
 		});
 

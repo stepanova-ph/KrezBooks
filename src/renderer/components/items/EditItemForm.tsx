@@ -17,7 +17,7 @@ function EditItemForm({ open, onClose, item }: EditItemFormProps) {
 				ean: item.ean,
 				...data,
 			});
-			onClose(); // Only close on success
+			onClose();
 		} catch (error) {
 			console.error("Chyba při úpravě položky:", error);
 			throw error;

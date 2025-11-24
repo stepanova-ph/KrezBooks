@@ -46,7 +46,6 @@ function NewInvoiceTab() {
 
 	const isType5 = form.formData.type === 5;
 
-	// Auto-populate prefix when type changes
 	useEffect(() => {
 		const invoiceType = INVOICE_TYPES.find(
 			(t) => t.value === form.formData.type,
@@ -57,7 +56,6 @@ function NewInvoiceTab() {
 		}
 	}, [form.formData.type]);
 
-	// Auto-increment invoice number based on type
 	useEffect(() => {
 		if (maxNumber !== undefined) {
 			const nextNumber = String(maxNumber + 1).padStart(4, "0");
@@ -73,7 +71,6 @@ function NewInvoiceTab() {
 		);
 
 		if (existingIndex !== -1) {
-			// Item already exists - open edit dialog
 			const existing = form.invoiceItems[existingIndex];
 			dialogs.amountPrice.openDialog(item, {
 				amount: getDisplayAmount(existing.amount, form.formData.type),
@@ -82,7 +79,6 @@ function NewInvoiceTab() {
 				index: existingIndex,
 			});
 		} else {
-			// New item - open with defaults
 			dialogs.amountPrice.openDialog(item);
 		}
 	};
@@ -105,13 +101,12 @@ function NewInvoiceTab() {
 		if (!dialogs.amountPrice.selectedItem) return;
 
 		if (amount === 0) {
-			// Remove item if amount is 0
 			if (dialogs.amountPrice.editingItemIndex !== null) {
 				form.handleDeleteItem(
 					form.invoiceItems[dialogs.amountPrice.editingItemIndex],
 				);
 			}
-			dialogs.amountPrice.closeDialog(true); // reopen picker
+			dialogs.amountPrice.closeDialog(true);
 			return;
 		}
 
@@ -123,7 +118,7 @@ function NewInvoiceTab() {
 				price,
 				p_group_index,
 			);
-			dialogs.amountPrice.closeDialog(true); // reopen picker
+			dialogs.amountPrice.closeDialog(true);
 		} else {
 			form.handleAddItem(
 				dialogs.amountPrice.selectedItem,
@@ -192,7 +187,6 @@ function NewInvoiceTab() {
 
 			await Promise.all(
 				form.invoiceItems.map(async (item) => {
-					// Check if we should set reset point for this item
 					const shouldSetResetPoint =
 						await window.electronAPI.stockMovements.shouldSetResetPoint(
 							item.ean,
@@ -234,7 +228,6 @@ function NewInvoiceTab() {
 
 	return (
 		<Box sx={{ height: "100%", display: "flex", overflow: "hidden" }}>
-			{/* Left Column - Header & Contact Info */}
 			<Box
 				sx={{
 					width: isType5 ? 0 : 480,
@@ -280,7 +273,6 @@ function NewInvoiceTab() {
 				/>
 			</Box>
 
-			{/* Right Column - Items Table & Totals */}
 			<Box
 				sx={{
 					flex: 1,
@@ -289,7 +281,6 @@ function NewInvoiceTab() {
 					overflow: "hidden",
 				}}
 			>
-				{/* Header for Type 5 */}
 				{isType5 && (
 					<Box sx={{ p: 4, px: 105, pb: 2 }}>
 						<InvoiceHeader
@@ -308,7 +299,6 @@ function NewInvoiceTab() {
 					</Box>
 				)}
 
-				{/* Items Table - Stretches to fill space */}
 				<Box
 					sx={{
 						flex: 1,
@@ -347,17 +337,14 @@ function NewInvoiceTab() {
 					</FormSection>
 				</Box>
 
-				{/* Totals & Buttons */}
 				<Box
 					sx={{
 						borderTop: (theme) => `1px solid ${theme.palette.divider}`,
 						bgcolor: "background.paper",
 					}}
 				>
-					{/* Totals */}
 					<InvoiceTotals items={form.invoiceItems} />
 
-					{/* Buttons */}
 					<Box
 						sx={{
 							px: 4,

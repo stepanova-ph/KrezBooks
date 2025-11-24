@@ -5,7 +5,6 @@ import {
 } from "../types/filter";
 import { INVOICE_TYPES } from "./constants";
 
-// Dynamic filter definitions that can be added on demand
 export const dateDueFilter: FilterAggregateFilterDef = {
 	id: "date_due_aggregate",
 	type: "filter-aggregate",

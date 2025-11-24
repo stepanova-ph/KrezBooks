@@ -7,7 +7,6 @@ import {
 import { logger } from "./logger";
 
 function registerBackupHandlers() {
-	// Get current backup path setting
 	ipcMain.handle("backup:getPath", async () => {
 		try {
 			const backupPath = getBackupPathSetting();
@@ -21,7 +20,6 @@ function registerBackupHandlers() {
 		}
 	});
 
-	// Set backup path setting
 	ipcMain.handle("backup:setPath", async (event, backupPath: string) => {
 		try {
 			setBackupPath(backupPath);
@@ -35,7 +33,6 @@ function registerBackupHandlers() {
 		}
 	});
 
-	// Perform manual backup
 	ipcMain.handle("backup:create", async () => {
 		try {
 			const result = await performManualBackup();

@@ -22,7 +22,6 @@ export function useAutoSearchFocus(options: UseAutoSearchFocusOptions) {
 		if (disabled) return;
 
 		const handleKeyDown = (event: KeyboardEvent) => {
-			// skip if we're already in an input
 			const target = event.target as HTMLElement;
 			const isInput =
 				target.tagName === "INPUT" ||
@@ -31,18 +30,14 @@ export function useAutoSearchFocus(options: UseAutoSearchFocusOptions) {
 
 			if (isInput) return;
 
-			// skip if modifier keys are pressed
 			if (event.ctrlKey || event.metaKey || event.altKey) return;
 
-			// check if it's alphanumeric or +
 			const isAlphanumeric = /^[a-zA-Z0-9+]$/.test(event.key);
 
 			if (isAlphanumeric) {
-				// Try direct input ref first
 				if (inputRef?.current) {
 					inputRef.current.focus();
 				}
-				// Fall back to FilterBar ref
 				else if (filterBarRef?.current?.searchInputRef.current) {
 					filterBarRef.current.searchInputRef.current.focus();
 				}

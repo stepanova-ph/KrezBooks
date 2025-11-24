@@ -55,13 +55,11 @@ function InvoicesTab() {
 			const selectedContacts = prev.selectedContacts || [];
 			const contactKey = { ico: contact.ico, modifier: contact.modifier };
 
-			// Check if contact is already selected
 			const existingIndex = selectedContacts.findIndex(
 				(c) => c.ico === contactKey.ico && c.modifier === contactKey.modifier,
 			);
 
 			if (existingIndex !== -1) {
-				// Remove contact
 				return {
 					...prev,
 					selectedContacts: selectedContacts.filter(
@@ -69,7 +67,6 @@ function InvoicesTab() {
 					),
 				};
 			} else {
-				// Add contact
 				return {
 					...prev,
 					selectedContacts: [...selectedContacts, contactKey],

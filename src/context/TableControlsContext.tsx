@@ -8,12 +8,10 @@ import React, {
 } from "react";
 
 interface TableControlsContextValue<T> {
-	// Selection state
 	focusedKey: string | number | null;
 	focusedIndex: number;
 	focusedItem: T | null;
 
-	// Actions
 	setFocusedKey: (key: string | number | null) => void;
 	setFocusedIndex: (index: number) => void;
 	moveUp: () => void;
@@ -24,10 +22,8 @@ interface TableControlsContextValue<T> {
 	moveToBottom: () => void;
 	enter: () => void;
 
-	// Data management
 	setData: (data: T[], getKey: (item: T) => string | number) => void;
 
-	// Callbacks
 	setOnEnterPress: (callback: (() => void) | undefined) => void;
 }
 
@@ -47,7 +43,6 @@ export function TableControlsProvider<T>({
 	const [focusedKey, setFocusedKey] = useState<string | number | null>(null);
 	const [focusedItem, setFocusedItem] = useState<T | null>(null);
 
-	// USE REF TO AVOID RE-RENDER LOOP
 	const onEnterPressRef = useRef<(() => void) | undefined>(undefined);
 
 	const dataRef = useRef<T[]>([]);
@@ -55,7 +50,6 @@ export function TableControlsProvider<T>({
 		(item: any) => item.id,
 	);
 
-	// Update focused item when index changes
 	useEffect(() => {
 		const item = dataRef.current[focusedIndex];
 		if (item) {
@@ -114,7 +108,6 @@ export function TableControlsProvider<T>({
 			dataRef.current = data;
 			getKeyRef.current = getKey;
 
-			// Reset focus if current index is out of bounds
 			if (focusedIndex >= data.length && data.length > 0) {
 				setFocusedIndex(data.length - 1);
 			} else if (data.length === 0) {
@@ -124,7 +117,6 @@ export function TableControlsProvider<T>({
 		[focusedIndex, setFocusedIndex],
 	);
 
-	// USE CALLBACK THAT UPDATES REF, NOT STATE
 	const setOnEnterPress = useCallback((callback: (() => void) | undefined) => {
 		onEnterPressRef.current = callback;
 	}, []);

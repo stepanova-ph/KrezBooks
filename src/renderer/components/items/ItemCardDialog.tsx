@@ -27,7 +27,6 @@ import type { StockMovementWithInvoiceInfo } from "../../../types/database";
 import { ViewInvoiceDialog } from "../invoice/ViewInvoiceDialog";
 import { useState } from "react";
 
-// Format date from ISO string to DD.MM.YYYY
 function formatDate(dateStr: string): string {
 	if (!dateStr) return "-";
 	const [year, month, day] = dateStr.split("-");
@@ -38,7 +37,6 @@ interface ItemCardDialogProps {
 	open: boolean;
 	onClose: () => void;
 	itemEan: string;
-	/** If true, left panel is collapsed by default */
 	defaultCollapsed?: boolean;
 }
 
@@ -92,7 +90,6 @@ export function ItemCardDialog({
 		movement: StockMovementWithInvoiceInfo,
 		columnId: string,
 	) => {
-		// Convert string values to numbers
 		const amount =
 			typeof movement.amount === "string"
 				? parseFloat(movement.amount)

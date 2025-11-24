@@ -475,7 +475,6 @@ if (parentPort) {
 
 	(async () => {
 	try {
-		// Create worker's own database connection
 		const db = new Database(dbPath);
 		db.pragma("foreign_keys = ON");
 
@@ -562,7 +561,6 @@ if (parentPort) {
 			allErrors.push(...result.errors);
 		}
 
-		// Close worker's database connection
 		db.close();
 
 		let logFile: string | undefined;

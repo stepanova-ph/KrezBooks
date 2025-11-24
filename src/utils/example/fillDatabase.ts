@@ -10,8 +10,6 @@ import {
 } from "../../main/queries";
 import { exampleStockMovements } from "./stockMovements";
 import { booleanToSQLiteInteger } from "../typeConverterUtils";
-// import { exampleInvoices } from './invoices';
-// import { exampleStockMovements } from './stockMovements';
 
 interface FillResult {
 	contactsAdded: number;
@@ -31,7 +29,6 @@ export function fillTestData(db: Database.Database): FillResult {
 	let stockMovementsAdded = 0;
 	const errors: string[] = [];
 
-	// Insert contacts
 	const insertContact = db.prepare(contactQueries.create);
 
 	for (const contact of exampleContacts) {
@@ -59,7 +56,6 @@ export function fillTestData(db: Database.Database): FillResult {
 		}
 	}
 
-	// Insert items
 	const insertItem = db.prepare(itemQueries.create);
 
 	for (const item of exampleItems) {

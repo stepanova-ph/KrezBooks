@@ -25,20 +25,16 @@ interface SettingsDialogProps {
 }
 
 export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
-	// Import state
 	const [importPath, setImportPath] = useState("");
 	const [isLegacyImport, setIsLegacyImport] = useState(false);
 	const [importInProgress, setImportInProgress] = useState(false);
 
-	// Export state
 	const [exportPath, setExportPath] = useState("");
 	const [exportInProgress, setExportInProgress] = useState(false);
 
-	// Backup state
 	const [backupPath, setBackupPath] = useState("");
 	const [backupInProgress, setBackupInProgress] = useState(false);
 
-	// Admin state
 	const [stats, setStats] = useState<{
 		contacts: number;
 		items: number;
@@ -48,7 +44,6 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 	const [adminLoading, setAdminLoading] = useState(false);
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-	// Messages
 	const [importMessage, setImportMessage] = useState<{
 		type: "success" | "error" | "info";
 		text: string;
@@ -66,7 +61,6 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 		text: string;
 	} | null>(null);
 
-	// Use custom hook for import/export with automatic query invalidation
 	const { invalidateAllQueries } = useDataImportExport(
 		(result) => {
 			setImportInProgress(false);
@@ -98,7 +92,6 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 		},
 	);
 
-	// Load backup path when dialog opens
 	useEffect(() => {
 		if (open) {
 			window.electronAPI.backup
@@ -143,7 +136,6 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 
 		if (result.success && result.path) {
 			setBackupPath(result.path);
-			// Save the path immediately
 			try {
 				const saveResult = await window.electronAPI.backup.setPath(result.path);
 				if (saveResult.success) {
@@ -221,7 +213,6 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 					text: result.error || "Import se nepodařilo spustit",
 				});
 			}
-			// If success, the completion will be handled by the onImportComplete listener
 		} catch (error: any) {
 			setImportInProgress(false);
 			setImportMessage({
@@ -254,7 +245,6 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 					text: result.error || "Export se nepodařilo spustit",
 				});
 			}
-			// If success, the completion will be handled by the onExportComplete listener
 		} catch (error: any) {
 			setExportInProgress(false);
 			setExportMessage({
@@ -265,13 +255,11 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 	};
 
 	const handleToggleStats = async () => {
-		// If stats are shown, hide them
 		if (stats) {
 			setStats(null);
 			return;
 		}
 
-		// Otherwise, fetch and show them
 		setAdminLoading(true);
 		setAdminMessage(null);
 		try {
@@ -306,7 +294,6 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 					type: "success",
 					text: "Databáze byla úspěšně vymazána",
 				});
-				// Invalidate all queries to refresh the UI
 				invalidateAllQueries();
 			} else {
 				setAdminMessage({
@@ -331,9 +318,7 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 					type: "success",
 					text: `Přidáno ${result.data.contactsAdded} kontaktů a ${result.data.itemsAdded} položek`,
 				});
-				// Invalidate all queries to refresh the UI
 				invalidateAllQueries();
-				// Refresh stats if they're shown
 				if (stats) {
 					const statsResult = await window.electronAPI.admin.getDbStats();
 					if (statsResult.success && statsResult.data) {
@@ -494,7 +479,6 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 						variant="contained"
 						onClick={handleCreateBackup}
 						disabled={backupInProgress}
-						// startIcon={<BackupIcon />}
 						fullWidth
 					>
 						{backupInProgress ? "Zálohuji..." : "Zálohovat nyní"}

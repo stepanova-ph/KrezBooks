@@ -16,10 +16,9 @@ function EditContactForm({ open, onClose, contact }: EditContactFormProps) {
 			await updateContact.mutateAsync({
 				...data,
 			});
-			onClose(); // Only close on success
+			onClose();
 		} catch (error) {
 			console.error("Chyba při úpravě kontaktu:", error);
-			// Re-throw so ContactForm can handle it
 			throw error;
 		}
 	};

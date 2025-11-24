@@ -25,7 +25,6 @@ export const contactFilterConfig: FilterConfig = {
 			width: 200,
 		},
 
-		// Supplier/Customer checkboxes (required group)
 		{
 			id: "is_supplier",
 			type: "checkbox",
@@ -45,7 +44,6 @@ export const contactFilterConfig: FilterConfig = {
 			required: false,
 		},
 
-		// ICO filter with validation
 		{
 			id: "ico",
 			type: "number-input",

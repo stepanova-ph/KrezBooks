@@ -50,7 +50,7 @@ export function InvoiceContactInfo({
 			hideDivider
 			title="Kontaktní informace"
 			actions={
-				!hideContactPicker ? ( // Add this condition
+				!hideContactPicker ? (
 					<Tooltip title="Vybrat z adresáře">
 						<IconButton
 							size="small"

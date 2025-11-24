@@ -83,7 +83,6 @@ function getBackupPath(): string {
 		logger.warn("Failed to get backup path from settings, using default:", error);
 	}
 
-	// Default location
 	const userDataPath = app.getPath("userData");
 	return path.join(userDataPath, "krezbooks-backups");
 }
@@ -116,7 +115,6 @@ export async function performAutomaticBackup(): Promise<{
 	try {
 		const backupBasePath = getBackupPath();
 
-		// Ensure backup base directory exists
 		if (!fs.existsSync(backupBasePath)) {
 			fs.mkdirSync(backupBasePath, { recursive: true });
 		}
@@ -124,12 +122,10 @@ export async function performAutomaticBackup(): Promise<{
 		const backupFolderName = `krezbooks-backup-${formatTimestamp(new Date())}`;
 		const backupPath = path.join(backupBasePath, backupFolderName);
 
-		// Create backup directory
 		fs.mkdirSync(backupPath, { recursive: true });
 
 		logger.info(`Starting automatic backup to: ${backupPath}`);
 
-		// Export all tables
 		for (const tableName of TABLES) {
 			const { csv: csvContent, count } = exportTable(tableName);
 

@@ -15,11 +15,9 @@ import { NumberInputFilter } from "./components/NumberInputFilter";
 import { SelectFilter } from "./components/SelectFilter";
 import { NumberComparatorFilter } from "./components/NumberComparatorFilter";
 import { FilterAggregateFilter } from "./components";
-import { clear } from "console";
 import { DateComparatorFilter } from "./components/DateComparatorFilter";
 import React from "react";
 
-// Import filter components
 
 interface FilterBarProps {
 	config: FilterConfig;
