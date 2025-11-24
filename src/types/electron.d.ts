@@ -57,6 +57,18 @@ export interface ExportDataResult {
 	path?: string;
 }
 
+export interface BackupResult {
+	success: boolean;
+	error?: string;
+	path?: string;
+}
+
+export interface BackupPathResult {
+	success: boolean;
+	error?: string;
+	path?: string;
+}
+
 declare global {
 	interface Window {
 		electronAPI: {
@@ -190,6 +202,11 @@ declare global {
 				getByItemWithInvoiceInfo: (
 					itemEan: string,
 				) => Promise<IpcResponse<any[]>>;
+			};
+			backup: {
+				getPath: () => Promise<BackupPathResult>;
+				setPath: (backupPath: string) => Promise<{ success: boolean; error?: string }>;
+				create: () => Promise<BackupResult>;
 			};
 		};
 	}

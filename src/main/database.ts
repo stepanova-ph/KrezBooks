@@ -3,7 +3,12 @@ import path from "path";
 import { app } from "electron";
 import fs from "fs";
 import { logger } from "./logger";
-import { contactQueries, invoiceQueries, itemQueries } from "./queries";
+import {
+	contactQueries,
+	invoiceQueries,
+	itemQueries,
+	settingsQueries,
+} from "./queries";
 import { stockMovementQueries } from "./queries/stockMovements";
 
 class DatabaseManager {
@@ -120,6 +125,9 @@ class DatabaseManager {
 
 			this.db.exec(invoiceQueries.createTable);
 			logger.log("✓ Invoice table ready");
+
+			this.db.exec(settingsQueries.createTable);
+			logger.log("✓ Settings table ready");
 
 			// this.db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_customer ON contacts(is_customer)');
 			// this.db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_supplier ON contacts(is_supplier)');

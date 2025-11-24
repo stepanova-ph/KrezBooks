@@ -2,7 +2,6 @@ import {
 	normalizePSC,
 	normalizeWebsite,
 	validateBankAccount,
-	validateDIC,
 	validateEmail,
 	validatePhone,
 	validatePSC,
@@ -131,13 +130,13 @@ export const contactSchema = z
 		),
 	})
 	.superRefine((data, ctx) => {
-		if (data.dic && data.dic !== "CZ" && !validateDIC(data.dic, data.ico)) {
-			ctx.addIssue({
-				path: ["dic"],
-				code: z.ZodIssueCode.custom,
-				message: validationMessages.contact.dic.invalid,
-			});
-		}
+		// if (data.dic && data.dic !== "CZ" && !validateDIC(data.dic, data.ico)) {
+		// 	ctx.addIssue({
+		// 		path: ["dic"],
+		// 		code: z.ZodIssueCode.custom,
+		// 		message: validationMessages.contact.dic.invalid,
+		// 	});
+		// }
 		if (!data.is_customer && !data.is_supplier) {
 			ctx.addIssue({
 				path: ["is_customer"],

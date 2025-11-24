@@ -181,4 +181,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		getByItemWithInvoiceInfo: (itemEan: string) =>
 			ipcRenderer.invoke("db:stockMovements:getByItemWithInvoiceInfo", itemEan),
 	},
+
+	backup: {
+		getPath: () => ipcRenderer.invoke("backup:getPath"),
+		setPath: (backupPath: string) =>
+			ipcRenderer.invoke("backup:setPath", backupPath),
+		create: () => ipcRenderer.invoke("backup:create"),
+	},
 });

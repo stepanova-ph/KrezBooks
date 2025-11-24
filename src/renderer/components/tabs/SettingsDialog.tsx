@@ -1,7 +1,7 @@
 import { Dialog } from "../common/dialog/Dialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { FormSection } from "../common/form/FormSection";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	Box,
 	TextField,
@@ -16,6 +16,7 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import InfoIcon from "@mui/icons-material/Info";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import DatasetIcon from "@mui/icons-material/Dataset";
+import BackupIcon from "@mui/icons-material/Backup";
 import { useDataImportExport } from "../../../hooks/useDataImportExport";
 
 interface SettingsDialogProps {
@@ -33,6 +34,10 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 	const [exportPath, setExportPath] = useState("");
 	const [exportInProgress, setExportInProgress] = useState(false);
 
+	// Backup state
+	const [backupPath, setBackupPath] = useState("");
+	const [backupInProgress, setBackupInProgress] = useState(false);
+
 	// Admin state
 	const [stats, setStats] = useState<{
 		contacts: number;
@@ -49,6 +54,10 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 		text: string;
 	} | null>(null);
 	const [exportMessage, setExportMessage] = useState<{
+		type: "success" | "error" | "info";
+		text: string;
+	} | null>(null);
+	const [backupMessage, setBackupMessage] = useState<{
 		type: "success" | "error" | "info";
 		text: string;
 	} | null>(null);
@@ -89,6 +98,22 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 		},
 	);
 
+	// Load backup path when dialog opens
+	useEffect(() => {
+		if (open) {
+			window.electronAPI.backup
+				.getPath()
+				.then((result) => {
+					if (result.success && result.path) {
+						setBackupPath(result.path);
+					}
+				})
+				.catch((error) => {
+					console.error("Failed to load backup path:", error);
+				});
+		}
+	}, [open]);
+
 	const handleSelectImportDirectory = async () => {
 		const result = await window.electronAPI.dialog.selectDirectory(
 			isLegacyImport
@@ -108,6 +133,67 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 
 		if (result.success && result.path) {
 			setExportPath(result.path);
+		}
+	};
+
+	const handleSelectBackupDirectory = async () => {
+		const result = await window.electronAPI.dialog.selectDirectory(
+			"Vyberte složku pro automatické zálohy",
+		);
+
+		if (result.success && result.path) {
+			setBackupPath(result.path);
+			// Save the path immediately
+			try {
+				const saveResult = await window.electronAPI.backup.setPath(result.path);
+				if (saveResult.success) {
+					setBackupMessage({
+						type: "success",
+						text: "Cesta k zálohám byla uložena",
+					});
+				} else {
+					setBackupMessage({
+						type: "error",
+						text: saveResult.error || "Nepodařilo se uložit cestu",
+					});
+				}
+			} catch (error: any) {
+				setBackupMessage({
+					type: "error",
+					text: `Chyba: ${error.message}`,
+				});
+			}
+		}
+	};
+
+	const handleCreateBackup = async () => {
+		setBackupInProgress(true);
+		setBackupMessage({
+			type: "info",
+			text: "Vytváření zálohy...",
+		});
+
+		try {
+			const result = await window.electronAPI.backup.create();
+
+			setBackupInProgress(false);
+			if (result.success) {
+				setBackupMessage({
+					type: "success",
+					text: `Záloha vytvořena úspěšně: ${result.path}`,
+				});
+			} else {
+				setBackupMessage({
+					type: "error",
+					text: result.error || "Záloha selhala",
+				});
+			}
+		} catch (error: any) {
+			setBackupInProgress(false);
+			setBackupMessage({
+				type: "error",
+				text: `Chyba: ${error.message}`,
+			});
 		}
 	};
 
@@ -373,6 +459,53 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 							onClose={() => setExportMessage(null)}
 						>
 							{exportMessage.text}
+						</Alert>
+					)}
+				</Box>
+			</FormSection>
+
+			<FormSection title="Automatické zálohy">
+				<Box sx={{ display: "flex", flexDirection: "column", gap: 1, px: 2 }}>
+					<Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+						<TextField
+							fullWidth
+							label="Cesta k zálohám"
+							value={backupPath}
+							onChange={(e) => setBackupPath(e.target.value)}
+							disabled={backupInProgress}
+							size="small"
+							placeholder="Složka pro automatické zálohy"
+						/>
+						<Button
+							variant="outlined"
+							onClick={handleSelectBackupDirectory}
+							disabled={backupInProgress}
+							startIcon={<FolderOpenIcon />}
+							sx={{ whiteSpace: "nowrap", paddingX: 6 }}
+						>
+							Vybrat adresář
+						</Button>
+					</Box>
+					<Typography variant="body2" color="text.secondary" fontSize={10} textAlign="center">
+						Zálohy se vytváří automaticky při spuštění a ukončení aplikace
+					</Typography>
+
+					<Button
+						variant="contained"
+						onClick={handleCreateBackup}
+						disabled={backupInProgress}
+						// startIcon={<BackupIcon />}
+						fullWidth
+					>
+						{backupInProgress ? "Zálohuji..." : "Zálohovat nyní"}
+					</Button>
+
+					{backupMessage && (
+						<Alert
+							severity={backupMessage.type}
+							onClose={() => setBackupMessage(null)}
+						>
+							{backupMessage.text}
 						</Alert>
 					)}
 				</Box>
