@@ -105,14 +105,14 @@ function InvoicesTab() {
 				]}
 				onRemoveDynamicFilter={removeDynamicFilter}
 				actions={[
-					{
-						id: "add-invoice",
-						label: "Vytvořit doklad",
-						startIcon: <DescriptionIcon />,
-						onClick: () => {
-							console.log("Navigate to create invoice");
-						},
-					},
+					// {
+					// 	id: "add-invoice",
+					// 	label: "Vytvořit doklad",
+					// 	startIcon: <DescriptionIcon />,
+					// 	onClick: () => {
+					// 		console.log("Navigate to create invoice");
+					// 	},
+					// },
 				]}
 				customFilterElements={
 					<Badge

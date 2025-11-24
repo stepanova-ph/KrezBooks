@@ -1,4 +1,4 @@
-import { Button, ButtonProps, useTheme } from "@mui/material";
+import { Button, ButtonProps, useTheme, Box } from "@mui/material";
 import { useState } from "react";
 
 interface AppBarButtonProps extends Omit<ButtonProps, "variant" | "color"> {
@@ -7,6 +7,7 @@ interface AppBarButtonProps extends Omit<ButtonProps, "variant" | "color"> {
 	disabled?: boolean;
 	onClick?: () => void;
 	variant?: "default" | "contained";
+	icon?: React.ReactNode;
 }
 
 export function AppBarButton({
@@ -15,6 +16,7 @@ export function AppBarButton({
 	disabled = false,
 	onClick,
 	variant = "default",
+	icon,
 	...props
 }: AppBarButtonProps) {
 	const theme = useTheme();
@@ -135,7 +137,18 @@ export function AppBarButton({
 				...props.sx,
 			}}
 		>
-			{label}
+			<Box
+				sx={{
+					display: "flex",
+					alignItems: "center",
+					gap: 1,
+					position: "relative",
+					zIndex: 1,
+				}}
+			>
+				{icon}
+				{label}
+			</Box>
 		</Button>
 	);
 }

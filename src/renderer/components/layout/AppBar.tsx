@@ -4,6 +4,11 @@ import { WindowControls } from "./WindowControls";
 import { ImportExportProgress } from "./ImportExportProgress";
 import React from "react";
 import { SettingsDialog } from "../tabs/SettingsDialog";
+import SettingsIcon from "@mui/icons-material/Settings";
+import RecentActorsIcon from "@mui/icons-material/RecentActors";
+import DescriptionIcon from "@mui/icons-material/Description";
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import InventoryIcon from "@mui/icons-material/Inventory";
 
 export type AppPage = "adresar" | "sklad" | "novy_doklad" | "doklady";
 
@@ -64,27 +69,32 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 					label="Nový doklad"
 					active={currentPage === "novy_doklad"}
 					onClick={() => onPageChange("novy_doklad")}
+					icon={<NoteAddIcon sx={{ fontSize: "1.1rem" }} />}
 				/>
 				<AppBarButton
 					label="Doklady"
 					active={currentPage === "doklady"}
 					onClick={() => onPageChange("doklady")}
+					icon={<DescriptionIcon sx={{ fontSize: "1.1rem" }} />}
 				/>
 				<AppBarButton
 					label="Sklad"
 					active={currentPage === "sklad"}
 					onClick={() => onPageChange("sklad")}
+					icon={<InventoryIcon sx={{ fontSize: "1.1rem" }} />}
 				/>
 				<AppBarButton
 					label="Adresář"
 					active={currentPage === "adresar"}
 					onClick={() => onPageChange("adresar")}
+					icon={<RecentActorsIcon sx={{ fontSize: "1.1rem" }} />}
 				/>
 
 
 				<AppBarButton
 					label="Nastavení"
 					onClick={() => setSettingsDialogOpen(true)}
+					icon={<SettingsIcon sx={{ fontSize: "1.1rem" }} />}
 				/>
 			</Box>
 
