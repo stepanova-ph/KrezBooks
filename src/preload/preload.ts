@@ -10,12 +10,9 @@ import type {
 	CreateStockMovementInput,
 } from "../types/database";
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld("electronAPI", {
 	ipcRenderer: {
 		send: (channel: string, data: any) => {
-			// Whitelist channels for security
 			const validChannels = [
 				"window-minimize",
 				"window-maximize",
@@ -76,7 +73,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
 			ipcRenderer.invoke("db:importLegacyData", directoryPath),
 		importData: (directoryPath: string) =>
 			ipcRenderer.invoke("db:importData", directoryPath),
-		// Progress event listeners
 		onExportProgress: (
 			callback: (data: { message: string; progress: number }) => void,
 		) => {
@@ -97,7 +93,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
 			ipcRenderer.on("import:progress", listener);
 			return () => ipcRenderer.removeListener("import:progress", listener);
 		},
-		// Completion event listeners
 		onExportComplete: (callback: (data: any) => void) => {
 			const listener = (_event: any, data: any) => callback(data);
 			ipcRenderer.on("export:complete", listener);
@@ -180,5 +175,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
 		getByItemWithInvoiceInfo: (itemEan: string) =>
 			ipcRenderer.invoke("db:stockMovements:getByItemWithInvoiceInfo", itemEan),
+	},
+
+	backup: {
+		getPath: () => ipcRenderer.invoke("backup:getPath"),
+		setPath: (backupPath: string) =>
+			ipcRenderer.invoke("backup:setPath", backupPath),
+		create: () => ipcRenderer.invoke("backup:create"),
 	},
 });

@@ -75,7 +75,6 @@ export function DateField({
 		...(typeof sx === "object" && sx !== null ? sx : {}),
 	};
 
-	// Only control open state if openOnFocus is true
 	const openProps = openOnFocus
 		? {
 				open,
@@ -84,7 +83,6 @@ export function DateField({
 			}
 		: {};
 
-	// Build InputProps with optional error icon
 	const inputProps =
 		showErrorIcon && hasError
 			? {

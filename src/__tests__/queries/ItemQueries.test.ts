@@ -10,6 +10,17 @@ describe("itemQueries", () => {
 	beforeEach(() => {
 		db = new Database(":memory:");
 		db.exec(itemQueries.createTable);
+		// Items query now joins with stock_movements, so we need this table too
+		db.exec(`
+			CREATE TABLE IF NOT EXISTS stock_movements (
+				invoice_prefix TEXT NOT NULL,
+				invoice_number TEXT NOT NULL,
+				item_ean TEXT NOT NULL,
+				amount REAL NOT NULL,
+				price REAL NOT NULL,
+				PRIMARY KEY (invoice_prefix, invoice_number, item_ean)
+			)
+		`);
 	});
 
 	describe("getAll", () => {

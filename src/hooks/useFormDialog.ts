@@ -6,7 +6,7 @@ export interface UseFormDialogOptions<T> {
 	mode: "create" | "edit";
 	defaultFormData: T;
 	onSubmit: (data: T) => Promise<void>;
-	schema?: any; // Zod schema for validation
+	schema?: any;
 }
 
 export function useFormDialog<T extends Record<string, any>>({
@@ -21,7 +21,6 @@ export function useFormDialog<T extends Record<string, any>>({
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [isPending, setIsPending] = useState(false);
 
-	// Reset form when dialog opens/closes or data changes
 	useEffect(() => {
 		if (open) {
 			if (mode === "edit" && initialData) {

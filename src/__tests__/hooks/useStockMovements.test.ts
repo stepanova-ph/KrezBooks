@@ -87,7 +87,7 @@ describe("useStockMovement", () => {
 			});
 
 			const { result } = renderHook(
-				() => useStockMovementsByInvoice("INV-001"),
+				() => useStockMovementsByInvoice("INV", "INV-001"),
 				{ wrapper: createWrapper() },
 			);
 
@@ -95,12 +95,12 @@ describe("useStockMovement", () => {
 
 			expect(result.current.data).toEqual(mockMovements);
 			expect(mockElectronAPI.stockMovements.getByInvoice).toHaveBeenCalledWith(
-				"INV-001",
+				"INV", "INV-001",
 			);
 		});
 
 		it("does not fetch when invoice number is empty", () => {
-			const { result } = renderHook(() => useStockMovementsByInvoice(""), {
+			const { result } = renderHook(() => useStockMovementsByInvoice("", ""), {
 				wrapper: createWrapper(),
 			});
 
@@ -117,7 +117,7 @@ describe("useStockMovement", () => {
 			});
 
 			const { result } = renderHook(
-				() => useStockMovementsByInvoice("INV-002"),
+				() => useStockMovementsByInvoice("INV", "INV-002"),
 				{ wrapper: createWrapper() },
 			);
 
@@ -130,6 +130,7 @@ describe("useStockMovement", () => {
 	describe("useCreateStockMovement", () => {
 		it("creates stock movement successfully", async () => {
 			const newMovement: CreateStockMovementInput = {
+				invoice_prefix: "INV",
 				invoice_number: "INV-001",
 				item_ean: "1234567890123",
 				amount: 15,
@@ -158,6 +159,7 @@ describe("useStockMovement", () => {
 
 		it("handles create error", async () => {
 			const newMovement: CreateStockMovementInput = {
+				invoice_prefix: "INV",
 				invoice_number: "INV-001",
 				item_ean: "1234567890123",
 				amount: 15,
@@ -185,6 +187,7 @@ describe("useStockMovement", () => {
 	describe("useUpdateStockMovement", () => {
 		it("updates stock movement successfully", async () => {
 			const updateData = {
+				invoicePrefix: "INV",
 				invoiceNumber: "INV-001",
 				itemEan: "1234567890123",
 				updates: {
@@ -207,7 +210,7 @@ describe("useStockMovement", () => {
 			await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
 			expect(mockElectronAPI.stockMovements.update).toHaveBeenCalledWith(
-				"INV-001",
+				"INV", "INV-001",
 				"1234567890123",
 				{ amount: 20, price: 200 },
 			);
@@ -215,6 +218,7 @@ describe("useStockMovement", () => {
 
 		it("handles update error", async () => {
 			const updateData = {
+				invoicePrefix: "INV",
 				invoiceNumber: "INV-999",
 				itemEan: "1234567890123",
 				updates: { amount: 20 },
@@ -249,6 +253,7 @@ describe("useStockMovement", () => {
 			});
 
 			result.current.mutate({
+				invoicePrefix: "INV",
 				invoiceNumber: "INV-001",
 				itemEan: "1234567890123",
 			});
@@ -256,7 +261,7 @@ describe("useStockMovement", () => {
 			await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
 			expect(mockElectronAPI.stockMovements.delete).toHaveBeenCalledWith(
-				"INV-001",
+				"INV", "INV-001",
 				"1234567890123",
 			);
 		});
@@ -272,6 +277,7 @@ describe("useStockMovement", () => {
 			});
 
 			result.current.mutate({
+				invoicePrefix: "INV",
 				invoiceNumber: "INV-999",
 				itemEan: "1234567890123",
 			});

@@ -19,7 +19,8 @@ describe("useInvoices", () => {
 		it("fetches all invoices successfully", async () => {
 			const mockInvoices: Invoice[] = [
 				{
-					number: "INV-001",
+					prefix: "INV",
+			number: "INV-001",
 					type: 1,
 					payment_method: null,
 					date_issue: "2024-01-15",
@@ -74,6 +75,7 @@ describe("useInvoices", () => {
 	describe("useInvoice", () => {
 		it("fetches single invoice successfully", async () => {
 			const mockInvoice: Invoice = {
+				prefix: "INV",
 				number: "INV-001",
 				type: 1,
 				payment_method: 1,
@@ -94,23 +96,23 @@ describe("useInvoices", () => {
 				bank_account: "1234567890/0100",
 			};
 
-			mockElectronAPI.invoices.getOne.mockResolvedValue({
+			mockElectronAPI.invoices.getOne.mockImplementation((prefix, number) => Promise.resolve({
 				success: true,
 				data: mockInvoice,
-			});
+			}));
 
-			const { result } = renderHook(() => useInvoice("INV-001"), {
+			const { result } = renderHook(() => useInvoice("INV", "INV-001"), {
 				wrapper: createWrapper(),
 			});
 
 			await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
 			expect(result.current.data).toEqual(mockInvoice);
-			expect(mockElectronAPI.invoices.getOne).toHaveBeenCalledWith("INV-001");
+			expect(mockElectronAPI.invoices.getOne).toHaveBeenCalledWith("INV", "INV-001");
 		});
 
 		it("does not fetch when number is empty", () => {
-			const { result } = renderHook(() => useInvoice(""), {
+			const { result } = renderHook(() => useInvoice("", ""), {
 				wrapper: createWrapper(),
 			});
 
@@ -122,6 +124,7 @@ describe("useInvoices", () => {
 	describe("useCreateInvoice", () => {
 		it("creates invoice successfully", async () => {
 			const newInvoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-002",
 				type: 1,
 				date_issue: "2024-01-20",
@@ -148,6 +151,7 @@ describe("useInvoices", () => {
 
 		it("creates invoice with all optional fields", async () => {
 			const fullInvoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-003",
 				type: 2,
 				payment_method: 1,
@@ -178,6 +182,7 @@ describe("useInvoices", () => {
 
 		it("handles create error", async () => {
 			const newInvoice: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-002",
 				type: 1,
 				date_issue: "2024-01-20",
@@ -219,6 +224,7 @@ describe("useInvoices", () => {
 			});
 
 			result.current.mutate({
+				prefix: "INV",
 				number: "INV-001",
 				updates,
 			});
@@ -242,6 +248,7 @@ describe("useInvoices", () => {
 			});
 
 			result.current.mutate({
+				prefix: "INV",
 				number: "INV-999",
 				updates: { note: "Updated" },
 			});
@@ -263,11 +270,11 @@ describe("useInvoices", () => {
 				wrapper: createWrapper(),
 			});
 
-			result.current.mutate("INV-001");
+			result.current.mutate({ prefix: "INV", number: "INV-001" });
 
 			await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-			expect(mockElectronAPI.invoices.delete).toHaveBeenCalledWith("INV-001");
+			expect(mockElectronAPI.invoices.delete).toHaveBeenCalledWith({ prefix: "INV", number: "INV-001" });
 			expect(result.current.data).toEqual({ changes: 1 });
 		});
 
@@ -281,7 +288,7 @@ describe("useInvoices", () => {
 				wrapper: createWrapper(),
 			});
 
-			result.current.mutate("INV-999");
+			result.current.mutate({ prefix: "INV", number: "INV-999" });
 
 			await waitFor(() => expect(result.current.isError).toBe(true));
 

@@ -1,4 +1,3 @@
-// filters/FilterAggregateFilter.tsx
 import { Box, Button, TextField, IconButton, Divider } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -29,7 +28,6 @@ interface FilterAggregateFilterProps {
 	renderExpandedFilter: (filter: FilterDef) => ReactNode;
 }
 
-// Internal component for rendering either TextField or DatePicker
 function AggregateInput({
 	isDateInput,
 	value,
@@ -126,21 +124,18 @@ export function FilterAggregateFilter({
 		undefined,
 	);
 
-	// Measure collapsed width when not expanded
 	useEffect(() => {
 		if (!isExpanded && collapsedRef.current) {
 			setCollapsedWidth(collapsedRef.current.offsetWidth);
 		}
 	}, [isExpanded]);
 
-	// Handle click outside and Escape key to close
 	useEffect(() => {
 		if (!isExpanded) return;
 
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as HTMLElement;
 
-			// Ignore clicks on DatePicker popper (calendar popup)
 			if (
 				target.closest(".MuiPopper-root") ||
 				target.closest(".MuiPickersPopper-root")

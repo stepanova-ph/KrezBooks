@@ -1,4 +1,3 @@
-// filters/NumberInputFilter.tsx
 import { TextField } from "@mui/material";
 import type { NumberInputFilterDef } from "src/types/filter";
 

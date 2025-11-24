@@ -56,7 +56,6 @@ export function AppBarButton({
 				position: "relative",
 				overflow: "hidden",
 
-				// Hover state
 				"&:hover:not(:disabled)": {
 					backgroundColor: active
 						? theme.palette.background.paper
@@ -71,7 +70,6 @@ export function AppBarButton({
 					},
 				},
 
-				// Hover underline animation
 				"&::before": {
 					content: '""',
 					position: "absolute",

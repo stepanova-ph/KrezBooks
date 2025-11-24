@@ -1,4 +1,3 @@
-// Re-export all filter components for easy importing
 export { TextSearchFilter } from "./TextSearchFilter";
 export { CheckboxFilter } from "./CheckboxFilter";
 export { NumberInputFilter } from "./NumberInputFilter";

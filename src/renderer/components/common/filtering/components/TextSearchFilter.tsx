@@ -1,4 +1,3 @@
-// filters/TextSearchFilter.tsx
 import { TextField } from "@mui/material";
 import type { TextSearchFilterDef } from "src/types/filter";
 

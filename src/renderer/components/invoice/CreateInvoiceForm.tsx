@@ -9,7 +9,7 @@ interface CreateInvoiceFormProps {
 export function CreateInvoiceForm({ open, onClose }: CreateInvoiceFormProps) {
 	const handleSubmit = async (data: CreateInvoiceInput) => {
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+			await new Promise((resolve) => setTimeout(resolve, 1000));
 			onClose();
 		} catch (error) {
 			console.error("Chyba při vytváření dokladu:", error);

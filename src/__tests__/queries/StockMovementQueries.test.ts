@@ -24,6 +24,7 @@ describe("stockMovementQueries", () => {
 		// Insert test invoice and item
 		db.prepare(invoiceQueries.create).run(
 			serializeInvoice({
+				prefix: "INV",
 				number: "INV001",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -55,7 +56,7 @@ describe("stockMovementQueries", () => {
 		it("should return undefined when movement does not exist", () => {
 			const result = db
 				.prepare(stockMovementQueries.getOne)
-				.get("INV999", "9999999999999");
+				.get("INV", "INV999", "9999999999999");
 			expect(result).toBeUndefined();
 		});
 
@@ -64,6 +65,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -74,7 +76,7 @@ describe("stockMovementQueries", () => {
 
 			const result = db
 				.prepare(stockMovementQueries.getOne)
-				.get("INV001", "1234567890123");
+				.get("INV", "INV001", "1234567890123");
 
 			expect(result).toBeDefined();
 			expect(result.invoice_number).toBe("INV001");
@@ -88,7 +90,7 @@ describe("stockMovementQueries", () => {
 		it("should return empty array when no movements for invoice", () => {
 			const result = db
 				.prepare(stockMovementQueries.getByInvoice)
-				.all("INV999");
+				.all("INV", "INV999");
 			expect(result).toEqual([]);
 		});
 
@@ -124,6 +126,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "9999999999999",
 					amount: "5",
@@ -134,6 +137,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -144,6 +148,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "5555555555555",
 					amount: "3",
@@ -154,7 +159,7 @@ describe("stockMovementQueries", () => {
 
 			const results = db
 				.prepare(stockMovementQueries.getByInvoice)
-				.all("INV001");
+				.all("INV", "INV001");
 
 			expect(results).toHaveLength(3);
 			expect(results[0].item_ean).toBe("1234567890123");
@@ -169,6 +174,7 @@ describe("stockMovementQueries", () => {
 
 			const result = insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -181,7 +187,7 @@ describe("stockMovementQueries", () => {
 
 			const check = db
 				.prepare(stockMovementQueries.getOne)
-				.get("INV001", "1234567890123");
+				.get("INV", "INV001", "1234567890123");
 			expect(check).toBeDefined();
 			expect(check.amount).toBe("10");
 			expect(check.price_per_unit).toBe("100");
@@ -194,6 +200,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -203,19 +210,19 @@ describe("stockMovementQueries", () => {
 			);
 
 			const deleteStmt = db.prepare(stockMovementQueries.delete);
-			const result = deleteStmt.run("INV001", "1234567890123");
+			const result = deleteStmt.run("INV", "INV001", "1234567890123");
 
 			expect(result.changes).toBe(1);
 
 			const check = db
 				.prepare(stockMovementQueries.getOne)
-				.get("INV001", "1234567890123");
+				.get("INV", "INV001", "1234567890123");
 			expect(check).toBeUndefined();
 		});
 
 		it("should return 0 changes when movement does not exist", () => {
 			const deleteStmt = db.prepare(stockMovementQueries.delete);
-			const result = deleteStmt.run("INV999", "9999999999999");
+			const result = deleteStmt.run("INV", "INV999", "9999999999999");
 
 			expect(result.changes).toBe(0);
 		});
@@ -241,6 +248,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -251,6 +259,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "9999999999999",
 					amount: "5",
@@ -260,11 +269,11 @@ describe("stockMovementQueries", () => {
 			);
 
 			const deleteStmt = db.prepare(stockMovementQueries.deleteByInvoice);
-			const result = deleteStmt.run("INV001");
+			const result = deleteStmt.run("INV", "INV001");
 
 			expect(result.changes).toBe(2);
 
-			const check = db.prepare(stockMovementQueries.getByInvoice).all("INV001");
+			const check = db.prepare(stockMovementQueries.getByInvoice).all("INV", "INV001");
 			expect(check).toHaveLength(0);
 		});
 	});
@@ -276,6 +285,7 @@ describe("stockMovementQueries", () => {
 			// Create another invoice
 			db.prepare(invoiceQueries.create).run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV002",
 					type: 1,
 					date_issue: "2024-01-20",
@@ -284,6 +294,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -295,7 +306,8 @@ describe("stockMovementQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeStockMovement({
-						invoice_number: "INV002",
+						invoice_prefix: "INV",
+					invoice_number: "INV002",
 						item_ean: "1234567890123",
 						amount: "5",
 						price_per_unit: "90",
@@ -310,6 +322,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -321,7 +334,8 @@ describe("stockMovementQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeStockMovement({
-						invoice_number: "INV001",
+						invoice_prefix: "INV",
+					invoice_number: "INV001",
 						item_ean: "1234567890123",
 						amount: "20",
 						price_per_unit: "90",
@@ -339,7 +353,8 @@ describe("stockMovementQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeStockMovement({
-						invoice_number: "INV999",
+						invoice_prefix: "INV",
+					invoice_number: "INV999",
 						item_ean: "1234567890123",
 						amount: "10",
 						price_per_unit: "100",
@@ -355,7 +370,8 @@ describe("stockMovementQueries", () => {
 			expect(() => {
 				insert.run(
 					serializeStockMovement({
-						invoice_number: "INV001",
+						invoice_prefix: "INV",
+					invoice_number: "INV001",
 						item_ean: "9999999999999",
 						amount: "10",
 						price_per_unit: "100",
@@ -370,6 +386,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -379,12 +396,12 @@ describe("stockMovementQueries", () => {
 			);
 
 			// Delete the invoice
-			db.prepare(invoiceQueries.delete).run("INV001");
+			db.prepare(invoiceQueries.delete).run("INV", "INV001");
 
 			// Movement should be gone
 			const check = db
 				.prepare(stockMovementQueries.getOne)
-				.get("INV001", "1234567890123");
+				.get("INV", "INV001", "1234567890123");
 			expect(check).toBeUndefined();
 		});
 
@@ -393,6 +410,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -422,6 +440,7 @@ describe("stockMovementQueries", () => {
 			// Create another invoice
 			db.prepare(invoiceQueries.create).run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV002",
 					type: 1,
 					date_issue: "2024-01-20",
@@ -430,6 +449,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -440,6 +460,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV002",
 					item_ean: "1234567890123",
 					amount: "5",
@@ -460,6 +481,7 @@ describe("stockMovementQueries", () => {
 			// Create another invoice
 			db.prepare(invoiceQueries.create).run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV002",
 					type: 1,
 					date_issue: "2024-01-20",
@@ -468,6 +490,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -478,6 +501,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV002",
 					item_ean: "1234567890123",
 					amount: "-3",
@@ -497,7 +521,7 @@ describe("stockMovementQueries", () => {
 		it("should return 0 when no buy invoices exist", () => {
 			const result = db
 				.prepare(stockMovementQueries.getAverageBuyPriceByItem)
-				.get("1234567890123");
+				.get("1234567890123", "1234567890123");
 			expect(result.avg_price).toBe(0);
 		});
 
@@ -507,6 +531,7 @@ describe("stockMovementQueries", () => {
 			// Create invoices of different types
 			db.prepare(invoiceQueries.create).run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV002",
 					type: 1,
 					date_issue: "2024-01-20",
@@ -515,6 +540,7 @@ describe("stockMovementQueries", () => {
 
 			db.prepare(invoiceQueries.create).run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV003",
 					type: 2,
 					date_issue: "2024-01-21",
@@ -523,6 +549,7 @@ describe("stockMovementQueries", () => {
 
 			db.prepare(invoiceQueries.create).run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV004",
 					type: 3,
 					date_issue: "2024-01-22",
@@ -531,6 +558,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -541,6 +569,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV002",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -551,6 +580,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV003",
 					item_ean: "1234567890123",
 					amount: "3",
@@ -562,6 +592,7 @@ describe("stockMovementQueries", () => {
 			// This should be excluded (type 3)
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV004",
 					item_ean: "1234567890123",
 					amount: "2",
@@ -572,7 +603,7 @@ describe("stockMovementQueries", () => {
 
 			const result = db
 				.prepare(stockMovementQueries.getAverageBuyPriceByItem)
-				.get("1234567890123");
+				.get("1234567890123", "1234567890123");
 			expect(result.avg_price).toBeCloseTo(110, 1);
 		});
 	});
@@ -591,6 +622,7 @@ describe("stockMovementQueries", () => {
 			// Create invoices
 			db.prepare(invoiceQueries.create).run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV002",
 					type: 1,
 					date_issue: "2024-01-20",
@@ -599,6 +631,7 @@ describe("stockMovementQueries", () => {
 
 			db.prepare(invoiceQueries.create).run(
 				serializeInvoice({
+					prefix: "INV",
 					number: "INV003",
 					type: 2,
 					date_issue: "2024-01-21",
@@ -607,6 +640,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV001",
 					item_ean: "1234567890123",
 					amount: "10",
@@ -617,6 +651,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV002",
 					item_ean: "1234567890123",
 					amount: "5",
@@ -627,6 +662,7 @@ describe("stockMovementQueries", () => {
 
 			insert.run(
 				serializeStockMovement({
+					invoice_prefix: "INV",
 					invoice_number: "INV003",
 					item_ean: "1234567890123",
 					amount: "3",

@@ -2,7 +2,6 @@ import { z } from "zod";
 import { optionalString } from "./optionalString";
 import { validationMessages } from "../config/validationMessages";
 
-// Helpers
 const requiresDateTax = (type: number) => [1, 2, 3, 4].includes(type); // all except 5 (korekce)
 const requiresInvoiceFields = (type: number) => type === 2 || type === 4; // na fakturu
 
@@ -13,10 +12,10 @@ export const invoiceSchema = z
 			.min(1, validationMessages.invoice.number.required)
 			.max(50, validationMessages.invoice.number.maxLength),
 
-		prefix: optionalString.refine(
-			(val) => !val || val.length <= 10,
-			"Prefix může mít maximálně 10 znaků",
-		),
+		prefix: z
+			.string()
+			.min(1, validationMessages.invoice.prefix.required)
+			.max(10, validationMessages.invoice.prefix.maxLength),
 
 		type: z.preprocess(
 			(v) => Number(v),
@@ -52,7 +51,6 @@ export const invoiceSchema = z
 			validationMessages.invoice.note.maxLength,
 		),
 
-		// Optional fields; requirements enforced in superRefine
 		date_tax: optionalString,
 		date_due: optionalString,
 		variable_symbol: optionalString,

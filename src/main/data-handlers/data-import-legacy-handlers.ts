@@ -23,8 +23,19 @@ interface ImportError {
 	issues: string[];
 }
 
+// =============================================================================
+// HELPER: Async yield to event loop
+// =============================================================================
+
+/**
+ * Yields control back to the event loop to prevent blocking.
+ * Call this periodically in long-running operations.
+ */
+function yieldToEventLoop(): Promise<void> {
+	return new Promise((resolve) => setImmediate(resolve));
+}
+
 function parseTSV(content: string): { headers: string[]; rows: string[][] } {
-	// Remove BOM if present
 	const cleanContent = content.replace(/^\uFEFF/, "");
 	const lines = cleanContent.split(/\r?\n/).filter((line) => line.trim());
 
@@ -41,13 +52,11 @@ function parseTSV(content: string): { headers: string[]; rows: string[][] } {
 function parseDecimalToHellers(value: string): number | null {
 	if (!value || value.trim() === "") return 0;
 
-	// Replace comma with dot, remove spaces
 	const normalized = value.replace(",", ".").replace(/\s/g, "");
 	const parsed = parseFloat(normalized);
 
 	if (isNaN(parsed)) return null;
 
-	// Convert to hellers (multiply by 100)
 	return Math.round(parsed * 100);
 }
 
@@ -145,7 +154,6 @@ function processLegacyItemRow(
 	const salePriceGroup3Raw = getColumnValue(row, headers, "Prodej 3");
 	const salePriceGroup4Raw = getColumnValue(row, headers, "Prodej 4");
 
-	// Validate required fields
 	if (!ean) {
 		issues.push("Missing required field: Číslo (ean)");
 	}
@@ -153,13 +161,11 @@ function processLegacyItemRow(
 		issues.push("Missing required field: Název položky (name)");
 	}
 
-	// Parse VAT rate
 	const vatRate = parseVatRate(vatRateRaw);
 	if (vatRate === null) {
 		issues.push(`Invalid VAT rate: "${vatRateRaw}"`);
 	}
 
-	// Parse prices
 	const salePriceGroup1 = parseDecimalToHellers(salePriceGroup1Raw);
 	const salePriceGroup2 = parseDecimalToHellers(salePriceGroup2Raw);
 	const salePriceGroup3 = parseDecimalToHellers(salePriceGroup3Raw);
@@ -197,8 +203,10 @@ function processLegacyItemRow(
 
 async function importLegacyItems(filePath: string): Promise<ImportResult> {
 	const db = getDatabase();
-	const content = fs.readFileSync(filePath, "utf-8");
+	const content = await fs.promises.readFile(filePath, "utf-8");
 	const { headers, rows } = parseTSV(content);
+
+	await yieldToEventLoop();
 
 	if (headers.length === 0) {
 		return { success: false, error: "Empty file or invalid format" };
@@ -253,9 +261,12 @@ async function importLegacyItems(filePath: string): Promise<ImportResult> {
 				});
 			}
 		}
+
+		if (i % 10 === 0 && i > 0) {
+			await yieldToEventLoop();
+		}
 	}
 
-	// Write error log if there were errors
 	let logFile: string | undefined;
 	if (errors.length > 0) {
 		const timestamp = Date.now();
@@ -298,7 +309,6 @@ function processLegacyContactRow(
 	const bankCode = getColumnValue(row, headers, "Kód banky");
 	const email = getColumnValue(row, headers, "Mail") || null;
 
-	// Validate required fields
 	if (!ico) {
 		issues.push("Missing required field: IČ (ico)");
 	}
@@ -306,19 +316,16 @@ function processLegacyContactRow(
 		issues.push("Missing required field: Název firmy (company_name)");
 	}
 
-	// Parse modifier
 	const modifier = modifierRaw ? parseInt(modifierRaw, 10) : 1;
 	if (isNaN(modifier)) {
 		issues.push(`Invalid modifier: "${modifierRaw}"`);
 	}
 
-	// Parse type
 	const contactType = parseContactType(typeRaw);
 	if (contactType === null) {
 		issues.push(`Invalid contact type: "${typeRaw}" (expected O, DO, ODO)`);
 	}
 
-	// Parse price group
 	let priceGroup = 1;
 	if (priceGroupRaw) {
 		priceGroup = parseInt(priceGroupRaw, 10);
@@ -328,10 +335,8 @@ function processLegacyContactRow(
 		}
 	}
 
-	// Process postal code
 	const postalCode = postalCodeRaw ? stripPSCSpaces(postalCodeRaw) : null;
 
-	// Combine bank account
 	const bankAccount = combineBankAccount(accountNumber, bankCode);
 
 	if (issues.length > 0) {
@@ -362,8 +367,10 @@ function processLegacyContactRow(
 
 async function importLegacyContacts(filePath: string): Promise<ImportResult> {
 	const db = getDatabase();
-	const content = fs.readFileSync(filePath, "utf-8");
+	const content = await fs.promises.readFile(filePath, "utf-8");
 	const { headers, rows } = parseTSV(content);
+
+	await yieldToEventLoop();
 
 	if (headers.length === 0) {
 		return { success: false, error: "Empty file or invalid format" };
@@ -420,9 +427,12 @@ async function importLegacyContacts(filePath: string): Promise<ImportResult> {
 				});
 			}
 		}
+
+		if (i % 10 === 0 && i > 0) {
+			await yieldToEventLoop();
+		}
 	}
 
-	// Write error log if there were errors
 	let logFile: string | undefined;
 	if (errors.length > 0) {
 		const timestamp = Date.now();
@@ -470,7 +480,6 @@ async function importLegacyData(
 	const hasItems = fs.existsSync(itemsFile);
 	const hasContacts = fs.existsSync(contactsFile);
 
-	// Check if at least one file exists
 	if (!hasItems && !hasContacts) {
 		return {
 			success: false,
@@ -486,7 +495,6 @@ async function importLegacyData(
 	const totalSteps = [hasContacts, hasItems].filter(Boolean).length;
 	let currentStep = 0;
 
-	// Import contacts first
 	if (hasContacts) {
 		currentStep++;
 		const progress = Math.round((currentStep / totalSteps) * 100);
@@ -507,7 +515,6 @@ async function importLegacyData(
 		}
 	}
 
-	// Import items
 	if (hasItems) {
 		currentStep++;
 		const progress = Math.round((currentStep / totalSteps) * 100);
@@ -543,7 +550,6 @@ async function importLegacyData(
 // =============================================================================
 
 function registerLegacyImportHandlers() {
-	// Unified handler for importing legacy data from directory
 	ipcMain.handle(
 		"db:importLegacyData",
 		async (event, directoryPath: string) => {
@@ -552,19 +558,16 @@ function registerLegacyImportHandlers() {
 					return { success: false, error: "Nebyla vybrána složka" };
 				}
 
-				// Validate directory exists
 				if (!fs.existsSync(directoryPath)) {
 					return { success: false, error: "Vybraná složka neexistuje" };
 				}
 
 				logger.info(`Importing legacy data from: ${directoryPath}`);
 
-				// Progress callback
 				const progressCallback = (message: string, progress: number) => {
 					event.sender.send("import:progress", { message, progress });
 				};
 
-				// Start import asynchronously (don't await)
 				importLegacyData(directoryPath, progressCallback)
 					.then((result) => {
 						event.sender.send("import:complete", result);
@@ -576,7 +579,6 @@ function registerLegacyImportHandlers() {
 						});
 					});
 
-				// Return immediately to indicate import has started
 				return { success: true, started: true };
 			} catch (error: any) {
 				logger.error("Legacy import failed:", error);

@@ -22,11 +22,9 @@ interface InvoiceFormState {
 }
 
 interface TabPersistenceContextValue {
-	// Filter states
 	getFilterState: (tab: keyof TabFilterStates) => FilterState | null;
 	setFilterState: (tab: keyof TabFilterStates, state: FilterState) => void;
 
-	// Invoice form state
 	invoiceFormState: InvoiceFormState | null;
 	setInvoiceFormState: (state: InvoiceFormState) => void;
 	clearInvoiceFormState: () => void;

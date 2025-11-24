@@ -48,7 +48,6 @@ export function validateDIC(dic: string, ico?: string): boolean {
 	const digits = dic.slice(2);
 	if (!/^[0-9]{8,10}$/.test(digits)) return false;
 
-	// If DIČ is 8 digits and IČO is provided, they should match
 	if (digits.length === 8 && ico && digits !== ico) return false;
 
 	return true;
@@ -96,14 +95,11 @@ export function validateWebsite(url: string): boolean {
 
 	let testUrl = url.trim();
 
-	// Check if protocol exists
 	if (/^[a-z]+:\/\//i.test(testUrl)) {
-		// Only allow http/https
 		if (!/^https?:\/\//i.test(testUrl)) {
 			return false;
 		}
 	} else {
-		// Add https:// for validation
 		testUrl = "https://" + testUrl;
 	}
 
@@ -121,10 +117,7 @@ export function normalizeWebsite(url: string): string {
 
 	let normalized = url.trim();
 
-	// Remove protocol
 	normalized = normalized.replace(/^https?:\/\//i, "");
-
-	// Remove trailing slash
 	normalized = normalized.replace(/\/$/, "");
 
 	return normalized;

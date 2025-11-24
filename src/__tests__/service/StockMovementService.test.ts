@@ -54,6 +54,7 @@ describe("StockMovementService", () => {
 
 		it("should calculate total stock amount", async () => {
 			const invoice1: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-012",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -62,6 +63,7 @@ describe("StockMovementService", () => {
 			};
 
 			const invoice2: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-013",
 				type: 1,
 				date_issue: "2024-01-16",
@@ -73,6 +75,7 @@ describe("StockMovementService", () => {
 			await invoiceService.create(invoice2);
 
 			await stockMovementService.create({
+				invoice_prefix: "INV",
 				invoice_number: "INV-012",
 				item_ean: "1234567890123",
 				amount: "10",
@@ -81,6 +84,7 @@ describe("StockMovementService", () => {
 			});
 
 			await stockMovementService.create({
+				invoice_prefix: "INV",
 				invoice_number: "INV-013",
 				item_ean: "1234567890123",
 				amount: "20",
@@ -103,6 +107,7 @@ describe("StockMovementService", () => {
 
 		it("should calculate average buy price from purchase invoices only", async () => {
 			const purchaseInvoice1: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-016",
 				type: 1,
 				date_issue: "2024-01-15",
@@ -111,6 +116,7 @@ describe("StockMovementService", () => {
 			};
 
 			const purchaseInvoice2: CreateInvoiceInput = {
+				prefix: "INV",
 				number: "INV-017",
 				type: 2,
 				date_issue: "2024-01-16",
@@ -122,6 +128,7 @@ describe("StockMovementService", () => {
 			await invoiceService.create(purchaseInvoice2);
 
 			await stockMovementService.create({
+				invoice_prefix: "INV",
 				invoice_number: "INV-016",
 				item_ean: "1234567890123",
 				amount: "10",
@@ -130,6 +137,7 @@ describe("StockMovementService", () => {
 			});
 
 			await stockMovementService.create({
+				invoice_prefix: "INV",
 				invoice_number: "INV-017",
 				item_ean: "1234567890123",
 				amount: "10",

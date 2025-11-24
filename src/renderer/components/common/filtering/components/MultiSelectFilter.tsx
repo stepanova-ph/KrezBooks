@@ -1,4 +1,3 @@
-// filters/MultiSelectFilter.tsx
 import {
 	FormControl,
 	InputLabel,

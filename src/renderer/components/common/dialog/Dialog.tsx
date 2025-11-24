@@ -66,7 +66,7 @@ export function Dialog({
 				},
 			}}
 			disablePortal={false}
-			style={{ zIndex: 1300 }} // Base dialogs at 1300
+			style={{ zIndex: 1300 }}
 		>
 			<Box
 				sx={{

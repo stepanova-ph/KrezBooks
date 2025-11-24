@@ -5,7 +5,6 @@ import { itemQueries } from "../main/queries/items";
 import { stockMovementQueries } from "../main/queries/stockMovements";
 import { invoiceQueries } from "../main/queries/invoices";
 
-// Mock logger to avoid console spam in tests
 vi.mock("../main/logger", () => ({
 	logger: {
 		info: vi.fn(),
@@ -15,15 +14,12 @@ vi.mock("../main/logger", () => ({
 	},
 }));
 
-// Test database instance
 let testDb: Database.Database | null = null;
 
-// Create in-memory database for tests
 export function createTestDatabase(): Database.Database {
 	const db = new Database(":memory:");
 	db.pragma("foreign_keys = ON");
 
-	// Create tables
 	db.exec(contactQueries.createTable);
 	db.exec(itemQueries.createTable);
 	db.exec(stockMovementQueries.createTable);
@@ -32,7 +28,6 @@ export function createTestDatabase(): Database.Database {
 	return db;
 }
 
-// Mock the database module
 vi.mock("../main/database", () => {
 	return {
 		getDatabase: () => {
@@ -56,7 +51,6 @@ vi.mock("../main/database", () => {
 	};
 });
 
-// Reset database before each test
 beforeEach(() => {
 	if (testDb) {
 		testDb.close();
@@ -64,7 +58,6 @@ beforeEach(() => {
 	testDb = createTestDatabase();
 });
 
-// Clean up after each test
 afterEach(() => {
 	if (testDb) {
 		testDb.close();

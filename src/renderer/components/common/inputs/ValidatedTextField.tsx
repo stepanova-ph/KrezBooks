@@ -29,8 +29,8 @@ const ValidatedTextField = ({
 			disabled={disabled}
 			error={hasError}
 			sx={(theme) => ({
-				...(typeof sx === "function" ? sx(theme) : sx), // preserve any sx from props
-				...(disabled ? disabledValidatedTextfieldSx(theme) : {}), // apply if disabled
+				...(typeof sx === "function" ? sx(theme) : sx),
+				...(disabled ? disabledValidatedTextfieldSx(theme) : {}),
 			})}
 			InputProps={{
 				...props.InputProps,

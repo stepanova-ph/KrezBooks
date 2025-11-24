@@ -54,7 +54,6 @@ interface DataTableProps<T> {
 function DataTableInner<T>(props: DataTableProps<T>) {
 	const controls = useTableControls<T>();
 
-	// Setup keyboard shortcuts
 	useKeyboardShortcuts(
 		{
 			ArrowUp: controls.moveUp,
@@ -71,19 +70,16 @@ function DataTableInner<T>(props: DataTableProps<T>) {
 		},
 	);
 
-	// Update data in context whenever it changes
 	useEffect(() => {
 		controls.setData(props.data, props.getRowKey || ((item: any) => item.id));
 	}, [props.data, props.getRowKey, controls]);
 
-	// STABLE CALLBACK - doesn't change on every render
 	const handleEnter = useCallback(() => {
 		if (props.onEnterAction && controls.focusedItem !== null) {
 			props.onEnterAction(controls.focusedItem, controls.focusedIndex);
 		}
 	}, [props.onEnterAction, controls.focusedItem, controls.focusedIndex]);
 
-	// Setup enter callback - ONLY UPDATE WHEN CALLBACK CHANGES
 	useEffect(() => {
 		if (props.onEnterAction) {
 			controls.setOnEnterPress(handleEnter);
@@ -92,7 +88,6 @@ function DataTableInner<T>(props: DataTableProps<T>) {
 		}
 	}, [handleEnter, props.onEnterAction, controls]);
 
-	// Notify parent of focus changes
 	useEffect(() => {
 		if (props.onFocusChange) {
 			props.onFocusChange(controls.focusedItem);

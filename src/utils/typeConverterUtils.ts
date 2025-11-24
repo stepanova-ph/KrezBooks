@@ -82,16 +82,19 @@ export function serializeItem(item: Partial<Item>): any {
 
 export function serializeStockMovement(movement: Partial<StockMovement>): any {
 	return {
+		invoice_prefix: movement.invoice_prefix ?? null,
 		invoice_number: movement.invoice_number ?? null,
 		item_ean: movement.item_ean ?? null,
 		amount: movement.amount ?? null,
 		price_per_unit: movement.price_per_unit ?? null,
 		vat_rate: movement.vat_rate ?? null,
+		reset_point: movement.reset_point === true ? 1 : 0,
 	};
 }
 
 export function serializeInvoice(invoice: Partial<Invoice>): any {
 	return {
+		prefix: invoice.prefix ?? null,
 		number: invoice.number ?? null,
 		type: invoice.type ?? null,
 		payment_method: invoice.payment_method ?? null,
@@ -120,11 +123,9 @@ export function serializeInvoice(invoice: Partial<Invoice>): any {
  * - Correction type (5): as-is from user input
  */
 export function getSignedAmount(amount: number, invoiceType: number): string {
-	// Sale types should be negative
 	if (invoiceType === 3 || invoiceType === 4) {
 		return (-Math.abs(amount)).toString();
 	}
-	// Purchase types and corrections keep the sign as-is
 	return amount.toString();
 }
 

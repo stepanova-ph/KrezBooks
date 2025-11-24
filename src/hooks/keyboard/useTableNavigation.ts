@@ -18,14 +18,12 @@ export function useTableNavigation(options: UseTableNavigationOptions) {
 	const [focusedRowIndex, setFocusedRowIndex] = useState(0);
 	const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
 
-	// reset focused index if data changes
 	useEffect(() => {
 		if (focusedRowIndex >= dataLength && dataLength > 0) {
 			setFocusedRowIndex(dataLength - 1);
 		}
 	}, [dataLength, focusedRowIndex]);
 
-	// auto-scroll to focused row
 	useEffect(() => {
 		if (rowRefs.current[focusedRowIndex]) {
 			rowRefs.current[focusedRowIndex]?.scrollIntoView({
@@ -35,7 +33,6 @@ export function useTableNavigation(options: UseTableNavigationOptions) {
 		}
 	}, [focusedRowIndex]);
 
-	// notify parent when focus changes
 	useEffect(() => {
 		onFocusChange?.(focusedRowIndex);
 	}, [focusedRowIndex, onFocusChange]);
@@ -94,7 +91,7 @@ export function useTableNavigation(options: UseTableNavigationOptions) {
 
 	return {
 		focusedRowIndex,
-		setFocusedRowIndex, // expose this for mouse interactions
+		setFocusedRowIndex,
 		setRowRef,
 	};
 }

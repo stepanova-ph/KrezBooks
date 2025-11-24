@@ -7,7 +7,6 @@ import path from "path";
 const TABLES = ["contacts", "items", "invoices", "stock_movements"] as const;
 type TableName = (typeof TABLES)[number];
 
-// UTF-8 BOM for Excel to recognize encoding
 const UTF8_BOM = "\uFEFF";
 const CSV_DELIMITER = ";";
 
@@ -18,7 +17,6 @@ function escapeCSVValue(value: unknown): string {
 
 	const stringValue = String(value);
 
-	// Escape if contains delimiter, quotes, or newlines
 	if (
 		stringValue.includes(CSV_DELIMITER) ||
 		stringValue.includes('"') ||
@@ -47,14 +45,14 @@ function tableToCSV(rows: Record<string, unknown>[]): string {
 	return UTF8_BOM + header + "\n" + dataRows.join("\n");
 }
 
-function exportTable(tableName: TableName): string {
+function exportTable(tableName: TableName): { csv: string; count: number } {
 	const db = getDatabase();
 	const rows = db.prepare(`SELECT * FROM ${tableName}`).all() as Record<
 		string,
 		unknown
 	>[];
 
-	return tableToCSV(rows);
+	return { csv: tableToCSV(rows), count: rows.length };
 }
 
 function formatDate(date: Date): string {
@@ -67,8 +65,19 @@ function formatDate(date: Date): string {
 async function performExport(
 	exportPath: string,
 	progressCallback?: (message: string, progress: number) => void,
-): Promise<{ success: boolean; error?: string; path?: string }> {
+): Promise<{
+	success: boolean;
+	error?: string;
+	path?: string;
+	exported?: Record<string, number>;
+}> {
 	const createdFiles: string[] = [];
+	const exported: Record<string, number> = {
+		contacts: 0,
+		items: 0,
+		invoices: 0,
+		stock_movements: 0,
+	};
 
 	try {
 		const totalTables = TABLES.length;
@@ -79,7 +88,9 @@ async function performExport(
 
 			progressCallback?.(`Exportuji tabulku ${tableName}...`, progress);
 
-			const csvContent = exportTable(tableName);
+			const { csv: csvContent, count } = exportTable(tableName);
+			exported[tableName] = count;
+
 			const filePath = path.join(exportPath, `${tableName}.csv`);
 
 			fs.writeFileSync(filePath, csvContent, "utf-8");
@@ -90,9 +101,8 @@ async function performExport(
 
 		progressCallback?.(`Export dokončen`, 100);
 		logger.info(`Export completed to ${exportPath}`);
-		return { success: true, path: exportPath };
+		return { success: true, path: exportPath, exported };
 	} catch (error: any) {
-		// Cleanup on failure
 		progressCallback?.(`Export selhal: ${error.message}`, 0);
 		logger.error("Export failed, cleaning up:", error);
 
@@ -106,7 +116,6 @@ async function performExport(
 			}
 		}
 
-		// Remove the export directory if empty
 		try {
 			if (fs.existsSync(exportPath)) {
 				const remaining = fs.readdirSync(exportPath);
@@ -129,7 +138,6 @@ function registerDataExportHandlers() {
 				return { success: false, error: "Nebyla vybrána složka" };
 			}
 
-			// Validate directory exists
 			if (!fs.existsSync(directoryPath)) {
 				return { success: false, error: "Vybraná složka neexistuje" };
 			}
@@ -137,10 +145,8 @@ function registerDataExportHandlers() {
 			const exportFolderName = `krezbooks-export-${formatDate(new Date())}`;
 			const exportPath = path.join(directoryPath, exportFolderName);
 
-			// Create export directory
 			let finalExportPath = exportPath;
 			if (fs.existsSync(exportPath)) {
-				// Add timestamp if folder already exists
 				const timestamp = Date.now();
 				finalExportPath = path.join(
 					directoryPath,
@@ -150,14 +156,53 @@ function registerDataExportHandlers() {
 
 			fs.mkdirSync(finalExportPath, { recursive: true });
 
-			// Progress callback
 			const progressCallback = (message: string, progress: number) => {
 				event.sender.send("export:progress", { message, progress });
 			};
 
-			// Start export asynchronously (don't await)
+			event.sender.send("export:progress", {
+				message: "Export zahájen",
+				progress: 0,
+			});
+
 			performExport(finalExportPath, progressCallback)
 				.then((result) => {
+					if (result.success && result.exported) {
+						const stats = result.exported;
+
+						if (stats.contacts > 0) {
+							event.sender.send("export:progress", {
+								message: `Kontakty: ${stats.contacts} exportováno`,
+								progress: 100,
+							});
+						}
+						if (stats.items > 0) {
+							event.sender.send("export:progress", {
+								message: `Položky: ${stats.items} exportováno`,
+								progress: 100,
+							});
+						}
+						if (stats.invoices > 0) {
+							event.sender.send("export:progress", {
+								message: `Doklady: ${stats.invoices} exportováno`,
+								progress: 100,
+							});
+						}
+						if (stats.stock_movements > 0) {
+							event.sender.send("export:progress", {
+								message: `Pohyby skladu: ${stats.stock_movements} exportováno`,
+								progress: 100,
+							});
+						}
+
+						if (result.path) {
+							event.sender.send("export:progress", {
+								message: `Exportováno do: ${result.path}`,
+								progress: 100,
+							});
+						}
+					}
+
 					event.sender.send("export:complete", result);
 				})
 				.catch((error) => {
@@ -167,7 +212,6 @@ function registerDataExportHandlers() {
 					});
 				});
 
-			// Return immediately to indicate export has started
 			return { success: true, started: true };
 		} catch (error: any) {
 			logger.error("Export failed:", error);

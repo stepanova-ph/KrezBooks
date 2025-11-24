@@ -73,7 +73,7 @@ export const invoiceQueries = {
       ) as total_with_vat
     FROM invoices i
     LEFT JOIN stock_movements sm ON i.prefix = sm.invoice_prefix AND i.number = sm.invoice_number
-    WHERE i.number = ? AND i.prefix = ?
+    WHERE i.prefix = ? AND i.number = ?
     GROUP BY i.prefix, i.number
   `,
 

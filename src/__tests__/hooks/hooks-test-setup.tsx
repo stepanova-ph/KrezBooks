@@ -2,7 +2,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { vi } from "vitest";
 
-// Mock window.electronAPI
 export const mockElectronAPI = {
 	contacts: {
 		getAll: vi.fn(),
@@ -39,7 +38,6 @@ export const mockElectronAPI = {
 // @ts-ignore
 global.window.electronAPI = mockElectronAPI;
 
-// Create test query client
 export function createTestQueryClient() {
 	return new QueryClient({
 		defaultOptions: {
@@ -54,7 +52,6 @@ export function createTestQueryClient() {
 	});
 }
 
-// Wrapper for rendering with React Query
 export function createWrapper() {
 	const queryClient = createTestQueryClient();
 	return ({ children }: { children: ReactNode }) => (

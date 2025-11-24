@@ -36,7 +36,6 @@ export function ViewInvoiceDialog({
 	const isLoading = invoiceLoading || movementsLoading;
 	const isType5 = invoice?.type === 5;
 
-	// Transform stock movements into InvoiceItems
 	const invoiceItems: InvoiceItem[] = movements.map((movement) => {
 		const item = allItems.find((i) => i.ean === movement.item_ean);
 		return {

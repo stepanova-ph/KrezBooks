@@ -1,5 +1,3 @@
-// Vite configuration for the preload script
-
 import { defineConfig } from 'vite';
 import path from 'path';
 

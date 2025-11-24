@@ -84,6 +84,10 @@ export const validationMessages = {
 	},
 
 	invoice: {
+		prefix: {
+			required: "Prefix faktury je povinný",
+			maxLength: "Prefix faktury je příliš dlouhý (max 10 znaků)",
+		},
 		number: {
 			required: "Číslo faktury je povinné",
 			maxLength: "Číslo faktury je příliš dlouhé (max 50 znaků)",
