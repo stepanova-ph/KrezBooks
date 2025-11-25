@@ -318,9 +318,10 @@ export function ItemAmountPriceDialog({
 												name="custom_price"
 												value={customPrice}
 												vatRate={vatPercentage}
-												onChange={(e) =>
-													setCustomPrice(parseFloat(e.target.value) || 0)
-												}
+												onChange={(e) => {
+													setCustomPrice(parseFloat(e.target.value) || 0);
+													setSelectedPrice("custom");
+												}}
 												precision={2}
 												min={0}
 											/>

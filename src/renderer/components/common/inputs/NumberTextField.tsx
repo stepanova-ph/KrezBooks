@@ -48,7 +48,9 @@ export function NumberTextField({
 	const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
 		setIsFocused(false);
 
-		let numValue = parseFloat(displayValue);
+		// Convert Czech comma format to dot format
+		const normalizedValue = displayValue.replace(',', '.');
+		let numValue = parseFloat(normalizedValue);
 
 		if (isNaN(numValue)) {
 			numValue = 0;
@@ -115,7 +117,8 @@ export function NumberTextField({
 		const isDecimal =
 			(key === "." || key === ",") &&
 			precision > 0 &&
-			!displayValue.includes(".");
+			!displayValue.includes(".") &&
+			!displayValue.includes(",");
 		const isMinus = key === "-" && allowNegative && displayValue.length === 0;
 
 		if (!isNumber && !isDecimal && !isMinus) {

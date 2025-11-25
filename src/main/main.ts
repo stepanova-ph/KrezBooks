@@ -12,6 +12,7 @@ import { registerBackupHandlers } from "./backup-handlers";
 import { performAutomaticBackup } from "./backup-service";
 
 let mainWindow: BrowserWindow | null = null;
+let isQuitting = false;
 
 function createWindow() {
 	mainWindow = new BrowserWindow({
@@ -59,28 +60,21 @@ app.whenReady().then(async () => {
 	registerBackupHandlers();
 
 	createWindow();
-
-	logger.info("Performing automatic backup on app startup...");
-	performAutomaticBackup()
-		.then((result) => {
-			if (result.success) {
-				logger.info(`✓ Startup backup completed: ${result.path}`);
-			} else {
-				logger.error(`✗ Startup backup failed: ${result.error}`);
-			}
-		})
-		.catch((error) => {
-			logger.error("Startup backup error:", error);
-		});
 });
 
 app.on("window-all-closed", () => {
-	closeDatabase();
-	app.quit();
+	if (process.platform !== "darwin") {
+		app.quit();
+	}
 });
 
 app.on("before-quit", async (event) => {
+	if (isQuitting) {
+		return;
+	}
+
 	event.preventDefault();
+	isQuitting = true;
 
 	logger.info("Performing automatic backup on app exit...");
 	try {
