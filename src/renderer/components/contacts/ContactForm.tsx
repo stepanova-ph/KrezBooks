@@ -7,6 +7,7 @@ import { FormSection } from "../common/form/FormSection";
 import { splitBankAccount, combineBankAccount } from "../../../utils/formUtils";
 import ContactTypeSelector from "./ContactsTypeSelector";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
+import { InfoDialog } from "../common/dialog/InfoDialog";
 
 interface ContactFormProps {
 	open: boolean;
@@ -64,6 +65,8 @@ function ContactForm({
 
 	const [bankAccountParts, setBankAccountParts] = useState(initialBankAccount);
 	const [errors, setErrors] = useState<Record<string, string>>({});
+	const [showInfoDialog, setShowInfoDialog] = useState(false);
+	const [infoMessage, setInfoMessage] = useState("");
 
 	useEffect(() => {
 		if (open) {
@@ -170,6 +173,11 @@ function ContactForm({
 		try {
 			await onSubmit(result.data as CreateContactInput);
 			if (mode === "create") {
+				const message = formData.dic
+					? `Kontakt s IČO ${formData.ico} a DIČ ${formData.dic} byl úspěšně vytvořen.`
+					: `Kontakt s IČO ${formData.ico} byl úspěšně vytvořen.`;
+				setInfoMessage(message);
+				setShowInfoDialog(true);
 				setFormData(defaultFormData);
 				setBankAccountParts({ accountNumber: "", bankCode: "" });
 			}
@@ -179,10 +187,16 @@ function ContactForm({
 		}
 	};
 
+	const handleInfoDialogClose = () => {
+		setShowInfoDialog(false);
+		onClose();
+	};
+
 	const title = mode === "create" ? "Přidat nový kontakt" : "Upravit kontakt";
 	const submitLabel = mode === "create" ? "Přidat kontakt" : "Uložit změny";
 
 	return (
+		<>
 		<FormDialog
 			open={open}
 			onClose={onClose}
@@ -412,6 +426,13 @@ function ContactForm({
 				</Grid>
 			</FormSection>
 		</FormDialog>
+		<InfoDialog
+			open={showInfoDialog}
+			title="Úspěch"
+			message={infoMessage}
+			onConfirm={handleInfoDialogClose}
+		/>
+		</>
 	);
 }
 

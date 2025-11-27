@@ -9,6 +9,7 @@ import { ItemPickerDialog } from "../invoice/new/ItemPickerDialog";
 import { ItemAmountPriceDialog } from "../invoice/new/ItemAmountPriceDialog";
 import { ContactPickerDialog } from "../invoice/new/ContactPickerDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
+import { InfoDialog } from "../common/dialog/InfoDialog";
 import { useInvoiceForm } from "../../../hooks/useInvoiceForm";
 import { useInvoiceDialogs } from "../../../hooks/useInvoiceDialogs";
 import {
@@ -43,6 +44,8 @@ function NewInvoiceTab() {
 		title: string;
 		message: string;
 	} | null>(null);
+	const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+	const [successMessage, setSuccessMessage] = useState("");
 
 	const isType5 = form.formData.type === 5;
 
@@ -210,11 +213,14 @@ function NewInvoiceTab() {
 
 			form.handleReset();
 
-			setAlertDialog({
-				open: true,
-				title: "Úspěch",
-				message: "Doklad byl úspěšně vytvořen",
-			});
+			const invoiceIdentifier = form.formData.prefix
+				? `${form.formData.prefix}${form.formData.number}`
+				: form.formData.number;
+
+			setSuccessMessage(
+				`Doklad č. ${invoiceIdentifier} byl úspěšně vytvořen.`,
+			);
+			setShowSuccessDialog(true);
 		} catch (error) {
 			console.error("Failed to create invoice:", error);
 
@@ -402,6 +408,13 @@ function NewInvoiceTab() {
 				title={alertDialog?.title || ""}
 				message={alertDialog?.message || ""}
 				onConfirm={() => setAlertDialog(null)}
+			/>
+
+			<InfoDialog
+				open={showSuccessDialog}
+				title="Úspěch"
+				message={successMessage}
+				onConfirm={() => setShowSuccessDialog(false)}
 			/>
 
 			{viewingItemEan && (
