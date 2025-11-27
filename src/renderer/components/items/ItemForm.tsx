@@ -15,6 +15,7 @@ import {
 } from "../../../hooks/useStockMovement";
 import { ValidatedAutocomplete } from "../common/inputs/ValidatedAutocomplete";
 import { VAT_RATES, UNIT_OPTIONS } from "../../../config/constants";
+import { InfoDialog } from "../common/dialog/InfoDialog";
 
 interface ItemFormProps {
 	open: boolean;
@@ -50,6 +51,8 @@ function ItemForm({
 		initialData ? { ...defaultFormData, ...initialData } : defaultFormData,
 	);
 	const [errors, setErrors] = useState<Record<string, string>>({});
+	const [showInfoDialog, setShowInfoDialog] = useState(false);
+	const [infoMessage, setInfoMessage] = useState("");
 
 	const { data: existingCategories = [] } = useItemCategories();
 
@@ -95,6 +98,18 @@ function ItemForm({
 		}
 
 		await onSubmit(formData);
+
+		if (mode === "create") {
+			const message =
+				`Položka s EAN ${formData.ean} byla úspěšně vytvořena.`;
+			setInfoMessage(message);
+			setShowInfoDialog(true);
+		}
+	};
+
+	const handleInfoDialogClose = () => {
+		setShowInfoDialog(false);
+		onClose();
 	};
 
 	const title = mode === "create" ? "Přidat novou položku" : "Upravit položku";
@@ -104,6 +119,7 @@ function ItemForm({
 		VAT_RATES[formData.vat_rate as keyof typeof VAT_RATES]?.percentage ?? 21;
 
 	return (
+		<>
 		<FormDialog
 			open={open}
 			onClose={onClose}
@@ -405,6 +421,13 @@ function ItemForm({
 				</Box>
 			</FormSection>
 		</FormDialog>
+		<InfoDialog
+			open={showInfoDialog}
+			title="Úspěch"
+			message={infoMessage}
+			onConfirm={handleInfoDialogClose}
+		/>
+		</>
 	);
 }
 

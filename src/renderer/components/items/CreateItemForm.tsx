@@ -12,13 +12,7 @@ function CreateItemForm({
 	const createItem = useCreateItem();
 
 	const handleSubmit = async (data: CreateItemInput) => {
-		try {
-			await createItem.mutateAsync(data);
-			onClose();
-		} catch (error) {
-			console.error("Chyba při vytváření položky:", error);
-			throw error;
-		}
+		await createItem.mutateAsync(data);
 	};
 
 	return (
