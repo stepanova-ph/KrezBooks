@@ -11,6 +11,7 @@ import { Loading } from "../layout/Loading";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 import { InvoiceTotals } from "./InvoiceTotals";
 import { getDisplayAmount } from "../../../utils/typeConverterUtils";
+import { InvoicePrintButtons } from "./InvoicePrintButton";
 
 interface ViewInvoiceDialogProps {
 	open: boolean;
@@ -87,6 +88,7 @@ export function ViewInvoiceDialog({
 							<InvoiceHeader
 								type={invoice.type}
 								number={invoice.number}
+								prefix={invoice.prefix}
 								paymentMethod={invoice.payment_method}
 								dateIssue={invoice.date_issue}
 								dateTax={invoice.date_tax}
@@ -96,6 +98,14 @@ export function ViewInvoiceDialog({
 								onChange={() => {}}
 								onBlur={() => {}}
 								disabled
+								headerAction={
+									<InvoicePrintButtons
+										variant="icon"
+										invoicePrefix={invoice.prefix}
+										invoiceNumber={invoice.number}
+										invoiceEmail={invoice.email || ""}
+									/>
+								}
 							/>
 						</Box>
 
@@ -135,6 +145,7 @@ export function ViewInvoiceDialog({
 								<InvoiceHeader
 									type={invoice.type}
 									number={invoice.number}
+									prefix={invoice.prefix}
 									paymentMethod={invoice.payment_method}
 									dateIssue={invoice.date_issue}
 									dateTax={invoice.date_tax}
@@ -144,6 +155,14 @@ export function ViewInvoiceDialog({
 									onChange={() => {}}
 									onBlur={() => {}}
 									disabled
+									headerAction={
+										<InvoicePrintButtons
+											variant="icon"
+											invoicePrefix={invoice.prefix}
+											invoiceNumber={invoice.number}
+											invoiceEmail={invoice.email || ""}
+										/>
+									}
 								/>
 							</Box>
 						)}

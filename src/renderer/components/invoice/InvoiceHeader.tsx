@@ -1,4 +1,4 @@
-import { Grid, MenuItem } from "@mui/material";
+import { Grid, MenuItem, Box } from "@mui/material";
 import { FormSection } from "../common/form/FormSection";
 import ValidatedTextField from "../common/inputs/ValidatedTextField";
 import { INVOICE_TYPES, PAYMENT_METHOD_TYPES } from "../../../config/constants";
@@ -18,6 +18,7 @@ interface InvoiceHeaderProps {
 	onChange: (field: string, value: string | number) => void;
 	onBlur: (field: string) => void;
 	disabled?: true;
+	headerAction?: React.ReactNode;
 }
 
 function headerType5({
@@ -28,9 +29,10 @@ function headerType5({
 	disabled,
 	onChange,
 	onBlur,
+	headerAction,
 }: Partial<InvoiceHeaderProps>) {
 	return (
-		<FormSection title="Hlavička" my={2}>
+		<FormSection title="Hlavička" my={2} actions={headerAction}>
 			<Grid container spacing={2}>
 				<Grid item xs={3.8}>
 					<ValidatedTextField
@@ -138,6 +140,7 @@ export function InvoiceHeader({
 	disabled,
 	onChange,
 	onBlur,
+	headerAction,
 }: InvoiceHeaderProps) {
 	const isType5 = type === 5;
 	const showDateTax = (type as number) >= 1 && (type as number) <= 4; // 1–4
@@ -154,11 +157,12 @@ export function InvoiceHeader({
 			disabled,
 			onChange,
 			onBlur,
+			headerAction,
 		});
 	}
 
 	return (
-		<FormSection title="Hlavička" my={2}>
+		<FormSection title="Hlavička" my={2} actions={headerAction}>
 			<Grid container spacing={2}>
 				<Grid item xs={5.3}>
 					<ValidatedTextField

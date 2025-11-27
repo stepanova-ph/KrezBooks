@@ -52,7 +52,6 @@ export function ContactPickerDialog({
 		contactPickerFilterConfig,
 	);
 
-	// Sort selected contacts to top
 	const sortedContacts = [...filteredContacts].sort((a, b) => {
 		const aSelected = isContactSelected(a);
 		const bSelected = isContactSelected(b);
@@ -63,13 +62,11 @@ export function ContactPickerDialog({
 
 	const handleSelect = (contact: Contact) => {
 		if (singleSelect) {
-			// Single select mode: call onSelect and close
 			if (onSelect) {
 				onSelect(contact);
 			}
 			onClose();
 		} else {
-			// Multi-select mode: toggle selection
 			if (onToggleSelect) {
 				onToggleSelect(contact);
 			}

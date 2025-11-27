@@ -58,6 +58,15 @@ declare global {
 					path?: string;
 					error?: string;
 				}>;
+				saveFile: (
+					defaultFilename?: string,
+					title?: string,
+				) => Promise<{
+					success: boolean;
+					canceled?: boolean;
+					path?: string;
+					error?: string;
+				}>;
 			};
 
 			admin: {
@@ -176,6 +185,24 @@ declare global {
 				getAverageBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
 				getLastBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
 				getMaxNumber: (type: number) => Promise<number>;
+			};
+			print: {
+				generateInvoiceHTML: (
+					invoicePrefix: string,
+					invoiceNumber: string,
+				) => Promise<IpcResponse<string>>;
+				invoiceToPDF: (
+					invoicePrefix: string,
+					invoiceNumber: string,
+					savePath?: string,
+				) => Promise<IpcResponse<{ path: string }>>;
+			};
+			shell: {
+				openEmail: (
+					email: string,
+					subject: string,
+					body: string,
+				) => Promise<IpcResponse<void>>;
 			};
 		};
 	}

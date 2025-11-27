@@ -34,6 +34,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	dialog: {
 		selectDirectory: (title?: string) =>
 			ipcRenderer.invoke("dialog:selectDirectory", title),
+		saveFile: (defaultFilename?: string, title?: string) =>
+			ipcRenderer.invoke("dialog:saveFile", defaultFilename, title),
 	},
 
 	contacts: {
@@ -182,5 +184,28 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		setPath: (backupPath: string) =>
 			ipcRenderer.invoke("backup:setPath", backupPath),
 		create: () => ipcRenderer.invoke("backup:create"),
+	},
+	print: {
+		generateInvoiceHTML: (invoicePrefix: string, invoiceNumber: string) =>
+			ipcRenderer.invoke(
+				"print:generateInvoiceHTML",
+				invoicePrefix,
+				invoiceNumber,
+			),
+		invoiceToPDF: (
+			invoicePrefix: string,
+			invoiceNumber: string,
+			savePath?: string,
+		) =>
+			ipcRenderer.invoke(
+				"print:invoiceToPDF",
+				invoicePrefix,
+				invoiceNumber,
+				savePath,
+			),
+	},
+	shell: {
+		openEmail: (email: string, subject: string, body: string) =>
+			ipcRenderer.invoke("shell:openEmail", email, subject, body),
 	},
 });

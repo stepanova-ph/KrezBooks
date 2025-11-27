@@ -10,6 +10,8 @@ import { registerDataImportHandlers } from "./data-handlers/data-import-handlers
 import { registerDialogHandlers } from "./dialog-handlers";
 import { registerBackupHandlers } from "./backup-handlers";
 import { performAutomaticBackup } from "./backup-service";
+import { registerPrintHandlers } from "./print-handlers";
+import { registerShellHandlers } from "./shell-handlers";
 
 let mainWindow: BrowserWindow | null = null;
 let isQuitting = false;
@@ -58,6 +60,8 @@ app.whenReady().then(async () => {
 	registerDataImportHandlers();
 	registerDialogHandlers();
 	registerBackupHandlers();
+	registerPrintHandlers();
+	registerShellHandlers();
 
 	createWindow();
 });
