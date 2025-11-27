@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ main, core, print_module ]
+    branches: [ main, print ]
   workflow_dispatch:
 
 jobs:
