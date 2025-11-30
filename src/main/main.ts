@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, globalShortcut } from "electron";
 import path from "path";
 import { initDatabase, closeDatabase } from "./database";
 import { registerIpcHandlers } from "./ipc-handlers";
@@ -31,11 +31,8 @@ function createWindow() {
 		},
 	});
 
-	mainWindow.webContents.openDevTools();
-
 	if (process.env.VITE_DEV_SERVER_URL) {
 		mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-		// mainWindow.webContents.openDevTools();
 	} else {
 		mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
 	}
@@ -64,6 +61,16 @@ app.whenReady().then(async () => {
 	registerShellHandlers();
 
 	createWindow();
+
+	// Register Q to toggle DevTools
+	globalShortcut.register("Q", () => {
+		if (mainWindow && mainWindow.webContents) {
+			mainWindow.webContents.toggleDevTools();
+			logger.info("DevTools toggled via Q");
+		}
+	});
+
+	logger.info("✓ Global shortcuts registered");
 });
 
 app.on("window-all-closed", () => {
@@ -79,6 +86,9 @@ app.on("before-quit", async (event) => {
 
 	event.preventDefault();
 	isQuitting = true;
+
+	// Unregister global shortcuts
+	globalShortcut.unregisterAll();
 
 	logger.info("Performing automatic backup on app exit...");
 	try {

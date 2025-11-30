@@ -472,7 +472,7 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 						</Button>
 					</Box>
 					<Typography variant="body2" color="text.secondary" fontSize={10} textAlign="center">
-						Zálohy se vytváří automaticky při spuštění a ukončení aplikace
+						Zálohy se vytváří automaticky při ukončení aplikace
 					</Typography>
 
 					<Button

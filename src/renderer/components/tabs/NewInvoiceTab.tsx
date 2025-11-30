@@ -288,7 +288,7 @@ function NewInvoiceTab() {
 				}}
 			>
 				{isType5 && (
-					<Box sx={{ p: 4, px: 105, pb: 2 }}>
+					<Box sx={{ p: 4, px: 100, pb: 2 }}>
 						<InvoiceHeader
 							type={form.formData.type}
 							number={form.formData.number}
