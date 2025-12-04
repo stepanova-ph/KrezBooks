@@ -33,8 +33,14 @@ export function useCreateInvoice() {
 			if (!result.success) throw new Error(result.error);
 			return result.data;
 		},
-		onSuccess: () => {
+		onSuccess: (_, invoice) => {
+			// Invalidate all invoice queries
 			queryClient.invalidateQueries({ queryKey: ["invoices"] });
+			// Specifically invalidate the max number query for this invoice type
+			// This ensures the next invoice number is fetched fresh from the database
+			queryClient.invalidateQueries({
+				queryKey: ["invoices", "maxNumber", invoice.type],
+			});
 		},
 	});
 }

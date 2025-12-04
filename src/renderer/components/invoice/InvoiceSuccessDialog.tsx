@@ -1,59 +1,59 @@
-import { Button, Box, IconButton } from "@mui/material";
-import { useState } from "react";
+import { Box } from "@mui/material";
+import { useState, useEffect } from "react";
+import { Dialog } from "../common/dialog/Dialog";
 import { useGenerateInvoiceHTML, usePrintInvoiceToPDF } from "../../../hooks/usePrint";
-import PrintIcon from "@mui/icons-material/Print";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import EmailIcon from "@mui/icons-material/Email";
-import { Dialog } from "../common/dialog/Dialog";
 import { InfoDialog } from "../common/dialog/InfoDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 
-interface InvoicePrintButtonsProps {
+interface InvoiceSuccessDialogProps {
+	open: boolean;
+	onClose: () => void;
 	invoicePrefix: string;
 	invoiceNumber: string;
-	variant?: "button" | "icon";
 	invoiceEmail?: string;
-	invoiceType?: number; // Invoice type to check if printing is supported
 }
 
-export function InvoicePrintButtons({
+export function InvoiceSuccessDialog({
+	open,
+	onClose,
 	invoicePrefix,
 	invoiceNumber,
-	variant = "button",
 	invoiceEmail,
-	invoiceType,
-}: InvoicePrintButtonsProps) {
-	// Only show print buttons for sale invoices (types 3 & 4)
-	const isPrintSupported = invoiceType === 3 || invoiceType === 4;
-
-	const [previewOpen, setPreviewOpen] = useState(false);
+}: InvoiceSuccessDialogProps) {
 	const [previewHTML, setPreviewHTML] = useState("");
 	const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 	const [infoMessage, setInfoMessage] = useState("");
 	const [alertDialogOpen, setAlertDialogOpen] = useState(false);
 	const [alertMessage, setAlertMessage] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 
 	const generateHTML = useGenerateInvoiceHTML();
 	const printToPDF = usePrintInvoiceToPDF();
 
-	if (!isPrintSupported) {
-		return null;
-	}
-
-	const handlePreview = async () => {
-		try {
-			const html = await generateHTML.mutateAsync({
-				invoicePrefix,
-				invoiceNumber,
-			});
-			setPreviewHTML(html);
-			setPreviewOpen(true);
-		} catch (error) {
-			console.error("Preview failed:", error);
-			setAlertMessage("Nepodařilo se vygenerovat náhled faktury");
-			setAlertDialogOpen(true);
+	// Load preview when dialog opens
+	useEffect(() => {
+		if (open && !previewHTML) {
+			setIsLoading(true);
+			generateHTML
+				.mutateAsync({
+					invoicePrefix,
+					invoiceNumber,
+				})
+				.then((html) => {
+					setPreviewHTML(html);
+				})
+				.catch((error) => {
+					console.error("Preview failed:", error);
+					setAlertMessage("Nepodařilo se vygenerovat náhled faktury");
+					setAlertDialogOpen(true);
+				})
+				.finally(() => {
+					setIsLoading(false);
+				});
 		}
-	};
+	}, [open, invoicePrefix, invoiceNumber]);
 
 	const handlePrintToPDF = async () => {
 		try {
@@ -96,44 +96,37 @@ export function InvoicePrintButtons({
 		}
 	};
 
+	const handleClose = () => {
+		setPreviewHTML(""); // Reset preview for next time
+		onClose();
+	};
+
 	return (
 		<>
-            {variant === "icon" ? 
-            	<IconButton size="small" onClick={handlePreview} disabled={generateHTML.isPending} color="primary">
-					<PrintIcon />
-				</IconButton>
-             : 		
-                <Box sx={{ display: "flex", gap: 1 }}>
-                    <Button
-                        variant="contained"
-                        startIcon={<PrintIcon />}
-                        onClick={handlePreview}
-                        disabled={generateHTML.isPending}
-                    >
-                        Tisk
-                    </Button>
-                </Box>		
-            }
-
 			<Dialog
-				open={previewOpen}
-				onClose={() => setPreviewOpen(false)}
-				title={`Náhled faktury ${invoicePrefix}${invoiceNumber}`}
+				open={open}
+				onClose={handleClose}
+				title={`Faktura ${invoicePrefix}${invoiceNumber} byla úspěšně vytvořena`}
 				maxWidth="md"
 				fullWidth
 				actions={[
-                    {
+					{
+						label: "Vytisknout do PDF",
+						onClick: handlePrintToPDF,
+						variant: "outlined",
+						icon: <PictureAsPdfIcon />,
+						disabled: printToPDF.isPending,
+					},
+					{
 						label: "Poslat emailem",
 						onClick: handleEmail,
 						variant: "outlined",
 						icon: <EmailIcon />,
 					},
-					{
-						label: "Vytisknout do PDF",
-						onClick: handlePrintToPDF,
+						{
+						label: "OK",
+						onClick: handleClose,
 						variant: "contained",
-						icon: <PictureAsPdfIcon />,
-						disabled: printToPDF.isPending,
 					},
 				]}
 			>
@@ -142,9 +135,16 @@ export function InvoicePrintButtons({
 						border: "1px solid #ddd",
 						height: "75vh",
 						overflow: "auto",
+						display: "flex",
+						alignItems: isLoading ? "center" : "flex-start",
+						justifyContent: isLoading ? "center" : "flex-start",
 					}}
 				>
-					<div dangerouslySetInnerHTML={{ __html: previewHTML }} />
+					{isLoading ? (
+						<Box sx={{ textAlign: "center", p: 4 }}>Načítám náhled...</Box>
+					) : (
+						<div dangerouslySetInnerHTML={{ __html: previewHTML }} />
+					)}
 				</Box>
 			</Dialog>
 

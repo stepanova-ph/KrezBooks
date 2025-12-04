@@ -10,6 +10,7 @@ import { ItemAmountPriceDialog } from "../invoice/new/ItemAmountPriceDialog";
 import { ContactPickerDialog } from "../invoice/new/ContactPickerDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { InfoDialog } from "../common/dialog/InfoDialog";
+import { InvoiceSuccessDialog } from "../invoice/InvoiceSuccessDialog";
 import { useInvoiceForm } from "../../../hooks/useInvoiceForm";
 import { useInvoiceDialogs } from "../../../hooks/useInvoiceDialogs";
 import {
@@ -46,8 +47,16 @@ function NewInvoiceTab() {
 	} | null>(null);
 	const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 	const [successMessage, setSuccessMessage] = useState("");
+	const [showInvoiceSuccessDialog, setShowInvoiceSuccessDialog] =
+		useState(false);
+	const [createdInvoiceInfo, setCreatedInvoiceInfo] = useState<{
+		prefix: string;
+		number: string;
+		email?: string;
+	} | null>(null);
 
 	const isType5 = form.formData.type === 5;
+	const isSaleInvoice = form.formData.type === 3 || form.formData.type === 4;
 
 	useEffect(() => {
 		const invoiceType = INVOICE_TYPES.find(
@@ -211,16 +220,27 @@ function NewInvoiceTab() {
 				}),
 			);
 
-			form.handleReset();
-
 			const invoiceIdentifier = form.formData.prefix
 				? `${form.formData.prefix}${form.formData.number}`
 				: form.formData.number;
 
-			setSuccessMessage(
-				`Doklad č. ${invoiceIdentifier} byl úspěšně vytvořen.`,
-			);
-			setShowSuccessDialog(true);
+			// For sale invoices (types 3 & 4), show the invoice success dialog with preview
+			if (isSaleInvoice) {
+				setCreatedInvoiceInfo({
+					prefix: form.formData.prefix || "",
+					number: form.formData.number,
+					email: form.formData.email,
+				});
+				setShowInvoiceSuccessDialog(true);
+			} else {
+				// For other invoice types, show simple success dialog
+				setSuccessMessage(
+					`Doklad č. ${invoiceIdentifier} byl úspěšně vytvořen.`,
+				);
+				setShowSuccessDialog(true);
+			}
+
+			form.handleReset();
 		} catch (error) {
 			console.error("Failed to create invoice:", error);
 
@@ -416,6 +436,19 @@ function NewInvoiceTab() {
 				message={successMessage}
 				onConfirm={() => setShowSuccessDialog(false)}
 			/>
+
+			{createdInvoiceInfo && (
+				<InvoiceSuccessDialog
+					open={showInvoiceSuccessDialog}
+					onClose={() => {
+						setShowInvoiceSuccessDialog(false);
+						setCreatedInvoiceInfo(null);
+					}}
+					invoicePrefix={createdInvoiceInfo.prefix}
+					invoiceNumber={createdInvoiceInfo.number}
+					invoiceEmail={createdInvoiceInfo.email}
+				/>
+			)}
 
 			{viewingItemEan && (
 				<ItemCardDialog

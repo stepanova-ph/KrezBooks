@@ -36,6 +36,7 @@ export function ViewInvoiceDialog({
 
 	const isLoading = invoiceLoading || movementsLoading;
 	const isType5 = invoice?.type === 5;
+	const isSaleInvoice = invoice?.type === 3 || invoice?.type === 4;
 
 	const invoiceItems: InvoiceItem[] = movements.map((movement) => {
 		const item = allItems.find((i) => i.ean === movement.item_ean);
@@ -99,12 +100,15 @@ export function ViewInvoiceDialog({
 								onBlur={() => {}}
 								disabled
 								headerAction={
-									<InvoicePrintButtons
-										variant="icon"
-										invoicePrefix={invoice.prefix}
-										invoiceNumber={invoice.number}
-										invoiceEmail={invoice.email || ""}
-									/>
+									isSaleInvoice ? (
+										<InvoicePrintButtons
+											variant="icon"
+											invoicePrefix={invoice.prefix}
+											invoiceNumber={invoice.number}
+											invoiceEmail={invoice.email || ""}
+											invoiceType={invoice.type as number}
+										/>
+									) : undefined
 								}
 							/>
 						</Box>
@@ -156,12 +160,15 @@ export function ViewInvoiceDialog({
 									onBlur={() => {}}
 									disabled
 									headerAction={
-										<InvoicePrintButtons
-											variant="icon"
-											invoicePrefix={invoice.prefix}
-											invoiceNumber={invoice.number}
-											invoiceEmail={invoice.email || ""}
-										/>
+										isSaleInvoice ? (
+											<InvoicePrintButtons
+												variant="icon"
+												invoicePrefix={invoice.prefix}
+												invoiceNumber={invoice.number}
+												invoiceEmail={invoice.email || ""}
+												invoiceType={invoice.type as number}
+											/>
+										) : undefined
 									}
 								/>
 							</Box>

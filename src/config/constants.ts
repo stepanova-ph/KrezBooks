@@ -27,3 +27,10 @@ export const INVOICE_TYPES = [
 	{ value: 4, label: "Prodej (faktura)", shortLabel: "PF", prefix: "PF" },
 	{ value: 5, label: "Korekce skladu", shortLabel: "K", prefix: "K" },
 ] as const;
+
+// Default invoice type for new invoices
+export const DEFAULT_INVOICE_TYPE = 3; // Prodej (hotovost)
+
+// Date offset in days for auto-calculation
+export const DATE_TAX_OFFSET_DAYS = 0; // Date of taxable supply = same as issue date
+export const DATE_DUE_OFFSET_DAYS = 14; // Due date = 14 days after issue date

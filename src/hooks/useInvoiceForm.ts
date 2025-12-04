@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 import type { Contact, InvoiceType, Item } from "../types/database";
 import { invoiceSchema } from "../validation/invoiceSchema";
 import { useTabPersistence } from "../context/TabPersistanceContext";
+import {
+	DEFAULT_INVOICE_TYPE,
+	DATE_TAX_OFFSET_DAYS,
+	DATE_DUE_OFFSET_DAYS,
+} from "../config/constants";
 
 export interface InvoiceItem extends Item {
 	amount: number;
@@ -32,14 +37,25 @@ export interface InvoiceFormData {
 	email: string;
 }
 
+/**
+ * Calculate date by adding days to a base date
+ */
+function addDays(dateString: string, days: number): string {
+	const date = new Date(dateString);
+	date.setDate(date.getDate() + days);
+	return date.toISOString().split("T")[0];
+}
+
+const getInitialDate = () => new Date().toISOString().split("T")[0];
+
 const defaultFormData: InvoiceFormData = {
 	number: "",
 	prefix: "",
-	type: 1,
+	type: DEFAULT_INVOICE_TYPE,
 	payment_method: undefined,
-	date_issue: new Date().toISOString().split("T")[0],
-	date_tax: "",
-	date_due: "",
+	date_issue: getInitialDate(),
+	date_tax: addDays(getInitialDate(), DATE_TAX_OFFSET_DAYS),
+	date_due: addDays(getInitialDate(), DATE_DUE_OFFSET_DAYS),
 	variable_symbol: "",
 	note: "",
 	ico: "",
@@ -73,7 +89,10 @@ export function useInvoiceForm() {
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
 	const [isVariableSymbolCustom, setIsVariableSymbolCustom] = useState(false);
+	const [isDateTaxManual, setIsDateTaxManual] = useState(false);
+	const [isDateDueManual, setIsDateDueManual] = useState(false);
 
+	// Auto-sync variable symbol
 	useEffect(() => {
 		if (!isVariableSymbolCustom) {
 			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
@@ -88,6 +107,33 @@ export function useInvoiceForm() {
 			console.log("Variable symbol is custom, not auto-syncing");
 		}
 	}, [formData.prefix, formData.number, isVariableSymbolCustom]);
+
+	// Auto-calculate date_tax and date_due based on date_issue
+	useEffect(() => {
+		if (formData.date_issue) {
+			const updates: Partial<InvoiceFormData> = {};
+
+			// Auto-calculate date_tax if not manually set
+			if (!isDateTaxManual) {
+				const autoDateTax = addDays(formData.date_issue, DATE_TAX_OFFSET_DAYS);
+				if (formData.date_tax !== autoDateTax) {
+					updates.date_tax = autoDateTax;
+				}
+			}
+
+			// Auto-calculate date_due if not manually set
+			if (!isDateDueManual) {
+				const autoDateDue = addDays(formData.date_issue, DATE_DUE_OFFSET_DAYS);
+				if (formData.date_due !== autoDateDue) {
+					updates.date_due = autoDateDue;
+				}
+			}
+
+			if (Object.keys(updates).length > 0) {
+				setFormData((prev) => ({ ...prev, ...updates }));
+			}
+		}
+	}, [formData.date_issue, isDateTaxManual, isDateDueManual]);
 
 	useEffect(() => {
 		setInvoiceFormState({
@@ -109,6 +155,17 @@ export function useInvoiceForm() {
 				console.log("User changed variable symbol back to auto value");
 				setIsVariableSymbolCustom(false);
 			}
+		}
+
+		// Track manual date changes
+		if (field === "date_tax") {
+			const autoDateTax = addDays(formData.date_issue, DATE_TAX_OFFSET_DAYS);
+			setIsDateTaxManual(value !== autoDateTax);
+		}
+
+		if (field === "date_due") {
+			const autoDateDue = addDays(formData.date_issue, DATE_DUE_OFFSET_DAYS);
+			setIsDateDueManual(value !== autoDateDue);
 		}
 
 		setFormData((prev) => ({ ...prev, [field]: value }));
@@ -159,11 +216,26 @@ export function useInvoiceForm() {
 	};
 
 	const handleReset = () => {
-		setFormData(defaultFormData);
+		// Persist header fields: dates, type, variable symbol, payment type
+		const today = new Date().toISOString().split("T")[0];
+		const newFormData: InvoiceFormData = {
+			...defaultFormData,
+			type: formData.type,
+			payment_method: formData.payment_method,
+			date_issue: today,
+			date_tax: addDays(today, DATE_TAX_OFFSET_DAYS), // Auto-calculate immediately
+			date_due: addDays(today, DATE_DUE_OFFSET_DAYS), // Auto-calculate immediately
+			prefix: formData.prefix, // Keep prefix for same type
+			number: "", // Clear number so it will be auto-filled by NewInvoiceTab
+		};
+
+		setFormData(newFormData);
 		setInvoiceItems([]);
 		setSelectedContact(null);
 		setErrors({});
 		setIsVariableSymbolCustom(false);
+		setIsDateTaxManual(false); // Reset date manual flags
+		setIsDateDueManual(false);
 		clearInvoiceFormState();
 	};
 

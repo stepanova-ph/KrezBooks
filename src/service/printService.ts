@@ -1,7 +1,7 @@
 import { Invoice, StockMovement } from "../types/database";
 import { VAT_RATES } from "../config/constants";
 import { COMPANY_INFO } from "../config/companyInfo";
-import { getDisplayAmount } from "../utils/typeConverterUtils";
+import { calculateItemTotals } from "../utils/invoiceCalculations";
 
 export interface InvoiceItemRow {
 	name: string;
@@ -38,28 +38,32 @@ export interface InvoicePrintData {
 const ITEMS_PER_PAGE = 25; // Adjust based on A4 fit
 
 /**
- * Calculate invoice items with VAT
+ * Calculate invoice items with VAT for sale invoices
+ * Note: Only sale invoices (types 3 & 4) should be printed
+ * Reuses shared calculation logic with smart rounding
  */
 function calculateInvoiceItems(
 	stockMovements: StockMovement[],
 	itemNames: Map<string, string>,
-	invoiceType: number, // ADD THIS PARAMETER
 ): InvoiceItemRow[] {
 	return stockMovements.map((movement) => {
-		const vatRate = VAT_RATES[movement.vat_rate].percentage / 100;
 		const priceWithoutVat = Number(movement.price_per_unit);
-		
-		// Use getDisplayAmount to handle negative amounts for sale invoices
-		const displayAmount = getDisplayAmount(Number(movement.amount), invoiceType);
-		
-		const totalWithoutVat = priceWithoutVat * displayAmount;
-		const vatAmount = totalWithoutVat * vatRate;
+		// For sale invoices, amounts are stored as negative, display as positive
+		const amount = Math.abs(Number(movement.amount));
+
+		// Use shared calculation logic with smart rounding
+		const { vatAmount, totalWithVat } = calculateItemTotals(
+			priceWithoutVat,
+			amount,
+			movement.vat_rate,
+		);
+
+		const vatRate = VAT_RATES[movement.vat_rate].percentage / 100;
 		const priceWithVat = priceWithoutVat * (1 + vatRate);
-		const totalWithVat = totalWithoutVat * (1 + vatRate);
 
 		return {
 			name: itemNames.get(movement.item_ean) || movement.item_ean,
-			amount: displayAmount, // Changed from movement.amount
+			amount,
 			priceWithoutVat,
 			vatAmount,
 			priceWithVat,
@@ -88,16 +92,21 @@ function calculateTotals(items: InvoiceItemRow[]): InvoiceTotals {
 
 /**
  * Prepare invoice data for printing
+ * Only supports sale invoices (types 3 & 4)
  */
 export function prepareInvoicePrintData(
 	invoice: Invoice,
 	stockMovements: StockMovement[],
 	itemNames: Map<string, string>,
 ): InvoicePrintData {
-	const items = calculateInvoiceItems(
-        stockMovements, 
-        itemNames,
-        invoice.type as number);
+	// Validate that this is a sale invoice
+	if (invoice.type !== 3 && invoice.type !== 4) {
+		throw new Error(
+			"Tisk je podporován pouze pro prodejní faktury (Prodej hotovost a Prodej faktura)",
+		);
+	}
+
+	const items = calculateInvoiceItems(stockMovements, itemNames);
 	const totals = calculateTotals(items);
 
 	return {
@@ -213,7 +222,17 @@ function generatePageHeader(
         </div>
       </div>
 
-      <div class="details-grid">
+      <div class="invoice-details-section detail-section">
+        <h3>Údaje faktury</h3>
+        <p><strong>Číslo faktury:</strong> ${invoice.prefix}${invoice.number}</p>
+        ${invoice.variable_symbol ? `<p><strong>Variabilní symbol:</strong> ${invoice.variable_symbol}</p>` : ""}
+        <p><strong>Datum vystavení:</strong> ${formatDate(invoice.date_issue)}</p>
+        ${invoice.date_tax ? `<p><strong>Datum zdanitelného plnění:</strong> ${formatDate(invoice.date_tax)}</p>` : ""}
+        ${invoice.date_due ? `<p><strong>Datum splatnosti:</strong> ${formatDate(invoice.date_due)}</p>` : ""}
+        ${invoice.payment_method !== undefined ? `<p><strong>Způsob platby:</strong> ${invoice.payment_method === 0 ? "Hotovost" : "Bankovní převod"}</p>` : ""}
+      </div>
+
+      <div class="parties-grid">
         <div class="detail-section">
           <h3>Dodavatel</h3>
           <p><strong>${seller.companyName}</strong></p>
@@ -235,16 +254,6 @@ function generatePageHeader(
           ${buyer.city && buyer.postalCode ? `<p>${buyer.city}, ${buyer.postalCode}</p>` : ""}
           ${buyer.phone ? `<p>Tel: ${buyer.phone}</p>` : ""}
           ${buyer.email ? `<p>Email: ${buyer.email}</p>` : ""}
-        </div>
-
-        <div class="detail-section">
-          <h3>Údaje faktury</h3>
-          <p><strong>Číslo faktury:</strong> ${invoice.prefix}${invoice.number}</p>
-          ${invoice.variable_symbol ? `<p><strong>Variabilní symbol:</strong> ${invoice.variable_symbol}</p>` : ""}
-          <p><strong>Datum vystavení:</strong> ${formatDate(invoice.date_issue)}</p>
-          ${invoice.date_tax ? `<p><strong>Datum zdanitelného plnění:</strong> ${formatDate(invoice.date_tax)}</p>` : ""}
-          ${invoice.date_due ? `<p><strong>Datum splatnosti:</strong> ${formatDate(invoice.date_due)}</p>` : ""}
-          ${invoice.payment_method !== undefined ? `<p><strong>Způsob platby:</strong> ${invoice.payment_method === 0 ? "Hotovost" : "Bankovní převod"}</p>` : ""}
         </div>
       </div>
     </div>
@@ -399,9 +408,13 @@ function getStyles(): string {
       margin-top: 5px;
     }
 
-    .details-grid {
+    .invoice-details-section {
+      margin-bottom: 15px;
+    }
+
+    .parties-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 15px;
       margin-bottom: 25px;
     }

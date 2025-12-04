@@ -1,36 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
-import { VAT_RATES } from "../../../config/constants";
+import { calculateItemTotals } from "../../../utils/invoiceCalculations";
 
 interface InvoiceTotalsProps {
 	items: InvoiceItem[];
-}
-
-function calculateItemTotals(item: InvoiceItem) {
-	const vatPercentage =
-		VAT_RATES.find((rate) => rate.value === item.vat_rate)?.percentage ?? 0;
-
-	const basePrice = item.sale_price * item.amount;
-	let vatAmount = basePrice * (vatPercentage / 100);
-	let totalWithVat = basePrice + vatAmount;
-
-	// Smart rounding: transfer 1 cent between VAT and total when total is .99 or .01
-	if (vatPercentage > 0 && basePrice > 0) {
-		const cents = Math.round((totalWithVat % 1) * 100);
-
-		if (cents === 99) {
-			vatAmount += 0.01;
-		} else if (cents === 1) {
-			vatAmount -= 0.01;
-		}
-		totalWithVat = basePrice + vatAmount;
-	}
-
-	return {
-		basePrice,
-		vatAmount,
-		totalWithVat,
-	};
 }
 
 function calculateTotals(items: InvoiceItem[]) {
@@ -43,7 +16,7 @@ function calculateTotals(items: InvoiceItem[]) {
 			basePrice,
 			vatAmount,
 			totalWithVat: itemTotal,
-		} = calculateItemTotals(item);
+		} = calculateItemTotals(item.sale_price, item.amount, item.vat_rate);
 		totalWithoutVat += basePrice;
 		totalVat += vatAmount;
 		totalWithVat += itemTotal;
