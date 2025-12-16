@@ -266,6 +266,19 @@ export function registerIpcHandlers() {
 	);
 
 	ipcMain.handle(
+		"db:invoices:createWithStockMovements",
+		async (
+			_event,
+			invoice: CreateInvoiceInput,
+			stockMovements: CreateStockMovementInput[]
+		) => {
+			return handleIpcRequest(() =>
+				invoiceService.createWithStockMovements(invoice, stockMovements)
+			);
+		},
+	);
+
+	ipcMain.handle(
 		"db:invoices:update",
 		async (_event, number: string, updates: Partial<Invoice>) => {
 			return handleIpcRequest(() => invoiceService.update(number, updates));

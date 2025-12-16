@@ -1,6 +1,8 @@
 import { getDatabase } from "../main/database";
 import { invoiceQueries } from "../main/queries";
-import { Invoice, CreateInvoiceInput } from "../types/database";
+import { stockMovementQueries } from "../main/queries/stockMovements";
+import { Invoice, CreateInvoiceInput, CreateStockMovementInput } from "../types/database";
+import { booleanToSQLiteInteger } from "../utils/typeConverterUtils";
 
 export class InvoiceService {
 	async getAll(): Promise<Invoice[]> {
@@ -47,6 +49,70 @@ export class InvoiceService {
 		return { changes: result.changes };
 	}
 
+	/**
+	 * Create invoice with stock movements in a single transaction
+	 * This ensures atomicity - either both invoice and all stock movements are created,
+	 * or nothing is created if any operation fails
+	 */
+	async createWithStockMovements(
+		invoice: CreateInvoiceInput,
+		stockMovements: CreateStockMovementInput[]
+	): Promise<{ changes: number; stockMovementChanges: number }> {
+		const db = getDatabase();
+
+		const transaction = db.transaction(() => {
+			// 1. Create invoice
+			const invoiceStatement = db.prepare(invoiceQueries.create);
+			const invoiceData = {
+				number: invoice.number,
+				prefix: invoice.prefix || null,
+				type: invoice.type,
+				payment_method: invoice.payment_method ?? null,
+				date_issue: invoice.date_issue,
+				date_tax: invoice.date_tax || null,
+				date_due: invoice.date_due || null,
+				variable_symbol: invoice.variable_symbol || null,
+				note: invoice.note || null,
+				ico: invoice.ico || null,
+				modifier: invoice.modifier ?? null,
+				dic: invoice.dic || null,
+				company_name: invoice.company_name || null,
+				bank_account: invoice.bank_account || null,
+				street: invoice.street || null,
+				city: invoice.city || null,
+				postal_code: invoice.postal_code || null,
+				phone: invoice.phone || null,
+				email: invoice.email || null,
+			};
+			const invoiceResult = invoiceStatement.run(invoiceData);
+
+			// 2. Create all stock movements
+			const movementStatement = db.prepare(stockMovementQueries.create);
+			let totalMovementChanges = 0;
+
+			for (const movement of stockMovements) {
+				const movementData = {
+					invoice_prefix: movement.invoice_prefix,
+					invoice_number: movement.invoice_number,
+					item_ean: movement.item_ean,
+					amount: movement.amount,
+					price_per_unit: movement.price_per_unit,
+					vat_rate: movement.vat_rate,
+					reset_point: booleanToSQLiteInteger(movement.reset_point ?? false),
+				};
+				const movementResult = movementStatement.run(movementData);
+				totalMovementChanges += movementResult.changes;
+			}
+
+			return {
+				changes: invoiceResult.changes,
+				stockMovementChanges: totalMovementChanges
+			};
+		});
+
+		return transaction();
+	}
+
 	async update(
 		prefix: string,
 		number: string,
@@ -81,14 +147,22 @@ export class InvoiceService {
 
 	async delete(prefix: string, number: string): Promise<{ changes: number }> {
 		const db = getDatabase();
-		const statement = db.prepare(invoiceQueries.delete);
-		const result = statement.run(prefix, number);
 
-		if (result.changes === 0) {
-			throw new Error("Invoice not found");
-		}
+		// Wrap in transaction for atomicity
+		// Even though CASCADE handles stock movements, transaction ensures
+		// no partial state if multiple operations or triggers are involved
+		const transaction = db.transaction(() => {
+			const statement = db.prepare(invoiceQueries.delete);
+			const result = statement.run(prefix, number);
 
-		return { changes: result.changes };
+			if (result.changes === 0) {
+				throw new Error("Invoice not found");
+			}
+
+			return { changes: result.changes };
+		});
+
+		return transaction();
 	}
 
 	private buildUpdateQuery(tableName: string, fields: string[]): string {

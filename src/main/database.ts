@@ -129,9 +129,9 @@ class DatabaseManager {
 			this.db.exec(settingsQueries.createTable);
 			logger.log("✓ Settings table ready");
 
-			// this.db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_customer ON contacts(is_customer)');
-			// this.db.exec('CREATE INDEX IF NOT EXISTS idx_contacts_supplier ON contacts(is_supplier)');
-			// this.db.exec('CREATE INDEX IF NOT EXISTS idx_items_category ON items(category)');
+			// Create indexes for performance optimization
+			this.db.exec('CREATE INDEX IF NOT EXISTS idx_invoices_type_date ON invoices(type, date_issue)');
+			this.db.exec('CREATE INDEX IF NOT EXISTS idx_stock_movements_reset ON stock_movements(item_ean, created_at, reset_point)');
 
 			logger.log("✓ Indexes created");
 

@@ -113,18 +113,32 @@ export function DataTableContent<T>({
 			if (aValue == null) return 1;
 			if (bValue == null) return -1;
 
-			const aStr = String(aValue).toLowerCase();
-			const bStr = String(bValue).toLowerCase();
+					const aStr = String(aValue).toLowerCase();
+					const bStr = String(bValue).toLowerCase();
 
-			const aNum = Number(aValue);
-			const bNum = Number(bValue);
-			if (!isNaN(aNum) && !isNaN(bNum)) {
-				return orderBy.order === "asc" ? aNum - bNum : bNum - aNum;
-			}
+					// Try direct numeric conversion first
+					let aNum = Number(aValue);
+					let bNum = Number(bValue);
 
-			if (aStr < bStr) return orderBy.order === "asc" ? -1 : 1;
-			if (aStr > bStr) return orderBy.order === "asc" ? 1 : -1;
-			return 0;
+					// If that fails, try extracting numbers from strings (e.g., "123.45 Kč" -> 123.45)
+					if (isNaN(aNum)) {
+						const aMatch = aStr.match(/[-+]?\d+\.?\d*/);
+						aNum = aMatch ? Number(aMatch[0]) : NaN;
+					}
+					if (isNaN(bNum)) {
+						const bMatch = bStr.match(/[-+]?\d+\.?\d*/);
+						bNum = bMatch ? Number(bMatch[0]) : NaN;
+					}
+
+					// Perform numeric comparison if both values are valid numbers
+					if (!isNaN(aNum) && !isNaN(bNum)) {
+						return orderBy.order === "asc" ? aNum - bNum : bNum - aNum;
+					}
+
+					// Fall back to string comparison
+					if (aStr < bStr) return orderBy.order === "asc" ? -1 : 1;
+					if (aStr > bStr) return orderBy.order === "asc" ? 1 : -1;
+					return 0;
 		});
 
 		return sorted;

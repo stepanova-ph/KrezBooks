@@ -6,10 +6,12 @@ import { calculateItemTotals } from "../utils/invoiceCalculations";
 export interface InvoiceItemRow {
 	name: string;
 	amount: number;
+	unit: string;
 	priceWithoutVat: number;
 	vatAmount: number;
 	priceWithVat: number;
 	totalWithVat: number;
+	vatRate: number;
 }
 
 export interface InvoiceTotals {
@@ -58,16 +60,18 @@ function calculateInvoiceItems(
 			movement.vat_rate,
 		);
 
-		const vatRate = VAT_RATES[movement.vat_rate].percentage / 100;
-		const priceWithVat = priceWithoutVat * (1 + vatRate);
+		const vatRateDecimal = VAT_RATES[movement.vat_rate].percentage / 100;
+		const priceWithVat = priceWithoutVat * (1 + vatRateDecimal);
 
 		return {
 			name: itemNames.get(movement.item_ean) || movement.item_ean,
 			amount,
+			unit: movement.unit || "ks",
 			priceWithoutVat,
 			vatAmount,
 			priceWithVat,
 			totalWithVat,
+			vatRate: VAT_RATES[movement.vat_rate].percentage,
 		};
 	});
 }
@@ -208,13 +212,7 @@ function generatePageHeader(
 	return `
     <div class="header">
       <div class="header-row">
-        <div class="company-info">
-          <h1>${seller.companyName}</h1>
-          <p>IČO: ${seller.ico}</p>
-          <p>DIČ: ${seller.dic}</p>
-          <p>${seller.street}</p>
-          <p>${seller.city}, ${seller.postalCode}</p>
-        </div>
+        
         <div class="invoice-title">
           <h1>FAKTURA</h1>
           <p class="invoice-number">${invoice.prefix}${invoice.number}</p>
@@ -229,7 +227,7 @@ function generatePageHeader(
         <p><strong>Datum vystavení:</strong> ${formatDate(invoice.date_issue)}</p>
         ${invoice.date_tax ? `<p><strong>Datum zdanitelného plnění:</strong> ${formatDate(invoice.date_tax)}</p>` : ""}
         ${invoice.date_due ? `<p><strong>Datum splatnosti:</strong> ${formatDate(invoice.date_due)}</p>` : ""}
-        ${invoice.payment_method !== undefined ? `<p><strong>Způsob platby:</strong> ${invoice.payment_method === 0 ? "Hotovost" : "Bankovní převod"}</p>` : ""}
+        ${invoice.payment_method !== undefined ? `<p><strong>Způsob úhrady:</strong> ${invoice.payment_method === 0 ? "Hotovost" : "Bankovní převod"}</p>` : ""}
       </div>
 
       <div class="parties-grid">
@@ -272,10 +270,11 @@ function generateItemsTable(
 			(item) => `
     <tr>
       <td class="item-name">${item.name}</td>
-      <td class="number">${item.amount}</td>
+      <td class="number">${item.amount} ${item.unit}</td>
       <td class="number">${formatCurrency(item.priceWithoutVat)}</td>
+      <td class="number">${formatCurrency(item.priceWithoutVat * item.amount)}</td>
+      <td class="number">${item.vatRate}%</td>
       <td class="number">${formatCurrency(item.vatAmount)}</td>
-      <td class="number">${formatCurrency(item.priceWithVat)}</td>
       <td class="number"><strong>${formatCurrency(item.totalWithVat)}</strong></td>
     </tr>
   `,
@@ -284,11 +283,16 @@ function generateItemsTable(
 
 	const totalsRow = totals
 		? `
-    <tr class="totals-row">
-      <td colspan="2"><strong>Celkem:</strong></td>
-      <td class="number"><strong>${formatCurrency(totals.totalWithoutVat)}</strong></td>
-      <td class="number"><strong>${formatCurrency(totals.totalVatAmount)}</strong></td>
-      <td></td>
+    <tr class="subtotal-row">
+      <td colspan="6"><strong>Součet položek:</strong></td>
+      <td class="number"><strong>${formatCurrency(totals.totalWithVat)}</strong></td>
+    </tr>
+    <tr class="rounding-row">
+      <td colspan="6"><strong>Zaokrouhlení:</strong></td>
+      <td class="number"><strong>${formatCurrency(0)}</strong></td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="6"><strong>CELKEM K ÚHRADĚ:</strong></td>
       <td class="number"><strong>${formatCurrency(totals.totalWithVat)}</strong></td>
     </tr>
   `
@@ -298,12 +302,13 @@ function generateItemsTable(
     <table class="items-table">
       <thead>
         <tr>
-          <th>Název položky</th>
+          <th>Název</th>
           <th class="number">Množství</th>
-          <th class="number">Cena bez DPH</th>
-          <th class="number">DPH (Kč)</th>
-          <th class="number">Cena s DPH</th>
-          <th class="number">Celkem s DPH</th>
+          <th class="number">Jednotková cena</th>
+          <th class="number">Cena</th>
+          <th class="number">Sazba DPH</th>
+          <th class="number">DPH</th>
+          <th class="number">Celkem</th>
         </tr>
       </thead>
       <tbody>
@@ -338,15 +343,15 @@ function getStyles(): string {
 
     body {
       font-family: 'Arial', sans-serif;
-      font-size: 11pt;
-      line-height: 1.4;
+      font-size: 8pt;
+      line-height: 1.3;
       color: #000;
     }
 
     .page {
       width: 210mm;
       min-height: 297mm;
-      padding: 15mm;
+      padding: 12mm;
       margin: 0 auto;
       background: white;
       page-break-after: always;
@@ -367,25 +372,25 @@ function getStyles(): string {
     }
 
     .header {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .header-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 3px solid #333;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #333;
     }
 
     .company-info h1 {
-      font-size: 16pt;
-      margin-bottom: 5px;
+      font-size: 12pt;
+      margin-bottom: 3px;
     }
 
     .company-info p {
-      font-size: 10pt;
-      margin: 2px 0;
+      font-size: 8pt;
+      margin: 1px 0;
     }
 
     .invoice-title {
@@ -393,73 +398,105 @@ function getStyles(): string {
     }
 
     .invoice-title h1 {
-      font-size: 24pt;
-      margin-bottom: 5px;
+      font-size: 18pt;
+      margin-bottom: 3px;
     }
 
     .invoice-number {
-      font-size: 14pt;
+      font-size: 11pt;
       font-weight: bold;
     }
 
     .page-number {
-      font-size: 10pt;
+      font-size: 8pt;
       color: #666;
-      margin-top: 5px;
+      margin-top: 3px;
     }
 
     .invoice-details-section {
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
 
     .parties-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 25px;
+      gap: 10px;
+      margin-bottom: 15px;
     }
 
     .detail-section {
       border: 1px solid #ddd;
-      padding: 10px;
+      padding: 6px;
       background: #f9f9f9;
     }
 
     .detail-section h3 {
-      font-size: 11pt;
-      margin-bottom: 8px;
-      padding-bottom: 5px;
+      font-size: 9pt;
+      margin-bottom: 4px;
+      padding-bottom: 3px;
       border-bottom: 1px solid #ccc;
     }
 
     .detail-section p {
-      font-size: 9pt;
-      margin: 3px 0;
+      font-size: 7pt;
+      margin: 2px 0;
+      line-height: 1.2;
     }
 
     .items-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
-      font-size: 10pt;
+      margin-bottom: 10px;
+      font-size: 8pt;
     }
 
     .items-table th {
       background: #333;
       color: white;
-      padding: 8px;
+      padding: 4px 6px;
       text-align: left;
       font-weight: bold;
+      font-size: 7pt;
       border: 1px solid #333;
+      white-space: nowrap;
     }
 
     .items-table th.number {
       text-align: right;
     }
 
+    .items-table th.col-name {
+      width: 40%;
+    }
+
+    .items-table th.col-qty {
+      width: 8%;
+    }
+
+    .items-table th.col-price {
+      width: 10%;
+    }
+
+    .items-table th.col-total {
+      width: 10%;
+    }
+
+    .items-table th.col-vat-rate {
+      width: 8%;
+    }
+
+    .items-table th.col-vat {
+      width: 10%;
+    }
+
+    .items-table th.col-final {
+      width: 14%;
+    }
+
     .items-table td {
-      padding: 6px 8px;
+      padding: 3px 6px;
       border: 1px solid #ddd;
+      font-size: 7pt;
     }
 
     .items-table td.number {
@@ -468,32 +505,42 @@ function getStyles(): string {
     }
 
     .items-table td.item-name {
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     .items-table tbody tr:nth-child(even) {
       background: #f9f9f9;
     }
 
-    .totals-row {
-      background: #e8e8e8 !important;
-      font-weight: bold;
+    .subtotal-row td {
+      border-top: 1px solid #999;
+      padding: 4px 6px;
+      font-size: 7pt;
     }
 
-    .totals-row td {
+    .rounding-row td {
+      padding: 4px 6px;
+      font-size: 7pt;
+    }
+
+    .total-row {
+      background: #e8e8e8 !important;
+      font-weight: bold;
+      font-size: 9pt;
+    }
+
+    .total-row td {
       border-top: 2px solid #333;
-      padding: 10px 8px;
+      padding: 6px;
     }
 
     .footer {
-      margin-top: 30px;
-      padding-top: 15px;
+      margin-top: 20px;
+      padding-top: 10px;
       border-top: 1px solid #ccc;
       text-align: center;
-      font-size: 9pt;
+      font-size: 7pt;
       color: #666;
     }
 

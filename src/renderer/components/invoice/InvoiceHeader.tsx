@@ -272,7 +272,7 @@ export function InvoiceHeader({
 				{showPaymentMethod && (
 					<Grid item xs={6}>
 						<ValidatedTextField
-							label="Způsob platby"
+							label="Způsob úhrady"
 							name="payment_method"
 							value={paymentMethod ?? ""}
 							onChange={(e: { target: { value: any } }) =>

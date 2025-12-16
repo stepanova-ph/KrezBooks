@@ -96,7 +96,7 @@ export const validationMessages = {
 			invalid: "Typ faktury musí být mezi 1-5",
 		},
 		paymentMethod: {
-			invalid: "Způsob platby musí být 0 nebo 1",
+			invalid: "Způsob úhrady musí být 0 nebo 1",
 		},
 		dateIssue: {
 			required: "Datum vystavení je povinné",

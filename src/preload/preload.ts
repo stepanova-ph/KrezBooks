@@ -113,6 +113,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
 			ipcRenderer.invoke("db:invoices:getOne", prefix, number),
 		create: (invoice: CreateInvoiceInput) =>
 			ipcRenderer.invoke("db:invoices:create", invoice),
+		createWithStockMovements: (
+			invoice: CreateInvoiceInput,
+			stockMovements: CreateStockMovementInput[]
+		) =>
+			ipcRenderer.invoke(
+				"db:invoices:createWithStockMovements",
+				invoice,
+				stockMovements
+			),
 		update: (number: string, updates: Partial<Invoice>) =>
 			ipcRenderer.invoke("db:invoices:update", number, updates),
 		delete: (prefix: string, number: string) =>
