@@ -9,7 +9,7 @@ import {
 } from "../common/table/DataTable";
 import { formatVatRateShort } from "../../../utils/formattingUtils";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
-import { calculateTotalWithVat } from "../../../utils/formUtils";
+import { calculateItemTotals } from "../../../utils/invoiceCalculations";
 
 interface InvoiceItemsListProps {
 	items: InvoiceItem[];
@@ -96,8 +96,15 @@ export function InvoiceItemsList({
 				return `${item.amount.toFixed(0)} ${item.unit_of_measure}`;
 			case "sale_price":
 				return `${item.sale_price.toFixed(2)} Kč`;
-			case "total":
-				return calculateTotalWithVat([item]).toFixed(2);
+			case "total": {
+				// Calculate with smart rounding per unit, then multiply by quantity
+				const { totalWithVat: unitTotal } = calculateItemTotals(
+					item.sale_price,
+					1,
+					item.vat_rate,
+				);
+				return (unitTotal * item.amount).toFixed(2);
+			}
 			default:
 				return "";
 		}

@@ -838,4 +838,100 @@ export const exampleInvoices: Array<Invoice> = [
 		email: exampleContacts[12].email,
 		note: "Sell invoice – Autoumývárna FRESH equipment delivery",
 	},
+
+	// ─────────────────────────────
+	// Large invoice for pagination testing
+	// ─────────────────────────────
+	{
+		number: "0051",
+		prefix: INVOICE_TYPES[3].prefix,
+		type: 4,
+		payment_method: 1,
+		date_issue: "2025-12-25",
+		date_tax: "2025-12-25",
+		date_due: "2026-01-08",
+		variable_symbol: "20250051",
+		ico: exampleContacts[6].ico,
+		modifier: exampleContacts[6].modifier,
+		dic: exampleContacts[6].dic,
+		company_name: exampleContacts[6].company_name,
+		street: exampleContacts[6].street,
+		city: exampleContacts[6].city,
+		postal_code: exampleContacts[6].postal_code,
+		phone: exampleContacts[6].phone,
+		email: exampleContacts[6].email,
+		note: "Large order - testing pagination with many items",
+	},
+
+	// ─────────────────────────────
+	// Mixed VAT rates invoice for testing VAT recapitulation
+	// ─────────────────────────────
+	{
+		number: "0052",
+		prefix: INVOICE_TYPES[3].prefix,
+		type: 4,
+		payment_method: 1,
+		date_issue: "2025-12-25",
+		date_tax: "2025-12-25",
+		date_due: "2026-01-08",
+		variable_symbol: "20250052",
+		ico: exampleContacts[5].ico,
+		modifier: exampleContacts[5].modifier,
+		dic: exampleContacts[5].dic,
+		company_name: exampleContacts[5].company_name,
+		street: exampleContacts[5].street,
+		city: exampleContacts[5].city,
+		postal_code: exampleContacts[5].postal_code,
+		phone: exampleContacts[5].phone,
+		email: exampleContacts[5].email,
+		note: "Testing mixed VAT rates (0%, 12%, 21%) and rounding",
+	},
+
+	// ─────────────────────────────
+	// Rounding test invoice
+	// ─────────────────────────────
+	{
+		number: "0053",
+		prefix: INVOICE_TYPES[3].prefix,
+		type: 4,
+		payment_method: 0,
+		date_issue: "2025-12-25",
+		date_tax: "2025-12-25",
+		date_due: "2026-01-08",
+		variable_symbol: "20250053",
+		ico: exampleContacts[4].ico,
+		modifier: exampleContacts[4].modifier,
+		dic: exampleContacts[4].dic,
+		company_name: exampleContacts[4].company_name,
+		street: exampleContacts[4].street,
+		city: exampleContacts[4].city,
+		postal_code: exampleContacts[4].postal_code,
+		phone: exampleContacts[4].phone,
+		email: exampleContacts[4].email,
+		note: "Testing rounding with prices that create decimal VAT amounts",
+	},
+
+	// ─────────────────────────────
+	// Smart rounding test invoice - items that trigger .01 and .99 cents
+	// ─────────────────────────────
+	{
+		number: "0054",
+		prefix: INVOICE_TYPES[3].prefix,
+		type: 4,
+		payment_method: 1,
+		date_issue: "2025-12-26",
+		date_tax: "2025-12-26",
+		date_due: "2026-01-09",
+		variable_symbol: "20250054",
+		ico: exampleContacts[3].ico,
+		modifier: exampleContacts[3].modifier,
+		dic: exampleContacts[3].dic,
+		company_name: exampleContacts[3].company_name,
+		street: exampleContacts[3].street,
+		city: exampleContacts[3].city,
+		postal_code: exampleContacts[3].postal_code,
+		phone: exampleContacts[3].phone,
+		email: exampleContacts[3].email,
+		note: "REAL smart rounding test - items with prices that produce .01 and .99 cents",
+	},
 ];

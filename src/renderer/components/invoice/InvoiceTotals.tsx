@@ -1,6 +1,5 @@
 import { Box, Typography } from "@mui/material";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
-import { calculateItemTotals } from "../../../utils/invoiceCalculations";
 
 interface InvoiceTotalsProps {
 	items: InvoiceItem[];
@@ -12,14 +11,15 @@ function calculateTotals(items: InvoiceItem[]) {
 	let totalWithVat = 0;
 
 	items.forEach((item) => {
-		const {
-			basePrice,
-			vatAmount,
-			totalWithVat: itemTotal,
-		} = calculateItemTotals(item.sale_price, item.amount, item.vat_rate);
+		// Items already have smart-rounded totals, just sum them up
+		// Don't apply smart rounding again on totals (that's only for print service)
+		const basePrice = item.sale_price * item.amount;
+		const vatRateDecimal = [0, 0.12, 0.21][item.vat_rate] || 0;
+		const vatAmount = basePrice * vatRateDecimal;
+
 		totalWithoutVat += basePrice;
 		totalVat += vatAmount;
-		totalWithVat += itemTotal;
+		totalWithVat += item.total; // Use pre-calculated smart-rounded total
 	});
 
 	return {

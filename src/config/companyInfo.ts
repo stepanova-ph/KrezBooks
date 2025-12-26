@@ -12,4 +12,8 @@ export const COMPANY_INFO = {
 	email: "krezbo@volny.cz",
 	website: 'www.krezbo.cz',
 	bankAccount: "123456789/8765",
+
+	invoiceIssuedBy: "Bořivoj Krecl, Zdeněk Zbořil",
+	invoiceNotes: `ŽU: Bílovec č. j. 003912 / 00 / 03492L
+Při nedodržení splatnosti účtujeme za každý den prodlení penále 0.1%. Zboží je majetkem prodávajícího do úplného zaplacení daňového dokladu.`,
 } as const;

@@ -61,7 +61,7 @@ function InvoicesList({
 
 	const handleDelete = async (invoice: Invoice) => {
 		try {
-			await deleteInvoice.mutateAsync(invoice.number);
+			await deleteInvoice.mutateAsync({ prefix: invoice.prefix || "", number: invoice.number });
 			setAlertDialog({
 				open: true,
 				title: "Úspěch",

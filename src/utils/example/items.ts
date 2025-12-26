@@ -501,4 +501,106 @@ export const exampleItems = [
 		sale_price_group3: 173,
 		sale_price_group4: 164,
 	},
+
+	// Items with different VAT rates for testing
+	{
+		ean: "8590000000042",
+		name: "Kniha - Instalace čerpadel (odborná literatura)",
+		category: "Literatura",
+		note: "Odborná kniha - osvobozeno od DPH",
+		vat_rate: 0, // 0% VAT
+		unit_of_measure: "ks",
+		sale_price_group1: 450,
+		sale_price_group2: 450,
+		sale_price_group3: 450,
+		sale_price_group4: 450,
+	},
+	{
+		ean: "8590000000043",
+		name: "Dětská knížka - O čerpadlech",
+		category: "Literatura",
+		note: "Dětská kniha - snížená sazba DPH",
+		vat_rate: 1, // 12% VAT
+		unit_of_measure: "ks",
+		sale_price_group1: 199,
+		sale_price_group2: 199,
+		sale_price_group3: 199,
+		sale_price_group4: 199,
+	},
+	{
+		ean: "8590000000044",
+		name: "Lékárnička pro dílnu",
+		category: "Zdravotnický materiál",
+		note: "Zdravotnický materiál - snížená sazba DPH",
+		vat_rate: 1, // 12% VAT
+		unit_of_measure: "ks",
+		sale_price_group1: 890,
+		sale_price_group2: 890,
+		sale_price_group3: 890,
+		sale_price_group4: 890,
+	},
+
+	// Items for rounding tests - prices that create decimals
+	{
+		ean: "8590000000045",
+		name: "Testovací položka A",
+		category: "Test",
+		note: "Cena která vytvoří desetinné DPH - 21%",
+		vat_rate: 2, // 21% VAT
+		unit_of_measure: "ks",
+		sale_price_group1: 333.33,
+		sale_price_group2: 333.33,
+		sale_price_group3: 333.33,
+		sale_price_group4: 333.33,
+	},
+	{
+		ean: "8590000000046",
+		name: "Testovací položka B",
+		category: "Test",
+		note: "Další cena pro test zaokrouhlení - 21%",
+		vat_rate: 2, // 21% VAT
+		unit_of_measure: "ks",
+		sale_price_group1: 147.89,
+		sale_price_group2: 147.89,
+		sale_price_group3: 147.89,
+		sale_price_group4: 147.89,
+	},
+	{
+		ean: "8590000000047",
+		name: "Testovací položka C",
+		category: "Test",
+		note: "Cena pro test zaokrouhlení - 21%",
+		vat_rate: 2, // 21% VAT
+		unit_of_measure: "ks",
+		sale_price_group1: 999.99,
+		sale_price_group2: 999.99,
+		sale_price_group3: 999.99,
+		sale_price_group4: 999.99,
+	},
+
+	// Items for REAL smart rounding test (.99 and .01)
+	{
+		ean: "8590000000048",
+		name: "Test smart rounding .01 → 0.00",
+		category: "Test - Smart Rounding",
+		note: "826.45 × 1.21 = 1000.01 → zaokrouhlí se na 1000.00",
+		vat_rate: 2, // 21% VAT
+		unit_of_measure: "ks",
+		sale_price_group1: 826.45,
+		sale_price_group2: 826.45,
+		sale_price_group3: 826.45,
+		sale_price_group4: 826.45,
+	},
+	{
+		ean: "8590000000049",
+		name: "Test smart rounding .99 → 0.00",
+		category: "Test - Smart Rounding",
+		note: "991.73 × 1.21 = 1199.99 → zaokrouhlí se na 1200.00",
+		vat_rate: 2, // 21% VAT
+		unit_of_measure: "ks",
+		sale_price_group1: 991.73,
+		sale_price_group2: 991.73,
+		sale_price_group3: 991.73,
+		sale_price_group4: 991.73,
+	},
 ];

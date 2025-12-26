@@ -2,6 +2,7 @@ import { Invoice, StockMovement } from "../types/database";
 import { VAT_RATES } from "../config/constants";
 import { COMPANY_INFO } from "../config/companyInfo";
 import { calculateItemTotals } from "../utils/invoiceCalculations";
+import { renderInvoice } from "../templates/invoice/invoiceRenderer";
 
 export interface InvoiceItemRow {
 	name: string;
@@ -17,13 +18,23 @@ export interface InvoiceItemRow {
 export interface InvoiceTotals {
 	totalWithoutVat: number;
 	totalVatAmount: number;
-	totalWithVat: number;
+	totalBeforeRounding: number; // Sum before smart rounding
+	rounding: number; // Rounding adjustment (-0.01, 0, or +0.01)
+	totalWithVat: number; // After rounding
+}
+
+export interface VatRecapRow {
+	vatRate: number;
+	baseAmount: number;
+	vatAmount: number;
+	totalAmount: number;
 }
 
 export interface InvoicePrintData {
 	invoice: Invoice;
 	items: InvoiceItemRow[];
 	totals: InvoiceTotals;
+	vatRecap: VatRecapRow[];
 	seller: typeof COMPANY_INFO;
 	buyer: {
 		companyName: string;
@@ -37,7 +48,20 @@ export interface InvoicePrintData {
 	};
 }
 
-const ITEMS_PER_PAGE = 25; // Adjust based on A4 fit
+// Page dimensions in mm (A4 with 10mm padding)
+const PAGE_HEIGHT_MM = 297 - 20; // A4 height minus top/bottom padding
+const HEADER_HEIGHT_MM = 75; // Header height (parties + meta box)
+const FOOTER_HEIGHT_MM = 30; // Footer height (notes + issued by)
+const TABLE_HEADER_HEIGHT_MM = 8; // Table header row
+const ROW_BASE_HEIGHT_MM = 6; // Single-line row height
+const ROW_HEIGHT_PER_LINE_MM = 3.5; // Additional height per line in item name
+const SUMMARY_HEIGHT_MM = 45; // VAT recap + totals section
+
+// Estimate how many lines an item name will take (roughly 60 characters per line at 8pt)
+function estimateNameLines(name: string): number {
+	const CHARS_PER_LINE = 60;
+	return Math.ceil(name.length / CHARS_PER_LINE);
+}
 
 /**
  * Calculate invoice items with VAT for sale invoices
@@ -77,21 +101,88 @@ function calculateInvoiceItems(
 }
 
 /**
- * Calculate invoice totals
+ * Calculate invoice totals with smart rounding using group-by-VAT-rate method
+ * Groups items by VAT rate, sums bases per group, then calculates VAT from grouped sums
  */
 function calculateTotals(items: InvoiceItemRow[]): InvoiceTotals {
-	const totalWithoutVat = items.reduce(
-		(sum, item) => sum + item.priceWithoutVat * item.amount,
-		0,
-	);
-	const totalVatAmount = items.reduce((sum, item) => sum + item.vatAmount, 0);
-	const totalWithVat = items.reduce((sum, item) => sum + item.totalWithVat, 0);
+	// Group items by VAT rate and sum base prices
+	// Note: item.vatRate is the percentage value (0, 12, 21), not the index
+	const groupedByVat: { [vatPercentage: number]: number } = {};
+
+	items.forEach((item) => {
+		const basePrice = item.priceWithoutVat * item.amount;
+		if (!groupedByVat[item.vatRate]) {
+			groupedByVat[item.vatRate] = 0;
+		}
+		groupedByVat[item.vatRate] += basePrice;
+	});
+
+	// Calculate VAT and totals from grouped sums
+	let totalWithoutVat = 0;
+	let totalVatAmount = 0;
+	let totalWithVat = 0;
+
+	Object.entries(groupedByVat).forEach(([vatPercentageStr, baseSum]) => {
+		const vatPercentage = Number.parseFloat(vatPercentageStr);
+		const vatAmount = baseSum * (vatPercentage / 100);
+
+		totalWithoutVat += baseSum;
+		totalVatAmount += vatAmount;
+		totalWithVat += baseSum + vatAmount;
+	});
+
+	// Save the sum BEFORE rounding
+	const totalBeforeRounding = totalWithVat;
+
+	// Smart rounding: transfer 1 cent between VAT and total when total is .99 or .01
+	const cents = Math.round((totalWithVat % 1) * 100);
+	let rounding = 0;
+
+	if (cents === 99) {
+		rounding = 0.01;
+		totalVatAmount += 0.01;
+		totalWithVat += 0.01;
+	} else if (cents === 1) {
+		rounding = -0.01;
+		totalVatAmount -= 0.01;
+		totalWithVat -= 0.01;
+	}
 
 	return {
 		totalWithoutVat,
 		totalVatAmount,
+		totalBeforeRounding,
+		rounding,
 		totalWithVat,
 	};
+}
+
+/**
+ * Calculate VAT recapitulation grouped by VAT rate
+ */
+function calculateVatRecap(items: InvoiceItemRow[]): VatRecapRow[] {
+	const recapMap = new Map<number, VatRecapRow>();
+
+	items.forEach((item) => {
+		const baseAmount = item.priceWithoutVat * item.amount;
+		const existing = recapMap.get(item.vatRate);
+
+		if (existing) {
+			existing.baseAmount += baseAmount;
+			existing.vatAmount += item.vatAmount;
+			existing.totalAmount += item.totalWithVat;
+		} else {
+			recapMap.set(item.vatRate, {
+				vatRate: item.vatRate,
+				baseAmount: baseAmount,
+				vatAmount: item.vatAmount,
+				totalAmount: item.totalWithVat,
+			});
+		}
+	});
+
+	// Sort by VAT rate ascending
+	return Array.from(recapMap.values()).sort((a, b) => a.vatRate - b.vatRate);
 }
 
 /**
@@ -112,11 +203,13 @@ export function prepareInvoicePrintData(
 
 	const items = calculateInvoiceItems(stockMovements, itemNames);
 	const totals = calculateTotals(items);
+	const vatRecap = calculateVatRecap(items);
 
 	return {
 		invoice,
 		items,
 		totals,
+		vatRecap,
 		seller: COMPANY_INFO,
 		buyer: {
 			companyName: invoice.company_name || "",
@@ -132,423 +225,54 @@ export function prepareInvoicePrintData(
 }
 
 /**
- * Format Czech date
- */
-function formatDate(dateString?: string): string {
-	if (!dateString) return "";
-	const date = new Date(dateString);
-	return date.toLocaleDateString("cs-CZ");
-}
-
-/**
- * Format Czech currency
- */
-function formatCurrency(amount: number): string {
-	return amount.toLocaleString("cs-CZ", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	}) + " Kč";
-}
-
-/**
- * Split items into pages
+ * Split items into pages based on actual row heights
  */
 function paginateItems(items: InvoiceItemRow[]): InvoiceItemRow[][] {
+	if (items.length === 0) return [[]];
+
 	const pages: InvoiceItemRow[][] = [];
-	for (let i = 0; i < items.length; i += ITEMS_PER_PAGE) {
-		pages.push(items.slice(i, i + ITEMS_PER_PAGE));
+	let currentPage: InvoiceItemRow[] = [];
+	let currentPageHeight = 0;
+
+	// First page has header, subsequent pages don't
+	let isFirstPage = true;
+
+	for (const item of items) {
+		// Calculate this row's height
+		const nameLines = estimateNameLines(item.name);
+		const rowHeight = ROW_BASE_HEIGHT_MM + (nameLines - 1) * ROW_HEIGHT_PER_LINE_MM;
+
+		// Calculate available space on current page
+		const pageContentHeight = isFirstPage
+			? PAGE_HEIGHT_MM - HEADER_HEIGHT_MM - TABLE_HEADER_HEIGHT_MM - FOOTER_HEIGHT_MM - SUMMARY_HEIGHT_MM
+			: PAGE_HEIGHT_MM - TABLE_HEADER_HEIGHT_MM - 15; // 15mm for page number
+
+		// Check if item fits on current page
+		if (currentPageHeight + rowHeight > pageContentHeight && currentPage.length > 0) {
+			// Start new page
+			pages.push(currentPage);
+			currentPage = [item];
+			currentPageHeight = rowHeight;
+			isFirstPage = false;
+		} else {
+			// Add to current page
+			currentPage.push(item);
+			currentPageHeight += rowHeight;
+		}
 	}
+
+	// Add last page
+	if (currentPage.length > 0) {
+		pages.push(currentPage);
+	}
+
 	return pages;
 }
 
 /**
- * Generate HTML for invoice
+ * Generate HTML for invoice using template system
  */
 export function generateInvoiceHTML(data: InvoicePrintData): string {
 	const pages = paginateItems(data.items);
-	const totalPages = pages.length;
-
-	const pagesHTML = pages
-		.map((pageItems, pageIndex) => {
-			const isLastPage = pageIndex === totalPages - 1;
-			const pageNumber = pageIndex + 1;
-
-			return `
-    <div class="page">
-      ${generatePageHeader(data, pageNumber, totalPages)}
-      ${generateItemsTable(pageItems, isLastPage ? data.totals : null)}
-      </div>
-      `;
-    //   ${generatePageFooter()}
-		})
-		.join("");
-
-	return `
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Faktura ${data.invoice.prefix}${data.invoice.number}</title>
-  <style>${getStyles()}</style>
-</head>
-<body>
-  ${pagesHTML}
-</body>
-</html>
-  `;
-}
-
-/**
- * Generate page header
- */
-function generatePageHeader(
-	data: InvoicePrintData,
-	pageNumber: number,
-	totalPages: number,
-): string {
-	const { invoice, seller, buyer } = data;
-
-	return `
-    <div class="header">
-      <div class="header-row">
-        
-        <div class="invoice-title">
-          <h1>FAKTURA</h1>
-          <p class="invoice-number">${invoice.prefix}${invoice.number}</p>
-          ${totalPages > 1 ? `<p class="page-number">Strana ${pageNumber} / ${totalPages}</p>` : ""}
-        </div>
-      </div>
-
-      <div class="invoice-details-section detail-section">
-        <h3>Údaje faktury</h3>
-        <p><strong>Číslo faktury:</strong> ${invoice.prefix}${invoice.number}</p>
-        ${invoice.variable_symbol ? `<p><strong>Variabilní symbol:</strong> ${invoice.variable_symbol}</p>` : ""}
-        <p><strong>Datum vystavení:</strong> ${formatDate(invoice.date_issue)}</p>
-        ${invoice.date_tax ? `<p><strong>Datum zdanitelného plnění:</strong> ${formatDate(invoice.date_tax)}</p>` : ""}
-        ${invoice.date_due ? `<p><strong>Datum splatnosti:</strong> ${formatDate(invoice.date_due)}</p>` : ""}
-        ${invoice.payment_method !== undefined ? `<p><strong>Způsob úhrady:</strong> ${invoice.payment_method === 0 ? "Hotovost" : "Bankovní převod"}</p>` : ""}
-      </div>
-
-      <div class="parties-grid">
-        <div class="detail-section">
-          <h3>Dodavatel</h3>
-          <p><strong>${seller.companyName}</strong></p>
-          <p>IČO: ${seller.ico}</p>
-          ${seller.dic ? `<p>DIČ: ${seller.dic}</p>` : ""}
-          <p>${seller.street}</p>
-          <p>${seller.city}, ${seller.postalCode}</p>
-          <p>Tel: ${seller.phone}</p>
-          <p>Email: ${seller.email}</p>
-          <p>Účet: ${seller.bankAccount}</p>
-        </div>
-
-        <div class="detail-section">
-          <h3>Odběratel</h3>
-          <p><strong>${buyer.companyName}</strong></p>
-          ${buyer.ico ? `<p>IČO: ${buyer.ico}</p>` : ""}
-          ${buyer.dic ? `<p>DIČ: ${buyer.dic}</p>` : ""}
-          ${buyer.street ? `<p>${buyer.street}</p>` : ""}
-          ${buyer.city && buyer.postalCode ? `<p>${buyer.city}, ${buyer.postalCode}</p>` : ""}
-          ${buyer.phone ? `<p>Tel: ${buyer.phone}</p>` : ""}
-          ${buyer.email ? `<p>Email: ${buyer.email}</p>` : ""}
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/**
- * Generate items table
- */
-function generateItemsTable(
-	items: InvoiceItemRow[],
-	totals: InvoiceTotals | null,
-): string {
-	const itemsRows = items
-		.map(
-			(item) => `
-    <tr>
-      <td class="item-name">${item.name}</td>
-      <td class="number">${item.amount} ${item.unit}</td>
-      <td class="number">${formatCurrency(item.priceWithoutVat)}</td>
-      <td class="number">${formatCurrency(item.priceWithoutVat * item.amount)}</td>
-      <td class="number">${item.vatRate}%</td>
-      <td class="number">${formatCurrency(item.vatAmount)}</td>
-      <td class="number"><strong>${formatCurrency(item.totalWithVat)}</strong></td>
-    </tr>
-  `,
-		)
-		.join("");
-
-	const totalsRow = totals
-		? `
-    <tr class="subtotal-row">
-      <td colspan="6"><strong>Součet položek:</strong></td>
-      <td class="number"><strong>${formatCurrency(totals.totalWithVat)}</strong></td>
-    </tr>
-    <tr class="rounding-row">
-      <td colspan="6"><strong>Zaokrouhlení:</strong></td>
-      <td class="number"><strong>${formatCurrency(0)}</strong></td>
-    </tr>
-    <tr class="total-row">
-      <td colspan="6"><strong>CELKEM K ÚHRADĚ:</strong></td>
-      <td class="number"><strong>${formatCurrency(totals.totalWithVat)}</strong></td>
-    </tr>
-  `
-		: "";
-
-	return `
-    <table class="items-table">
-      <thead>
-        <tr>
-          <th>Název</th>
-          <th class="number">Množství</th>
-          <th class="number">Jednotková cena</th>
-          <th class="number">Cena</th>
-          <th class="number">Sazba DPH</th>
-          <th class="number">DPH</th>
-          <th class="number">Celkem</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${itemsRows}
-        ${totalsRow}
-      </tbody>
-    </table>
-  `;
-}
-
-/**
- * Generate page footer
- */
-function generatePageFooter(): string {
-	return `
-    <div class="footer">
-      <p>Děkujeme za vaši důvěru</p>
-    </div>
-  `;
-}
-
-/**
- * CSS styles
- */
-function getStyles(): string {
-	return `
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Arial', sans-serif;
-      font-size: 8pt;
-      line-height: 1.3;
-      color: #000;
-    }
-
-    .page {
-      width: 210mm;
-      min-height: 297mm;
-      padding: 12mm;
-      margin: 0 auto;
-      background: white;
-      page-break-after: always;
-    }
-
-    .page:last-child {
-      page-break-after: auto;
-    }
-
-    @media print {
-      .page {
-        margin: 0;
-        page-break-after: always;
-      }
-      .page:last-child {
-        page-break-after: auto;
-      }
-    }
-
-    .header {
-      margin-bottom: 15px;
-    }
-
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #333;
-    }
-
-    .company-info h1 {
-      font-size: 12pt;
-      margin-bottom: 3px;
-    }
-
-    .company-info p {
-      font-size: 8pt;
-      margin: 1px 0;
-    }
-
-    .invoice-title {
-      text-align: right;
-    }
-
-    .invoice-title h1 {
-      font-size: 18pt;
-      margin-bottom: 3px;
-    }
-
-    .invoice-number {
-      font-size: 11pt;
-      font-weight: bold;
-    }
-
-    .page-number {
-      font-size: 8pt;
-      color: #666;
-      margin-top: 3px;
-    }
-
-    .invoice-details-section {
-      margin-bottom: 10px;
-    }
-
-    .parties-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .detail-section {
-      border: 1px solid #ddd;
-      padding: 6px;
-      background: #f9f9f9;
-    }
-
-    .detail-section h3 {
-      font-size: 9pt;
-      margin-bottom: 4px;
-      padding-bottom: 3px;
-      border-bottom: 1px solid #ccc;
-    }
-
-    .detail-section p {
-      font-size: 7pt;
-      margin: 2px 0;
-      line-height: 1.2;
-    }
-
-    .items-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 10px;
-      font-size: 8pt;
-    }
-
-    .items-table th {
-      background: #333;
-      color: white;
-      padding: 4px 6px;
-      text-align: left;
-      font-weight: bold;
-      font-size: 7pt;
-      border: 1px solid #333;
-      white-space: nowrap;
-    }
-
-    .items-table th.number {
-      text-align: right;
-    }
-
-    .items-table th.col-name {
-      width: 40%;
-    }
-
-    .items-table th.col-qty {
-      width: 8%;
-    }
-
-    .items-table th.col-price {
-      width: 10%;
-    }
-
-    .items-table th.col-total {
-      width: 10%;
-    }
-
-    .items-table th.col-vat-rate {
-      width: 8%;
-    }
-
-    .items-table th.col-vat {
-      width: 10%;
-    }
-
-    .items-table th.col-final {
-      width: 14%;
-    }
-
-    .items-table td {
-      padding: 3px 6px;
-      border: 1px solid #ddd;
-      font-size: 7pt;
-    }
-
-    .items-table td.number {
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    .items-table td.item-name {
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
-
-    .items-table tbody tr:nth-child(even) {
-      background: #f9f9f9;
-    }
-
-    .subtotal-row td {
-      border-top: 1px solid #999;
-      padding: 4px 6px;
-      font-size: 7pt;
-    }
-
-    .rounding-row td {
-      padding: 4px 6px;
-      font-size: 7pt;
-    }
-
-    .total-row {
-      background: #e8e8e8 !important;
-      font-weight: bold;
-      font-size: 9pt;
-    }
-
-    .total-row td {
-      border-top: 2px solid #333;
-      padding: 6px;
-    }
-
-    .footer {
-      margin-top: 20px;
-      padding-top: 10px;
-      border-top: 1px solid #ccc;
-      text-align: center;
-      font-size: 7pt;
-      color: #666;
-    }
-
-    @media print {
-      body {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-    }
-  `;
+	return renderInvoice(data, pages);
 }

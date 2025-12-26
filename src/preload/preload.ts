@@ -125,7 +125,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		update: (number: string, updates: Partial<Invoice>) =>
 			ipcRenderer.invoke("db:invoices:update", number, updates),
 		delete: (prefix: string, number: string) =>
-			ipcRenderer.invoke("db:invoices:delete", number),
+			ipcRenderer.invoke("db:invoices:delete", prefix, number),
 		getMaxNumber: (type: number) =>
 			ipcRenderer.invoke("db:invoices:getMaxNumber", type),
 	},

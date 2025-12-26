@@ -1,5 +1,6 @@
 import { DIC_PREFIXES } from "../config/constants";
 import { VAT_RATES } from "../config/constants";
+import { calculateItemTotals } from "./invoiceCalculations";
 
 /**
  * Split bank account string into account number and bank code
@@ -30,6 +31,11 @@ export function combineBankAccount(
 	return `${accountNumber}/${bankCode}`;
 }
 
+/**
+ * Calculate item total with VAT and smart rounding
+ * Smart rounding is applied per unit BEFORE multiplying by quantity
+ * @deprecated Use calculateItemTotalWithVat instead
+ */
 export const calculateTotalWithVat = (items) => {
 	return items.reduce((sum, item) => {
 		const totalWithVat =
@@ -37,6 +43,20 @@ export const calculateTotalWithVat = (items) => {
 		return sum + totalWithVat;
 	}, 0);
 };
+
+/**
+ * Calculate item total with VAT including smart rounding
+ * Applies smart rounding to individual item price BEFORE multiplying by quantity
+ * This ensures correct totals: (price_with_vat_rounded) × quantity
+ */
+export function calculateItemTotalWithVat(
+	pricePerUnit: number,
+	amount: number,
+	vatRateIndex: number,
+): number {
+	const { totalWithVat } = calculateItemTotals(pricePerUnit, 1, vatRateIndex);
+	return totalWithVat * amount;
+}
 
 export const calculateTotalWithoutVat = (items) => {
 	return items.reduce((sum, item) => sum + item.total, 0);

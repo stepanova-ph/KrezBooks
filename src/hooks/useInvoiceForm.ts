@@ -7,6 +7,7 @@ import {
 	DATE_TAX_OFFSET_DAYS,
 	DATE_DUE_OFFSET_DAYS,
 } from "../config/constants";
+import { calculateItemTotals } from "../utils/invoiceCalculations";
 
 export interface InvoiceItem extends Item {
 	amount: number;
@@ -262,11 +263,18 @@ export function useInvoiceForm() {
 		price: number,
 		p_group_index: number,
 	) => {
+		// Calculate total with smart rounding applied per unit BEFORE multiplying by quantity
+		const { totalWithVat: unitTotal } = calculateItemTotals(
+			price,
+			1,
+			item.vat_rate,
+		);
+
 		const newItem: InvoiceItem = {
 			...item,
 			amount,
 			sale_price: price,
-			total: amount * price,
+			total: unitTotal * amount, // Smart rounded per unit × quantity
 			p_group_index,
 		};
 		setInvoiceItems((prev) => [...prev, newItem]);
@@ -279,11 +287,18 @@ export function useInvoiceForm() {
 		price: number,
 		p_group_index: number,
 	) => {
+		// Calculate total with smart rounding applied per unit BEFORE multiplying by quantity
+		const { totalWithVat: unitTotal } = calculateItemTotals(
+			price,
+			1,
+			item.vat_rate,
+		);
+
 		const updatedItem: InvoiceItem = {
 			...item,
 			amount,
 			sale_price: price,
-			total: amount * price,
+			total: unitTotal * amount, // Smart rounded per unit × quantity
 			p_group_index,
 		};
 		setInvoiceItems((prev) => {

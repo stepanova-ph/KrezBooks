@@ -12,6 +12,7 @@ import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 import { InvoiceTotals } from "./InvoiceTotals";
 import { getDisplayAmount } from "../../../utils/typeConverterUtils";
 import { InvoicePrintButtons } from "./InvoicePrintButton";
+import { calculateItemTotals } from "../../../utils/invoiceCalculations";
 
 interface ViewInvoiceDialogProps {
 	open: boolean;
@@ -40,17 +41,26 @@ export function ViewInvoiceDialog({
 
 	const invoiceItems: InvoiceItem[] = movements.map((movement) => {
 		const item = allItems.find((i) => i.ean === movement.item_ean);
+		const invoiceType = (invoice?.type ?? 1) as number;
+		const amount = getDisplayAmount(movement.amount, invoiceType);
+		const pricePerUnit = Number(movement.price_per_unit);
+
+		// Calculate total with smart rounding applied per unit BEFORE quantity multiplication
+		const { totalWithVat: unitTotal } = calculateItemTotals(
+			pricePerUnit,
+			1,
+			movement.vat_rate,
+		);
+
 		return {
 			ean: movement.item_ean,
 			name: item?.name || movement.item_ean,
 			category: item?.category || "",
 			unit_of_measure: item?.unit_of_measure || "ks",
 			vat_rate: movement.vat_rate,
-			amount: getDisplayAmount(movement.amount, invoice.type),
-			sale_price: Number(movement.price_per_unit),
-			total:
-				getDisplayAmount(movement.amount, invoice.type) *
-				Number(movement.price_per_unit),
+			amount: amount,
+			sale_price: pricePerUnit,
+			total: unitTotal * amount, // Smart rounded per unit × quantity
 			p_group_index: 1,
 			note: item?.note,
 			sale_price_group1: item?.sale_price_group1 || 0,

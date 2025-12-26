@@ -639,4 +639,509 @@ export const exampleStockMovements: Array<StockMovement> = [
 		vat_rate: exampleItems[29].vat_rate as VatRate,
 		reset_point: false,
 	},
+
+	// ─────────────────────────────
+	// Large invoice 0051 – pagination testing (40 items)
+	// ─────────────────────────────
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[0].ean,
+		amount: -2,
+		price_per_unit: exampleItems[0].sale_price_group1,
+		vat_rate: exampleItems[0].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[1].ean,
+		amount: -3,
+		price_per_unit: exampleItems[1].sale_price_group1,
+		vat_rate: exampleItems[1].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[2].ean,
+		amount: -1,
+		price_per_unit: exampleItems[2].sale_price_group1,
+		vat_rate: exampleItems[2].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[3].ean,
+		amount: -4,
+		price_per_unit: exampleItems[3].sale_price_group1,
+		vat_rate: exampleItems[3].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[4].ean,
+		amount: -2,
+		price_per_unit: exampleItems[4].sale_price_group1,
+		vat_rate: exampleItems[4].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[5].ean,
+		amount: -5,
+		price_per_unit: exampleItems[5].sale_price_group1,
+		vat_rate: exampleItems[5].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[6].ean,
+		amount: -1,
+		price_per_unit: exampleItems[6].sale_price_group1,
+		vat_rate: exampleItems[6].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[7].ean,
+		amount: -3,
+		price_per_unit: exampleItems[7].sale_price_group1,
+		vat_rate: exampleItems[7].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[8].ean,
+		amount: -2,
+		price_per_unit: exampleItems[8].sale_price_group1,
+		vat_rate: exampleItems[8].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[9].ean,
+		amount: -6,
+		price_per_unit: exampleItems[9].sale_price_group1,
+		vat_rate: exampleItems[9].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[10].ean,
+		amount: -4,
+		price_per_unit: exampleItems[10].sale_price_group1,
+		vat_rate: exampleItems[10].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[11].ean,
+		amount: -2,
+		price_per_unit: exampleItems[11].sale_price_group1,
+		vat_rate: exampleItems[11].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[12].ean,
+		amount: -5,
+		price_per_unit: exampleItems[12].sale_price_group1,
+		vat_rate: exampleItems[12].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[13].ean,
+		amount: -3,
+		price_per_unit: exampleItems[13].sale_price_group1,
+		vat_rate: exampleItems[13].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[14].ean,
+		amount: -1,
+		price_per_unit: exampleItems[14].sale_price_group1,
+		vat_rate: exampleItems[14].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[15].ean,
+		amount: -4,
+		price_per_unit: exampleItems[15].sale_price_group1,
+		vat_rate: exampleItems[15].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[16].ean,
+		amount: -2,
+		price_per_unit: exampleItems[16].sale_price_group1,
+		vat_rate: exampleItems[16].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[17].ean,
+		amount: -7,
+		price_per_unit: exampleItems[17].sale_price_group1,
+		vat_rate: exampleItems[17].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[18].ean,
+		amount: -3,
+		price_per_unit: exampleItems[18].sale_price_group1,
+		vat_rate: exampleItems[18].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[19].ean,
+		amount: -5,
+		price_per_unit: exampleItems[19].sale_price_group1,
+		vat_rate: exampleItems[19].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[20].ean,
+		amount: -2,
+		price_per_unit: exampleItems[20].sale_price_group1,
+		vat_rate: exampleItems[20].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[21].ean,
+		amount: -4,
+		price_per_unit: exampleItems[21].sale_price_group1,
+		vat_rate: exampleItems[21].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[22].ean,
+		amount: -1,
+		price_per_unit: exampleItems[22].sale_price_group1,
+		vat_rate: exampleItems[22].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[23].ean,
+		amount: -6,
+		price_per_unit: exampleItems[23].sale_price_group1,
+		vat_rate: exampleItems[23].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[24].ean,
+		amount: -3,
+		price_per_unit: exampleItems[24].sale_price_group1,
+		vat_rate: exampleItems[24].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[25].ean,
+		amount: -2,
+		price_per_unit: exampleItems[25].sale_price_group1,
+		vat_rate: exampleItems[25].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[26].ean,
+		amount: -5,
+		price_per_unit: exampleItems[26].sale_price_group1,
+		vat_rate: exampleItems[26].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[27].ean,
+		amount: -4,
+		price_per_unit: exampleItems[27].sale_price_group1,
+		vat_rate: exampleItems[27].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[28].ean,
+		amount: -1,
+		price_per_unit: exampleItems[28].sale_price_group1,
+		vat_rate: exampleItems[28].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[29].ean,
+		amount: -3,
+		price_per_unit: exampleItems[29].sale_price_group1,
+		vat_rate: exampleItems[29].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[30].ean,
+		amount: -2,
+		price_per_unit: exampleItems[30].sale_price_group1,
+		vat_rate: exampleItems[30].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[31].ean,
+		amount: -4,
+		price_per_unit: exampleItems[31].sale_price_group1,
+		vat_rate: exampleItems[31].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[32].ean,
+		amount: -5,
+		price_per_unit: exampleItems[32].sale_price_group1,
+		vat_rate: exampleItems[32].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[33].ean,
+		amount: -3,
+		price_per_unit: exampleItems[33].sale_price_group1,
+		vat_rate: exampleItems[33].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[34].ean,
+		amount: -1,
+		price_per_unit: exampleItems[34].sale_price_group1,
+		vat_rate: exampleItems[34].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[35].ean,
+		amount: -6,
+		price_per_unit: exampleItems[35].sale_price_group1,
+		vat_rate: exampleItems[35].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[36].ean,
+		amount: -2,
+		price_per_unit: exampleItems[36].sale_price_group1,
+		vat_rate: exampleItems[36].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[37].ean,
+		amount: -4,
+		price_per_unit: exampleItems[37].sale_price_group1,
+		vat_rate: exampleItems[37].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[38].ean,
+		amount: -3,
+		price_per_unit: exampleItems[38].sale_price_group1,
+		vat_rate: exampleItems[38].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0051",
+		item_ean: exampleItems[39].ean,
+		amount: -5,
+		price_per_unit: exampleItems[39].sale_price_group1,
+		vat_rate: exampleItems[39].vat_rate as VatRate,
+		reset_point: false,
+	},
+
+	// ─────────────────────────────
+	// Stock movements for PF0052 - mixed VAT rates
+	// ─────────────────────────────
+
+	// Items with 21% VAT
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0052",
+		item_ean: exampleItems[0].ean, // Ponorné čerpadlo - 21%
+		amount: -3,
+		price_per_unit: exampleItems[0].sale_price_group1,
+		vat_rate: exampleItems[0].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0052",
+		item_ean: exampleItems[5].ean, // Kalové čerpadlo - 21%
+		amount: -2,
+		price_per_unit: exampleItems[5].sale_price_group1,
+		vat_rate: exampleItems[5].vat_rate as VatRate,
+		reset_point: false,
+	},
+
+	// Items with 12% VAT
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0052",
+		item_ean: exampleItems[42].ean, // Dětská knížka - 12%
+		amount: -5,
+		price_per_unit: exampleItems[42].sale_price_group1,
+		vat_rate: exampleItems[42].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0052",
+		item_ean: exampleItems[43].ean, // Lékárnička - 12%
+		amount: -3,
+		price_per_unit: exampleItems[43].sale_price_group1,
+		vat_rate: exampleItems[43].vat_rate as VatRate,
+		reset_point: false,
+	},
+
+	// Items with 0% VAT
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0052",
+		item_ean: exampleItems[41].ean, // Kniha - 0%
+		amount: -7,
+		price_per_unit: exampleItems[41].sale_price_group1,
+		vat_rate: exampleItems[41].vat_rate as VatRate,
+		reset_point: false,
+	},
+
+	// ─────────────────────────────
+	// Stock movements for PF0053 - rounding test
+	// ─────────────────────────────
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0053",
+		item_ean: exampleItems[44].ean, // Testovací položka A - 333.33 Kč
+		amount: -3,
+		price_per_unit: exampleItems[44].sale_price_group1,
+		vat_rate: exampleItems[44].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0053",
+		item_ean: exampleItems[45].ean, // Testovací položka B - 147.89 Kč
+		amount: -7,
+		price_per_unit: exampleItems[45].sale_price_group1,
+		vat_rate: exampleItems[45].vat_rate as VatRate,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0053",
+		item_ean: exampleItems[46].ean, // Testovací položka C - 999.99 Kč
+		amount: -2,
+		price_per_unit: exampleItems[46].sale_price_group1,
+		vat_rate: exampleItems[46].vat_rate as VatRate,
+		reset_point: false,
+	},
+
+	// ─────────────────────────────
+	// Stock movements for PF0054 - Smart rounding test for PRINT
+	// Goal: Sum of smart-rounded items ends in .99 → triggers +0.01 total rounding in PRINT
+	//
+	// IMPORTANT: Items get smart-rounded individually first (per unit price × 1.21)
+	// Then in PRINT service, the sum gets checked for .99 or .01 cents
+	//
+	// Calculation WITH smart rounding applied per item:
+	// Item 1: 826.45 × 1.21 = 1000.0045 → smart rounds to 1000.00 (was .01, removed .01)
+	// Item 2: 991.73 × 1.21 = 1199.9933 → smart rounds to 1200.00 (was .99, added .01)
+	// Item 3: Need sum to be .99:
+	//         Total needed: XXXX.99
+	//         1000.00 + 1200.00 = 2200.00
+	//         Need +X.99 more
+	//         Let's use: 1641.31 × 1.21 = 1985.9851 → smart rounds to 1986.00 (was .99, added .01)
+	//         Total = 1000 + 1200 + 1986 = 4186.00 (damn, all .00)
+	//
+	// New strategy: Use prices that DON'T trigger item smart rounding
+	// (don't end in .01 or .99 after VAT), but sum to .99:
+	//
+	// Item 1: 1000.00 × 1.21 = 1210.00 (no item rounding)
+	// Item 2: 1641.15 × 1.21 = 1985.7915 → 1985.79 (no item rounding, ends in .79)
+	// Item 3: 0.165 × 1.21 = 0.19965 → 0.20 (no item rounding, ends in .20)
+	// Total = 1210.00 + 1985.79 + 0.20 = 3195.99 ✓ (ends in .99!)
+	//
+	// This should trigger invoice-level rounding +0.01 in print to get 3196.00
+	// ─────────────────────────────
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0054",
+		item_ean: exampleItems[0].ean,
+		amount: -1,
+		price_per_unit: 1000.0, // × 1.21 = 1210.00 (no smart rounding)
+		vat_rate: 2,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0054",
+		item_ean: exampleItems[1].ean,
+		amount: -1,
+		price_per_unit: 1641.15, // × 1.21 = 1985.7915 → 1985.79
+		vat_rate: 2,
+		reset_point: false,
+	},
+	{
+		invoice_prefix: INVOICE_TYPES[3].prefix,
+		invoice_number: "0054",
+		item_ean: exampleItems[25].ean, // Hadice
+		amount: -1,
+		price_per_unit: 0.165, // × 1.21 = 0.19965 → 0.20
+		vat_rate: 2,
+		reset_point: false,
+	},
 ];

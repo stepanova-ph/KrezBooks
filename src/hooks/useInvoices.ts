@@ -70,8 +70,8 @@ export function useDeleteInvoice() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async (number: string) => {
-			const result = await window.electronAPI.invoices.delete(number);
+		mutationFn: async ({ prefix, number }: { prefix: string; number: string }) => {
+			const result = await window.electronAPI.invoices.delete(prefix, number);
 			if (!result.success) throw new Error(result.error);
 			return result.data;
 		},

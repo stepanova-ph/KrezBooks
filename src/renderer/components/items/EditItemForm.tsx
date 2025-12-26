@@ -13,9 +13,11 @@ function EditItemForm({ open, onClose, item }: EditItemFormProps) {
 
 	const handleSubmit = async (data: CreateItemInput) => {
 		try {
+			// Remove stock_amount as it's calculated from stock movements, not editable
+			const { stock_amount, ...updateData } = data as any;
 			await updateItem.mutateAsync({
 				ean: item.ean,
-				...data,
+				...updateData,
 			});
 			onClose();
 		} catch (error) {

@@ -44,17 +44,16 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 					WebkitAppRegion: "no-drag",
 				}}
 			>
-				<Typography
-					variant="h6"
+				<Box
+					component="img"
+					src="/krezbooks_logo.png"
+					alt="KrezBooks"
 					sx={{
-						color: (theme) => theme.palette.background.paper,
-						fontWeight: 700,
-						fontSize: "1.1rem",
-						letterSpacing: "0.5px",
+						height: 28,
+						width: "auto",
+						objectFit: "contain",
 					}}
-				>
-					KrezBooks
-				</Typography>
+				/>
 			</Box>
 
 			<Box
