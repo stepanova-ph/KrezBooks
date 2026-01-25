@@ -41,7 +41,7 @@ function registerAdminHandlers() {
 			logger.error("Error getting database stats:", error);
 			return {
 				success: false,
-				error: error.message || "Failed to get database statistics",
+				error: error.message || "Nepodařilo se získat statistiky databáze",
 			};
 		}
 	});
@@ -61,7 +61,7 @@ function registerAdminHandlers() {
 			logger.error("Error clearing database:", error);
 			return {
 				success: false,
-				error: error.message || "Failed to clear database",
+				error: error.message || "Nepodařilo se vymazat databázi",
 			};
 		}
 	});
@@ -88,7 +88,7 @@ function registerAdminHandlers() {
 			logger.error("Error recreating tables:", error);
 			return {
 				success: false,
-				error: error.message || "Failed to recreate tables",
+				error: error.message || "Nepodařilo se znovu vytvořit tabulky",
 			};
 		}
 	});
@@ -125,7 +125,7 @@ function registerAdminHandlers() {
 			logger.error("Error filling test data:", error);
 			return {
 				success: false,
-				error: error.message || "Failed to fill test data",
+				error: error.message || "Nepodařilo se naplnit testovací data",
 			};
 		}
 	});

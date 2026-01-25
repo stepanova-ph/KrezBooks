@@ -1,6 +1,4 @@
-import { DIC_PREFIXES } from "../config/constants";
-import { VAT_RATES } from "../config/constants";
-import { calculateItemTotals } from "./invoiceCalculations";
+import { calculateItemTotals, getVatPercentage } from "./invoiceCalculations";
 
 /**
  * Split bank account string into account number and bank code
@@ -39,7 +37,7 @@ export function combineBankAccount(
 export const calculateTotalWithVat = (items) => {
 	return items.reduce((sum, item) => {
 		const totalWithVat =
-			item.total * (1 + VAT_RATES[item.vat_rate].percentage / 100);
+			item.total * (1 + getVatPercentage(item.vat_rate) / 100);
 		return sum + totalWithVat;
 	}, 0);
 };

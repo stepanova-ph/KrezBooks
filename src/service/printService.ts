@@ -1,7 +1,6 @@
 import { Invoice, StockMovement } from "../types/database";
-import { VAT_RATES } from "../config/constants";
 import { COMPANY_INFO } from "../config/companyInfo";
-import { calculateItemTotals } from "../utils/invoiceCalculations";
+import { calculateItemTotals, getVatPercentage } from "../utils/invoiceCalculations";
 import { renderInvoice } from "../templates/invoice/invoiceRenderer";
 
 export interface InvoiceItemRow {
@@ -84,7 +83,8 @@ function calculateInvoiceItems(
 			movement.vat_rate,
 		);
 
-		const vatRateDecimal = VAT_RATES[movement.vat_rate].percentage / 100;
+		const vatPercentage = getVatPercentage(movement.vat_rate);
+		const vatRateDecimal = vatPercentage / 100;
 		const priceWithVat = priceWithoutVat * (1 + vatRateDecimal);
 
 		return {
@@ -95,7 +95,7 @@ function calculateInvoiceItems(
 			vatAmount,
 			priceWithVat,
 			totalWithVat,
-			vatRate: VAT_RATES[movement.vat_rate].percentage,
+			vatRate: vatPercentage,
 		};
 	});
 }

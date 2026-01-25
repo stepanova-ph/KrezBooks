@@ -1,5 +1,11 @@
 import { VAT_RATES } from "../config/constants";
 
+/** Get VAT rate percentage by value index, with fallback to 21% */
+export const getVatPercentage = (vatRateValue: number): number => {
+	const rate = VAT_RATES.find((r) => r.value === vatRateValue);
+	return rate?.percentage ?? 21;
+};
+
 /**
  * Calculate item totals with VAT including smart rounding
  * Smart rounding: transfer 1 cent between VAT and total when total is .99 or .01
@@ -9,7 +15,7 @@ export function calculateItemTotals(
 	amount: number,
 	vatRateIndex: number,
 ) {
-	const vatPercentage = VAT_RATES[vatRateIndex].percentage;
+	const vatPercentage = getVatPercentage(vatRateIndex);
 
 	const basePrice = pricePerUnit * amount;
 	let vatAmount = basePrice * (vatPercentage / 100);

@@ -20,24 +20,24 @@ describe("useInvoices", () => {
 			const mockInvoices: Invoice[] = [
 				{
 					prefix: "INV",
-			number: "INV-001",
+					number: "INV-001",
 					type: 1,
-					payment_method: null,
+					payment_method: undefined,
 					date_issue: "2024-01-15",
-					date_tax: null,
-					date_due: null,
-					variable_symbol: null,
-					note: null,
+					date_tax: undefined,
+					date_due: undefined,
+					variable_symbol: undefined,
+					note: undefined,
 					ico: "12345678",
 					modifier: 1,
-					dic: null,
+					dic: undefined,
 					company_name: "Test Company",
-					street: null,
-					city: null,
-					postal_code: null,
-					phone: null,
-					email: null,
-					bank_account: null,
+					street: undefined,
+					city: undefined,
+					postal_code: undefined,
+					phone: undefined,
+					email: undefined,
+					bank_account: undefined,
 				},
 			];
 
@@ -96,7 +96,7 @@ describe("useInvoices", () => {
 				bank_account: "1234567890/0100",
 			};
 
-			mockElectronAPI.invoices.getOne.mockImplementation((prefix, number) => Promise.resolve({
+			mockElectronAPI.invoices.getOne.mockImplementation(() => Promise.resolve({
 				success: true,
 				data: mockInvoice,
 			}));
@@ -224,7 +224,6 @@ describe("useInvoices", () => {
 			});
 
 			result.current.mutate({
-				prefix: "INV",
 				number: "INV-001",
 				updates,
 			});
@@ -248,7 +247,6 @@ describe("useInvoices", () => {
 			});
 
 			result.current.mutate({
-				prefix: "INV",
 				number: "INV-999",
 				updates: { note: "Updated" },
 			});

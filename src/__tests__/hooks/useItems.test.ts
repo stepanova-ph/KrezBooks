@@ -32,8 +32,8 @@ describe("useItems", () => {
 					sale_price_group2: 90,
 					sale_price_group3: 80,
 					sale_price_group4: 70,
-					category: null,
-					note: null,
+					category: undefined,
+					note: undefined,
 				},
 			];
 

@@ -16,7 +16,6 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import InfoIcon from "@mui/icons-material/Info";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import DatasetIcon from "@mui/icons-material/Dataset";
-import BackupIcon from "@mui/icons-material/Backup";
 import { useDataImportExport } from "../../../hooks/useDataImportExport";
 
 interface SettingsDialogProps {

@@ -23,11 +23,12 @@ describe("useStockMovement", () => {
 		it("fetches all stock movements successfully", async () => {
 			const mockMovements: StockMovement[] = [
 				{
+					invoice_prefix: "INV",
 					invoice_number: "INV-001",
 					item_ean: "1234567890123",
 					amount: 10,
-					price: 100,
-					type: 1,
+					price_per_unit: 100,
+					vat_rate: 1,
 				},
 			];
 
@@ -66,18 +67,20 @@ describe("useStockMovement", () => {
 		it("fetches movements for specific invoice", async () => {
 			const mockMovements: StockMovement[] = [
 				{
+					invoice_prefix: "INV",
 					invoice_number: "INV-001",
 					item_ean: "1234567890123",
 					amount: 10,
-					price: 100,
-					type: 1,
+					price_per_unit: 100,
+					vat_rate: 1,
 				},
 				{
+					invoice_prefix: "INV",
 					invoice_number: "INV-001",
 					item_ean: "9876543210987",
 					amount: 5,
-					price: 50,
-					type: 1,
+					price_per_unit: 50,
+					vat_rate: 1,
 				},
 			];
 
@@ -134,8 +137,8 @@ describe("useStockMovement", () => {
 				invoice_number: "INV-001",
 				item_ean: "1234567890123",
 				amount: 15,
-				price: 150,
-				type: 1,
+				price_per_unit: 150,
+				vat_rate: 1,
 			};
 
 			mockElectronAPI.stockMovements.create.mockResolvedValue({
@@ -163,8 +166,8 @@ describe("useStockMovement", () => {
 				invoice_number: "INV-001",
 				item_ean: "1234567890123",
 				amount: 15,
-				price: 150,
-				type: 1,
+				price_per_unit: 150,
+				vat_rate: 1,
 			};
 
 			mockElectronAPI.stockMovements.create.mockResolvedValue({
@@ -192,7 +195,7 @@ describe("useStockMovement", () => {
 				itemEan: "1234567890123",
 				updates: {
 					amount: 20,
-					price: 200,
+					price_per_unit: 200,
 				},
 			};
 
@@ -212,7 +215,7 @@ describe("useStockMovement", () => {
 			expect(mockElectronAPI.stockMovements.update).toHaveBeenCalledWith(
 				"INV", "INV-001",
 				"1234567890123",
-				{ amount: 20, price: 200 },
+				{ amount: 20, price_per_unit: 200 },
 			);
 		});
 

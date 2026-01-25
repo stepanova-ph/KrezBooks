@@ -1,4 +1,5 @@
 import { validationMessages } from "../config/validationMessages";
+import { VALID_VAT_RATE_VALUES } from "../config/constants";
 import { z } from "zod";
 import { optionalString } from "./optionalString";
 
@@ -26,9 +27,10 @@ export const itemSchema = z.object({
 
 	vat_rate: z.preprocess(
 		(v) => Number(v),
-		z.number().refine((n) => !isNaN(n), {
-			message: validationMessages.item.vatRate,
-		}),
+		z.number().refine(
+			(n) => VALID_VAT_RATE_VALUES.includes(n),
+			validationMessages.item.vatRate
+		),
 	),
 
 	unit_of_measure: z

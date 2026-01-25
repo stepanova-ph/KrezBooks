@@ -62,11 +62,11 @@ app.whenReady().then(async () => {
 
 	createWindow();
 
-	// Register Q to toggle DevTools
-	globalShortcut.register("Q", () => {
+	// Register Shift+Q to toggle DevTools
+	globalShortcut.register("Shift+Q", () => {
 		if (mainWindow && mainWindow.webContents) {
 			mainWindow.webContents.toggleDevTools();
-			logger.info("DevTools toggled via Q");
+			logger.info("DevTools toggled via Shift+Q");
 		}
 	});
 

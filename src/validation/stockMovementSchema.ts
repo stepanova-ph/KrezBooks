@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { validationMessages } from "../config/validationMessages";
+import { VALID_VAT_RATE_VALUES } from "../config/constants";
 
 export const stockMovementSchema = z.object({
 	invoice_prefix: z
@@ -25,7 +26,13 @@ export const stockMovementSchema = z.object({
 	price_per_unit: z.string().refine((val) => {
 		const num = parseFloat(val);
 		return !isNaN(num) && num >= 0;
-	}, "Cena musí být kladné číslo"),
+	}, validationMessages.stockMovement.pricePerUnitInvalid),
 
-	vat_rate: z.preprocess((v) => Number(v), z.number()),
+	vat_rate: z.preprocess(
+		(v) => Number(v),
+		z.number().refine(
+			(n) => VALID_VAT_RATE_VALUES.includes(n),
+			validationMessages.item.vatRate
+		)
+	),
 });

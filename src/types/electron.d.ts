@@ -84,6 +84,12 @@ declare global {
 					path?: string;
 					error?: string;
 				}>;
+				saveFile: (defaultFilename?: string, title?: string) => Promise<{
+					success: boolean;
+					canceled?: boolean;
+					path?: string;
+					error?: string;
+				}>;
 			};
 			contacts: {
 				getAll: () => Promise<IpcResponse<Contact[]>>;
@@ -160,7 +166,12 @@ declare global {
 					number: string,
 				) => Promise<IpcResponse<Invoice>>;
 				create: (invoice: CreateInvoiceInput) => Promise<IpcResponse<Invoice>>;
+				createWithStockMovements: (
+					invoice: CreateInvoiceInput,
+					stockMovements: CreateStockMovementInput[],
+				) => Promise<IpcResponse<{ changes: number; stockMovementChanges: number }>>;
 				update: (
+					prefix: string,
 					number: string,
 					updates: Partial<Invoice>,
 				) => Promise<IpcResponse<Invoice>>;
@@ -207,6 +218,24 @@ declare global {
 				getPath: () => Promise<BackupPathResult>;
 				setPath: (backupPath: string) => Promise<{ success: boolean; error?: string }>;
 				create: () => Promise<BackupResult>;
+			};
+			print: {
+				generateInvoiceHTML: (
+					invoicePrefix: string,
+					invoiceNumber: string,
+				) => Promise<IpcResponse<string>>;
+				invoiceToPDF: (
+					invoicePrefix: string,
+					invoiceNumber: string,
+					savePath?: string,
+				) => Promise<IpcResponse<{ path: string }>>;
+			};
+			shell: {
+				openEmail: (
+					email: string,
+					subject: string,
+					body: string,
+				) => Promise<IpcResponse<{ opened: boolean }>>;
 			};
 		};
 	}

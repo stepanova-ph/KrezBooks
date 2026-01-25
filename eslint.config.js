@@ -18,6 +18,10 @@ export default [
           jsx: true,
         },
       },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
     },
     plugins: {
       '@typescript-eslint': typescript,
@@ -33,10 +37,6 @@ export default [
         version: 'detect',
       },
     },
-    globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
   },
   prettier,
 ];

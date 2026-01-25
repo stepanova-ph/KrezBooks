@@ -14,7 +14,7 @@ export async function handleIpcRequest<T>(
 		console.error("IPC handler error:", error);
 		return {
 			success: false,
-			error: error instanceof Error ? error.message : "Unknown error",
+			error: error instanceof Error ? error.message : "Neznámá chyba",
 		};
 	}
 }

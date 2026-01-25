@@ -6,6 +6,15 @@ export const VAT_RATES = [
 	{ value: 2, percentage: 21, label: "21% (základní)" },
 ] as const;
 
+export const VALID_VAT_RATE_VALUES: number[] = VAT_RATES.map((rate) => rate.value);
+export const VAT_RATE_PERCENTAGES: number[] = VAT_RATES.map((rate) => rate.percentage);
+
+/** VAT rate options for dropdowns/selects - derived from VAT_RATES */
+export const VAT_RATE_OPTIONS = VAT_RATES.map((rate) => ({
+	value: rate.value,
+	label: rate.label,
+}));
+
 export const PRICE_GROUPS = [1, 2, 3, 4] as const;
 
 export const UNIT_OPTIONS = ["ks", "kg", "l", "m", "m2", "m3"] as const;

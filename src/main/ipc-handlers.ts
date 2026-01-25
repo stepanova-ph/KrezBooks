@@ -280,8 +280,8 @@ export function registerIpcHandlers() {
 
 	ipcMain.handle(
 		"db:invoices:update",
-		async (_event, number: string, updates: Partial<Invoice>) => {
-			return handleIpcRequest(() => invoiceService.update(number, updates));
+		async (_event, prefix: string, number: string, updates: Partial<Invoice>) => {
+			return handleIpcRequest(() => invoiceService.update(prefix, number, updates));
 		},
 	);
 
@@ -302,30 +302,30 @@ export function registerIpcHandlers() {
 		}
 	});
 
+	// --------------------------------------------------------------------------
+	// WINDOW CONTROL HANDLERS
+	// --------------------------------------------------------------------------
+
+	ipcMain.on("window-minimize", (event) => {
+		const win = BrowserWindow.fromWebContents(event.sender);
+		if (win) win.minimize();
+	});
+
+	ipcMain.on("window-maximize", (event) => {
+		const win = BrowserWindow.fromWebContents(event.sender);
+		if (win) {
+			if (win.isMaximized()) {
+				win.unmaximize();
+			} else {
+				win.maximize();
+			}
+		}
+	});
+
+	ipcMain.on("window-close", (event) => {
+		const win = BrowserWindow.fromWebContents(event.sender);
+		if (win) win.close();
+	});
+
 	logger.info("✓ IPC handlers registered");
 }
-
-// ============================================================================
-// WINDOW CONTROL HANDLERS
-// ============================================================================
-
-ipcMain.on("window-minimize", (event) => {
-	const win = BrowserWindow.fromWebContents(event.sender);
-	if (win) win.minimize();
-});
-
-ipcMain.on("window-maximize", (event) => {
-	const win = BrowserWindow.fromWebContents(event.sender);
-	if (win) {
-		if (win.isMaximized()) {
-			win.unmaximize();
-		} else {
-			win.maximize();
-		}
-	}
-});
-
-ipcMain.on("window-close", (event) => {
-	const win = BrowserWindow.fromWebContents(event.sender);
-	if (win) win.close();
-});

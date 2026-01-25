@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Retail shop accounting and inventory management",
   "main": "dist/main/main.js",
-  "author": "Your Name",
+  "author": "Petra Hana Štěpánová",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -67,6 +67,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.11.0",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",

@@ -15,6 +15,7 @@ import {
 } from "../../../hooks/useStockMovement";
 import { ValidatedAutocomplete } from "../common/inputs/ValidatedAutocomplete";
 import { VAT_RATES, UNIT_OPTIONS } from "../../../config/constants";
+import { getVatPercentage } from "../../../utils/invoiceCalculations";
 import { InfoDialog } from "../common/dialog/InfoDialog";
 
 interface ItemFormProps {
@@ -115,8 +116,7 @@ function ItemForm({
 	const title = mode === "create" ? "Přidat novou položku" : "Upravit položku";
 	const submitLabel = mode === "create" ? "Přidat položku" : "Uložit změny";
 
-	const vatPercentage =
-		VAT_RATES[formData.vat_rate as keyof typeof VAT_RATES]?.percentage ?? 21;
+	const vatPercentage = getVatPercentage(formData.vat_rate);
 
 	return (
 		<>

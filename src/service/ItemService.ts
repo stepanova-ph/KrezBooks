@@ -1,26 +1,36 @@
-import { logger } from "../main/logger";
-import { getDatabase } from "../main/database";
 import { itemQueries } from "../main/queries";
 import { Item, CreateItemInput } from "../types/database";
+import { BaseService } from "./BaseService";
 
-export class ItemService {
+const ALLOWED_UPDATE_FIELDS = new Set([
+	"category",
+	"name",
+	"note",
+	"vat_rate",
+	"unit_of_measure",
+	"sale_price_group1",
+	"sale_price_group2",
+	"sale_price_group3",
+	"sale_price_group4",
+]);
+
+export class ItemService extends BaseService {
 	async getAll(): Promise<Item[]> {
-		const db = getDatabase();
+		const db = this.getDb();
 		const statement = db.prepare(itemQueries.getAll);
 		const items = statement.all();
 		return items as Item[];
 	}
 
 	async getOne(ean: string): Promise<Item | undefined> {
-		const db = getDatabase();
+		const db = this.getDb();
 		const statement = db.prepare(itemQueries.getOne);
 		const item = statement.get(ean);
-		logger.info(item);
 		return item as Item | undefined;
 	}
 
 	async create(item: CreateItemInput): Promise<{ changes: number }> {
-		const db = getDatabase();
+		const db = this.getDb();
 		const statement = db.prepare(itemQueries.create);
 
 		const itemData = {
@@ -47,76 +57,46 @@ export class ItemService {
 		ean: string,
 		updates: Partial<Item>,
 	): Promise<{ changes: number }> {
-		const db = getDatabase();
+		const db = this.getDb();
 
-		const fieldsToUpdate = Object.keys(updates).filter(
-			(key) => key !== "ean" && key !== "created_at" && key !== "updated_at",
+		const fieldsToUpdate = this.getFieldsToUpdate(updates, ["ean"]);
+
+		const sql = this.buildUpdateQuery(
+			"items",
+			fieldsToUpdate,
+			ALLOWED_UPDATE_FIELDS,
+			"ean = @ean"
 		);
-
-		if (fieldsToUpdate.length === 0) {
-			throw new Error("No fields to update");
-		}
-
-		const sql = this.buildUpdateQuery("items", fieldsToUpdate);
 		const statement = db.prepare(sql);
 
-		const updateData: any = { ean };
+		const updateData: Record<string, unknown> = { ean };
 		for (const field of fieldsToUpdate) {
-			updateData[field] = (updates as any)[field] ?? null;
+			updateData[field] = (updates as Record<string, unknown>)[field] ?? null;
 		}
 
 		const result = statement.run(updateData);
 
 		if (result.changes === 0) {
-			throw new Error("Item not found");
+			throw new Error("Položka nenalezena");
 		}
 
 		return { changes: result.changes };
 	}
 
 	async delete(ean: string): Promise<{ changes: number }> {
-		const db = getDatabase();
+		const db = this.getDb();
 		const statement = db.prepare(itemQueries.delete);
 		const result = statement.run(ean);
 
 		if (result.changes === 0) {
-			throw new Error("Item not found");
+			throw new Error("Položka nenalezena");
 		}
 
 		return { changes: result.changes };
 	}
 
-	private buildUpdateQuery(tableName: string, fields: string[]): string {
-		const allowedFields = new Set([
-			"category",
-			"name",
-			"note",
-			"vat_rate",
-			"unit_of_measure",
-			"sale_price_group1",
-			"sale_price_group2",
-			"sale_price_group3",
-			"sale_price_group4",
-		]);
-
-		const validFields = fields.filter((f) => allowedFields.has(f));
-		if (validFields.length !== fields.length) {
-			throw new Error("Invalid field names detected");
-		}
-
-		const setClause = validFields
-			.map((field) => `${field} = @${field}`)
-			.join(", ");
-
-		return `
-      UPDATE ${tableName}
-      SET ${setClause}, updated_at = CURRENT_TIMESTAMP
-      WHERE ean = @ean
-    `;
-	}
-
 	async getCategories(): Promise<string[]> {
-		const db = getDatabase();
+		const db = this.getDb();
 		const statement = db.prepare(itemQueries.getCategories);
 		const results = statement.all() as { category: string }[];
 		return results.map((r) => r.category);

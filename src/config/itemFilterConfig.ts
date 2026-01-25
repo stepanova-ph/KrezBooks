@@ -1,4 +1,5 @@
 import { FilterConfig, ItemFilterState } from "../types/filter";
+import { VAT_RATE_OPTIONS } from "./constants";
 
 /**
  * Filter configuration for Items table
@@ -21,11 +22,7 @@ export const itemFilterConfig: FilterConfig = {
 			field: "vat_rate",
 			columnId: "vat_rate",
 			placeholder: "Všechny sazby",
-			options: [
-				{ value: 0, label: "0% (nulová sazba)" },
-				{ value: 1, label: "21% (základní sazba)" },
-				{ value: 2, label: "12% (snížená sazba)" },
-			],
+			options: VAT_RATE_OPTIONS,
 		},
 		{
 			id: "unit_of_measure",

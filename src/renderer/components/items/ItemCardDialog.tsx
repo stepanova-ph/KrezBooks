@@ -18,7 +18,7 @@ import {
 	useLastBuyPriceByItem,
 } from "../../../hooks/useStockMovement";
 import { useItem } from "../../../hooks/useItems";
-import { VAT_RATES } from "../../../config/constants";
+import { getVatPercentage } from "../../../utils/invoiceCalculations";
 import {
 	formatPrice,
 	formatVatRateShort,
@@ -119,8 +119,7 @@ export function ItemCardDialog({
 
 	if (!item && !isLoading) return null;
 
-	const vatPercentage =
-		VAT_RATES[item?.vat_rate as keyof typeof VAT_RATES]?.percentage ?? 21;
+	const vatPercentage = getVatPercentage(item?.vat_rate ?? 2);
 
 	return (
 		<>

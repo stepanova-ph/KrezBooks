@@ -20,7 +20,7 @@ export function registerPrintHandlers() {
 					invoiceNumber,
 				);
 				if (!invoice) {
-					throw new Error("Invoice not found");
+					throw new Error("Faktura nenalezena");
 				}
 
 				const stockMovements = await stockMovementService.getByInvoice(
@@ -57,7 +57,7 @@ export function registerPrintHandlers() {
 					invoiceNumber,
 				);
 				if (!invoice) {
-					throw new Error("Invoice not found");
+					throw new Error("Faktura nenalezena");
 				}
 
 				const stockMovements = await stockMovementService.getByInvoice(
@@ -105,7 +105,12 @@ export function registerPrintHandlers() {
 				}
 
 				const data = await printWindow.webContents.printToPDF({
-					marginsType: 0,
+					margins: {
+						top: 0,
+						bottom: 0,
+						left: 0,
+						right: 0,
+					},
 					pageSize: "A4",
 					printBackground: true,
 					landscape: false,
