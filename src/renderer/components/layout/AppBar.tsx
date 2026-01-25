@@ -44,7 +44,7 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 					WebkitAppRegion: "no-drag",
 				}}
 			>
-				<Box
+				{/* <Box
 					component="img"
 					src="/krezbooks_logo.png"
 					alt="KrezBooks"
@@ -53,7 +53,7 @@ export function AppBar({ currentPage, onPageChange }: AppBarProps) {
 						width: "auto",
 						objectFit: "contain",
 					}}
-				/>
+				/> */}
 			</Box>
 
 			<Box

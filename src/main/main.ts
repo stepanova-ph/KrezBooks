@@ -24,6 +24,7 @@ function createWindow() {
 		minHeight: 720,
 		transparent: false,
 		frame: false,
+		icon: __dirname + "krezbooks_icon.svg",
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: true,
