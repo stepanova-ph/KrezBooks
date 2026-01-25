@@ -47,6 +47,7 @@
       "strictSSL": false
     },
     "win": {
+      "icon": "assets/krezbooks_icon.ico",
       "target": [
         "nsis"
       ]
