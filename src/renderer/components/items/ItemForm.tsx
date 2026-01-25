@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, MenuItem, Typography, Chip } from "@mui/material";
 import type { CreateItemInput, Item, VatRate } from "../../../types/database";
 import { itemSchema } from "../../../validation/itemSchema";
@@ -57,6 +57,18 @@ function ItemForm({
 
 	const { data: existingCategories = [] } = useItemCategories();
 
+	// Reset form data and errors when dialog opens
+	useEffect(() => {
+		if (open) {
+			if (initialData) {
+				setFormData({ ...defaultFormData, ...initialData });
+			} else {
+				setFormData(defaultFormData);
+			}
+			setErrors({});
+		}
+	}, [open, initialData]);
+
 	const itemEan = mode === "edit" && initialData?.ean ? initialData.ean : "";
 	const { data: stockAmount = 0 } = useStockAmountByItem(itemEan);
 	const { data: avgBuyPrice = 0 } = useAverageBuyPriceByItem(itemEan);
@@ -80,7 +92,7 @@ function ItemForm({
 	const handleBlur = (field: string) => {
 		const result = itemSchema.safeParse(formData);
 		if (!result.success) {
-			const fieldError = result.error.errors.find((e) => e.path[0] === field);
+			const fieldError = result.error.issues.find((e) => e.path[0] === field);
 			if (fieldError) {
 				setErrors((p) => ({ ...p, [field]: fieldError.message }));
 			}
@@ -91,7 +103,7 @@ function ItemForm({
 		const result = itemSchema.safeParse(formData);
 		if (!result.success) {
 			const newErrors: Record<string, string> = {};
-			result.error.errors.forEach((err) => {
+			result.error.issues.forEach((err) => {
 				if (err.path[0]) newErrors[err.path[0] as string] = err.message;
 			});
 			setErrors(newErrors);

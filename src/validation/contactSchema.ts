@@ -13,13 +13,9 @@ import { optionalString } from "./optionalString";
 
 export const contactSchema = z
 	.object({
-		ico: z.string(),
-		// .min(8, validationMessages.contact.ico.length)
-		// .max(8, validationMessages.contact.ico.length)
-		// .refine(
-		//   (val) => validateICO(val),
-		//   validationMessages.contact.ico.invalid,
-		// )
+		ico: z
+			.string()
+			.min(1, validationMessages.contact.ico.required),
 		dic: optionalString,
 		// .refine(
 		// (val) => validateDIC(val!, ""),

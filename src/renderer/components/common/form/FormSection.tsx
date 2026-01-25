@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Divider } from "@mui/material";
+import { Box, Typography, Divider, SxProps, Theme } from "@mui/material";
 
 interface FormSectionProps {
 	title?: string;
@@ -10,6 +10,7 @@ interface FormSectionProps {
 	direction?: "row" | "column";
 	mb?: number | string;
 	my?: number | string;
+	sx?: SxProps<Theme>;
 }
 
 export function FormSection({
@@ -20,12 +21,13 @@ export function FormSection({
 	hideDivider = false,
 	direction = "column",
 	my = undefined,
+	sx,
 }: FormSectionProps) {
 	const showHeader = !!title || !!actions;
 
 	return (
-		<Box px={4}>
-			<Box>
+		<Box px={4} sx={sx}>
+			<Box sx={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
 				{showHeader && (
 					<Box
 						sx={{
@@ -67,6 +69,8 @@ export function FormSection({
 						flexDirection: direction,
 						gap: spacing,
 						mx: -2,
+						flex: 1,
+						minHeight: 0,
 					}}
 				>
 					{children}

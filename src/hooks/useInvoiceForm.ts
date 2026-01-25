@@ -200,7 +200,7 @@ export function useInvoiceForm() {
 		}
 	};
 
-	const handleValidate = (): boolean => {
+	const handleValidate = (): { valid: boolean; errors: Record<string, string> } => {
 		const result = invoiceSchema.safeParse(formData);
 		if (!result.success) {
 			const fieldErrors: Record<string, string> = {};
@@ -210,10 +210,10 @@ export function useInvoiceForm() {
 				}
 			});
 			setErrors(fieldErrors);
-			return false;
+			return { valid: false, errors: fieldErrors };
 		}
 		setErrors({});
-		return true;
+		return { valid: true, errors: {} };
 	};
 
 	const handleReset = () => {

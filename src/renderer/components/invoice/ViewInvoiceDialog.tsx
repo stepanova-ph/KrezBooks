@@ -193,25 +193,16 @@ export function ViewInvoiceDialog({
 								pt: isType5 ? 2 : 3,
 								display: "flex",
 								flexDirection: "column",
-								overflowY: "scroll",
 							}}
 						>
-							<FormSection title="Položky dokladu" hideDivider>
-								<Box
-									sx={{
-										height: "100%",
-										display: "flex",
-										flexDirection: "column",
-										minHeight: 400,
-									}}
-								>
-									<InvoiceItemsList
-										items={invoiceItems}
-										onEditItem={() => {}}
-										onDeleteItem={() => {}}
-										readOnly={true}
-									/>
-								</Box>
+							<FormSection title="Položky dokladu" hideDivider sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+								<InvoiceItemsList
+									items={invoiceItems}
+									onEditItem={() => {}}
+									onDeleteItem={() => {}}
+									readOnly={true}
+									maxHeight="fill"
+								/>
 							</FormSection>
 						</Box>
 

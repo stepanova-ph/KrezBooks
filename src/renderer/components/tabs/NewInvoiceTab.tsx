@@ -152,15 +152,14 @@ function NewInvoiceTab() {
 	};
 
 	const handleSubmit = async () => {
-		if (!form.handleValidate()) {
-			const errorMessages = Object.entries(form.errors)
-				.map(([_, msg]) => `${msg}`)
-				.join("\n");
+		const validationResult = form.handleValidate();
+		if (!validationResult.valid) {
+			const errorMessages = Object.values(validationResult.errors).join("\n");
 
 			setAlertDialog({
 				open: true,
 				title: "Chyby ve formuláři",
-				message: `Opravte chyby ve formuláři: \n${errorMessages}`,
+				message: `Opravte chyby ve formuláři:\n${errorMessages}`,
 			});
 			return;
 		}
@@ -334,14 +333,13 @@ function NewInvoiceTab() {
 						pt: isType5 ? 2 : 3,
 						display: "flex",
 						flexDirection: "column",
-						overflowY: "scroll",
 					}}
 				>
 					<FormSection
 						hideDivider
 						title="Položky dokladu"
 						actions={
-							<Tooltip title="Přidat položku ze skladu">
+							<Tooltip title="Přidat položку ze skladu">
 								<IconButton
 									size="small"
 									color="primary"
@@ -351,15 +349,15 @@ function NewInvoiceTab() {
 								</IconButton>
 							</Tooltip>
 						}
+						sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}
 					>
-						<Box sx={{ height: "100%", minHeight: 400 }}>
-							<InvoiceItemsList
-								items={form.invoiceItems}
-								onEditItem={handleEditItem}
-								onDeleteItem={form.handleDeleteItem}
-								onOpenItemCard={(item) => setViewingItemEan(item.ean)}
-							/>
-						</Box>
+						<InvoiceItemsList
+							items={form.invoiceItems}
+							onEditItem={handleEditItem}
+							onDeleteItem={form.handleDeleteItem}
+							onOpenItemCard={(item) => setViewingItemEan(item.ean)}
+							maxHeight="fill"
+						/>
 					</FormSection>
 				</Box>
 

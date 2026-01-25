@@ -125,19 +125,18 @@ export function PickerDialog<T>({
 				{filterActions}
 			</Box>
 
-			<Box sx={{ maxHeight: "60vh", overflow: "auto" }}>
-				<DataTable
-					columns={columns}
-					data={data}
-					visibleColumnIds={new Set(columns.map((c) => c.id))}
-					renderRow={renderRow}
-					getRowKey={getRowKey}
-					emptyMessage={emptyMessage}
-					onFocusChange={handleFocusChange}
-					onRowDoubleClick={handleDoubleClick}
-					onEnterAction={handleEnterAction}
-				/>
-			</Box>
+			<DataTable
+				columns={columns}
+				data={data}
+				visibleColumnIds={new Set(columns.map((c) => c.id))}
+				renderRow={renderRow}
+				getRowKey={getRowKey}
+				emptyMessage={emptyMessage}
+				onFocusChange={handleFocusChange}
+				onRowDoubleClick={handleDoubleClick}
+				onEnterAction={handleEnterAction}
+				maxHeight="60vh"
+			/>
 		</Dialog>
 	);
 }

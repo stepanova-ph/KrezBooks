@@ -63,6 +63,8 @@ interface DataTableContentProps<T> {
 	orderBy?: OrderByConfig;
 	getCellContent?: (item: T, columnId: string) => any;
 	disableDrag?: true;
+	/** Custom maxHeight for the table container. Use "fill" to stretch to parent container height */
+	maxHeight?: string;
 }
 
 export function DataTableContent<T>({
@@ -80,7 +82,9 @@ export function DataTableContent<T>({
 	orderBy,
 	getCellContent,
 	disableDrag,
+	maxHeight,
 }: DataTableContentProps<T>) {
+	const isFillMode = maxHeight === "fill";
 	const controls = useTableControls<T>();
 	const tableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -271,16 +275,25 @@ export function DataTableContent<T>({
 	const virtualItems = rowVirtualizer.getVirtualItems();
 
 	return (
-		<Box>
+		<Box
+			sx={{
+				display: isFillMode ? "flex" : "block",
+				flexDirection: "column",
+				height: isFillMode ? "100%" : "auto",
+				minHeight: isFillMode ? 0 : "auto",
+			}}
+		>
 			<TableContainer
 				component={Paper}
 				ref={tableContainerRef}
 				sx={{
 					boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
 					border: (theme) => `1px solid ${theme.palette.divider}`,
-					overflow: "auto",
+					overflow: maxHeight === "none" ? "visible" : "auto",
 					position: "relative",
-					maxHeight: "calc(100vh - 165px)",
+					...(isFillMode
+						? { flex: 1, minHeight: 0 }
+						: { maxHeight: maxHeight === "none" ? "none" : (maxHeight || "calc(100vh - 165px)") }),
 				}}
 			>
 				<DndContext

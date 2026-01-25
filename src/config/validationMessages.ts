@@ -1,7 +1,7 @@
 export const validationMessages = {
 	contact: {
 		ico: {
-			length: "IČO musí mít 8 číslic.",
+			required: "IČO je povinné.",
 			invalid: "IČO není platné (kontrolní součet nesouhlasí).",
 		},
 		dic: {

@@ -49,6 +49,8 @@ interface DataTableProps<T> {
 	getCellContent?: (item: T, columnId: string) => any;
 	onFocusChange?: (item: T | null) => void;
 	disableDrag?: true;
+	/** Custom maxHeight for the table container. Set to "none" to disable internal scroll */
+	maxHeight?: string;
 }
 
 function DataTableInner<T>(props: DataTableProps<T>) {

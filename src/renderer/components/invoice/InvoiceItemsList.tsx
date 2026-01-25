@@ -1,4 +1,4 @@
-import { TableCell, Box } from "@mui/material";
+import { TableCell } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import BadgeIcon from "@mui/icons-material/Badge";
@@ -110,13 +110,14 @@ export function InvoiceItemsList({
 		}
 	};
 
-	const content = (
+	return (
 		<DataTable
 			disableDrag
 			columns={invoiceItemColumns}
 			data={items}
 			visibleColumnIds={visibleColumnIds}
 			contextMenuActions={contextMenuActions}
+			maxHeight={maxHeight}
 			renderRow={(item, visibleColumns) => (
 				<>
 					{visibleColumns.map((column) => (
@@ -138,10 +139,4 @@ export function InvoiceItemsList({
 			emptyMessage="Žádné položky"
 		/>
 	);
-
-	if (maxHeight) {
-		return <Box sx={{ maxHeight, overflow: "auto" }}>{content}</Box>;
-	}
-
-	return content;
 }
