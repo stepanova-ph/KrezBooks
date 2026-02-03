@@ -83,6 +83,51 @@ function stripPSCSpaces(value: string): string {
 	return value.replace(/\s/g, "");
 }
 
+/**
+ * Extracts and normalizes category from item name.
+ * Input: "Ch-klapka 75 bez přít." or "F-teflon.páska"
+ * Output: { category: "CH", name: "Klapka 75 bez přít." }
+ *
+ * Category normalization:
+ * - Extracts prefix before first "-"
+ * - Removes non-alphanumeric characters
+ * - Converts to uppercase
+ *
+ * Name normalization:
+ * - Removes the category prefix and "-"
+ * - Capitalizes first letter
+ */
+function extractCategoryFromName(rawName: string): { category: string | null; name: string } {
+	const trimmedName = rawName.trim();
+
+	const dashIndex = trimmedName.indexOf("-");
+	if (dashIndex === -1 || dashIndex === 0) {
+		// No dash or starts with dash - no category to extract
+		return { category: null, name: trimmedName };
+	}
+
+	const rawCategory = trimmedName.substring(0, dashIndex);
+	const nameAfterDash = trimmedName.substring(dashIndex + 1);
+
+	// Normalize category: remove non-alphanumeric, uppercase
+	const normalizedCategory = rawCategory
+		.replace(/[^a-zA-Z0-9]/g, "")
+		.toUpperCase();
+
+	// If category is empty after normalization, treat as no category
+	if (!normalizedCategory) {
+		return { category: null, name: trimmedName };
+	}
+
+	// Normalize name: trim and capitalize first letter
+	const trimmedNameAfterDash = nameAfterDash.trim();
+	const capitalizedName = trimmedNameAfterDash.length > 0
+		? trimmedNameAfterDash.charAt(0).toUpperCase() + trimmedNameAfterDash.slice(1)
+		: trimmedNameAfterDash;
+
+	return { category: normalizedCategory, name: capitalizedName };
+}
+
 function combineBankAccount(
 	accountNumber: string,
 	bankCode: string,
@@ -144,8 +189,10 @@ function processLegacyItemRow(
 	const issues: string[] = [];
 
 	const ean = getColumnValue(row, headers, "Číslo");
-	const name = getColumnValue(row, headers, "Název položky");
-	const category = getColumnValue(row, headers, "Skupina") || null;
+	const rawName = getColumnValue(row, headers, "Název položky");
+
+	// Extract category from name prefix (e.g., "Ch-klapka" -> category: "CH", name: "Klapka")
+	const { category, name } = extractCategoryFromName(rawName);
 	const vatRateRaw = getColumnValue(row, headers, "DPH");
 	const unitOfMeasure = getColumnValue(row, headers, "Jednotka") || "ks";
 

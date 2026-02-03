@@ -119,6 +119,51 @@ function rowToDbObject(
 	return obj;
 }
 
+/**
+ * Extracts and normalizes category from item name.
+ * Input: "Ch-klapka 75 bez přít." or "F-teflon.páska"
+ * Output: { category: "CH", name: "Klapka 75 bez přít." }
+ *
+ * Category normalization:
+ * - Extracts prefix before first "-"
+ * - Removes non-alphanumeric characters
+ * - Converts to uppercase
+ *
+ * Name normalization:
+ * - Removes the category prefix and "-"
+ * - Capitalizes first letter
+ */
+function extractCategoryFromName(rawName: string): { category: string | null; name: string } {
+	const trimmedName = rawName.trim();
+
+	const dashIndex = trimmedName.indexOf("-");
+	if (dashIndex === -1 || dashIndex === 0) {
+		// No dash or starts with dash - no category to extract
+		return { category: null, name: trimmedName };
+	}
+
+	const rawCategory = trimmedName.substring(0, dashIndex);
+	const nameAfterDash = trimmedName.substring(dashIndex + 1);
+
+	// Normalize category: remove non-alphanumeric, uppercase
+	const normalizedCategory = rawCategory
+		.replace(/[^a-zA-Z0-9]/g, "")
+		.toUpperCase();
+
+	// If category is empty after normalization, treat as no category
+	if (!normalizedCategory) {
+		return { category: null, name: trimmedName };
+	}
+
+	// Normalize name: trim and capitalize first letter
+	const trimmedNameAfterDash = nameAfterDash.trim();
+	const capitalizedName = trimmedNameAfterDash.length > 0
+		? trimmedNameAfterDash.charAt(0).toUpperCase() + trimmedNameAfterDash.slice(1)
+		: trimmedNameAfterDash;
+
+	return { category: normalizedCategory, name: capitalizedName };
+}
+
 // =============================================================================
 // TABLE IMPORTERS
 // =============================================================================
@@ -223,6 +268,13 @@ function importItemsTable(filePath: string, db: Database.Database): TableImportR
 
 				try {
 					const data = rowToDbObject(row, headers);
+
+					// Extract category from name prefix (e.g., "Ch-klapka" -> category: "CH", name: "Klapka")
+					if (typeof data.name === "string" && data.name) {
+						const { category, name } = extractCategoryFromName(data.name);
+						data.name = name;
+						data.category = category;
+					}
 
 					const validationResult = itemSchema.safeParse(data);
 					if (!validationResult.success) {
