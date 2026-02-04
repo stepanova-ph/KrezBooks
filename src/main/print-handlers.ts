@@ -125,5 +125,62 @@ export function registerPrintHandlers() {
 		},
 	);
 
+	ipcMain.handle(
+		"print:invoiceToSystemPrinter",
+		async (
+			_event,
+			invoicePrefix: string,
+			invoiceNumber: string,
+		) => {
+			return handleIpcRequest(async () => {
+				const invoice = await invoiceService.getOne(
+					invoicePrefix,
+					invoiceNumber,
+				);
+				if (!invoice) {
+					throw new Error("Faktura nenalezena");
+				}
+
+				const stockMovements = await stockMovementService.getByInvoice(
+					invoicePrefix,
+					invoiceNumber,
+				);
+
+				const items = await itemService.getAll();
+				const itemNames = new Map(items.map((item) => [item.ean, item.name]));
+
+				const printData = prepareInvoicePrintData(
+					invoice,
+					stockMovements,
+					itemNames,
+				);
+
+				const html = generateInvoiceHTML(printData);
+				const printWindow = new BrowserWindow({
+					show: true,
+					width: 800,
+					height: 600,
+					title: `Tisk faktury ${invoicePrefix}${invoiceNumber}`,
+					webPreferences: {
+						nodeIntegration: false,
+						contextIsolation: true,
+					},
+				});
+
+				await printWindow.loadURL(
+					`data:text/html;charset=utf-8,${encodeURIComponent(html)}`,
+				);
+
+				await new Promise((resolve) => setTimeout(resolve, 500));
+
+				// Use window.print() via JavaScript - this always shows the native print dialog
+				printWindow.webContents.executeJavaScript('window.print()');
+
+				logger.info(`Print dialog opened for: ${invoicePrefix}${invoiceNumber}`);
+				return { success: true };
+			});
+		},
+	);
+
 	logger.info("✓ Print handlers registered");
 }

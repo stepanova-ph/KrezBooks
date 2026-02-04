@@ -45,16 +45,16 @@ export const itemPickerFilterConfig: FilterConfig = {
 			id: "search",
 			type: "text-search",
 			label: "Hledat",
-			placeholder: "IČO, DIČ, název...",
+			placeholder: "EAN, kategorie...",
 			searchFields: [
 				{
 					field: "ean",
 					match: (value: string, query: string) => value.startsWith(query),
 				},
-				{ field: "name" },
 				{
-					field: "dic",
-					match: (value: string, query: string) => value.startsWith(query),
+					field: "category",
+					match: (value: string, query: string) =>
+						value.toLowerCase().startsWith(query.toLowerCase()),
 				},
 			],
 			columnId: null,

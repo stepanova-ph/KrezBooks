@@ -49,3 +49,23 @@ export function usePrintInvoiceToPDF() {
 		},
 	});
 }
+
+export function usePrintInvoiceToSystemPrinter() {
+	return useMutation({
+		mutationFn: async ({
+			invoicePrefix,
+			invoiceNumber,
+		}: GenerateHTMLParams) => {
+			const result = await window.electronAPI.print.invoiceToSystemPrinter(
+				invoicePrefix,
+				invoiceNumber,
+			);
+
+			if (!result.success) {
+				throw new Error(result.error || "Failed to print invoice");
+			}
+
+			return result.data as { success: boolean };
+		},
+	});
+}

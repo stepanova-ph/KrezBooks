@@ -91,7 +91,6 @@ export function InvoiceContactInfo({
 						}
 						onBlur={() => onBlur("modifier")}
 						error={errors.modifier}
-						required={requiresContactInfo}
 						disabled={disabled}
 						fullWidth
 					/>

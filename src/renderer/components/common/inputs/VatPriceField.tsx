@@ -15,6 +15,7 @@ interface VatPriceFieldProps {
 	grayWhenZero?: boolean;
 	size?: "small" | "medium";
 	readonly?: true;
+	buy?: true;
 }
 
 export function VatPriceField({
@@ -30,6 +31,7 @@ export function VatPriceField({
 	grayWhenZero,
 	size = "small",
 	readonly,
+	buy
 }: VatPriceFieldProps) {
 	const [basePrice, setBasePrice] = useState<number>(value);
 
@@ -94,19 +96,22 @@ export function VatPriceField({
 	return (
 		<Box>
 			<Grid container spacing={1} alignItems="center">
-				<Grid item xs="auto">
-					<Chip
-						label={groupNumber}
-						size="small"
-						color="primary"
-						sx={{
-							height: 28,
-							fontWeight: 600,
-							fontSize: "0.875rem",
-							minWidth: 28,
-						}}
-					/>
-				</Grid>
+				{!buy &&
+					<Grid item xs="auto">
+						<Chip
+							label={groupNumber}
+							size="small"
+							color="primary"
+							sx={{
+								height: 28,
+								fontWeight: 600,
+								fontSize: "0.875rem",
+								minWidth: 28,
+							}}
+						/>
+					</Grid>
+				}
+				
 
 				<Grid item xs>
 					<Grid container spacing={1}>

@@ -229,6 +229,10 @@ declare global {
 					invoiceNumber: string,
 					savePath?: string,
 				) => Promise<IpcResponse<{ path: string }>>;
+				invoiceToSystemPrinter: (
+					invoicePrefix: string,
+					invoiceNumber: string,
+				) => Promise<IpcResponse<{ success: boolean }>>;
 			};
 			shell: {
 				openEmail: (

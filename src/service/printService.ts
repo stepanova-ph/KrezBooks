@@ -134,19 +134,23 @@ function calculateTotals(items: InvoiceItemRow[]): InvoiceTotals {
 	// Save the sum BEFORE rounding
 	const totalBeforeRounding = totalWithVat;
 
-	// Smart rounding: transfer 1 cent between VAT and total when total is .99 or .01
-	const cents = Math.round((totalWithVat % 1) * 100);
-	let rounding = 0;
+	// Simple rounding to nearest whole crown
+	const roundedTotal = Math.round(totalWithVat);
+	const rounding = roundedTotal - totalWithVat;
+	totalWithVat = roundedTotal;
 
-	if (cents === 99) {
-		rounding = 0.01;
-		totalVatAmount += 0.01;
-		totalWithVat += 0.01;
-	} else if (cents === 1) {
-		rounding = -0.01;
-		totalVatAmount -= 0.01;
-		totalWithVat -= 0.01;
-	}
+	// Old smart rounding (only adjusted .99 and .01):
+	// const cents = Math.round((totalWithVat % 1) * 100);
+	// let rounding = 0;
+	// if (cents === 99) {
+	// 	rounding = 0.01;
+	// 	totalVatAmount += 0.01;
+	// 	totalWithVat += 0.01;
+	// } else if (cents === 1) {
+	// 	rounding = -0.01;
+	// 	totalVatAmount -= 0.01;
+	// 	totalWithVat -= 0.01;
+	// }
 
 	return {
 		totalWithoutVat,

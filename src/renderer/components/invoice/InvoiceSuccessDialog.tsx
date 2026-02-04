@@ -1,10 +1,9 @@
 import { Box } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Dialog } from "../common/dialog/Dialog";
-import { useGenerateInvoiceHTML, usePrintInvoiceToPDF } from "../../../hooks/usePrint";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import { useGenerateInvoiceHTML, usePrintInvoiceToSystemPrinter } from "../../../hooks/usePrint";
+import PrintIcon from "@mui/icons-material/Print";
 import EmailIcon from "@mui/icons-material/Email";
-import { InfoDialog } from "../common/dialog/InfoDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 
 interface InvoiceSuccessDialogProps {
@@ -23,14 +22,12 @@ export function InvoiceSuccessDialog({
 	invoiceEmail,
 }: InvoiceSuccessDialogProps) {
 	const [previewHTML, setPreviewHTML] = useState("");
-	const [infoDialogOpen, setInfoDialogOpen] = useState(false);
-	const [infoMessage, setInfoMessage] = useState("");
 	const [alertDialogOpen, setAlertDialogOpen] = useState(false);
 	const [alertMessage, setAlertMessage] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 
 	const generateHTML = useGenerateInvoiceHTML();
-	const printToPDF = usePrintInvoiceToPDF();
+	const printToSystemPrinter = usePrintInvoiceToSystemPrinter();
 
 	// Load preview when dialog opens
 	useEffect(() => {
@@ -55,24 +52,12 @@ export function InvoiceSuccessDialog({
 		}
 	}, [open, invoicePrefix, invoiceNumber]);
 
-	const handlePrintToPDF = async () => {
+	const handlePrint = async () => {
 		try {
-			const dialogResult = await window.electronAPI.dialog.saveFile(
-				`Faktura_${invoicePrefix}${invoiceNumber}.pdf`,
-				"Uložit fakturu jako PDF",
-			);
-
-			if (dialogResult.canceled || !dialogResult.path) {
-				return;
-			}
-
-			const result = await printToPDF.mutateAsync({
+			await printToSystemPrinter.mutateAsync({
 				invoicePrefix,
 				invoiceNumber,
-				savePath: dialogResult.path,
 			});
-			setInfoMessage(`Faktura byla uložena do:\n${result.path}`);
-			setInfoDialogOpen(true);
 		} catch (error) {
 			console.error("Print failed:", error);
 			setAlertMessage("Nepodařilo se vytisknout fakturu");
@@ -111,11 +96,11 @@ export function InvoiceSuccessDialog({
 				fullWidth
 				actions={[
 					{
-						label: "Vytisknout do PDF",
-						onClick: handlePrintToPDF,
+						label: "Tisknout",
+						onClick: handlePrint,
 						variant: "outlined",
-						icon: <PictureAsPdfIcon />,
-						disabled: printToPDF.isPending,
+						icon: <PrintIcon />,
+						disabled: printToSystemPrinter.isPending,
 					},
 					{
 						label: "Poslat emailem",
@@ -123,7 +108,7 @@ export function InvoiceSuccessDialog({
 						variant: "outlined",
 						icon: <EmailIcon />,
 					},
-						{
+					{
 						label: "OK",
 						onClick: handleClose,
 						variant: "contained",
@@ -147,13 +132,6 @@ export function InvoiceSuccessDialog({
 					)}
 				</Box>
 			</Dialog>
-
-			<InfoDialog
-				open={infoDialogOpen}
-				title="Úspěch"
-				message={infoMessage}
-				onConfirm={() => setInfoDialogOpen(false)}
-			/>
 
 			<AlertDialog
 				open={alertDialogOpen}

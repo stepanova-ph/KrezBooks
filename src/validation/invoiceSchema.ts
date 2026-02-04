@@ -82,7 +82,7 @@ export const invoiceSchema = z
 			}
 		}
 
-		// date_due, ico, modifier, variable_symbol required for types 2 & 4
+		// date_due, ico, variable_symbol required for types 2 & 4 (modifier is optional)
 		if (requiresInvoiceFields(data.type)) {
 			if (!data.date_due) {
 				ctx.addIssue({
@@ -97,14 +97,6 @@ export const invoiceSchema = z
 					path: ["ico"],
 					code: z.ZodIssueCode.custom,
 					message: validationMessages.invoice.ico.required,
-				});
-			}
-
-			if (data.modifier === undefined || data.modifier === null) {
-				ctx.addIssue({
-					path: ["modifier"],
-					code: z.ZodIssueCode.custom,
-					message: validationMessages.invoice.modifier.required,
 				});
 			}
 

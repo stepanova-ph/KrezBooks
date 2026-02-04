@@ -212,6 +212,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
 				invoiceNumber,
 				savePath,
 			),
+		invoiceToSystemPrinter: (invoicePrefix: string, invoiceNumber: string) =>
+			ipcRenderer.invoke(
+				"print:invoiceToSystemPrinter",
+				invoicePrefix,
+				invoiceNumber,
+			),
 	},
 	shell: {
 		openEmail: (email: string, subject: string, body: string) =>

@@ -44,9 +44,18 @@ export function ItemPickerDialog({
 		itemPickerFilterConfig,
 	);
 
+	// Sort by category alphabetically (A-Z), items without category at the end
+	const sortedItems = [...filteredItems].sort((a, b) => {
+		const catA = a.category || "";
+		const catB = b.category || "";
+		if (!catA && catB) return 1;
+		if (catA && !catB) return -1;
+		return catA.localeCompare(catB, "cs");
+	});
+
 	const displayItems = hideSelected
-		? filteredItems.filter((item) => !selectedItemEans?.has(item.ean))
-		: filteredItems;
+		? sortedItems.filter((item) => !selectedItemEans?.has(item.ean))
+		: sortedItems;
 
 	const renderRow = (item: Item, visibleColumns: Column[]) => {
 		const isSelected = selectedItemEans?.has(item.ean) || false;
@@ -98,7 +107,7 @@ export function ItemPickerDialog({
 			getRowKey={(item) => item.ean}
 			renderRow={renderRow}
 			emptyMessage="Žádné položky nenalezeny"
-			searchPlaceholder="EAN, název, kategorie..."
+			searchPlaceholder="EAN, kategorie..."
 			filterValue={filters.search || ""}
 			onFilterChange={(value) => setFilters({ ...filters, search: value })}
 			filterActions={

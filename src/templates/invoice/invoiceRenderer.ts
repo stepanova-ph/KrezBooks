@@ -77,6 +77,7 @@ function generatePageHeader(
         <div class="party-box party-supplier">
           <h3 class="party-title">Dodavatel</h3>
           <div class="party-content">
+            <p class="party-name">${seller.ownerName}</p>
             <p class="party-name">${seller.companyName}</p>
             <p>IČO: ${seller.ico}</p>
             ${seller.dic ? `<p>DIČ: ${seller.dic}</p>` : ""}

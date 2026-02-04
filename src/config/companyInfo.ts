@@ -1,6 +1,6 @@
 export const COMPANY_INFO = {
 	ico: "46534792",
-	dic: "CZ46534792",
+	dic: "CZ6209281859",
 
 	ownerName: "Zdeněk Zbořil",
 	companyName: "KREZBO",

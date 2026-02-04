@@ -8,15 +8,17 @@ import {
 	Typography,
 	useTheme,
 	Chip,
+	Button,
 } from "@mui/material";
 import { Item, InvoiceType } from "../../../../types/database";
 import { useKeyboardShortcuts } from "../../../../hooks/keyboard/useKeyboardShortcuts";
 import { NumberTextField } from "../../common/inputs/NumberTextField";
 import { VatPriceField } from "../../common/inputs/VatPriceField";
 import { VAT_RATES } from "../../../../config/constants";
-import { useStockAmountByItem } from "../../../../hooks/useStockMovement";
+import { useStockAmountByItem, useLastBuyPriceByItem } from "../../../../hooks/useStockMovement";
 import { FormSection } from "../../common/form/FormSection";
 import { Dialog } from "../../common/dialog/Dialog";
+import { formatPrice } from "../../../../utils/formattingUtils";
 
 interface ItemAmountPriceDialogProps {
 	open: boolean;
@@ -77,16 +79,18 @@ export function ItemAmountPriceDialog({
 	const [customPrice, setCustomPrice] = useState<number>(0);
 
 	const { data: stockAmount = 0 } = useStockAmountByItem(item?.ean || "");
+	const { data: lastBuyPrice } = useLastBuyPriceByItem(item?.ean || "");
 
 	const isType5 = invoiceType === 5;
 	const isSale = invoiceType === 3 || invoiceType === 4;
+	const isBuy = invoiceType === 1 || invoiceType === 2;
 	const isEditing = initialAmount !== undefined && initialPrice !== undefined;
 
 	useEffect(() => {
 		if (open && item) {
 			setAmount(initialAmount ?? 1);
 
-			if (isType5) {
+			if (isType5 || isBuy) {
 				setSelectedPrice("custom");
 				setCustomPrice(initialPrice ?? 0);
 			} else {
@@ -103,7 +107,7 @@ export function ItemAmountPriceDialog({
 				}
 			}
 		}
-	}, [open, item, isType5, contactPriceGroup, initialAmount, initialPrice]);
+	}, [open, item, isType5, isBuy, contactPriceGroup, initialAmount, initialPrice]);
 
 	const getFinalPrice = (): number => {
 		if (!item) return 0;
@@ -213,7 +217,51 @@ export function ItemAmountPriceDialog({
 					/>
 				)}
 
-				{!isType5 && (
+				{isBuy && (
+					<Box>
+						<VatPriceField
+							label="Nákupní cena"
+							name="buy_price"
+							value={customPrice}
+							vatRate={vatPercentage}
+							onChange={(e) => setCustomPrice(parseFloat(e.target.value) || 0)}
+							precision={2}
+							min={0}
+							buy
+						/>
+						<Box
+							sx={{
+								display: "flex",
+								alignItems: "center",
+								gap: 2,
+								mt: 2,
+								p: 1.5,
+								bgcolor: "action.hover",
+								borderRadius: 1,
+							}}
+						>
+							<Typography variant="body2" color="text.secondary">
+								Poslední nákupní cena (bez DPH):
+							</Typography>
+							<Typography variant="body2" sx={{ fontWeight: 600 }}>
+								{lastBuyPrice !== undefined && lastBuyPrice > 0
+									? formatPrice(lastBuyPrice)
+									: "—"}
+							</Typography>
+							<Button
+								size="small"
+								variant="outlined"
+								disabled={!lastBuyPrice || lastBuyPrice === 0}
+								onClick={() => setCustomPrice(lastBuyPrice || 0)}
+								sx={{ ml: "auto" }}
+							>
+								Použít poslední
+							</Button>
+						</Box>
+					</Box>
+				)}
+
+				{!isType5 && !isBuy && (
 					<RadioGroup
 						value={selectedPrice}
 						onChange={(e) => setSelectedPrice(e.target.value as PriceGroup)}
@@ -343,7 +391,7 @@ export function ItemAmountPriceDialog({
 					gap: 4,
 					p: 2,
 					mx: 2,
-					mt: 3,
+					mt: isBuy ? 1 : 3,
 					bgcolor: "background.default",
 					borderRadius: 1,
 				}}

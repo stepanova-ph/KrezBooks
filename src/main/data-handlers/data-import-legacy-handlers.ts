@@ -49,7 +49,7 @@ function parseTSV(content: string): { headers: string[]; rows: string[][] } {
 	return { headers, rows };
 }
 
-function parseDecimalToHellers(value: string): number | null {
+function parseDecimalPrice(value: string): number | null {
 	if (!value || value.trim() === "") return 0;
 
 	const normalized = value.replace(",", ".").replace(/\s/g, "");
@@ -57,7 +57,7 @@ function parseDecimalToHellers(value: string): number | null {
 
 	if (isNaN(parsed)) return null;
 
-	return Math.round(parsed * 100);
+	return parsed;
 }
 
 function parseVatRate(value: string): number | null {
@@ -213,10 +213,10 @@ function processLegacyItemRow(
 		issues.push(`Invalid VAT rate: "${vatRateRaw}"`);
 	}
 
-	const salePriceGroup1 = parseDecimalToHellers(salePriceGroup1Raw);
-	const salePriceGroup2 = parseDecimalToHellers(salePriceGroup2Raw);
-	const salePriceGroup3 = parseDecimalToHellers(salePriceGroup3Raw);
-	const salePriceGroup4 = parseDecimalToHellers(salePriceGroup4Raw);
+	const salePriceGroup1 = parseDecimalPrice(salePriceGroup1Raw);
+	const salePriceGroup2 = parseDecimalPrice(salePriceGroup2Raw);
+	const salePriceGroup3 = parseDecimalPrice(salePriceGroup3Raw);
+	const salePriceGroup4 = parseDecimalPrice(salePriceGroup4Raw);
 
 	if (salePriceGroup1 === null)
 		issues.push(`Invalid price Prodej 1: "${salePriceGroup1Raw}"`);
