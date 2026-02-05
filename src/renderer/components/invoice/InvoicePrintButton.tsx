@@ -29,6 +29,7 @@ export function InvoicePrintButtons({
 	const [previewHTML, setPreviewHTML] = useState("");
 	const [alertDialogOpen, setAlertDialogOpen] = useState(false);
 	const [alertMessage, setAlertMessage] = useState("");
+	const [alertTitle, setAlertTitle] = useState("Chyba");
 
 	const generateHTML = useGenerateInvoiceHTML();
 	const printToSystemPrinter = usePrintInvoiceToSystemPrinter();
@@ -48,6 +49,7 @@ export function InvoicePrintButtons({
 			setPreviewOpen(true);
 		} catch (error) {
 			console.error("Preview failed:", error);
+			setAlertTitle("Chyba");
 			setAlertMessage("Nepodařilo se vygenerovat náhled faktury");
 			setAlertDialogOpen(true);
 		}
@@ -62,6 +64,7 @@ export function InvoicePrintButtons({
 			setPreviewOpen(false);
 		} catch (error) {
 			console.error("Print failed:", error);
+			setAlertTitle("Chyba");
 			setAlertMessage("Nepodařilo se vytisknout fakturu");
 			setAlertDialogOpen(true);
 		}
@@ -83,13 +86,15 @@ export function InvoicePrintButtons({
 			const result = await window.electronAPI.shell.openEmail(email, subject, body, pdfResult.path);
 			console.log("Email result:", result);
 
-			// Inform user about PDF location if attachment may not work
+			// Inform user about success
 			if (result.success && result.data?.opened) {
-				setAlertMessage(`E-mail byl otevřen. PDF bylo uloženo do:\n${pdfResult.path}\n\nPokud příloha nebyla automaticky přidána, prosím přiložte PDF ručně.`);
+				setAlertTitle("Hotovo");
+				setAlertMessage(`E-mailový návrh byl vytvořen s přílohou faktury.\n\nProsím zkontrolujte a odešlete e-mail.`);
 				setAlertDialogOpen(true);
 			}
 		} catch (error) {
 			console.error("Email failed:", error);
+			setAlertTitle("Chyba");
 			setAlertMessage("Nepodařilo se otevřít e-mailového klienta nebo vygenerovat PDF");
 			setAlertDialogOpen(true);
 		}
@@ -149,7 +154,7 @@ export function InvoicePrintButtons({
 
 			<AlertDialog
 				open={alertDialogOpen}
-				title="Chyba"
+				title={alertTitle}
 				message={alertMessage}
 				onConfirm={() => setAlertDialogOpen(false)}
 			/>

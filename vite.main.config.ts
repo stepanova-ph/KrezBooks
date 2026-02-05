@@ -48,6 +48,8 @@ export default defineConfig({
         'fs',
         'url',
         'worker_threads',
+        'child_process',
+        'util',
       ],
       output: {
         format: 'cjs',
