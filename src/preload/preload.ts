@@ -220,7 +220,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 			),
 	},
 	shell: {
-		openEmail: (email: string, subject: string, body: string) =>
-			ipcRenderer.invoke("shell:openEmail", email, subject, body),
+		openEmail: (email: string, subject: string, body: string, attachmentPath?: string) =>
+			ipcRenderer.invoke("shell:openEmail", email, subject, body, attachmentPath),
 	},
 });

@@ -7,6 +7,7 @@ import type {
 	CreateStockMovementInput,
 	Invoice,
 	CreateInvoiceInput,
+	StockMovementWithInvoiceInfo,
 } from "./types/database";
 import type { IpcResponse } from "./main/ipcWrapper";
 
@@ -171,6 +172,10 @@ declare global {
 				create: (
 					invoice: CreateInvoiceInput,
 				) => Promise<IpcResponse<{ changes: number }>>;
+				createWithStockMovements: (
+					invoice: CreateInvoiceInput,
+					stockMovements: CreateStockMovementInput[],
+				) => Promise<IpcResponse<{ changes: number; stockMovementChanges: number }>>;
 				update: (
 					number: string,
 					updates: Partial<Invoice>,
@@ -196,13 +201,34 @@ declare global {
 					invoiceNumber: string,
 					savePath?: string,
 				) => Promise<IpcResponse<{ path: string }>>;
+				invoiceToSystemPrinter: (
+					invoicePrefix: string,
+					invoiceNumber: string,
+				) => Promise<IpcResponse<{ success: boolean }>>;
+			};
+			backup: {
+				getPath: () => Promise<{
+					success: boolean;
+					error?: string;
+					path?: string;
+				}>;
+				setPath: (backupPath: string) => Promise<{
+					success: boolean;
+					error?: string;
+				}>;
+				create: () => Promise<{
+					success: boolean;
+					error?: string;
+					path?: string;
+				}>;
 			};
 			shell: {
 				openEmail: (
 					email: string,
 					subject: string,
 					body: string,
-				) => Promise<IpcResponse<void>>;
+					attachmentPath?: string,
+				) => Promise<IpcResponse<{ opened: boolean; pdfPath?: string }>>;
 			};
 		};
 	}

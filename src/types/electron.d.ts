@@ -239,7 +239,8 @@ declare global {
 					email: string,
 					subject: string,
 					body: string,
-				) => Promise<IpcResponse<{ opened: boolean }>>;
+					attachmentPath?: string,
+				) => Promise<IpcResponse<{ opened: boolean; pdfPath?: string }>>;
 			};
 		};
 	}

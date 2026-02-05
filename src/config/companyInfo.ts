@@ -11,7 +11,7 @@ export const COMPANY_INFO = {
 	phone2: "+420 602 795 008",
 	email: "krezbo@volny.cz",
 	website: 'www.krezbo.cz',
-	bankAccount: "123456789/8765",
+	bankAccount: "2110072282/2700",
 
 	invoiceIssuedBy: "Bořivoj Krecl, Zdeněk Zbořil",
 	invoiceNotes: `ŽU: Bílovec č. j. 003912 / 00 / 03492L

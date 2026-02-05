@@ -1,10 +1,11 @@
 import { Button, Box, IconButton } from "@mui/material";
 import { useState } from "react";
-import { useGenerateInvoiceHTML, usePrintInvoiceToSystemPrinter } from "../../../hooks/usePrint";
+import { useGenerateInvoiceHTML, usePrintInvoiceToSystemPrinter, usePrintInvoiceToPDF } from "../../../hooks/usePrint";
 import PrintIcon from "@mui/icons-material/Print";
 import EmailIcon from "@mui/icons-material/Email";
 import { Dialog } from "../common/dialog/Dialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
+import { COMPANY_INFO } from "../../../config/companyInfo";
 
 interface InvoicePrintButtonsProps {
 	invoicePrefix: string;
@@ -31,6 +32,7 @@ export function InvoicePrintButtons({
 
 	const generateHTML = useGenerateInvoiceHTML();
 	const printToSystemPrinter = usePrintInvoiceToSystemPrinter();
+	const printToPDF = usePrintInvoiceToPDF();
 
 	if (!isPrintSupported) {
 		return null;
@@ -67,16 +69,28 @@ export function InvoicePrintButtons({
 
 	const handleEmail = async () => {
 		try {
+			// First, generate the PDF
+			const pdfResult = await printToPDF.mutateAsync({
+				invoicePrefix,
+				invoiceNumber,
+			});
+
 			const email = invoiceEmail || "";
 			const subject = `Faktura ${invoicePrefix}${invoiceNumber}`;
-			const body = `Dobrý den,\n\nv příloze zasílám fakturu ${invoicePrefix}${invoiceNumber}.\n\nS pozdravem`;
+			const body = `Dobrý den,\n\nv příloze zasílám fakturu ${invoicePrefix}${invoiceNumber}.\n\nS pozdravem,\n${COMPANY_INFO.ownerName}\n${COMPANY_INFO.companyName}`;
 
-			console.log("Opening email with:", { email, subject, body });
-			const result = await window.electronAPI.shell.openEmail(email, subject, body);
+			console.log("Opening email with:", { email, subject, body, pdfPath: pdfResult.path });
+			const result = await window.electronAPI.shell.openEmail(email, subject, body, pdfResult.path);
 			console.log("Email result:", result);
+
+			// Inform user about PDF location if attachment may not work
+			if (result.success && result.data?.opened) {
+				setAlertMessage(`E-mail byl otevřen. PDF bylo uloženo do:\n${pdfResult.path}\n\nPokud příloha nebyla automaticky přidána, prosím přiložte PDF ručně.`);
+				setAlertDialogOpen(true);
+			}
 		} catch (error) {
 			console.error("Email failed:", error);
-			setAlertMessage("Nepodařilo se otevřít e-mailového klienta");
+			setAlertMessage("Nepodařilo se otevřít e-mailového klienta nebo vygenerovat PDF");
 			setAlertDialogOpen(true);
 		}
 	};
