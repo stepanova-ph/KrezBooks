@@ -1,8 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
+import { getCurrencySymbol } from "../../../utils/formattingUtils";
 
 interface InvoiceTotalsProps {
 	items: InvoiceItem[];
+	isInEur?: boolean;
 }
 
 function calculateTotals(items: InvoiceItem[]) {
@@ -29,8 +31,9 @@ function calculateTotals(items: InvoiceItem[]) {
 	};
 }
 
-export function InvoiceTotals({ items }: InvoiceTotalsProps) {
+export function InvoiceTotals({ items, isInEur = false }: InvoiceTotalsProps) {
 	const { totalWithoutVat, totalVat, totalWithVat } = calculateTotals(items);
+	const currencySymbol = getCurrencySymbol(isInEur);
 
 	return (
 		<Box
@@ -53,7 +56,7 @@ export function InvoiceTotals({ items }: InvoiceTotalsProps) {
 						Celkem bez DPH:
 					</Typography>
 					<Typography variant="h6" fontWeight={700}>
-						{totalWithoutVat.toFixed(2)} Kč
+						{totalWithoutVat.toFixed(2)} {currencySymbol}
 					</Typography>
 				</Box>
 				<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -61,7 +64,7 @@ export function InvoiceTotals({ items }: InvoiceTotalsProps) {
 						DPH:
 					</Typography>
 					<Typography variant="h6" fontWeight={700} color="text.primary">
-						{totalVat.toFixed(2)} Kč
+						{totalVat.toFixed(2)} {currencySymbol}
 					</Typography>
 				</Box>
 				<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -69,7 +72,7 @@ export function InvoiceTotals({ items }: InvoiceTotalsProps) {
 						Celkem s DPH:
 					</Typography>
 					<Typography variant="h6" fontWeight={700} color="primary.main">
-						{totalWithVat.toFixed(2)} Kč
+						{totalWithVat.toFixed(2)} {currencySymbol}
 					</Typography>
 				</Box>
 			</Box>

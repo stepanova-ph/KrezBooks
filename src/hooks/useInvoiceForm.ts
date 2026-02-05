@@ -25,7 +25,9 @@ export interface InvoiceFormData {
 	date_tax: string;
 	date_due: string;
 	variable_symbol: string;
+	order_number: string;
 	note: string;
+	is_in_eur: boolean;
 	ico: string;
 	modifier: number | undefined;
 	dic: string;
@@ -53,12 +55,14 @@ const defaultFormData: InvoiceFormData = {
 	number: "",
 	prefix: "",
 	type: DEFAULT_INVOICE_TYPE,
-	payment_method: undefined,
+	payment_method: 1,
 	date_issue: getInitialDate(),
 	date_tax: addDays(getInitialDate(), DATE_TAX_OFFSET_DAYS),
 	date_due: addDays(getInitialDate(), DATE_DUE_OFFSET_DAYS),
 	variable_symbol: "",
+	order_number: "",
 	note: "",
+	is_in_eur: false,
 	ico: "",
 	modifier: undefined,
 	dic: "",
@@ -144,7 +148,7 @@ export function useInvoiceForm() {
 		});
 	}, [formData, invoiceItems, selectedContact, setInvoiceFormState]);
 
-	const handleChange = (field: string, value: string | number) => {
+	const handleChange = (field: string, value: string | number | boolean) => {
 		if (field === "variable_symbol") {
 			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
 			if (value !== autoVariableSymbol) {

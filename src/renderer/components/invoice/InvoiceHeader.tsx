@@ -14,8 +14,11 @@ interface InvoiceHeaderProps {
 	dateTax: string;
 	dateDue: string;
 	variableSymbol: string;
+	orderNumber: string;
+	note: string;
+	isInEur: boolean;
 	errors: Record<string, string>;
-	onChange: (field: string, value: string | number) => void;
+	onChange: (field: string, value: string | number | boolean) => void;
 	onBlur: (field: string) => void;
 	disabled?: true;
 	headerAction?: React.ReactNode;
@@ -34,7 +37,7 @@ function headerType5({
 	return (
 		<FormSection title="Hlavička" my={2} actions={headerAction}>
 			<Grid container spacing={2}>
-				<Grid item xs={3.8}>
+				<Grid item xs={4}>
 					<ValidatedTextField
 						select
 						required
@@ -81,13 +84,10 @@ function headerType5({
 								onBlur("prefix");
 							}
 						}}
-						inputProps={{
-							style: { textTransform: "uppercase", textAlign: "right" },
-						}}
 					/>
 				</Grid>
 
-				<Grid item xs={3.1}>
+				<Grid item xs={3}>
 					<ValidatedTextField
 						required
 						fullWidth
@@ -109,13 +109,21 @@ function headerType5({
 					/>
 				</Grid>
 
-				<Grid item xs={3.1}>
+				<Grid item xs={3}>
 					<ValidatedDateField
 						label="Datum vystavení"
 						name="date_issue"
-						value={dateIssue}
-						onChange={(value) => onChange("date_issue", value)}
-						onBlur={() => onBlur("date_issue")}
+						value={dateIssue || ""}
+						onChange={(value) => {
+							if (onChange) {
+								onChange("date_issue", value);
+							}
+						}}
+						onBlur={() => {
+							if (onBlur) {
+								onBlur("date_issue");
+							}
+						}}
 						error={errors?.date_issue}
 						required
 						disabled={disabled}
@@ -136,6 +144,9 @@ export function InvoiceHeader({
 	dateTax,
 	dateDue,
 	variableSymbol,
+	orderNumber,
+	note,
+	isInEur,
 	errors,
 	disabled,
 	onChange,
@@ -147,6 +158,9 @@ export function InvoiceHeader({
 	const showDateDue = type === 2 || type === 4; // 2,4
 	const requireInvoiceFields24 = type === 2 || type === 4; // for variable_symbol (+ your ICO/mod elsewhere)
 	const showPaymentMethod = type === 2 || type === 4; // keep your original behavior
+	const showVariableSymbol = requireInvoiceFields24 && paymentMethod === 1; // only for bank transfer
+	const showOrderNumber = type === 4; // only for Prodej faktura
+	const showDodatek = type === 3 || type === 4; // only for Prodej types
 
 	if (isType5) {
 		return headerType5({
@@ -274,19 +288,17 @@ export function InvoiceHeader({
 						<ValidatedTextField
 							label="Způsob úhrady"
 							name="payment_method"
-							value={paymentMethod ?? ""}
+							value={paymentMethod ?? 1}
 							onChange={(e: { target: { value: any } }) =>
 								onChange("payment_method", Number(e.target.value))
 							}
 							onBlur={() => onBlur("payment_method")}
 							error={errors.payment_method}
+							required
 							select
 							disabled={disabled}
 							fullWidth
 						>
-							<MenuItem value="">
-								<em>Žádný</em>
-							</MenuItem>
 							{PAYMENT_METHOD_TYPES.map((option) => (
 								<MenuItem key={option.value} value={option.value}>
 									{option.label}
@@ -296,8 +308,8 @@ export function InvoiceHeader({
 					</Grid>
 				)}
 
-				{/* Variabilní symbol – jen 2,4 (povinné) */}
-				{requireInvoiceFields24 && (
+				{/* Variabilní symbol – jen pro bankovní převod (payment_method === 1) */}
+				{showVariableSymbol && (
 					<Grid item xs={6}>
 						<ValidatedTextField
 							label="Variabilní symbol"
@@ -311,6 +323,45 @@ export function InvoiceHeader({
 							required
 							disabled={disabled}
 							fullWidth
+						/>
+					</Grid>
+				)}
+
+				{/* Číslo objednávky – jen pro Prodej faktura (type 4) */}
+				{showOrderNumber && (
+					<Grid item xs={12}>
+						<ValidatedTextField
+							label="Číslo objednávky"
+							name="order_number"
+							value={orderNumber}
+							onChange={(e: { target: { value: string | number } }) =>
+								onChange("order_number", e.target.value)
+							}
+							onBlur={() => onBlur("order_number")}
+							error={errors.order_number}
+							disabled={disabled}
+							fullWidth
+						/>
+					</Grid>
+				)}
+
+				{/* Dodatek – jen pro Prodej (types 3 & 4) */}
+				{showDodatek && (
+					<Grid item xs={12}>
+						<ValidatedTextField
+							label="Dodatek"
+							name="note"
+							value={note}
+							onChange={(e: { target: { value: string } }) =>
+								onChange("note", e.target.value)
+							}
+							onBlur={() => onBlur("note")}
+							error={errors.note}
+							disabled={disabled}
+							fullWidth
+							multiline
+							rows={3}
+							placeholder="Dodatečné informace k dokladu..."
 						/>
 					</Grid>
 				)}

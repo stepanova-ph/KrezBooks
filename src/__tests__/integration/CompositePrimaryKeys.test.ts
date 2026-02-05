@@ -31,6 +31,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -62,6 +63,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -97,6 +99,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -133,6 +136,7 @@ describe("Composite Primary Key Edge Cases", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -144,6 +148,7 @@ describe("Composite Primary Key Edge Cases", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 			}).toThrow(/NOT NULL constraint failed/);
 
@@ -157,6 +162,7 @@ describe("Composite Primary Key Edge Cases", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -168,6 +174,7 @@ describe("Composite Primary Key Edge Cases", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 			}).toThrow(/NOT NULL constraint failed/);
 		});
@@ -182,6 +189,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: "Test Invoice",
 				ico: null,
 				modifier: null,
@@ -221,6 +229,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -232,6 +241,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -321,6 +331,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -332,6 +343,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			const movement1 = {
@@ -393,6 +405,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -404,6 +417,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -452,6 +466,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -463,6 +478,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -521,6 +537,7 @@ describe("Composite Primary Key Edge Cases", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -532,6 +549,7 @@ describe("Composite Primary Key Edge Cases", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 			}
 		});
@@ -576,6 +594,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -611,6 +630,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -643,6 +663,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,

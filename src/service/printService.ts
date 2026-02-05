@@ -45,6 +45,10 @@ export interface InvoicePrintData {
 		phone?: string;
 		email?: string;
 	};
+	currency: {
+		code: string;
+		symbol: string;
+	};
 }
 
 // Page dimensions in mm (A4 with 10mm padding)
@@ -224,6 +228,10 @@ export function prepareInvoicePrintData(
 			postalCode: invoice.postal_code,
 			phone: invoice.phone,
 			email: invoice.email,
+		},
+		currency: {
+			code: invoice.is_in_eur ? "EUR" : "CZK",
+			symbol: invoice.is_in_eur ? "€" : "Kč",
 		},
 	};
 }

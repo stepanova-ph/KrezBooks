@@ -14,13 +14,13 @@ function formatDate(dateString?: string): string {
 }
 
 /**
- * Format Czech currency
+ * Format currency with symbol
  */
-function formatCurrency(amount: number): string {
+function formatCurrency(amount: number, currencySymbol: string = "Kč"): string {
 	return amount.toLocaleString("cs-CZ", {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
-	}) + " Kč";
+	}) + ` ${currencySymbol}`;
 }
 
 /**
@@ -119,10 +119,18 @@ function generatePageHeader(
           </tr>
           <tr>
             <td class="meta-label">${invoice.payment_method !== undefined ? "Způsob úhrady:" : ""}</td>
-            <td class="meta-value">${invoice.payment_method !== undefined ? (invoice.payment_method === 0 ? "Hotovost" : "Bankovní převod") : ""}</td>
+            <td class="meta-value">${invoice.payment_method !== undefined ? (invoice.payment_method === 0 ? "Hotovost" : invoice.payment_method === 1 ? "Bankovní převod" : "Karta") : ""}</td>
             <td class="meta-label">${invoice.date_due ? "Datum splatnosti:" : ""}</td>
             <td class="meta-value">${invoice.date_due ? formatDate(invoice.date_due) : ""}</td>
           </tr>
+          ${invoice.order_number ? `
+          <tr>
+            <td class="meta-label">Číslo objednávky:</td>
+            <td class="meta-value">${invoice.order_number}</td>
+            <td class="meta-label"></td>
+            <td class="meta-value"></td>
+          </tr>
+          ` : ""}
         </table>
       </div>
     </div>
@@ -135,6 +143,7 @@ function generatePageHeader(
 function generateItemsTable(
 	items: InvoiceItemRow[],
 	totals: InvoiceTotals | null,
+	currencySymbol: string,
 ): string {
 	const itemsRows = items
 		.map(
@@ -142,11 +151,11 @@ function generateItemsTable(
     <tr>
       <td class="item-name">${item.name}</td>
       <td class="number">${item.amount} ${item.unit}</td>
-      <td class="number">${formatCurrency(item.priceWithoutVat)}</td>
-      <td class="number">${formatCurrency(item.priceWithoutVat * item.amount)}</td>
+      <td class="number">${formatCurrency(item.priceWithoutVat, currencySymbol)}</td>
+      <td class="number">${formatCurrency(item.priceWithoutVat * item.amount, currencySymbol)}</td>
       <td class="number">${item.vatRate}%</td>
-      <td class="number">${formatCurrency(item.vatAmount)}</td>
-      <td class="number"><strong>${formatCurrency(item.totalWithVat)}</strong></td>
+      <td class="number">${formatCurrency(item.vatAmount, currencySymbol)}</td>
+      <td class="number"><strong>${formatCurrency(item.totalWithVat, currencySymbol)}</strong></td>
     </tr>
   `,
 		)
@@ -156,7 +165,7 @@ function generateItemsTable(
 		? `
     <tr class="subtotal-row">
       <td colspan="6"><strong>Mezisoučet:</strong></td>
-      <td class="number"><strong>${formatCurrency(totals.totalBeforeRounding)}</strong></td>
+      <td class="number"><strong>${formatCurrency(totals.totalBeforeRounding, currencySymbol)}</strong></td>
     </tr>
   `
 		: "";
@@ -190,15 +199,16 @@ function generateItemsTable(
 function generateVatRecapAndTotals(
 	vatRecap: VatRecapRow[],
 	totals: InvoiceTotals,
+	currencySymbol: string,
 ): string {
 	const recapRows = vatRecap
 		.map(
 			(row) => `
     <tr>
-      <td>${formatCurrency(row.baseAmount)}</td>
+      <td>${formatCurrency(row.baseAmount, currencySymbol)}</td>
       <td class="center">${row.vatRate}%</td>
-      <td>${formatCurrency(row.vatAmount)}</td>
-      <td><strong>${formatCurrency(row.totalAmount)}</strong></td>
+      <td>${formatCurrency(row.vatAmount, currencySymbol)}</td>
+      <td><strong>${formatCurrency(row.totalAmount, currencySymbol)}</strong></td>
     </tr>
   `,
 		)
@@ -240,15 +250,15 @@ function generateVatRecapAndTotals(
             <tbody>
               <tr>
                 <td><strong>Součet:</strong></td>
-                <td class="number"><strong>${formatCurrency(totals.totalBeforeRounding)}</strong></td>
+                <td class="number"><strong>${formatCurrency(totals.totalBeforeRounding, currencySymbol)}</strong></td>
               </tr>
               <tr>
                 <td><strong>Zaokrouhlení:</strong></td>
-                <td class="number"><strong>${formatCurrency(totals.rounding)}</strong></td>
+                <td class="number"><strong>${formatCurrency(totals.rounding, currencySymbol)}</strong></td>
               </tr>
               <tr class="total-row">
                 <td><strong>CELKEM K ÚHRADĚ:</strong></td>
-                <td class="number"><strong>${formatCurrency(totals.totalWithVat)}</strong></td>
+                <td class="number"><strong>${formatCurrency(totals.totalWithVat, currencySymbol)}</strong></td>
               </tr>
             </tbody>
           </table>
@@ -261,11 +271,12 @@ function generateVatRecapAndTotals(
 /**
  * Generate footer HTML (only on last page)
  */
-function generateFooter(pageNumber: number, totalPages: number): string {
+function generateFooter(pageNumber: number, totalPages: number, invoiceNote?: string): string {
 	return `
     <div class="footer">
       <div class="invoice-notes">
         ${COMPANY_INFO.invoiceNotes.split('\n').join('<br>')}
+        ${invoiceNote ? `<br><br>${invoiceNote.split('\n').join('<br>')}` : ''}
       </div>
 
       <div class="issued-by">
@@ -291,9 +302,9 @@ function generatePage(
 	return `
     <div class="page">
       ${isFirstPage ? generatePageHeader(data, pageNumber, totalPages) : ""}
-      ${generateItemsTable(pageItems, isLastPage ? data.totals : null)}
-      ${isLastPage ? generateVatRecapAndTotals(data.vatRecap, data.totals) : ""}
-      ${isLastPage ? generateFooter(pageNumber, totalPages) : `<div class="page-footer">${pageNumber}/${totalPages}</div>`}
+      ${generateItemsTable(pageItems, isLastPage ? data.totals : null, data.currency.symbol)}
+      ${isLastPage ? generateVatRecapAndTotals(data.vatRecap, data.totals, data.currency.symbol) : ""}
+      ${isLastPage ? generateFooter(pageNumber, totalPages, data.invoice.note) : `<div class="page-footer">${pageNumber}/${totalPages}</div>`}
     </div>
   `;
 }

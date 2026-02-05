@@ -286,12 +286,13 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 		setAdminLoading(true);
 		setAdminMessage(null);
 		try {
-			const result = await window.electronAPI.admin.clearDb();
+			// Recreate tables to ensure schema is up to date with new columns
+			const result = await window.electronAPI.admin.recreateTables();
 			if (result.success) {
 				setStats({ contacts: 0, items: 0, stockMovements: 0, invoices: 0 });
 				setAdminMessage({
 					type: "success",
-					text: "Databáze byla úspěšně vymazána",
+					text: "Databáze byla úspěšně vymazána a znovu vytvořena",
 				});
 				invalidateAllQueries();
 			} else {

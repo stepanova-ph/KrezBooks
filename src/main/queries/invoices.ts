@@ -11,6 +11,7 @@ export const invoiceQueries = {
       date_tax TEXT,
       date_due TEXT,
       variable_symbol TEXT,
+      order_number TEXT,
       note TEXT,
       ico TEXT,
       modifier INTEGER,
@@ -22,12 +23,13 @@ export const invoiceQueries = {
       postal_code TEXT,
       phone TEXT,
       email TEXT,
+      is_in_eur INTEGER NOT NULL DEFAULT 0,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
 
       PRIMARY KEY (number, prefix),
       CONSTRAINT check_type CHECK (type BETWEEN 1 AND 5),
-      CONSTRAINT check_payment_method CHECK (payment_method IN (0, 1) OR payment_method IS NULL)
+      CONSTRAINT check_payment_method CHECK (payment_method IN (0, 1, 2) OR payment_method IS NULL)
     )
   `,
 
@@ -87,6 +89,7 @@ export const invoiceQueries = {
       date_tax,
       date_due,
       variable_symbol,
+      order_number,
       note,
       ico,
       modifier,
@@ -97,7 +100,8 @@ export const invoiceQueries = {
       city,
       postal_code,
       phone,
-      email
+      email,
+      is_in_eur
     ) VALUES (
       @number,
       @prefix,
@@ -107,6 +111,7 @@ export const invoiceQueries = {
       @date_tax,
       @date_due,
       @variable_symbol,
+      @order_number,
       @note,
       @ico,
       @modifier,
@@ -117,7 +122,8 @@ export const invoiceQueries = {
       @city,
       @postal_code,
       @phone,
-      @email
+      @email,
+      @is_in_eur
     )
   `,
 

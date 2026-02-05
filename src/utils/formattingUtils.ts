@@ -1,7 +1,12 @@
 import { VAT_RATES } from "../config/constants";
 
-export function formatPrice(amount: number): string {
-	return `${amount.toFixed(2)} Kč`;
+export function formatPrice(amount: number, isEur: boolean = false): string {
+	const symbol = isEur ? "€" : "Kč";
+	return `${amount.toFixed(2)} ${symbol}`;
+}
+
+export function getCurrencySymbol(isEur: boolean): string {
+	return isEur ? "€" : "Kč";
 }
 
 export function formatVatRate(rate: number): string {

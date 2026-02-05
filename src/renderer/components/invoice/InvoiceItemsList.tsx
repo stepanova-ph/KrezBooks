@@ -7,7 +7,7 @@ import {
 	Column,
 	ContextMenuAction,
 } from "../common/table/DataTable";
-import { formatVatRateShort } from "../../../utils/formattingUtils";
+import { formatVatRateShort, getCurrencySymbol } from "../../../utils/formattingUtils";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 import { calculateItemTotals } from "../../../utils/invoiceCalculations";
 
@@ -18,6 +18,7 @@ interface InvoiceItemsListProps {
 	onOpenItemCard?: (item: InvoiceItem) => void;
 	readOnly?: boolean;
 	maxHeight?: string;
+	isInEur?: boolean;
 }
 
 export const invoiceItemColumns: Column[] = [
@@ -37,7 +38,9 @@ export function InvoiceItemsList({
 	visibleColumnIds = new Set(invoiceItemColumns.map((c) => c.id)),
 	readOnly = false,
 	maxHeight,
+	isInEur = false,
 }: InvoiceItemsListProps & { visibleColumnIds?: Set<string> }) {
+	const currencySymbol = getCurrencySymbol(isInEur);
 	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = readOnly
 		? [
 				...(onOpenItemCard
@@ -95,7 +98,7 @@ export function InvoiceItemsList({
 			case "amount":
 				return `${item.amount.toFixed(0)} ${item.unit_of_measure}`;
 			case "sale_price":
-				return `${item.sale_price.toFixed(2)} Kč`;
+				return `${item.sale_price.toFixed(2)} ${currencySymbol}`;
 			case "total": {
 				// Calculate with smart rounding per unit, then multiply by quantity
 				const { totalWithVat: unitTotal } = calculateItemTotals(
@@ -103,7 +106,7 @@ export function InvoiceItemsList({
 					1,
 					item.vat_rate,
 				);
-				return (unitTotal * item.amount).toFixed(2);
+				return `${(unitTotal * item.amount).toFixed(2)} ${currencySymbol}`;
 			}
 			default:
 				return "";

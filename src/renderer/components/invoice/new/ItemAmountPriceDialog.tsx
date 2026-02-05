@@ -30,6 +30,7 @@ interface ItemAmountPriceDialogProps {
 	initialAmount?: number;
 	initialPrice?: number;
 	initialPriceGroup?: number;
+	isInEur?: boolean;
 }
 
 type PriceGroup = "group1" | "group2" | "group3" | "group4" | "custom";
@@ -72,6 +73,7 @@ export function ItemAmountPriceDialog({
 	initialAmount,
 	initialPrice,
 	initialPriceGroup,
+	isInEur = false,
 }: ItemAmountPriceDialogProps) {
 	const theme = useTheme();
 	const [amount, setAmount] = useState<number>(1);
@@ -90,7 +92,8 @@ export function ItemAmountPriceDialog({
 		if (open && item) {
 			setAmount(initialAmount ?? 1);
 
-			if (isType5 || isBuy) {
+			// For EUR invoices, always use custom price
+			if (isInEur || isType5 || isBuy) {
 				setSelectedPrice("custom");
 				setCustomPrice(initialPrice ?? 0);
 			} else {
@@ -107,7 +110,7 @@ export function ItemAmountPriceDialog({
 				}
 			}
 		}
-	}, [open, item, isType5, isBuy, contactPriceGroup, initialAmount, initialPrice]);
+	}, [open, item, isType5, isBuy, isInEur, contactPriceGroup, initialAmount, initialPrice]);
 
 	const getFinalPrice = (): number => {
 		if (!item) return 0;
@@ -220,7 +223,7 @@ export function ItemAmountPriceDialog({
 				{isBuy && (
 					<Box>
 						<VatPriceField
-							label="Nákupní cena"
+							label={`Nákupní cena (${isInEur ? 'EUR' : 'Kč'})`}
 							name="buy_price"
 							value={customPrice}
 							vatRate={vatPercentage}
@@ -245,7 +248,7 @@ export function ItemAmountPriceDialog({
 							</Typography>
 							<Typography variant="body2" sx={{ fontWeight: 600 }}>
 								{lastBuyPrice !== undefined && lastBuyPrice > 0
-									? formatPrice(lastBuyPrice)
+									? formatPrice(lastBuyPrice, isInEur)
 									: "—"}
 							</Typography>
 							<Button
@@ -261,7 +264,21 @@ export function ItemAmountPriceDialog({
 					</Box>
 				)}
 
-				{!isType5 && !isBuy && (
+				{/* For EUR sales, only show custom price */}
+				{isInEur && isSale && (
+					<VatPriceField
+						label="Prodejní cena (EUR)"
+						name="custom_price_eur"
+						value={customPrice}
+						vatRate={vatPercentage}
+						onChange={(e) => setCustomPrice(parseFloat(e.target.value) || 0)}
+						precision={2}
+						min={0}
+					/>
+				)}
+
+				{/* For CZK sales, show price groups */}
+				{!isType5 && !isBuy && !isInEur && (
 					<RadioGroup
 						value={selectedPrice}
 						onChange={(e) => setSelectedPrice(e.target.value as PriceGroup)}

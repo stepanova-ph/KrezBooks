@@ -36,14 +36,13 @@ export const invoiceSchema = z
 
 		payment_method: z.preprocess(
 			(v) =>
-				v === "" || v === null || v === undefined ? undefined : Number(v),
+				v === "" || v === null || v === undefined ? 1 : Number(v),
 			z
 				.number()
 				.refine(
-					(n) => n === 0 || n === 1,
+					(n) => n === 0 || n === 1 || n === 2,
 					validationMessages.invoice.paymentMethod.invalid,
-				)
-				.optional(),
+				),
 		),
 
 		note: optionalString.refine(
@@ -54,6 +53,12 @@ export const invoiceSchema = z
 		date_tax: optionalString,
 		date_due: optionalString,
 		variable_symbol: optionalString,
+		order_number: optionalString,
+
+		is_in_eur: z.preprocess(
+			(v) => v === true || v === "true" || v === 1,
+			z.boolean(),
+		),
 
 		ico: optionalString,
 		modifier: z.preprocess(
@@ -105,6 +110,14 @@ export const invoiceSchema = z
 					path: ["variable_symbol"],
 					code: z.ZodIssueCode.custom,
 					message: validationMessages.invoice.variableSymbol.required,
+				});
+			}
+
+			if (data.payment_method === undefined) {
+				ctx.addIssue({
+					path: ["payment_method"],
+					code: z.ZodIssueCode.custom,
+					message: "Způsob úhrady je povinný",
 				});
 			}
 		}

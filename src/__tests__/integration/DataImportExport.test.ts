@@ -74,6 +74,7 @@ describe("Data Import/Export Integration Tests", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -85,6 +86,7 @@ describe("Data Import/Export Integration Tests", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			const rows = db.prepare("SELECT * FROM invoices").all();
@@ -106,6 +108,7 @@ describe("Data Import/Export Integration Tests", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -117,6 +120,7 @@ describe("Data Import/Export Integration Tests", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -337,6 +341,7 @@ describe("Data Import/Export Integration Tests", () => {
 				date_tax: "2024-01-15",
 				date_due: "2024-02-15",
 				variable_symbol: "123456",
+				order_number: "PO-2024-001",
 				note: "Test invoice with special chars: €, ř, č, š",
 				ico: "12345678",
 				modifier: 1,
@@ -348,6 +353,7 @@ describe("Data Import/Export Integration Tests", () => {
 				postal_code: "110 00",
 				phone: "+420 123 456 789",
 				email: "test@example.cz",
+				is_in_eur: 0,
 			};
 
 			db.prepare(invoiceQueries.create).run(originalInvoice);
@@ -393,6 +399,7 @@ describe("Data Import/Export Integration Tests", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				ico: null,
 				modifier: null,
 				dic: null,
@@ -403,6 +410,7 @@ describe("Data Import/Export Integration Tests", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			const invoice = db.prepare("SELECT * FROM invoices WHERE prefix = ? AND number = ?").get("TST", "001");

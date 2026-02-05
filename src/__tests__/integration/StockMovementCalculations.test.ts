@@ -44,6 +44,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -55,6 +56,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			// Add stock
@@ -101,6 +103,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -112,6 +115,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -134,6 +138,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -145,6 +150,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -188,6 +194,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -199,6 +206,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -240,6 +248,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -251,6 +260,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -293,6 +303,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -304,6 +315,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -326,6 +338,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -337,6 +350,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -388,6 +402,7 @@ describe("Stock Movement Calculations", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -399,6 +414,7 @@ describe("Stock Movement Calculations", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 
 				db.prepare(stockMovementQueries.create).run({
@@ -444,6 +460,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -455,6 +472,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -488,6 +506,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -499,6 +518,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -521,6 +541,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -532,6 +553,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -554,6 +576,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -565,6 +588,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -605,6 +629,7 @@ describe("Stock Movement Calculations", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -616,6 +641,7 @@ describe("Stock Movement Calculations", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 
 				db.prepare(stockMovementQueries.create).run({
@@ -662,6 +688,7 @@ describe("Stock Movement Calculations", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -673,6 +700,7 @@ describe("Stock Movement Calculations", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 
 				db.prepare(stockMovementQueries.create).run({
@@ -712,6 +740,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -723,6 +752,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -761,6 +791,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -772,6 +803,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -801,6 +833,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -812,6 +845,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -842,6 +876,7 @@ describe("Stock Movement Calculations", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -853,6 +888,7 @@ describe("Stock Movement Calculations", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({

@@ -33,6 +33,7 @@ describe("Data Integrity & Validation", () => {
 						date_tax: null,
 						date_due: null,
 						variable_symbol: null,
+						order_number: null,
 						note: null,
 						ico: null,
 						modifier: null,
@@ -44,6 +45,7 @@ describe("Data Integrity & Validation", () => {
 						postal_code: null,
 						phone: null,
 						email: null,
+						is_in_eur: 0,
 					});
 				}).toThrow(/NOT NULL constraint failed: invoices\.prefix/);
 			});
@@ -59,6 +61,7 @@ describe("Data Integrity & Validation", () => {
 						date_tax: null,
 						date_due: null,
 						variable_symbol: null,
+						order_number: null,
 						note: null,
 						ico: null,
 						modifier: null,
@@ -70,6 +73,7 @@ describe("Data Integrity & Validation", () => {
 						postal_code: null,
 						phone: null,
 						email: null,
+						is_in_eur: 0,
 					});
 				}).toThrow(/NOT NULL constraint failed: invoices\.number/);
 			});
@@ -85,6 +89,7 @@ describe("Data Integrity & Validation", () => {
 						date_tax: null,
 						date_due: null,
 						variable_symbol: null,
+						order_number: null,
 						note: null,
 						ico: null,
 						modifier: null,
@@ -96,6 +101,7 @@ describe("Data Integrity & Validation", () => {
 						postal_code: null,
 						phone: null,
 						email: null,
+						is_in_eur: 0,
 					});
 				}).toThrow(/NOT NULL constraint failed: invoices\.type/);
 			});
@@ -111,6 +117,7 @@ describe("Data Integrity & Validation", () => {
 						date_tax: null,
 						date_due: null,
 						variable_symbol: null,
+						order_number: null,
 						note: null,
 						ico: null,
 						modifier: null,
@@ -122,6 +129,7 @@ describe("Data Integrity & Validation", () => {
 						postal_code: null,
 						phone: null,
 						email: null,
+						is_in_eur: 0,
 					});
 				}).toThrow(/NOT NULL constraint failed: invoices\.date_issue/);
 			});
@@ -208,6 +216,7 @@ describe("Data Integrity & Validation", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -219,6 +228,7 @@ describe("Data Integrity & Validation", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+					is_in_eur: 0,
 				});
 
 				db.prepare(itemQueries.create).run({
@@ -409,6 +419,7 @@ describe("Data Integrity & Validation", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -420,6 +431,7 @@ describe("Data Integrity & Validation", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+					is_in_eur: 0,
 				});
 			}).toThrow(/CHECK constraint failed/);
 
@@ -433,6 +445,7 @@ describe("Data Integrity & Validation", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -444,6 +457,7 @@ describe("Data Integrity & Validation", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+					is_in_eur: 0,
 				});
 			}).toThrow(/CHECK constraint failed/);
 		});
@@ -605,6 +619,7 @@ describe("Data Integrity & Validation", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -616,6 +631,7 @@ describe("Data Integrity & Validation", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -660,6 +676,7 @@ describe("Data Integrity & Validation", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -671,6 +688,7 @@ describe("Data Integrity & Validation", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -742,6 +760,7 @@ describe("Data Integrity & Validation", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -753,6 +772,7 @@ describe("Data Integrity & Validation", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			expect(() => {
@@ -808,6 +828,7 @@ describe("Data Integrity & Validation", () => {
 				date_tax: "2024-01-15",
 				date_due: "2024-02-15",
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -819,6 +840,7 @@ describe("Data Integrity & Validation", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			const invoice = db
@@ -840,6 +862,7 @@ describe("Data Integrity & Validation", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: "Czech characters: ěščřžýáíé, Special: €$£¥",
 				ico: null,
 				modifier: null,
@@ -851,6 +874,7 @@ describe("Data Integrity & Validation", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			const invoice = db

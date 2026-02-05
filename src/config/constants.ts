@@ -24,9 +24,15 @@ export const CONTACT_TYPES = {
 	customer: { label: "Odběratel" },
 };
 
+export const CURRENCIES = [
+	{ value: false, code: "CZK", symbol: "Kč", label: "Koruna (CZK)" },
+	{ value: true, code: "EUR", symbol: "€", label: "Euro (EUR)" },
+] as const;
+
 export const PAYMENT_METHOD_TYPES = [
 	{ value: 0, label: "Hotovost" },
 	{ value: 1, label: "Bankovní převod" },
+	{ value: 2, label: "Karta" },
 ] as const;
 
 export const INVOICE_TYPES = [

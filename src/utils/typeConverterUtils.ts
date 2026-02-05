@@ -99,6 +99,7 @@ export function serializeInvoice(invoice: Partial<Invoice>): any {
 		date_tax: invoice.date_tax ?? null,
 		date_due: invoice.date_due ?? null,
 		variable_symbol: invoice.variable_symbol ?? null,
+		order_number: invoice.order_number ?? null,
 		note: invoice.note ?? null,
 		ico: invoice.ico ?? null,
 		modifier: invoice.modifier ?? null,
@@ -110,6 +111,7 @@ export function serializeInvoice(invoice: Partial<Invoice>): any {
 		postal_code: invoice.postal_code ?? null,
 		phone: invoice.phone ?? null,
 		email: invoice.email ?? null,
+		is_in_eur: invoice.is_in_eur ?? 0,
 	};
 }
 

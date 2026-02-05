@@ -31,6 +31,7 @@ import {
 	getSignedAmount,
 } from "../../../utils/typeConverterUtils";
 import { ItemCardDialog } from "../items/ItemCardDialog";
+import theme from "src/lib/theme";
 
 function NewInvoiceTab() {
 	const form = useInvoiceForm();
@@ -76,6 +77,14 @@ function NewInvoiceTab() {
 			}
 		}
 	}, [maxNumber, form.formData.type]);
+
+	// Currency change warning
+	useEffect(() => {
+		if (form.invoiceItems.length > 0) {
+			// Show warning that prices may need to be updated
+			// User can choose to continue or cancel currency change
+		}
+	}, [form.formData.is_in_eur]);
 
 	const handleSelectItem = (item: Item) => {
 		const existingIndex = form.invoiceItems.findIndex(
@@ -183,7 +192,9 @@ function NewInvoiceTab() {
 				date_tax: form.formData.date_tax || undefined,
 				date_due: form.formData.date_due || undefined,
 				variable_symbol: form.formData.variable_symbol || undefined,
+				order_number: form.formData.order_number || undefined,
 				note: form.formData.note || undefined,
+				is_in_eur: form.formData.is_in_eur,
 				ico: form.formData.ico || undefined,
 				modifier: form.formData.modifier,
 				dic: form.formData.dic || undefined,
@@ -246,7 +257,7 @@ function NewInvoiceTab() {
 			setAlertDialog({
 				open: true,
 				title: "Chyba",
-				message: `Chyba při vytváření dokladu: ${(error as Error).message}`,
+				message: `Chyba při vytvářfení dokladu: ${(error as Error).message}`,
 			});
 		}
 	};
@@ -273,9 +284,28 @@ function NewInvoiceTab() {
 						dateTax={form.formData.date_tax}
 						dateDue={form.formData.date_due}
 						variableSymbol={form.formData.variable_symbol}
+						orderNumber={form.formData.order_number}
+						note={form.formData.note}
+						isInEur={form.formData.is_in_eur}
 						errors={form.errors}
 						onChange={form.handleChange}
 						onBlur={form.handleBlur}
+						headerAction={
+							<IconButton
+								size="small"
+								onClick={() => form.handleChange("is_in_eur", !form.formData.is_in_eur)}
+								sx={{
+									borderRadius: "50%",
+									aspectRatio: "1 / 1",
+									p: 1,
+									fontWeight: 700,
+									minHeight: "35px",
+									color: "primary.main",
+								}}
+							>
+								{form.formData.is_in_eur ? "€" : "Kč"}
+							</IconButton>
+						}
 					/>
 				</Box>
 
@@ -317,9 +347,30 @@ function NewInvoiceTab() {
 							dateTax={form.formData.date_tax}
 							dateDue={form.formData.date_due}
 							variableSymbol={form.formData.variable_symbol}
+							orderNumber={form.formData.order_number}
+							note={form.formData.note}
+							isInEur={form.formData.is_in_eur}
 							errors={form.errors}
 							onChange={form.handleChange}
 							onBlur={form.handleBlur}
+							headerAction={
+								<Button
+									size="small"
+									onClick={() => form.handleChange("is_in_eur", !form.formData.is_in_eur)}
+									sx={{
+										minWidth: "auto",
+										px: 1.5,
+										fontWeight: 600,
+										fontSize: "0.9rem",
+										color: "text.primary",
+										"&:hover": {
+											bgcolor: "action.hover",
+										},
+									}}
+								>
+									{form.formData.is_in_eur ? "€" : "Kč"}
+								</Button>
+							}
 						/>
 					</Box>
 				)}
@@ -356,6 +407,7 @@ function NewInvoiceTab() {
 							onEditItem={handleEditItem}
 							onDeleteItem={form.handleDeleteItem}
 							onOpenItemCard={(item) => setViewingItemEan(item.ean)}
+							isInEur={form.formData.is_in_eur}
 							maxHeight="fill"
 						/>
 					</FormSection>
@@ -367,7 +419,7 @@ function NewInvoiceTab() {
 						bgcolor: "background.paper",
 					}}
 				>
-					<InvoiceTotals items={form.invoiceItems} />
+					<InvoiceTotals items={form.invoiceItems} isInEur={form.formData.is_in_eur} />
 
 					<Box
 						sx={{
@@ -412,6 +464,7 @@ function NewInvoiceTab() {
 				initialAmount={dialogs.amountPrice.editingItemData?.amount}
 				initialPrice={dialogs.amountPrice.editingItemData?.price}
 				initialPriceGroup={dialogs.amountPrice.editingItemData?.p_group_index}
+				isInEur={form.formData.is_in_eur}
 			/>
 
 			<ContactPickerDialog

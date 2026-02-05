@@ -37,6 +37,7 @@ describe("Concurrent Operations", () => {
 			date_tax: null,
 			date_due: null,
 			variable_symbol: null,
+			order_number: null,
 			note: null,
 			ico: null,
 			modifier: null,
@@ -48,6 +49,7 @@ describe("Concurrent Operations", () => {
 			postal_code: null,
 			phone: null,
 			email: null,
+		is_in_eur: 0,
 		});
 	});
 
@@ -68,6 +70,7 @@ describe("Concurrent Operations", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -79,6 +82,7 @@ describe("Concurrent Operations", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 			}
 
@@ -202,6 +206,7 @@ describe("Concurrent Operations", () => {
 								date_tax: null,
 								date_due: null,
 								variable_symbol: null,
+								order_number: null,
 								note: null,
 								ico: null,
 								modifier: null,
@@ -213,6 +218,7 @@ describe("Concurrent Operations", () => {
 								postal_code: null,
 								phone: null,
 								email: null,
+							is_in_eur: 0,
 							});
 							successCount++;
 						} catch (e) {
@@ -259,6 +265,7 @@ describe("Concurrent Operations", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -270,6 +277,7 @@ describe("Concurrent Operations", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 			}
 
@@ -347,6 +355,7 @@ describe("Concurrent Operations", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -358,6 +367,7 @@ describe("Concurrent Operations", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 			}
 
@@ -391,6 +401,7 @@ describe("Concurrent Operations", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -402,6 +413,7 @@ describe("Concurrent Operations", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 			}
 
@@ -488,6 +500,7 @@ describe("Concurrent Operations", () => {
 						date_tax: null,
 						date_due: null,
 						variable_symbol: null,
+						order_number: null,
 						note: null,
 						ico: null,
 						modifier: null,
@@ -499,6 +512,7 @@ describe("Concurrent Operations", () => {
 						postal_code: null,
 						phone: null,
 						email: null,
+					is_in_eur: 0,
 					});
 				}
 			});
@@ -565,6 +579,7 @@ describe("Concurrent Operations", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -576,6 +591,7 @@ describe("Concurrent Operations", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 
 				// Add stock movement
@@ -621,6 +637,7 @@ describe("Concurrent Operations", () => {
 						date_tax: null,
 						date_due: null,
 						variable_symbol: null,
+						order_number: null,
 						note: null,
 						ico: null,
 						modifier: null,
@@ -632,6 +649,7 @@ describe("Concurrent Operations", () => {
 						postal_code: null,
 						phone: null,
 						email: null,
+					is_in_eur: 0,
 					});
 				}
 			});
@@ -661,6 +679,7 @@ describe("Concurrent Operations", () => {
 						date_tax: null,
 						date_due: null,
 						variable_symbol: null,
+						order_number: null,
 						note: null,
 						ico: null,
 						modifier: null,
@@ -672,6 +691,7 @@ describe("Concurrent Operations", () => {
 						postal_code: null,
 						phone: null,
 						email: null,
+					is_in_eur: 0,
 					});
 
 					movementStmt.run({

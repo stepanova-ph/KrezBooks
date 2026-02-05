@@ -43,6 +43,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -54,6 +55,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			const invoice = db
@@ -73,6 +75,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -84,6 +87,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -120,6 +124,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: "12345678",
 				modifier: 1,
@@ -131,6 +136,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: "110 00",
 				phone: "+420123456789",
 				email: "supplier@example.cz",
+				is_in_eur: 0,
 			});
 
 			const invoice = db
@@ -153,6 +159,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: "2024-01-15",
 				date_due: "2024-02-15",
 				variable_symbol: "123456",
+				order_number: null,
 				note: null,
 				ico: "12345678",
 				modifier: 1,
@@ -164,6 +171,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			const invoice = db
@@ -185,6 +193,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -196,6 +205,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -218,6 +228,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: "2024-01-15",
 				date_due: "2024-02-15",
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -229,6 +240,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -269,6 +281,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: "2024-01-15",
 				date_due: "2024-02-15",
 				variable_symbol: "123456",
+				order_number: null,
 				note: null,
 				ico: "87654321",
 				modifier: 1,
@@ -280,6 +293,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: "602 00",
 				phone: "+420987654321",
 				email: "customer@example.cz",
+				is_in_eur: 0,
 			});
 
 			const invoice = db
@@ -302,6 +316,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: "2024-02-15",
 				variable_symbol: "123456",
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -313,6 +328,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			const invoice = db
@@ -332,6 +348,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: "2024-02-15",
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -343,6 +360,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -384,6 +402,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: "2024-02-15",
 				variable_symbol: "123456",
+				order_number: null,
 				note: "Proforma for quote",
 				ico: "12345678",
 				modifier: 1,
@@ -395,6 +414,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -428,6 +448,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -458,6 +479,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: "Return to supplier",
 				ico: "12345678",
 				modifier: 1,
@@ -469,6 +491,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			const invoice = db
@@ -488,6 +511,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -499,6 +523,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -540,6 +565,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: "2024-01-15",
 				date_due: null,
 				variable_symbol: "123456",
+				order_number: null,
 				note: "Customer return",
 				ico: "87654321",
 				modifier: 1,
@@ -551,6 +577,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			const invoice = db
@@ -571,6 +598,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -582,6 +610,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -604,6 +633,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: "2024-01-15",
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -615,6 +645,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -658,6 +689,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -669,6 +701,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -691,6 +724,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: null,
 				date_due: "2024-02-12",
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -702,6 +736,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -724,6 +759,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: "2024-01-15",
 				date_due: "2024-02-15",
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -735,6 +771,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -757,6 +794,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				date_tax: "2024-01-20",
 				date_due: null,
 				variable_symbol: null,
+				order_number: null,
 				note: null,
 				ico: null,
 				modifier: null,
@@ -768,6 +806,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				postal_code: null,
 				phone: null,
 				email: null,
+				is_in_eur: 0,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -811,6 +850,7 @@ describe("Invoice Type-Specific Behavior", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -822,6 +862,7 @@ describe("Invoice Type-Specific Behavior", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 			}).toThrow(/CHECK constraint failed/);
 
@@ -835,6 +876,7 @@ describe("Invoice Type-Specific Behavior", () => {
 					date_tax: null,
 					date_due: null,
 					variable_symbol: null,
+					order_number: null,
 					note: null,
 					ico: null,
 					modifier: null,
@@ -846,6 +888,7 @@ describe("Invoice Type-Specific Behavior", () => {
 					postal_code: null,
 					phone: null,
 					email: null,
+				is_in_eur: 0,
 				});
 			}).toThrow(/CHECK constraint failed/);
 		});

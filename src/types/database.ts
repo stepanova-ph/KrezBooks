@@ -115,7 +115,9 @@ export interface Invoice {
 	date_tax?: string;
 	date_due?: string;
 	variable_symbol?: string;
+	order_number?: string;
 	note?: string;
+	is_in_eur?: boolean;
 	total_without_vat?: number;
 	total_with_vat?: number;
 

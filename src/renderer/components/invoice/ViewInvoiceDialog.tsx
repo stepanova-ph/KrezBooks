@@ -105,6 +105,8 @@ export function ViewInvoiceDialog({
 								dateTax={invoice.date_tax}
 								dateDue={invoice.date_due}
 								variableSymbol={invoice.variable_symbol}
+								orderNumber={invoice.order_number || ""}
+								isInEur={invoice.is_in_eur || false}
 								errors={{}}
 								onChange={() => {}}
 								onBlur={() => {}}
@@ -165,6 +167,8 @@ export function ViewInvoiceDialog({
 									dateTax={invoice.date_tax}
 									dateDue={invoice.date_due}
 									variableSymbol={invoice.variable_symbol}
+									orderNumber={invoice.order_number || ""}
+									isInEur={invoice.is_in_eur || false}
 									errors={{}}
 									onChange={() => {}}
 									onBlur={() => {}}
@@ -201,12 +205,13 @@ export function ViewInvoiceDialog({
 									onEditItem={() => {}}
 									onDeleteItem={() => {}}
 									readOnly={true}
+									isInEur={invoice.is_in_eur || false}
 									maxHeight="fill"
 								/>
 							</FormSection>
 						</Box>
 
-						<InvoiceTotals items={invoiceItems} />
+						<InvoiceTotals items={invoiceItems} isInEur={invoice.is_in_eur || false} />
 					</Box>
 				</Box>
 			)}
