@@ -119,7 +119,13 @@ export function NumberTextField({
 			precision > 0 &&
 			!displayValue.includes(".") &&
 			!displayValue.includes(",");
-		const isMinus = key === "-" && allowNegative && displayValue.length === 0;
+		const target = e.currentTarget as HTMLInputElement;
+		const allSelected = target.selectionStart === 0 && target.selectionEnd === displayValue.length;
+		const cursorAtStart = target.selectionStart === 0;
+		const isMinus =
+			key === "-" &&
+			allowNegative &&
+			(displayValue === "" || allSelected || (cursorAtStart && !displayValue.startsWith("-")));
 
 		if (!isNumber && !isDecimal && !isMinus) {
 			e.preventDefault();
