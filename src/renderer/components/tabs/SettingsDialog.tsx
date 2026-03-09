@@ -27,6 +27,7 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 	const [importPath, setImportPath] = useState("");
 	const [isLegacyImport, setIsLegacyImport] = useState(false);
 	const [importInProgress, setImportInProgress] = useState(false);
+	const [showVatDialog, setShowVatDialog] = useState(false);
 
 	const [exportPath, setExportPath] = useState("");
 	const [exportInProgress, setExportInProgress] = useState(false);
@@ -194,6 +195,11 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 			return;
 		}
 
+		if (isLegacyImport) {
+			setShowVatDialog(true);
+			return;
+		}
+
 		setImportInProgress(true);
 		setImportMessage({
 			type: "info",
@@ -201,9 +207,34 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 		});
 
 		try {
-			const result = isLegacyImport
-				? await window.electronAPI.importExport.importLegacyData(importPath)
-				: await window.electronAPI.importExport.importData(importPath);
+			const result = await window.electronAPI.importExport.importData(importPath);
+
+			if (!result.success) {
+				setImportInProgress(false);
+				setImportMessage({
+					type: "error",
+					text: result.error || "Import se nepodařilo spustit",
+				});
+			}
+		} catch (error: any) {
+			setImportInProgress(false);
+			setImportMessage({
+				type: "error",
+				text: `Chyba: ${error.message}`,
+			});
+		}
+	};
+
+	const handleImportWithVatChoice = async (pricesIncludeVat: boolean) => {
+		setShowVatDialog(false);
+		setImportInProgress(true);
+		setImportMessage({
+			type: "info",
+			text: "Import probíhá... (můžete zavřít tento dialog)",
+		});
+
+		try {
+			const result = await window.electronAPI.importExport.importLegacyData(importPath, pricesIncludeVat);
 
 			if (!result.success) {
 				setImportInProgress(false);
@@ -573,6 +604,32 @@ export const SettingsDialog = ({ open, onClose }: SettingsDialogProps) => {
 				onConfirm={handleConfirmClearDatabase}
 				onCancel={() => setShowDeleteConfirm(false)}
 			/>
+
+			<Dialog
+				open={showVatDialog}
+				title="Typ cen v souboru"
+				onClose={() => setShowVatDialog(false)}
+				noCloseButton
+				maxWidth="xs"
+				actions={[
+					{
+						label: "Bez DPH",
+						onClick: () => handleImportWithVatChoice(false),
+						variant: "outlined",
+					},
+					{
+						label: "S DPH",
+						onClick: () => handleImportWithVatChoice(true),
+						variant: "contained",
+					},
+				]}
+			>
+				<Box sx={{ py: 2, textAlign: "center" }}>
+					<Typography variant="body1">
+						Jsou ceny v importovaném souboru s DPH nebo bez DPH?
+					</Typography>
+				</Box>
+			</Dialog>
 		</Dialog>
 	);
 };

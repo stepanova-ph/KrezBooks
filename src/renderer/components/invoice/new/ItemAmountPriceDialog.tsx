@@ -216,7 +216,7 @@ export function ItemAmountPriceDialog({
 						vatRate={vatPercentage}
 						onChange={(e) => setCustomPrice(parseFloat(e.target.value) || 0)}
 						precision={0}
-						min={0}
+						allowNegative={true}
 					/>
 				)}
 

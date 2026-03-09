@@ -71,8 +71,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	importExport: {
 		exportData: (directoryPath: string) =>
 			ipcRenderer.invoke("db:exportData", directoryPath),
-		importLegacyData: (directoryPath: string) =>
-			ipcRenderer.invoke("db:importLegacyData", directoryPath),
+		importLegacyData: (directoryPath: string, pricesIncludeVat: boolean) =>
+			ipcRenderer.invoke("db:importLegacyData", directoryPath, pricesIncludeVat),
 		importData: (directoryPath: string) =>
 			ipcRenderer.invoke("db:importData", directoryPath),
 		onExportProgress: (

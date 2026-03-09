@@ -142,6 +142,7 @@ declare global {
 				) => Promise<{ success: boolean; started?: boolean; error?: string }>;
 				importLegacyData: (
 					directoryPath: string,
+					pricesIncludeVat: boolean,
 				) => Promise<{ success: boolean; started?: boolean; error?: string }>;
 				importData: (
 					directoryPath: string,

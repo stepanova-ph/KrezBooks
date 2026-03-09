@@ -16,6 +16,7 @@ interface VatPriceFieldProps {
 	size?: "small" | "medium";
 	readonly?: true;
 	buy?: true;
+	allowNegative?: boolean;
 }
 
 export function VatPriceField({
@@ -31,7 +32,8 @@ export function VatPriceField({
 	grayWhenZero,
 	size = "small",
 	readonly,
-	buy
+	buy,
+	allowNegative = false
 }: VatPriceFieldProps) {
 	const [basePrice, setBasePrice] = useState<number>(value);
 
@@ -124,6 +126,7 @@ export function VatPriceField({
 								onBlur={onBlur}
 								precision={precision}
 								min={min}
+								allowNegative={allowNegative}
 								grayWhenZero={grayWhenZero}
 								size={size}
 								disabled={readonly}
@@ -155,6 +158,7 @@ export function VatPriceField({
 								onBlur={onBlur}
 								precision={precision}
 								min={min}
+								allowNegative={allowNegative}
 								grayWhenZero={grayWhenZero}
 								size={size}
 								disabled={readonly}

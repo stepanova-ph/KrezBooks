@@ -182,9 +182,16 @@ function getColumnValue(
 // LEGACY ITEMS IMPORT
 // =============================================================================
 
+function vatRateToPercentage(vatRate: number): number {
+	if (vatRate === 1) return 12;
+	if (vatRate === 2) return 21;
+	return 0;
+}
+
 function processLegacyItemRow(
 	row: string[],
 	headers: string[],
+	pricesIncludeVat: boolean,
 ): { data: Record<string, unknown> | null; issues: string[] } {
 	const issues: string[] = [];
 
@@ -231,6 +238,19 @@ function processLegacyItemRow(
 		return { data: null, issues };
 	}
 
+	let p1 = salePriceGroup1!;
+	let p2 = salePriceGroup2!;
+	let p3 = salePriceGroup3!;
+	let p4 = salePriceGroup4!;
+
+	if (pricesIncludeVat) {
+		const divisor = 1 + vatRateToPercentage(vatRate!) / 100;
+		p1 = p1 / divisor;
+		p2 = p2 / divisor;
+		p3 = p3 / divisor;
+		p4 = p4 / divisor;
+	}
+
 	return {
 		data: {
 			ean,
@@ -238,17 +258,17 @@ function processLegacyItemRow(
 			category,
 			vat_rate: vatRate,
 			unit_of_measure: unitOfMeasure,
-			sale_price_group1: salePriceGroup1,
-			sale_price_group2: salePriceGroup2,
-			sale_price_group3: salePriceGroup3,
-			sale_price_group4: salePriceGroup4,
+			sale_price_group1: p1,
+			sale_price_group2: p2,
+			sale_price_group3: p3,
+			sale_price_group4: p4,
 			note: null,
 		},
 		issues: [],
 	};
 }
 
-async function importLegacyItems(filePath: string): Promise<ImportResult> {
+async function importLegacyItems(filePath: string, pricesIncludeVat: boolean): Promise<ImportResult> {
 	const db = getDatabase();
 	const content = await fs.promises.readFile(filePath, "utf-8");
 	const { headers, rows } = parseTSV(content);
@@ -279,7 +299,7 @@ async function importLegacyItems(filePath: string): Promise<ImportResult> {
 		const row = rows[i];
 		const rawRow = row.join("\t");
 
-		const { data, issues } = processLegacyItemRow(row, headers);
+		const { data, issues } = processLegacyItemRow(row, headers, pricesIncludeVat);
 
 		if (issues.length > 0 || data === null) {
 			errors.push({ rowNumber, rawRow, issues });
@@ -519,6 +539,7 @@ interface LegacyImportResult {
 
 async function importLegacyData(
 	directoryPath: string,
+	pricesIncludeVat: boolean,
 	progressCallback?: (message: string, progress: number) => void,
 ): Promise<LegacyImportResult> {
 	const itemsFile = path.join(directoryPath, "items.tsv");
@@ -568,7 +589,7 @@ async function importLegacyData(
 		progressCallback?.(`Importuji položky (legacy)...`, progress);
 		logger.info(`Importing legacy items from: ${itemsFile}`);
 
-		const result = await importLegacyItems(itemsFile);
+		const result = await importLegacyItems(itemsFile, pricesIncludeVat);
 		if (!result.success) {
 			return {
 				success: false,
@@ -599,7 +620,7 @@ async function importLegacyData(
 function registerLegacyImportHandlers() {
 	ipcMain.handle(
 		"db:importLegacyData",
-		async (event, directoryPath: string) => {
+		async (event, directoryPath: string, pricesIncludeVat: boolean) => {
 			try {
 				if (!directoryPath) {
 					return { success: false, error: "Nebyla vybrána složka" };
@@ -609,13 +630,13 @@ function registerLegacyImportHandlers() {
 					return { success: false, error: "Vybraná složka neexistuje" };
 				}
 
-				logger.info(`Importing legacy data from: ${directoryPath}`);
+				logger.info(`Importing legacy data from: ${directoryPath}, pricesIncludeVat: ${pricesIncludeVat}`);
 
 				const progressCallback = (message: string, progress: number) => {
 					event.sender.send("import:progress", { message, progress });
 				};
 
-				importLegacyData(directoryPath, progressCallback)
+				importLegacyData(directoryPath, pricesIncludeVat, progressCallback)
 					.then((result) => {
 						event.sender.send("import:complete", result);
 					})
