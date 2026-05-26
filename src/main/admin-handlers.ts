@@ -74,13 +74,11 @@ function registerAdminHandlers() {
 			db.prepare("DROP TABLE IF EXISTS invoices").run();
 			db.prepare("DROP TABLE IF EXISTS items").run();
 			db.prepare("DROP TABLE IF EXISTS contacts").run();
-			db.prepare("DROP TABLE IF EXISTS invoices").run();
-			db.prepare("DROP TABLE IF EXISTS stockMovements").run();
 
 			db.exec(contactQueries.createTable);
 			db.exec(itemQueries.createTable);
-			db.exec(stockMovementQueries.createTable);
 			db.exec(invoiceQueries.createTable);
+			db.exec(stockMovementQueries.createTable);
 
 			logger.info("Tables recreated successfully");
 			return { success: true };
