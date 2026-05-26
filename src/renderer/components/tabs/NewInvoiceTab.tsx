@@ -181,15 +181,13 @@ function NewInvoiceTab() {
 		}
 
 		try {
-			const resetPoints = await Promise.all(
-				form.invoiceItems.map(async (item) => {
-					const result = await window.electronAPI.stockMovements.shouldSetResetPoint(
-						item.ean,
-						item.amount.toString(),
-					);
-					return { ean: item.ean, shouldReset: result.data ?? false };
-				}),
+			const resetPointResult = await window.electronAPI.stockMovements.shouldSetResetPointBatch(
+				form.invoiceItems.map((item) => ({
+					itemEan: item.ean,
+					newAmount: item.amount.toString(),
+				})),
 			);
+			const resetPoints = resetPointResult.data ?? {};
 
 			const stockMovements = form.invoiceItems.map((item) => ({
 				invoice_prefix: form.formData.prefix || "",
@@ -198,7 +196,7 @@ function NewInvoiceTab() {
 				amount: getSignedAmount(item.amount, form.formData.type) as unknown as number,
 				price_per_unit: item.sale_price.toString() as unknown as number,
 				vat_rate: item.vat_rate,
-				reset_point: resetPoints.find((rp) => rp.ean === item.ean)?.shouldReset ?? false,
+				reset_point: resetPoints[item.ean] ?? false,
 			}));
 
 			await createInvoiceWithStockMovements.mutateAsync({

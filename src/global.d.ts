@@ -140,6 +140,9 @@ declare global {
 					itemEan: string,
 					newAmount: string,
 				) => Promise<IpcResponse<boolean>>;
+				shouldSetResetPointBatch: (
+					items: { itemEan: string; newAmount: string }[],
+				) => Promise<IpcResponse<Record<string, boolean>>>;
 				create: (
 					movement: CreateStockMovementInput,
 				) => Promise<IpcResponse<{ changes: number }>>;

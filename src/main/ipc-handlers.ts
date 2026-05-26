@@ -235,6 +235,15 @@ export function registerIpcHandlers() {
 	);
 
 	ipcMain.handle(
+		"db:stockMovements:shouldSetResetPointBatch",
+		async (_event, items: { itemEan: string; newAmount: string }[]) => {
+			return handleIpcRequest(() =>
+				stockMovementService.shouldSetResetPointBatch(items),
+			);
+		},
+	);
+
+	ipcMain.handle(
 		"db:stockMovements:getByItemWithInvoiceInfo",
 		async (_event, itemEan: string) => {
 			return handleIpcRequest(() =>

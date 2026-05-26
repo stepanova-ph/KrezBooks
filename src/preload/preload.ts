@@ -183,6 +183,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
 				itemEan,
 				newAmount,
 			),
+		shouldSetResetPointBatch: (items: { itemEan: string; newAmount: string }[]) =>
+			ipcRenderer.invoke(
+				"db:stockMovements:shouldSetResetPointBatch",
+				items,
+			),
 
 		getByItemWithInvoiceInfo: (itemEan: string) =>
 			ipcRenderer.invoke("db:stockMovements:getByItemWithInvoiceInfo", itemEan),

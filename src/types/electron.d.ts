@@ -211,6 +211,9 @@ declare global {
 					itemEan: string,
 					newAmount: string,
 				) => Promise<IpcResponse<boolean>>;
+				shouldSetResetPointBatch: (
+					items: { itemEan: string; newAmount: string }[],
+				) => Promise<IpcResponse<Record<string, boolean>>>;
 				getByItemWithInvoiceInfo: (
 					itemEan: string,
 				) => Promise<IpcResponse<any[]>>;

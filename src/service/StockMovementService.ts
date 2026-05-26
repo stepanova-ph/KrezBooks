@@ -199,6 +199,16 @@ export class StockMovementService extends BaseService {
 		return currentStock > 0 && resultingStock <= 0;
 	}
 
+	async shouldSetResetPointBatch(
+		items: { itemEan: string; newAmount: string }[],
+	): Promise<Record<string, boolean>> {
+		const result: Record<string, boolean> = {};
+		for (const { itemEan, newAmount } of items) {
+			result[itemEan] = await this.shouldSetResetPoint(itemEan, newAmount);
+		}
+		return result;
+	}
+
 	async getByItemWithInvoiceInfo(
 		itemEan: string,
 	): Promise<StockMovementWithInvoiceInfo[]> {
