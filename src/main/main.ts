@@ -93,7 +93,14 @@ app.on("before-quit", async (event) => {
 
 	logger.info("Performing automatic backup on app exit...");
 	try {
-		const result = await performAutomaticBackup();
+		const BACKUP_TIMEOUT_MS = 10_000;
+		const backupWithTimeout = Promise.race([
+			performAutomaticBackup(),
+			new Promise<{ success: false; error: string }>((resolve) =>
+				setTimeout(() => resolve({ success: false, error: "Backup timed out" }), BACKUP_TIMEOUT_MS),
+			),
+		]);
+		const result = await backupWithTimeout;
 		if (result.success) {
 			logger.info(`✓ Exit backup completed: ${result.path}`);
 		} else {
