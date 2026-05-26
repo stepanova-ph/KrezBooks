@@ -34,6 +34,16 @@ function registerDataImportHandlers() {
 				progress: 0,
 			});
 
+			const IMPORT_TIMEOUT_MS = 5 * 60 * 1000;
+			const timeout = setTimeout(() => {
+				logger.error("Import worker timed out after 5 minutes");
+				worker.terminate();
+				event.sender.send("import:complete", {
+					success: false,
+					error: "Import vypršel po 5 minutách",
+				});
+			}, IMPORT_TIMEOUT_MS);
+
 			worker.on("message", (msg) => {
 				if (msg.type === "progress") {
 					event.sender.send("import:progress", {
@@ -78,12 +88,14 @@ function registerDataImportHandlers() {
 						}
 					}
 
+					clearTimeout(timeout);
 					event.sender.send("import:complete", msg.result);
 					worker.terminate();
 				}
 			});
 
 			worker.on("error", (error) => {
+				clearTimeout(timeout);
 				logger.error("Import worker error:", error);
 				event.sender.send("import:complete", {
 					success: false,
