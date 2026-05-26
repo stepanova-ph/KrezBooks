@@ -526,8 +526,9 @@ if (parentPort) {
 	const { folderPath, dbPath } = workerData;
 
 	(async () => {
+	let db: InstanceType<typeof Database> | undefined;
 	try {
-		const db = new Database(dbPath);
+		db = new Database(dbPath);
 		db.pragma("foreign_keys = ON");
 
 		const contactsFile = path.join(folderPath, "contacts.csv");
@@ -613,8 +614,6 @@ if (parentPort) {
 			allErrors.push(...result.errors);
 		}
 
-		db.close();
-
 		let logFile: string | undefined;
 		if (allErrors.length > 0) {
 			const timestamp = Date.now();
@@ -645,6 +644,8 @@ if (parentPort) {
 				error: error.message || "Import selhal",
 			},
 		});
+	} finally {
+		db?.close();
 	}
 	})();
 }
