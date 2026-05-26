@@ -20,7 +20,7 @@ export const stockMovementSchema = z.object({
 
 	amount: z.string().refine((val) => {
 		const num = parseFloat(val);
-		return !isNaN(num) && num >= 0;
+		return !isNaN(num) && num > 0;
 	}, validationMessages.stockMovement.amountRequired),
 
 	price_per_unit: z.string().refine((val) => {
