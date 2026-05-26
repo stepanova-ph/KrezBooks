@@ -293,13 +293,7 @@ export function registerIpcHandlers() {
 	);
 
 	ipcMain.handle("db:invoices:getMaxNumber", async (_, type: number) => {
-		try {
-			const maxNumber = await invoiceService.getMaxNumberByType(type);
-			return maxNumber;
-		} catch (error) {
-			logger.error("Failed to get max invoice number:", error);
-			throw error;
-		}
+		return handleIpcRequest(() => invoiceService.getMaxNumberByType(type));
 	});
 
 	// --------------------------------------------------------------------------

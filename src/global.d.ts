@@ -189,7 +189,7 @@ declare global {
 				) => Promise<IpcResponse<StockMovement[]>>;
 				getAverageBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
 				getLastBuyPriceByItem: (ean: string) => Promise<IpcResponse<number>>;
-				getMaxNumber: (type: number) => Promise<number>;
+				getMaxNumber: (type: number) => Promise<IpcResponse<number>>;
 			};
 			print: {
 				generateInvoiceHTML: (

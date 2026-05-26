@@ -117,7 +117,11 @@ export function useDeleteInvoice() {
 export function useMaxInvoiceNumber(type: number) {
 	return useQuery({
 		queryKey: ["invoices", "maxNumber", type],
-		queryFn: () => window.electronAPI.invoices.getMaxNumber(type),
+		queryFn: async () => {
+			const result = await window.electronAPI.invoices.getMaxNumber(type);
+			if (!result.success) throw new Error(result.error);
+			return result.data as number;
+		},
 		staleTime: 0,
 		enabled: type >= 1 && type <= 5,
 	});
