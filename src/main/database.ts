@@ -41,6 +41,15 @@ class DatabaseManager {
 		return path.join(userDataPath, "krezbooks.db");
 	}
 
+	private checkIntegrity(db: Database.Database): boolean {
+		try {
+			const result = db.pragma("integrity_check") as { integrity_check: string }[];
+			return result.length === 1 && result[0].integrity_check === "ok";
+		} catch {
+			return false;
+		}
+	}
+
 	public initDatabase(): Database.Database {
 		try {
 			if (this.db) return this.db;
@@ -51,10 +60,17 @@ class DatabaseManager {
 			try {
 				this.db = new Database(dbPath);
 			} catch (error) {
-				logger.error("Failed to open database:", error);
-				throw new Error(
-					`Cannot open database: ${error instanceof Error ? error.message : "Unknown error"}`,
-				);
+				logger.warn("Failed to open database, attempting recovery:", error);
+				this.recoverCorruptDatabase(dbPath);
+				this.db = new Database(dbPath);
+			}
+
+			if (!this.checkIntegrity(this.db)) {
+				logger.warn("Database integrity check failed, attempting recovery");
+				this.db.close();
+				this.db = null;
+				this.recoverCorruptDatabase(dbPath);
+				this.db = new Database(dbPath);
 			}
 
 			try {
@@ -106,6 +122,21 @@ class DatabaseManager {
 				logger.error("Error closing database:", error);
 				this.db = null;
 			}
+		}
+	}
+
+	private recoverCorruptDatabase(dbPath: string) {
+		const corruptPath = `${dbPath}.corrupt-${Date.now()}`;
+		try {
+			if (fs.existsSync(dbPath)) {
+				fs.renameSync(dbPath, corruptPath);
+				logger.warn(`Corrupt database moved to: ${corruptPath}`);
+			}
+		} catch (error) {
+			logger.error("Failed to move corrupt database:", error);
+			throw new Error(
+				`Database recovery failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+			);
 		}
 	}
 
