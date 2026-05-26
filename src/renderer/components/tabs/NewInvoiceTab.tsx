@@ -14,10 +14,9 @@ import { InvoiceSuccessDialog } from "../invoice/InvoiceSuccessDialog";
 import { useInvoiceForm } from "../../../hooks/useInvoiceForm";
 import { useInvoiceDialogs } from "../../../hooks/useInvoiceDialogs";
 import {
-	useCreateInvoice,
+	useCreateInvoiceWithStockMovements,
 	useMaxInvoiceNumber,
 } from "../../../hooks/useInvoices";
-import { useCreateStockMovement } from "../../../hooks/useStockMovement";
 import type { Item, Contact } from "../../../types/database";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 import {
@@ -36,8 +35,7 @@ import theme from "src/lib/theme";
 function NewInvoiceTab() {
 	const form = useInvoiceForm();
 	const dialogs = useInvoiceDialogs();
-	const createInvoice = useCreateInvoice();
-	const createStockMovement = useCreateStockMovement();
+	const createInvoiceWithStockMovements = useCreateInvoiceWithStockMovements();
 	const { data: maxNumber = 0 } = useMaxInvoiceNumber(form.formData.type ?? 1);
 
 	const [viewingItemEan, setViewingItemEan] = useState<string | null>(null);
@@ -183,52 +181,52 @@ function NewInvoiceTab() {
 		}
 
 		try {
-			await createInvoice.mutateAsync({
-				number: form.formData.number,
-				prefix: form.formData.prefix || undefined,
-				type: form.formData.type,
-				payment_method: form.formData.payment_method,
-				date_issue: form.formData.date_issue,
-				date_tax: form.formData.date_tax || undefined,
-				date_due: form.formData.date_due || undefined,
-				variable_symbol: form.formData.variable_symbol || undefined,
-				order_number: form.formData.order_number || undefined,
-				note: form.formData.note || undefined,
-				is_in_eur: form.formData.is_in_eur,
-				ico: form.formData.ico || undefined,
-				modifier: form.formData.modifier,
-				dic: form.formData.dic || undefined,
-				company_name: form.formData.company_name || undefined,
-				bank_account: form.formData.bank_account || undefined,
-				street: form.formData.street || undefined,
-				city: form.formData.city || undefined,
-				postal_code: form.formData.postal_code || undefined,
-				phone: form.formData.phone || undefined,
-				email: form.formData.email || undefined,
-			});
-
-			await Promise.all(
+			const resetPoints = await Promise.all(
 				form.invoiceItems.map(async (item) => {
-					const shouldSetResetPoint =
-						await window.electronAPI.stockMovements.shouldSetResetPoint(
-							item.ean,
-							item.amount.toString(),
-						);
-					console.log(
-						`Should set reset point for ${item.ean}: ${shouldSetResetPoint}`,
+					const result = await window.electronAPI.stockMovements.shouldSetResetPoint(
+						item.ean,
+						item.amount.toString(),
 					);
-
-					return createStockMovement.mutateAsync({
-						invoice_prefix: form.formData.prefix || "",
-						invoice_number: form.formData.number,
-						item_ean: item.ean,
-						amount: getSignedAmount(item.amount, form.formData.type),
-						price_per_unit: item.sale_price.toString(),
-						vat_rate: item.vat_rate,
-						reset_point: shouldSetResetPoint,
-					});
+					return { ean: item.ean, shouldReset: result.data ?? false };
 				}),
 			);
+
+			const stockMovements = form.invoiceItems.map((item) => ({
+				invoice_prefix: form.formData.prefix || "",
+				invoice_number: form.formData.number,
+				item_ean: item.ean,
+				amount: getSignedAmount(item.amount, form.formData.type) as unknown as number,
+				price_per_unit: item.sale_price.toString() as unknown as number,
+				vat_rate: item.vat_rate,
+				reset_point: resetPoints.find((rp) => rp.ean === item.ean)?.shouldReset ?? false,
+			}));
+
+			await createInvoiceWithStockMovements.mutateAsync({
+				invoice: {
+					number: form.formData.number,
+					prefix: form.formData.prefix || "",
+					type: form.formData.type,
+					payment_method: form.formData.payment_method,
+					date_issue: form.formData.date_issue,
+					date_tax: form.formData.date_tax || undefined,
+					date_due: form.formData.date_due || undefined,
+					variable_symbol: form.formData.variable_symbol || undefined,
+					order_number: form.formData.order_number || undefined,
+					note: form.formData.note || undefined,
+					is_in_eur: form.formData.is_in_eur,
+					ico: form.formData.ico || undefined,
+					modifier: form.formData.modifier,
+					dic: form.formData.dic || undefined,
+					company_name: form.formData.company_name || undefined,
+					bank_account: form.formData.bank_account || undefined,
+					street: form.formData.street || undefined,
+					city: form.formData.city || undefined,
+					postal_code: form.formData.postal_code || undefined,
+					phone: form.formData.phone || undefined,
+					email: form.formData.email || undefined,
+				},
+				stockMovements,
+			});
 
 			const invoiceIdentifier = form.formData.prefix
 				? `${form.formData.prefix}${form.formData.number}`
@@ -437,7 +435,7 @@ function NewInvoiceTab() {
 							variant="contained"
 							onClick={handleSubmit}
 							disabled={
-								createInvoice.isPending || form.invoiceItems.length === 0
+								createInvoiceWithStockMovements.isPending || form.invoiceItems.length === 0
 							}
 							size="large"
 						>

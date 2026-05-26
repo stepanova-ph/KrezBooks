@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Invoice, CreateInvoiceInput } from "../types/database";
+import type { Invoice, CreateInvoiceInput, CreateStockMovementInput } from "../types/database";
 
 export function useInvoices() {
 	return useQuery({
@@ -41,6 +41,35 @@ export function useCreateInvoice() {
 			queryClient.invalidateQueries({
 				queryKey: ["invoices", "maxNumber", invoice.type],
 			});
+		},
+	});
+}
+
+export function useCreateInvoiceWithStockMovements() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({
+			invoice,
+			stockMovements,
+		}: {
+			invoice: CreateInvoiceInput;
+			stockMovements: CreateStockMovementInput[];
+		}) => {
+			const result = await window.electronAPI.invoices.createWithStockMovements(
+				invoice,
+				stockMovements,
+			);
+			if (!result.success) throw new Error(result.error);
+			return result.data;
+		},
+		onSuccess: (_, { invoice }) => {
+			queryClient.invalidateQueries({ queryKey: ["invoices"] });
+			queryClient.invalidateQueries({
+				queryKey: ["invoices", "maxNumber", invoice.type],
+			});
+			queryClient.invalidateQueries({ queryKey: ["stockMovements"] });
+			queryClient.invalidateQueries({ queryKey: ["items"] });
 		},
 	});
 }
