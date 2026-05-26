@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Contact, InvoiceType, Item } from "../types/database";
 import { invoiceSchema } from "../validation/invoiceSchema";
 import { useTabPersistence } from "../context/TabPersistanceContext";
@@ -148,37 +148,42 @@ export function useInvoiceForm() {
 		});
 	}, [formData, invoiceItems, selectedContact, setInvoiceFormState]);
 
-	const handleChange = (field: string, value: string | number | boolean) => {
+	const handleChange = useCallback((field: string, value: string | number | boolean) => {
 		if (field === "variable_symbol") {
-			const autoVariableSymbol = `${formData.prefix}${formData.number}`;
-			if (value !== autoVariableSymbol) {
-				console.log(
-					`User entered custom variable symbol: ${value} (auto would be: ${autoVariableSymbol})`,
-				);
-				setIsVariableSymbolCustom(true);
+			setFormData((prev) => {
+				const autoVariableSymbol = `${prev.prefix}${prev.number}`;
+				if (value !== autoVariableSymbol) {
+					setIsVariableSymbolCustom(true);
+				} else {
+					setIsVariableSymbolCustom(false);
+				}
+				return { ...prev, [field]: value };
+			});
+		} else {
+			if (field === "date_tax") {
+				setFormData((prev) => {
+					const autoDateTax = addDays(prev.date_issue, DATE_TAX_OFFSET_DAYS);
+					setIsDateTaxManual(value !== autoDateTax);
+					return { ...prev, [field]: value };
+				});
+			} else if (field === "date_due") {
+				setFormData((prev) => {
+					const autoDateDue = addDays(prev.date_issue, DATE_DUE_OFFSET_DAYS);
+					setIsDateDueManual(value !== autoDateDue);
+					return { ...prev, [field]: value };
+				});
 			} else {
-				console.log("User changed variable symbol back to auto value");
-				setIsVariableSymbolCustom(false);
+				setFormData((prev) => ({ ...prev, [field]: value }));
 			}
 		}
 
-		// Track manual date changes
-		if (field === "date_tax") {
-			const autoDateTax = addDays(formData.date_issue, DATE_TAX_OFFSET_DAYS);
-			setIsDateTaxManual(value !== autoDateTax);
-		}
-
-		if (field === "date_due") {
-			const autoDateDue = addDays(formData.date_issue, DATE_DUE_OFFSET_DAYS);
-			setIsDateDueManual(value !== autoDateDue);
-		}
-
-		setFormData((prev) => ({ ...prev, [field]: value }));
-
-		if (errors[field]) {
-			setErrors((prev) => ({ ...prev, [field]: "" }));
-		}
-	};
+		setErrors((prev) => {
+			if (prev[field]) {
+				return { ...prev, [field]: "" };
+			}
+			return prev;
+		});
+	}, []);
 
 	const handleBlur = (field: string) => {
 		if (field === "variable_symbol" && !formData.variable_symbol.trim()) {

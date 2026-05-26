@@ -65,7 +65,7 @@ function NewInvoiceTab() {
 		if (defaultPrefix && form.formData.prefix !== defaultPrefix) {
 			form.handleChange("prefix", defaultPrefix);
 		}
-	}, [form.formData.type]);
+	}, [form.formData.type, form.formData.prefix, form.handleChange]);
 
 	useEffect(() => {
 		if (maxNumber !== undefined) {
@@ -74,7 +74,7 @@ function NewInvoiceTab() {
 				form.handleChange("number", nextNumber);
 			}
 		}
-	}, [maxNumber, form.formData.type]);
+	}, [maxNumber, form.formData.type, form.formData.number, form.handleChange]);
 
 	// Currency change warning
 	useEffect(() => {
@@ -82,7 +82,7 @@ function NewInvoiceTab() {
 			// Show warning that prices may need to be updated
 			// User can choose to continue or cancel currency change
 		}
-	}, [form.formData.is_in_eur]);
+	}, [form.formData.is_in_eur, form.invoiceItems.length]);
 
 	const handleSelectItem = (item: Item) => {
 		const existingIndex = form.invoiceItems.findIndex(
