@@ -112,6 +112,7 @@ export async function performAutomaticBackup(): Promise<{
 	error?: string;
 	path?: string;
 }> {
+	let tempPath: string | undefined;
 	try {
 		const backupBasePath = getBackupPath();
 
@@ -121,24 +122,36 @@ export async function performAutomaticBackup(): Promise<{
 
 		const backupFolderName = `krezbooks-backup-${formatTimestamp(new Date())}`;
 		const backupPath = path.join(backupBasePath, backupFolderName);
+		tempPath = path.join(backupBasePath, `${backupFolderName}.tmp`);
 
-		fs.mkdirSync(backupPath, { recursive: true });
+		fs.mkdirSync(tempPath, { recursive: true });
 
 		logger.info(`Starting automatic backup to: ${backupPath}`);
 
 		for (const tableName of TABLES) {
 			const { csv: csvContent, count } = exportTable(tableName);
 
-			const filePath = path.join(backupPath, `${tableName}.csv`);
+			const filePath = path.join(tempPath, `${tableName}.csv`);
 			fs.writeFileSync(filePath, csvContent, "utf-8");
 
 			logger.info(`Backed up ${count} rows from ${tableName}`);
 		}
 
+		fs.renameSync(tempPath, backupPath);
+
 		logger.info(`Automatic backup completed: ${backupPath}`);
 		return { success: true, path: backupPath };
 	} catch (error: any) {
 		logger.error("Automatic backup failed:", error);
+		if (tempPath) {
+			try {
+				if (fs.existsSync(tempPath)) {
+					fs.rmSync(tempPath, { recursive: true });
+				}
+			} catch {
+				// Cleanup is best-effort
+			}
+		}
 		return {
 			success: false,
 			error: error.message || "Backup selhal",
