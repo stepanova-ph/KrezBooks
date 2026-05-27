@@ -1,12 +1,12 @@
 import { ipcMain, shell, app } from "electron";
 import { handleIpcRequest } from "./ipcWrapper";
 import { logger } from "./logger";
-import { exec } from "child_process";
+import { execFile } from "child_process";
 import { promisify } from "util";
 import path from "path";
 import fs from "fs";
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 async function createOutlookDraft(
 	email: string,
@@ -24,14 +24,18 @@ async function createOutlookDraft(
 		throw new Error(`PowerShell script not found: ${scriptPath}`);
 	}
 
-	// Escape PowerShell parameters
-	const escapePowerShellParam = (str: string) => str.replace(/'/g, "''");
-
-	const psCommand = `powershell.exe -ExecutionPolicy Bypass -File "${scriptPath}" -to '${escapePowerShellParam(email)}' -subject '${escapePowerShellParam(subject)}' -body '${escapePowerShellParam(body)}' -attachmentPath '${attachmentPath ? escapePowerShellParam(attachmentPath) : ''}'`;
+	const args = [
+		"-ExecutionPolicy", "Bypass",
+		"-File", scriptPath,
+		"-to", email,
+		"-subject", subject,
+		"-body", body,
+		"-attachmentPath", attachmentPath || "",
+	];
 
 	logger.info(`Executing PowerShell command to create Outlook draft`);
 
-	const { stdout, stderr } = await execAsync(psCommand);
+	const { stdout, stderr } = await execFileAsync("powershell.exe", args);
 
 	if (stderr && !stderr.includes('WARNING')) {
 		logger.warn(`PowerShell stderr: ${stderr}`);
@@ -56,14 +60,17 @@ async function createMailDraft(
 		throw new Error(`AppleScript not found: ${scriptPath}`);
 	}
 
-	// Escape AppleScript parameters by wrapping in quotes and escaping existing quotes
-	const escapeAppleScriptParam = (str: string) => str.replace(/"/g, '\\"');
-
-	const osascriptCommand = `osascript "${scriptPath}" "${escapeAppleScriptParam(email)}" "${escapeAppleScriptParam(subject)}" "${escapeAppleScriptParam(body)}" "${attachmentPath ? escapeAppleScriptParam(attachmentPath) : ''}"`;
+	const args = [
+		scriptPath,
+		email,
+		subject,
+		body,
+		attachmentPath || "",
+	];
 
 	logger.info(`Executing AppleScript command to create Mail draft`);
 
-	const { stdout, stderr } = await execAsync(osascriptCommand);
+	const { stdout, stderr } = await execFileAsync("osascript", args);
 
 	if (stderr) {
 		logger.warn(`AppleScript stderr: ${stderr}`);
