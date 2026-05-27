@@ -8,6 +8,7 @@ import { FormSection } from "../common/form/FormSection";
 import { ItemPickerDialog } from "../invoice/new/ItemPickerDialog";
 import { ItemAmountPriceDialog } from "../invoice/new/ItemAmountPriceDialog";
 import { ContactPickerDialog } from "../invoice/new/ContactPickerDialog";
+import { ErrorBoundary } from "../ErrorBoundary";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { InfoDialog } from "../common/dialog/InfoDialog";
 import { InvoiceSuccessDialog } from "../invoice/InvoiceSuccessDialog";
@@ -443,32 +444,38 @@ function NewInvoiceTab() {
 				</Box>
 			</Box>
 
-			<ItemPickerDialog
-				open={dialogs.itemPicker.open}
-				onClose={dialogs.itemPicker.closeDialog}
-				onSelect={handleSelectItem}
-				selectedItemEans={new Set(form.invoiceItems.map((i) => i.ean))}
-			/>
+			<ErrorBoundary fallback={(_, reset) => { dialogs.itemPicker.closeDialog(); reset(); return null; }}>
+				<ItemPickerDialog
+					open={dialogs.itemPicker.open}
+					onClose={dialogs.itemPicker.closeDialog}
+					onSelect={handleSelectItem}
+					selectedItemEans={new Set(form.invoiceItems.map((i) => i.ean))}
+				/>
+			</ErrorBoundary>
 
-			<ItemAmountPriceDialog
-				open={dialogs.amountPrice.open}
-				onClose={handleCloseAmountPriceDialog}
-				onConfirm={handleConfirmAmountPrice}
-				item={dialogs.amountPrice.selectedItem}
-				invoiceType={form.formData.type}
-				contactPriceGroup={form.selectedContact?.price_group}
-				initialAmount={dialogs.amountPrice.editingItemData?.amount}
-				initialPrice={dialogs.amountPrice.editingItemData?.price}
-				initialPriceGroup={dialogs.amountPrice.editingItemData?.p_group_index}
-				isInEur={form.formData.is_in_eur}
-			/>
+			<ErrorBoundary fallback={(_, reset) => { handleCloseAmountPriceDialog(); reset(); return null; }}>
+				<ItemAmountPriceDialog
+					open={dialogs.amountPrice.open}
+					onClose={handleCloseAmountPriceDialog}
+					onConfirm={handleConfirmAmountPrice}
+					item={dialogs.amountPrice.selectedItem}
+					invoiceType={form.formData.type}
+					contactPriceGroup={form.selectedContact?.price_group}
+					initialAmount={dialogs.amountPrice.editingItemData?.amount}
+					initialPrice={dialogs.amountPrice.editingItemData?.price}
+					initialPriceGroup={dialogs.amountPrice.editingItemData?.p_group_index}
+					isInEur={form.formData.is_in_eur}
+				/>
+			</ErrorBoundary>
 
-			<ContactPickerDialog
-				open={dialogs.contactPicker.open}
-				onClose={dialogs.contactPicker.closeDialog}
-				onSelect={handleSelectContact}
-				singleSelect={true}
-			/>
+			<ErrorBoundary fallback={(_, reset) => { dialogs.contactPicker.closeDialog(); reset(); return null; }}>
+				<ContactPickerDialog
+					open={dialogs.contactPicker.open}
+					onClose={dialogs.contactPicker.closeDialog}
+					onSelect={handleSelectContact}
+					singleSelect={true}
+				/>
+			</ErrorBoundary>
 
 			<AlertDialog
 				open={alertDialog?.open || false}

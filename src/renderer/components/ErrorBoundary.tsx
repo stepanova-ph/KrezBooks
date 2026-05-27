@@ -4,6 +4,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 interface Props {
 	children: React.ReactNode;
+	fallback?: React.ReactNode | ((error: Error, reset: () => void) => React.ReactNode);
 }
 
 interface State {
@@ -25,8 +26,22 @@ export class ErrorBoundary extends React.Component<Props, State> {
 		console.error("ErrorBoundary caught:", error, errorInfo);
 	}
 
+	private handleReset = () => {
+		this.setState({ hasError: false, error: undefined });
+	};
+
 	render() {
 		if (this.state.hasError) {
+			const { fallback } = this.props;
+			const error = this.state.error || new Error("Neznámá chyba");
+
+			if (fallback) {
+				if (typeof fallback === "function") {
+					return fallback(error, this.handleReset);
+				}
+				return fallback;
+			}
+
 			return (
 				<Box sx={{ p: 4, textAlign: "center" }}>
 					<ErrorOutlineIcon sx={{ fontSize: 64, color: "error.main", mb: 2 }} />
@@ -34,7 +49,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 						Něco se pokazilo
 					</Typography>
 					<Typography variant="body1" color="text.secondary" paragraph>
-						{this.state.error?.message || "Neznámá chyba"}
+						{error.message}
 					</Typography>
 					<Button variant="contained" onClick={() => window.location.reload()}>
 						Obnovit aplikaci

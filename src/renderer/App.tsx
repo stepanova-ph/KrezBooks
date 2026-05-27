@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ThemeProvider, CssBaseline } from "@mui/material";
+import React, { useState } from "react";
+import { ThemeProvider, CssBaseline, Box, Typography, Button } from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -16,6 +16,7 @@ import InvoicesTab from "./components/tabs/InvoicesTab";
 
 import { useGlobalShortcuts } from "../hooks/keyboard/useGlobalShortcuts";
 import { TabPersistenceProvider } from "../context/TabPersistanceContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -27,18 +28,43 @@ function App() {
 	useGlobalShortcuts(setCurrentPage);
 
 	const renderPage = () => {
+		const tabFallback = (error: Error, reset: () => void) => (
+			<Box sx={{ p: 4, textAlign: "center" }}>
+				<Typography variant="h6" gutterBottom>
+					V této záložce došlo k chybě
+				</Typography>
+				<Typography variant="body2" color="text.secondary" paragraph>
+					{error.message}
+				</Typography>
+				<Button variant="contained" onClick={reset}>
+					Zkusit znovu
+				</Button>
+			</Box>
+		);
+
+		let tab: React.ReactNode;
 		switch (currentPage) {
 			case "adresar":
-				return <ContactsTab />;
+				tab = <ContactsTab />;
+				break;
 			case "sklad":
-				return <InventoryTab />;
+				tab = <InventoryTab />;
+				break;
 			case "novy_doklad":
-				return <NewInvoiceTab />;
+				tab = <NewInvoiceTab />;
+				break;
 			case "doklady":
-				return <InvoicesTab />;
+				tab = <InvoicesTab />;
+				break;
 			default:
-				return <NewInvoiceTab />;
+				tab = <NewInvoiceTab />;
 		}
+
+		return (
+			<ErrorBoundary key={currentPage} fallback={tabFallback}>
+				{tab}
+			</ErrorBoundary>
+		);
 	};
 
 	return (
