@@ -1,6 +1,8 @@
 import { ipcMain } from "electron";
 import { getDatabase } from "../database";
 import { logger } from "../logger";
+import { invoiceQueries } from "../queries";
+import { stockMovementQueries } from "../queries/stockMovements";
 import fs from "fs";
 import path from "path";
 
@@ -188,14 +190,23 @@ function vatRateToPercentage(vatRate: number): number {
 	return 0;
 }
 
+interface LegacyItemResult {
+	data: Record<string, unknown> | null;
+	stockData: { ean: string; amount: number; buyPrice: number; vatRate: number } | null;
+	issues: string[];
+}
+
 function processLegacyItemRow(
 	row: string[],
 	headers: string[],
 	pricesIncludeVat: boolean,
-): { data: Record<string, unknown> | null; issues: string[] } {
+): LegacyItemResult {
 	const issues: string[] = [];
 
-	const ean = getColumnValue(row, headers, "Číslo");
+	// Support both formats: use Čarový kód as EAN if available, fall back to Číslo
+	const barcode = getColumnValue(row, headers, "Čarový kód");
+	const itemNumber = getColumnValue(row, headers, "Číslo");
+	const ean = barcode || itemNumber;
 	const rawName = getColumnValue(row, headers, "Název položky");
 
 	// Extract category from name prefix (e.g., "Ch-klapka" -> category: "CH", name: "Klapka")
@@ -208,6 +219,9 @@ function processLegacyItemRow(
 	const salePriceGroup3Raw = getColumnValue(row, headers, "Prodej 3");
 	const salePriceGroup4Raw = getColumnValue(row, headers, "Prodej 4");
 
+	const stockAmountRaw = getColumnValue(row, headers, "Množství");
+	const buyPriceRaw = getColumnValue(row, headers, "Nákup");
+
 	if (!ean) {
 		issues.push("Missing required field: Číslo (ean)");
 	}
@@ -215,28 +229,28 @@ function processLegacyItemRow(
 		issues.push("Missing required field: Název položky (name)");
 	}
 
-	const vatRate = parseVatRate(vatRateRaw);
+	// Default to 21% (standard rate) if DPH column is missing
+	const vatRate = vatRateRaw ? parseVatRate(vatRateRaw) : 2;
 	if (vatRate === null) {
 		issues.push(`Invalid VAT rate: "${vatRateRaw}"`);
 	}
 
 	const salePriceGroup1 = parseDecimalPrice(salePriceGroup1Raw);
-	const salePriceGroup2 = parseDecimalPrice(salePriceGroup2Raw);
-	const salePriceGroup3 = parseDecimalPrice(salePriceGroup3Raw);
-	const salePriceGroup4 = parseDecimalPrice(salePriceGroup4Raw);
+	// If Prodej 2/3/4 columns are missing, fall back to Prodej 1
+	const salePriceGroup2 = parseDecimalPrice(salePriceGroup2Raw) || salePriceGroup1;
+	const salePriceGroup3 = parseDecimalPrice(salePriceGroup3Raw) || salePriceGroup1;
+	const salePriceGroup4 = parseDecimalPrice(salePriceGroup4Raw) || salePriceGroup1;
 
 	if (salePriceGroup1 === null)
 		issues.push(`Invalid price Prodej 1: "${salePriceGroup1Raw}"`);
-	if (salePriceGroup2 === null)
-		issues.push(`Invalid price Prodej 2: "${salePriceGroup2Raw}"`);
-	if (salePriceGroup3 === null)
-		issues.push(`Invalid price Prodej 3: "${salePriceGroup3Raw}"`);
-	if (salePriceGroup4 === null)
-		issues.push(`Invalid price Prodej 4: "${salePriceGroup4Raw}"`);
 
 	if (issues.length > 0) {
-		return { data: null, issues };
+		return { data: null, stockData: null, issues };
 	}
+
+	// Parse stock amount and buy price for correction invoice
+	const stockAmount = parseDecimalPrice(stockAmountRaw) ?? 0;
+	const buyPrice = parseDecimalPrice(buyPriceRaw) ?? 0;
 
 	let p1 = salePriceGroup1!;
 	let p2 = salePriceGroup2!;
@@ -264,6 +278,7 @@ function processLegacyItemRow(
 			sale_price_group4: p4,
 			note: null,
 		},
+		stockData: stockAmount !== 0 ? { ean, amount: stockAmount, buyPrice, vatRate: vatRate! } : null,
 		issues: [],
 	};
 }
@@ -281,6 +296,7 @@ async function importLegacyItems(filePath: string, pricesIncludeVat: boolean): P
 
 	const errors: ImportError[] = [];
 	let imported = 0;
+	const stockEntries: { ean: string; amount: number; buyPrice: number; vatRate: number }[] = [];
 
 	const insertStmt = db.prepare(`
 		INSERT INTO items (
@@ -299,7 +315,7 @@ async function importLegacyItems(filePath: string, pricesIncludeVat: boolean): P
 		const row = rows[i];
 		const rawRow = row.join("\t");
 
-		const { data, issues } = processLegacyItemRow(row, headers, pricesIncludeVat);
+		const { data, stockData, issues } = processLegacyItemRow(row, headers, pricesIncludeVat);
 
 		if (issues.length > 0 || data === null) {
 			errors.push({ rowNumber, rawRow, issues });
@@ -309,6 +325,9 @@ async function importLegacyItems(filePath: string, pricesIncludeVat: boolean): P
 		try {
 			insertStmt.run(data);
 			imported++;
+			if (stockData) {
+				stockEntries.push(stockData);
+			}
 		} catch (dbError: any) {
 			const errorMessage = dbError.message || "Unknown database error";
 			if (
@@ -331,6 +350,72 @@ async function importLegacyItems(filePath: string, pricesIncludeVat: boolean): P
 
 		if (i % 10 === 0 && i > 0) {
 			await yieldToEventLoop();
+		}
+	}
+
+	// Create a single correction invoice (type 5) with stock movements for initial inventory
+	let stockMovementsCreated = 0;
+	if (stockEntries.length > 0) {
+		try {
+			const today = new Date().toISOString().split("T")[0];
+			const correctionPrefix = "IMP";
+			const correctionNumber = `${Date.now()}`;
+
+			const insertInvoiceStmt = db.prepare(invoiceQueries.create);
+			insertInvoiceStmt.run({
+				number: correctionNumber,
+				prefix: correctionPrefix,
+				type: 5,
+				payment_method: null,
+				date_issue: today,
+				date_tax: null,
+				date_due: null,
+				variable_symbol: null,
+				order_number: null,
+				note: "Počáteční stav skladu z legacy importu",
+				ico: null,
+				modifier: null,
+				dic: null,
+				company_name: null,
+				bank_account: null,
+				street: null,
+				city: null,
+				postal_code: null,
+				phone: null,
+				email: null,
+				is_in_eur: 0,
+			});
+
+			const insertMovementStmt = db.prepare(stockMovementQueries.create);
+			for (const entry of stockEntries) {
+				try {
+					insertMovementStmt.run({
+						invoice_prefix: correctionPrefix,
+						invoice_number: correctionNumber,
+						item_ean: entry.ean,
+						amount: entry.amount.toString(),
+						price_per_unit: entry.buyPrice.toString(),
+						vat_rate: entry.vatRate,
+						reset_point: 0,
+					});
+					stockMovementsCreated++;
+				} catch (smError: any) {
+					errors.push({
+						rowNumber: 0,
+						rawRow: `Stock movement for EAN ${entry.ean}`,
+						issues: [`Stock movement error: ${smError.message}`],
+					});
+				}
+			}
+
+			logger.info(`Created correction invoice ${correctionPrefix}${correctionNumber} with ${stockMovementsCreated} stock movements`);
+		} catch (invoiceError: any) {
+			logger.error("Failed to create correction invoice:", invoiceError);
+			errors.push({
+				rowNumber: 0,
+				rawRow: "Correction invoice creation",
+				issues: [`Failed to create correction invoice: ${invoiceError.message}`],
+			});
 		}
 	}
 
