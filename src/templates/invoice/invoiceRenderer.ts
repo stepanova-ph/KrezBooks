@@ -77,28 +77,49 @@ function generatePageHeader(
         <div class="party-box party-supplier">
           <h3 class="party-title">Dodavatel</h3>
           <div class="party-content">
-            <p class="party-name">${seller.ownerName}</p>
-            <p class="party-name">${seller.companyName}</p>
-            <p>IČO: ${seller.ico}</p>
-            ${seller.dic ? `<p>DIČ: ${seller.dic}</p>` : ""}
-            <p>${seller.street}</p>
-            <p>${seller.city}, ${seller.postalCode}</p>
-            <p>Tel: ${seller.phone}</p>
-            <p>Email: ${seller.email}</p>
-            <p>Účet: ${seller.bankAccount}</p>
+            <div class="party-group">
+              <p class="party-name">${seller.ownerName}</p>
+              <p class="party-name">${seller.companyName}</p>
+              <p>IČO: ${seller.ico}</p>
+              ${seller.dic ? `<p>DIČ: ${seller.dic}</p>` : ""}
+              <p>${seller.street}</p>
+              <p>${seller.city}, ${seller.postalCode}</p>
+            </div>
+            <div class="party-group">
+              <p>Tel: ${seller.phone}${seller.phone2 ? ` / ${seller.phone2}` : ""}</p>
+              <p>Email: ${seller.email}</p>
+            </div>
+            <div class="party-group">
+              <p class="party-group-label">Bankovní spojení:</p>
+              <p>Číslo účtu: ${seller.bankAccount}</p>
+              ${seller.bankName ? `<p>Název banky: ${seller.bankName}</p>` : ""}
+              ${seller.iban ? `<p>IBAN: ${seller.iban}</p>` : ""}
+              ${seller.bic ? `<p>BIC: ${seller.bic}</p>` : ""}
+            </div>
           </div>
         </div>
 
         <div class="party-box party-buyer">
           <h3 class="party-title">Odběratel</h3>
           <div class="party-content">
-            <p class="party-name">${buyer.companyName}</p>
-            ${buyer.ico ? `<p>IČO: ${buyer.ico}</p>` : ""}
-            ${buyer.dic ? `<p>DIČ: ${buyer.dic}</p>` : ""}
-            ${buyer.street ? `<p>${buyer.street}</p>` : ""}
-            ${buyer.city && buyer.postalCode ? `<p>${buyer.city}, ${buyer.postalCode}</p>` : ""}
-            ${buyer.phone ? `<p>Tel: ${buyer.phone}</p>` : ""}
-            ${buyer.email ? `<p>Email: ${buyer.email}</p>` : ""}
+            <div class="party-group">
+              <p class="party-name">${buyer.companyName}</p>
+              ${buyer.ico ? `<p>IČO: ${buyer.ico}</p>` : ""}
+              ${buyer.dic ? `<p>DIČ: ${buyer.dic}</p>` : ""}
+              ${buyer.street ? `<p>${buyer.street}</p>` : ""}
+              ${buyer.city && buyer.postalCode ? `<p>${buyer.city}, ${buyer.postalCode}</p>` : ""}
+            </div>
+            ${buyer.phone || buyer.email ? `
+            <div class="party-group">
+              ${buyer.phone ? `<p>Tel: ${buyer.phone}</p>` : ""}
+              ${buyer.email ? `<p>Email: ${buyer.email}</p>` : ""}
+            </div>
+            ` : ""}
+            ${buyer.bankAccount ? `
+            <div class="party-group">
+              <p>Účet: ${buyer.bankAccount}</p>
+            </div>
+            ` : ""}
           </div>
         </div>
       </div>

@@ -44,6 +44,7 @@ export interface InvoicePrintData {
 		postalCode?: string;
 		phone?: string;
 		email?: string;
+		bankAccount?: string;
 	};
 	currency: {
 		code: string;
@@ -228,6 +229,7 @@ export function prepareInvoicePrintData(
 			postalCode: invoice.postal_code,
 			phone: invoice.phone,
 			email: invoice.email,
+			bankAccount: invoice.bank_account,
 		},
 		currency: {
 			code: invoice.is_in_eur ? "EUR" : "CZK",

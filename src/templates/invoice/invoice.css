@@ -187,6 +187,19 @@ body {
   margin-bottom: 6px !important;
 }
 
+.party-group {
+  margin-top: 6px;
+}
+
+.party-group:first-child {
+  margin-top: 0;
+}
+
+.party-group-label {
+  font-weight: 600;
+  margin-bottom: 2px !important;
+}
+
 /* Invoice table */
 .invoice-table {
   width: 100%;
