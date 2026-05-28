@@ -10,9 +10,9 @@ export type VatRate = (typeof VAT_RATES)[number]["value"]; // → 0 | 1 | 2
 
 export type PriceGroup = (typeof PRICE_GROUPS)[number];
 
-export type InvoiceType = keyof typeof INVOICE_TYPES;
+export type InvoiceType = (typeof INVOICE_TYPES)[number]["value"];
 
-export type PaymentMethodType = keyof typeof PAYMENT_METHOD_TYPES;
+export type PaymentMethodType = (typeof PAYMENT_METHOD_TYPES)[number]["value"];
 
 /**
  * Contact

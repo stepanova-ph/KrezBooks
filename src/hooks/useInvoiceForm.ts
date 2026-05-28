@@ -157,23 +157,23 @@ export function useInvoiceForm() {
 				} else {
 					setIsVariableSymbolCustom(false);
 				}
-				return { ...prev, [field]: value };
+				return { ...prev, [field]: value } as InvoiceFormData;
 			});
 		} else {
 			if (field === "date_tax") {
 				setFormData((prev) => {
 					const autoDateTax = addDays(prev.date_issue, DATE_TAX_OFFSET_DAYS);
 					setIsDateTaxManual(value !== autoDateTax);
-					return { ...prev, [field]: value };
+					return { ...prev, [field]: value } as InvoiceFormData;
 				});
 			} else if (field === "date_due") {
 				setFormData((prev) => {
 					const autoDateDue = addDays(prev.date_issue, DATE_DUE_OFFSET_DAYS);
 					setIsDateDueManual(value !== autoDateDue);
-					return { ...prev, [field]: value };
+					return { ...prev, [field]: value } as InvoiceFormData;
 				});
 			} else {
-				setFormData((prev) => ({ ...prev, [field]: value }));
+				setFormData((prev) => ({ ...prev, [field]: value }) as InvoiceFormData);
 			}
 		}
 

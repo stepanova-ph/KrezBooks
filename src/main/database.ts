@@ -150,11 +150,11 @@ class DatabaseManager {
 			this.db.exec(itemQueries.createTable);
 			logger.log("✓ Items table ready");
 
-			this.db.exec(stockMovementQueries.createTable);
-			logger.log("✓ Stock Movements table ready");
-
 			this.db.exec(invoiceQueries.createTable);
 			logger.log("✓ Invoice table ready");
+
+			this.db.exec(stockMovementQueries.createTable);
+			logger.log("✓ Stock Movements table ready");
 
 			this.db.exec(settingsQueries.createTable);
 			logger.log("✓ Settings table ready");
