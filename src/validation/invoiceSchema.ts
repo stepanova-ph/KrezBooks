@@ -97,14 +97,6 @@ export const invoiceSchema = z
 				});
 			}
 
-			if (!data.ico || data.ico.length !== 8) {
-				ctx.addIssue({
-					path: ["ico"],
-					code: z.ZodIssueCode.custom,
-					message: validationMessages.invoice.ico.required,
-				});
-			}
-
 			if (!data.variable_symbol) {
 				ctx.addIssue({
 					path: ["variable_symbol"],
