@@ -14,7 +14,7 @@ import {
 	ListItemText,
 	Divider,
 } from "@mui/material";
-import { useState, MouseEvent, useMemo, useRef, useEffect } from "react";
+import { useState, useCallback, MouseEvent, useMemo, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
 	DndContext,
@@ -87,6 +87,9 @@ export function DataTableContent<T>({
 	const isFillMode = maxHeight === "fill";
 	const controls = useTableControls<T>();
 	const tableContainerRef = useRef<HTMLDivElement>(null);
+	const isScrollingRef = useRef(false);
+	const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+	const focusSourceRef = useRef<"keyboard" | "mouse">("keyboard");
 
 	const visibleColumns = columns.filter((col) => visibleColumnIds.has(col.id));
 
@@ -148,6 +151,16 @@ export function DataTableContent<T>({
 		return sorted;
 	}, [data, orderBy, getCellContent]);
 
+	const handleScroll = useCallback(() => {
+		isScrollingRef.current = true;
+		if (scrollTimeoutRef.current) {
+			clearTimeout(scrollTimeoutRef.current);
+		}
+		scrollTimeoutRef.current = setTimeout(() => {
+			isScrollingRef.current = false;
+		}, 150);
+	}, []);
+
 	const rowVirtualizer = useVirtualizer({
 		count: sortedData.length,
 		getScrollElement: () => tableContainerRef.current,
@@ -156,12 +169,17 @@ export function DataTableContent<T>({
 	});
 
 	useEffect(() => {
-		if (controls.focusedIndex >= 0 && sortedData.length > 0) {
+		if (
+			controls.focusedIndex >= 0 &&
+			sortedData.length > 0 &&
+			focusSourceRef.current === "keyboard"
+		) {
 			rowVirtualizer.scrollToIndex(controls.focusedIndex, {
 				align: "auto",
 				behavior: "auto",
 			});
 		}
+		focusSourceRef.current = "keyboard";
 	}, [controls.focusedIndex, rowVirtualizer, sortedData.length]);
 
 	const [contextMenu, setContextMenu] = useState<{
@@ -205,6 +223,8 @@ export function DataTableContent<T>({
 	};
 
 	const handleRowMouseEnter = (index: number) => {
+		if (isScrollingRef.current) return;
+		focusSourceRef.current = "mouse";
 		controls.setFocusedIndex(index);
 	};
 
@@ -286,6 +306,7 @@ export function DataTableContent<T>({
 			<TableContainer
 				component={Paper}
 				ref={tableContainerRef}
+				onScroll={handleScroll}
 				sx={{
 					boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
 					border: (theme) => `1px solid ${theme.palette.divider}`,
