@@ -37,6 +37,59 @@ function yieldToEventLoop(): Promise<void> {
 	return new Promise((resolve) => setImmediate(resolve));
 }
 
+/**
+ * Read a file with encoding detection.
+ * Tries UTF-8 first; if the result contains replacement characters (garbled text),
+ * falls back to Windows-1250 (common Czech encoding).
+ */
+async function readFileWithEncoding(filePath: string): Promise<string> {
+	const buffer = await fs.promises.readFile(filePath);
+
+	// Check if the buffer is valid UTF-8 by looking for typical Windows-1250 byte patterns
+	// Windows-1250 Czech chars (á=e1, č=e8, ď=ef, é=e9, ě=ec, í=ed, etc.) fall in 0x80-0xFF
+	// and are NOT valid single-byte UTF-8. If we see high bytes that don't form valid UTF-8
+	// multibyte sequences, it's likely Windows-1250.
+	let hasInvalidUtf8 = false;
+	for (let i = 0; i < Math.min(buffer.length, 1000); i++) {
+		const byte = buffer[i];
+		if (byte >= 0x80 && byte <= 0xBF) {
+			// Continuation byte without a leading byte — not valid UTF-8 start
+			if (i === 0 || buffer[i - 1] < 0xC0) {
+				hasInvalidUtf8 = true;
+				break;
+			}
+		} else if (byte >= 0xC0 && byte <= 0xDF) {
+			// 2-byte UTF-8 sequence — next byte must be 0x80-0xBF
+			if (i + 1 >= buffer.length || buffer[i + 1] < 0x80 || buffer[i + 1] > 0xBF) {
+				hasInvalidUtf8 = true;
+				break;
+			}
+			i++; // skip continuation byte
+		} else if (byte >= 0x80) {
+			// Bytes like 0xE1, 0x9E, 0xED in isolation are Windows-1250
+			// Check if this could be a valid 3/4-byte UTF-8 sequence
+			if (byte >= 0xE0 && byte <= 0xEF) {
+				if (i + 2 >= buffer.length || buffer[i + 1] < 0x80 || buffer[i + 1] > 0xBF || buffer[i + 2] < 0x80 || buffer[i + 2] > 0xBF) {
+					hasInvalidUtf8 = true;
+					break;
+				}
+				i += 2;
+			} else {
+				hasInvalidUtf8 = true;
+				break;
+			}
+		}
+	}
+
+	if (hasInvalidUtf8) {
+		logger.info("Detected Windows-1250 encoding, converting to UTF-8");
+		const decoder = new TextDecoder("windows-1250");
+		return decoder.decode(buffer);
+	}
+
+	return buffer.toString("utf-8");
+}
+
 function parseTSV(content: string): { headers: string[]; rows: string[][] } {
 	const cleanContent = content.replace(/^\uFEFF/, "");
 	const lines = cleanContent.split(/\r?\n/).filter((line) => line.trim());
@@ -285,7 +338,7 @@ function processLegacyItemRow(
 
 async function importLegacyItems(filePath: string, pricesIncludeVat: boolean): Promise<ImportResult> {
 	const db = getDatabase();
-	const content = await fs.promises.readFile(filePath, "utf-8");
+	const content = await readFileWithEncoding(filePath);
 	const { headers, rows } = parseTSV(content);
 
 	await yieldToEventLoop();
@@ -519,7 +572,7 @@ function processLegacyContactRow(
 
 async function importLegacyContacts(filePath: string): Promise<ImportResult> {
 	const db = getDatabase();
-	const content = await fs.promises.readFile(filePath, "utf-8");
+	const content = await readFileWithEncoding(filePath);
 	const { headers, rows } = parseTSV(content);
 
 	await yieldToEventLoop();
