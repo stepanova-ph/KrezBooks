@@ -80,22 +80,31 @@ function generatePageHeader(
             <div class="party-group">
               <p class="party-name">${seller.ownerName}</p>
               <p class="party-name">${seller.companyName}</p>
-              <p>IČO: ${seller.ico}</p>
-              ${seller.dic ? `<p>DIČ: ${seller.dic}</p>` : ""}
+              <table class="party-details"><tbody>
+                <tr><td class="party-label">IČO:</td><td>${seller.ico}</td></tr>
+                ${seller.dic ? `<tr><td class="party-label">DIČ:</td><td>${seller.dic}</td></tr>` : ""}
+              </tbody></table>
               <p>${seller.street}</p>
               <p>${seller.city}, ${seller.postalCode}</p>
             </div>
             <div class="party-group">
-              <p>Tel: ${seller.phone}${seller.phone2 ? ` / ${seller.phone2}` : ""}</p>
-              <p>Email: ${seller.email}</p>
+              <table class="party-details"><tbody>
+                ${invoice.is_in_eur ? "" : `<tr><td class="party-label">Účet:</td><td>${seller.bankAccount}</td></tr>`}
+                <tr><td class="party-label">Tel:</td><td>${seller.phone}${seller.phone2 ? ` / ${seller.phone2}` : ""}</td></tr>
+                <tr><td class="party-label">Email:</td><td>${seller.email}</td></tr>
+              </tbody></table>
             </div>
+            ${invoice.is_in_eur ? `
             <div class="party-group">
               <p class="party-group-label">Bankovní spojení:</p>
-              <p>Číslo účtu: ${seller.bankAccount}</p>
-              ${seller.bankName ? `<p>Název banky: ${seller.bankName}</p>` : ""}
-              ${seller.iban ? `<p>IBAN: ${seller.iban}</p>` : ""}
-              ${seller.bic ? `<p>BIC: ${seller.bic}</p>` : ""}
+              <table class="party-details party-details-indented"><tbody>
+                <tr><td class="party-label">Číslo účtu:</td><td>${seller.bankAccount}</td></tr>
+                ${seller.bankName ? `<tr><td class="party-label">Název banky:</td><td>${seller.bankName}</td></tr>` : ""}
+                ${seller.iban ? `<tr><td class="party-label">IBAN:</td><td>${seller.iban}</td></tr>` : ""}
+                ${seller.bic ? `<tr><td class="party-label">BIC:</td><td>${seller.bic}</td></tr>` : ""}
+              </tbody></table>
             </div>
+            ` : ""}
           </div>
         </div>
 
@@ -104,20 +113,30 @@ function generatePageHeader(
           <div class="party-content">
             <div class="party-group">
               <p class="party-name">${buyer.companyName}</p>
-              ${buyer.ico ? `<p>IČO: ${buyer.ico}</p>` : ""}
-              ${buyer.dic ? `<p>DIČ: ${buyer.dic}</p>` : ""}
+              ${buyer.ico || buyer.dic ? `
+              <table class="party-details"><tbody>
+                ${buyer.ico ? `<tr><td class="party-label">IČO:</td><td>${buyer.ico}</td></tr>` : ""}
+                ${buyer.dic ? `<tr><td class="party-label">DIČ:</td><td>${buyer.dic}</td></tr>` : ""}
+              </tbody></table>
+              ` : ""}
               ${buyer.street ? `<p>${buyer.street}</p>` : ""}
               ${buyer.city && buyer.postalCode ? `<p>${buyer.city}, ${buyer.postalCode}</p>` : ""}
             </div>
-            ${buyer.phone || buyer.email ? `
+            ${buyer.bankAccount || buyer.phone || buyer.email ? `
             <div class="party-group">
-              ${buyer.phone ? `<p>Tel: ${buyer.phone}</p>` : ""}
-              ${buyer.email ? `<p>Email: ${buyer.email}</p>` : ""}
+              <table class="party-details"><tbody>
+                ${!invoice.is_in_eur && buyer.bankAccount ? `<tr><td class="party-label">Účet:</td><td>${buyer.bankAccount}</td></tr>` : ""}
+                ${buyer.phone ? `<tr><td class="party-label">Tel:</td><td>${buyer.phone}</td></tr>` : ""}
+                ${buyer.email ? `<tr><td class="party-label">Email:</td><td>${buyer.email}</td></tr>` : ""}
+              </tbody></table>
             </div>
             ` : ""}
-            ${buyer.bankAccount ? `
+            ${invoice.is_in_eur && buyer.bankAccount ? `
             <div class="party-group">
-              <p>Účet: ${buyer.bankAccount}</p>
+              <p class="party-group-label">Bankovní spojení:</p>
+              <table class="party-details party-details-indented"><tbody>
+                <tr><td class="party-label">Účet:</td><td>${buyer.bankAccount}</td></tr>
+              </tbody></table>
             </div>
             ` : ""}
           </div>
