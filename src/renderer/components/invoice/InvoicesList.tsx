@@ -111,7 +111,7 @@ function InvoicesList({
 			case "ico":
 				return invoice.ico || "-";
 			case "total":
-				return (invoice.total_with_vat?.toFixed(2) || "0.00") + " Kč";
+				return (invoice.total_with_vat?.toFixed(2) || "0.00") + (invoice.is_in_eur ? " €" : " Kč");
 
 			default:
 				return "";
