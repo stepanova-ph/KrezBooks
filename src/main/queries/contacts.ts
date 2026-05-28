@@ -2,7 +2,7 @@ export const contactQueries = {
 	createTable: `
     CREATE TABLE IF NOT EXISTS contacts (
       ico TEXT NOT NULL,
-      modifier INTEGER NOT NULL DEFAULT 1,
+      modifier INTEGER NOT NULL DEFAULT 0,
       dic TEXT,
       company_name TEXT NOT NULL,
       representative_name TEXT,

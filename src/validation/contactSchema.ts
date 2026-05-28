@@ -22,15 +22,11 @@ export const contactSchema = z
 		// validationMessages.contact.dic.invalid,
 		// )
 		modifier: z.preprocess(
-			(v) => {
-				const num = Number(v);
-				// Convert 0 to 1 for imports (legacy data compatibility)
-				return num === 0 ? 1 : num;
-			},
+			(v) => Number(v),
 			z
 				.number()
 				.int()
-				.min(1, validationMessages.contact.modifier.range)
+				.min(0, validationMessages.contact.modifier.range)
 				.max(100, validationMessages.contact.modifier.range),
 		),
 

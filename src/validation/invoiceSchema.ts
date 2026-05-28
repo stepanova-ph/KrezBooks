@@ -64,7 +64,7 @@ export const invoiceSchema = z
 		modifier: z.preprocess(
 			(v) =>
 				v === "" || v === null || v === undefined ? undefined : Number(v),
-			z.number().int().min(1).max(100).optional(),
+			z.number().int().min(0).max(100).optional(),
 		),
 		dic: optionalString,
 		company_name: optionalString,
