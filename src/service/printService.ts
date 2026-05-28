@@ -75,6 +75,7 @@ function estimateNameLines(name: string): number {
 function calculateInvoiceItems(
 	stockMovements: StockMovement[],
 	itemNames: Map<string, string>,
+	itemUnits: Map<string, string>,
 ): InvoiceItemRow[] {
 	return stockMovements.map((movement) => {
 		const priceWithoutVat = Number(movement.price_per_unit);
@@ -95,7 +96,7 @@ function calculateInvoiceItems(
 		return {
 			name: itemNames.get(movement.item_ean) || movement.item_ean,
 			amount,
-			unit: movement.unit || "ks",
+			unit: itemUnits.get(movement.item_ean) || "ks",
 			priceWithoutVat,
 			vatAmount,
 			priceWithVat,
@@ -204,6 +205,7 @@ export function prepareInvoicePrintData(
 	invoice: Invoice,
 	stockMovements: StockMovement[],
 	itemNames: Map<string, string>,
+	itemUnits: Map<string, string>,
 ): InvoicePrintData {
 	// Validate that this is a sale invoice
 	if (invoice.type !== 3 && invoice.type !== 4) {
@@ -212,7 +214,7 @@ export function prepareInvoicePrintData(
 		);
 	}
 
-	const items = calculateInvoiceItems(stockMovements, itemNames);
+	const items = calculateInvoiceItems(stockMovements, itemNames, itemUnits);
 	const totals = calculateTotals(items, !!invoice.is_in_eur);
 	const vatRecap = calculateVatRecap(items);
 

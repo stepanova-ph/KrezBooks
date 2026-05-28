@@ -30,11 +30,13 @@ export function registerPrintHandlers() {
 
 				const items = await itemService.getAll();
 				const itemNames = new Map(items.map((item) => [item.ean, item.name]));
+				const itemUnits = new Map(items.map((item) => [item.ean, item.unit_of_measure || "ks"]));
 
 				const printData = prepareInvoicePrintData(
 					invoice,
 					stockMovements,
 					itemNames,
+					itemUnits,
 				);
 
 				const html = generateInvoiceHTML(printData);
@@ -67,11 +69,13 @@ export function registerPrintHandlers() {
 
 				const items = await itemService.getAll();
 				const itemNames = new Map(items.map((item) => [item.ean, item.name]));
+				const itemUnits = new Map(items.map((item) => [item.ean, item.unit_of_measure || "ks"]));
 
 				const printData = prepareInvoicePrintData(
 					invoice,
 					stockMovements,
 					itemNames,
+					itemUnits,
 				);
 
 				const html = generateInvoiceHTML(printData);
@@ -148,11 +152,13 @@ export function registerPrintHandlers() {
 
 				const items = await itemService.getAll();
 				const itemNames = new Map(items.map((item) => [item.ean, item.name]));
+				const itemUnits = new Map(items.map((item) => [item.ean, item.unit_of_measure || "ks"]));
 
 				const printData = prepareInvoicePrintData(
 					invoice,
 					stockMovements,
 					itemNames,
+					itemUnits,
 				);
 
 				const html = generateInvoiceHTML(printData);
