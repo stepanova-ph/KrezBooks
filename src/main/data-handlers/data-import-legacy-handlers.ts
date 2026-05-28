@@ -368,7 +368,7 @@ function processLegacyContactRow(
 	const street = getColumnValue(row, headers, "Ulice") || null;
 	const city = getColumnValue(row, headers, "Obec") || null;
 	const postalCodeRaw = getColumnValue(row, headers, "PSČ");
-	const dic = getColumnValue(row, headers, "DIČBZK-C1FE7") || null;
+	const dic = getColumnValue(row, headers, "DIČ") || null;
 	const typeRaw = getColumnValue(row, headers, "Typ");
 	const phone = getColumnValue(row, headers, "Telefon 1") || null;
 	const priceGroupRaw = getColumnValue(row, headers, "Cen. skup.");
