@@ -11,7 +11,7 @@ import type { OrderByConfig } from "../common/filtering/ColumnPickerButton";
 import { useDeleteInvoice } from "../../../hooks/useInvoices";
 import { ViewInvoiceDialog } from "./ViewInvoiceDialog";
 import { AlertDialog } from "../common/dialog/AlertDialog";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { INVOICE_TYPES } from "../../../config/constants";
 
 interface InvoicesListProps {
@@ -55,11 +55,11 @@ function InvoicesList({
 		message: string;
 	} | null>(null);
 
-	const handleRowClick = (invoice: Invoice) => {
+	const handleRowClick = useCallback((invoice: Invoice) => {
 		setViewingInvoice(invoice);
-	};
+	}, []);
 
-	const handleDelete = async (invoice: Invoice) => {
+	const handleDelete = useCallback(async (invoice: Invoice) => {
 		try {
 			await deleteInvoice.mutateAsync({ prefix: invoice.prefix || "", number: invoice.number });
 			setAlertDialog({
@@ -75,9 +75,9 @@ function InvoicesList({
 				message: `Chyba při mazání dokladu: ${(error as Error).message}`,
 			});
 		}
-	};
+	}, [deleteInvoice]);
 
-	const contextMenuActions: ContextMenuAction<Invoice>[] = [
+	const contextMenuActions = useMemo<ContextMenuAction<Invoice>[]>(() => [
 		{
 			id: "view",
 			label: "Zobrazit doklad",
@@ -94,9 +94,9 @@ function InvoicesList({
 				`Opravdu chcete smazat doklad "${invoice.number}"?\n\nTato akce také smaže všechny pohyby skladu související s tímto dokladem.`,
 			divider: true,
 		},
-	];
+	], [handleDelete]);
 
-	const getCellContent = (invoice: Invoice, columnId: string) => {
+	const getCellContent = useCallback((invoice: Invoice, columnId: string) => {
 		switch (columnId) {
 			case "number":
 				return `${invoice.prefix || ""}${invoice.number}`;
@@ -116,7 +116,7 @@ function InvoicesList({
 			default:
 				return "";
 		}
-	};
+	}, []);
 
 	return (
 		<>
@@ -132,7 +132,7 @@ function InvoicesList({
 				orderBy={orderBy}
 				getCellContent={getCellContent}
 				contextMenuActions={contextMenuActions}
-				renderRow={(invoice, visibleColumns) => (
+				renderRow={useCallback((invoice: Invoice, visibleColumns: Column[]) => (
 					<>
 						{visibleColumns.map((column) => (
 							<TableCell
@@ -148,7 +148,7 @@ function InvoicesList({
 							</TableCell>
 						))}
 					</>
-				)}
+				), [getCellContent])}
 			/>
 
 			{viewingInvoice && (

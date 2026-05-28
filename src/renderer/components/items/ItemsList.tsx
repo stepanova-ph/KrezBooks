@@ -1,5 +1,5 @@
 import { Box, TableCell, Typography } from "@mui/material";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDeleteItem } from "../../../hooks/useItems";
 import { Item } from "../../../types/database";
 import {
@@ -81,16 +81,16 @@ function ItemsList({
 	const [editingItem, setEditingItem] = useState<Item | null>(null);
 	const [viewingItemEan, setViewingItemEan] = useState<string | null>(null);
 
-	const handleDelete = async (item: Item) => {
+	const handleDelete = useCallback(async (item: Item) => {
 		try {
 			await deleteItem.mutateAsync(item.ean);
 		} catch (error) {
 			console.error("Chyba při mazání položky:", error);
 			alert("Chyba: " + (error as Error).message);
 		}
-	};
+	}, [deleteItem]);
 
-	const contextMenuActions: ContextMenuAction<Item>[] = [
+	const contextMenuActions = useMemo<ContextMenuAction<Item>[]>(() => [
 		{
 			id: "card",
 			label: "Otevřít kartu položky",
@@ -113,9 +113,9 @@ function ItemsList({
 			confirmMessage: (item) => `Opravdu chcete smazat položku "${item.name}"?`,
 			divider: true,
 		},
-	];
+	], [handleDelete]);
 
-	const getCellContent = (item: Item, columnId: string) => {
+	const getCellContent = useCallback((item: Item, columnId: string) => {
 		switch (columnId) {
 			case "ean":
 				return item.ean;
@@ -155,7 +155,7 @@ function ItemsList({
 			default:
 				return "-";
 		}
-	};
+	}, []);
 
 	return (
 		<>
@@ -172,7 +172,7 @@ function ItemsList({
 				orderBy={orderBy}
 				onEnterAction={(item) => setViewingItemEan(item.ean)}
 				onRowDoubleClick={(item) => setViewingItemEan(item.ean)}
-				renderRow={(item, visibleColumns) => (
+				renderRow={useCallback((item: Item, visibleColumns: Column[]) => (
 					<>
 						{visibleColumns
 							.filter((col) => !col.hidden)
@@ -214,7 +214,7 @@ function ItemsList({
 								</TableCell>
 							))}
 					</>
-				)}
+				), [getCellContent, visibleColumnIds])}
 			/>
 
 			{editingItem && (

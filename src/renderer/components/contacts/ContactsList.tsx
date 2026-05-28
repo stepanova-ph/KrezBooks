@@ -1,7 +1,7 @@
 import { TableCell, Chip, Typography, Box, Link } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDeleteContact } from "../../../hooks/useContacts";
 import type { Contact } from "../../../types/database";
 import {
@@ -65,7 +65,7 @@ function ContactsList({
 	const deleteContact = useDeleteContact();
 	const [editingContact, setEditingContact] = useState<Contact | null>(null);
 
-	const handleDelete = async (contact: Contact) => {
+	const handleDelete = useCallback(async (contact: Contact) => {
 		try {
 			await deleteContact.mutateAsync({
 				ico: contact.ico,
@@ -75,9 +75,9 @@ function ContactsList({
 			console.error("Chyba při mazání kontaktu:", error);
 			alert("Chyba: " + (error as Error).message);
 		}
-	};
+	}, [deleteContact]);
 
-	const contextMenuActions: ContextMenuAction<Contact>[] = [
+	const contextMenuActions = useMemo<ContextMenuAction<Contact>[]>(() => [
 		{
 			id: "edit",
 			label: "Upravit",
@@ -94,9 +94,9 @@ function ContactsList({
 				`Opravdu chcete smazat kontakt "${contact.company_name}"?`,
 			divider: true,
 		},
-	];
+	], [handleDelete]);
 
-	const getCellContent = (contact: Contact, columnId: string) => {
+	const getCellContent = useCallback((contact: Contact, columnId: string) => {
 		switch (columnId) {
 			case "ico":
 				return contact.ico;
@@ -147,7 +147,7 @@ function ContactsList({
 			default:
 				return "-";
 		}
-	};
+	}, []);
 
 	return (
 		<>
@@ -164,7 +164,7 @@ function ContactsList({
 				getCellContent={getCellContent}
 				onRowDoubleClick={(contact) => setEditingContact(contact)}
 				onEnterAction={(contact) => setEditingContact(contact)}
-				renderRow={(contact, visibleColumns) => (
+				renderRow={useCallback((contact: Contact, visibleColumns: Column[]) => (
 					<>
 						{visibleColumns.map((column) => {
 							const value = getCellContent(contact, column.id);
@@ -223,8 +223,7 @@ function ContactsList({
 											case "type":
 												return (
 													<Box display="flex" gap={0.5} flexWrap="wrap">
-														{!!contacts.find((c) => c === contact)
-															?.is_customer && (
+														{!!contact.is_customer && (
 															<Chip
 																label="Odběratel"
 																size="small"
@@ -232,8 +231,7 @@ function ContactsList({
 																sx={{ height: 22 }}
 															/>
 														)}
-														{!!contacts.find((c) => c === contact)
-															?.is_supplier && (
+														{!!contact.is_supplier && (
 															<Chip
 																label="Dodavatel"
 																size="small"
@@ -256,7 +254,7 @@ function ContactsList({
 							);
 						})}
 					</>
-				)}
+				), [getCellContent])}
 			/>
 
 			{editingContact && (
