@@ -109,7 +109,7 @@ function calculateInvoiceItems(
  * Calculate invoice totals with smart rounding using group-by-VAT-rate method
  * Groups items by VAT rate, sums bases per group, then calculates VAT from grouped sums
  */
-function calculateTotals(items: InvoiceItemRow[]): InvoiceTotals {
+function calculateTotals(items: InvoiceItemRow[], isInEur: boolean = false): InvoiceTotals {
 	// Group items by VAT rate and sum base prices
 	// Note: item.vatRate is the percentage value (0, 12, 21), not the index
 	const groupedByVat: { [vatPercentage: number]: number } = {};
@@ -139,8 +139,10 @@ function calculateTotals(items: InvoiceItemRow[]): InvoiceTotals {
 	// Save the sum BEFORE rounding
 	const totalBeforeRounding = totalWithVat;
 
-	// Simple rounding to nearest whole crown
-	const roundedTotal = Math.round(totalWithVat);
+	// EUR: round to nearest 0.10, CZK: round to nearest whole crown
+	const roundedTotal = isInEur
+		? Math.round(totalWithVat * 10) / 10
+		: Math.round(totalWithVat);
 	const rounding = roundedTotal - totalWithVat;
 	totalWithVat = roundedTotal;
 
@@ -211,7 +213,7 @@ export function prepareInvoicePrintData(
 	}
 
 	const items = calculateInvoiceItems(stockMovements, itemNames);
-	const totals = calculateTotals(items);
+	const totals = calculateTotals(items, !!invoice.is_in_eur);
 	const vatRecap = calculateVatRecap(items);
 
 	return {
