@@ -46,6 +46,7 @@ describe("Data Integrity & Validation", () => {
 						phone: null,
 						email: null,
 						is_in_eur: 0,
+					discount: null,
 					});
 				}).toThrow(/NOT NULL constraint failed: invoices\.prefix/);
 			});
@@ -74,6 +75,7 @@ describe("Data Integrity & Validation", () => {
 						phone: null,
 						email: null,
 						is_in_eur: 0,
+					discount: null,
 					});
 				}).toThrow(/NOT NULL constraint failed: invoices\.number/);
 			});
@@ -102,6 +104,7 @@ describe("Data Integrity & Validation", () => {
 						phone: null,
 						email: null,
 						is_in_eur: 0,
+					discount: null,
 					});
 				}).toThrow(/NOT NULL constraint failed: invoices\.type/);
 			});
@@ -130,6 +133,7 @@ describe("Data Integrity & Validation", () => {
 						phone: null,
 						email: null,
 						is_in_eur: 0,
+					discount: null,
 					});
 				}).toThrow(/NOT NULL constraint failed: invoices\.date_issue/);
 			});
@@ -229,6 +233,7 @@ describe("Data Integrity & Validation", () => {
 					phone: null,
 					email: null,
 					is_in_eur: 0,
+					discount: null,
 				});
 
 				db.prepare(itemQueries.create).run({
@@ -432,6 +437,7 @@ describe("Data Integrity & Validation", () => {
 					phone: null,
 					email: null,
 					is_in_eur: 0,
+					discount: null,
 				});
 			}).toThrow(/CHECK constraint failed/);
 
@@ -458,6 +464,7 @@ describe("Data Integrity & Validation", () => {
 					phone: null,
 					email: null,
 					is_in_eur: 0,
+					discount: null,
 				});
 			}).toThrow(/CHECK constraint failed/);
 		});
@@ -632,6 +639,7 @@ describe("Data Integrity & Validation", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -689,6 +697,7 @@ describe("Data Integrity & Validation", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -773,6 +782,7 @@ describe("Data Integrity & Validation", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			expect(() => {
@@ -841,6 +851,7 @@ describe("Data Integrity & Validation", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const invoice = db
@@ -875,6 +886,7 @@ describe("Data Integrity & Validation", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const invoice = db

@@ -28,6 +28,7 @@ export interface InvoiceFormData {
 	order_number: string;
 	note: string;
 	is_in_eur: boolean;
+	discount: number | null;
 	ico: string;
 	modifier: number | undefined;
 	dic: string;
@@ -63,6 +64,7 @@ const defaultFormData: InvoiceFormData = {
 	order_number: "",
 	note: "",
 	is_in_eur: false,
+	discount: null,
 	ico: "",
 	modifier: undefined,
 	dic: "",
@@ -148,7 +150,7 @@ export function useInvoiceForm() {
 		});
 	}, [formData, invoiceItems, selectedContact, setInvoiceFormState]);
 
-	const handleChange = useCallback((field: string, value: string | number | boolean) => {
+	const handleChange = useCallback((field: string, value: string | number | boolean | null) => {
 		if (field === "variable_symbol") {
 			setFormData((prev) => {
 				const autoVariableSymbol = `${prev.prefix}${prev.number}`;
@@ -160,7 +162,18 @@ export function useInvoiceForm() {
 				return { ...prev, [field]: value } as InvoiceFormData;
 			});
 		} else {
-			if (field === "date_tax") {
+			if (field === "type") {
+				setFormData((prev) => {
+					const newType = Number(value);
+					// Discount only applies to sale invoices (types 3 & 4)
+					const keepDiscount = newType === 3 || newType === 4;
+					return {
+						...prev,
+						type: newType,
+						discount: keepDiscount ? prev.discount : null,
+					} as InvoiceFormData;
+				});
+			} else if (field === "date_tax") {
 				setFormData((prev) => {
 					const autoDateTax = addDays(prev.date_issue, DATE_TAX_OFFSET_DAYS);
 					setIsDateTaxManual(value !== autoDateTax);

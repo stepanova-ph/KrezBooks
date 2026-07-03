@@ -24,12 +24,14 @@ export const invoiceQueries = {
       phone TEXT,
       email TEXT,
       is_in_eur INTEGER NOT NULL DEFAULT 0,
+      discount INTEGER,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
 
       PRIMARY KEY (number, prefix),
       CONSTRAINT check_type CHECK (type BETWEEN 1 AND 6),
-      CONSTRAINT check_payment_method CHECK (payment_method IN (0, 1, 2) OR payment_method IS NULL)
+      CONSTRAINT check_payment_method CHECK (payment_method IN (0, 1, 2) OR payment_method IS NULL),
+      CONSTRAINT check_discount CHECK (discount IS NULL OR discount BETWEEN 1 AND 100)
     )
   `,
 
@@ -103,7 +105,8 @@ export const invoiceQueries = {
       postal_code,
       phone,
       email,
-      is_in_eur
+      is_in_eur,
+      discount
     ) VALUES (
       @number,
       @prefix,
@@ -125,7 +128,8 @@ export const invoiceQueries = {
       @postal_code,
       @phone,
       @email,
-      @is_in_eur
+      @is_in_eur,
+      @discount
     )
   `,
 

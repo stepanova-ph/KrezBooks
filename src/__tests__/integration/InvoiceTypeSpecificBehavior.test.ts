@@ -60,6 +60,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const invoice = db
@@ -92,6 +93,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -141,6 +143,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: "+420123456789",
 				email: "supplier@example.cz",
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const invoice = db
@@ -176,6 +179,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const invoice = db
@@ -210,6 +214,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -245,6 +250,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -298,6 +304,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: "+420987654321",
 				email: "customer@example.cz",
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const invoice = db
@@ -333,6 +340,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const invoice = db
@@ -365,6 +373,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -419,6 +428,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -453,6 +463,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -496,6 +507,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const invoice = db
@@ -528,6 +540,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -582,6 +595,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const invoice = db
@@ -615,6 +629,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -650,6 +665,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -705,6 +721,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 		};
 
@@ -802,6 +819,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -848,6 +866,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -883,6 +902,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -918,6 +938,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -953,6 +974,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -1009,6 +1031,7 @@ describe("Invoice Type-Specific Behavior", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 			}).toThrow(/CHECK constraint failed/);
 
@@ -1035,6 +1058,7 @@ describe("Invoice Type-Specific Behavior", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 			}).toThrow(/CHECK constraint failed/);
 		});

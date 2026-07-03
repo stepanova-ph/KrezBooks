@@ -149,6 +149,7 @@ describe("Composite Primary Key Edge Cases", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 			}).toThrow(/NOT NULL constraint failed/);
 
@@ -175,6 +176,7 @@ describe("Composite Primary Key Edge Cases", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 			}).toThrow(/NOT NULL constraint failed/);
 		});
@@ -242,6 +244,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -344,6 +347,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const movement1 = {
@@ -418,6 +422,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -479,6 +484,7 @@ describe("Composite Primary Key Edge Cases", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -550,6 +556,7 @@ describe("Composite Primary Key Edge Cases", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 			}
 		});

@@ -17,7 +17,10 @@ export interface InvoiceItemRow {
 export interface InvoiceTotals {
 	totalWithoutVat: number;
 	totalVatAmount: number;
-	totalBeforeRounding: number; // Sum before smart rounding
+	subtotalBeforeDiscount: number; // Sum with VAT before discount (equals totalBeforeRounding when no discount)
+	discount: number | null; // Percentage discount 1-100, null = no discount
+	discountAmount: number; // With-VAT amount subtracted by the discount
+	totalBeforeRounding: number; // Sum before smart rounding (after discount)
 	rounding: number; // Rounding adjustment (-0.01, 0, or +0.01)
 	totalWithVat: number; // After rounding
 }
@@ -115,7 +118,11 @@ function calculateInvoiceItems(
  * Calculate invoice totals with smart rounding using group-by-VAT-rate method
  * Groups items by VAT rate, sums bases per group, then calculates VAT from grouped sums
  */
-function calculateTotals(items: InvoiceItemRow[], isInEur: boolean = false): InvoiceTotals {
+function calculateTotals(
+	items: InvoiceItemRow[],
+	isInEur: boolean = false,
+	discount: number | null = null,
+): InvoiceTotals {
 	// Group items by VAT rate and sum base prices
 	// Note: item.vatRate is the percentage value (0, 12, 21), not the index
 	const groupedByVat: { [vatPercentage: number]: number } = {};
@@ -141,6 +148,14 @@ function calculateTotals(items: InvoiceItemRow[], isInEur: boolean = false): Inv
 		totalVatAmount += vatAmount;
 		totalWithVat += baseSum + vatAmount;
 	});
+
+	// Apply invoice-level discount; VAT is computed from the discounted bases
+	const subtotalBeforeDiscount = totalWithVat;
+	const discountFactor = discount ? 1 - discount / 100 : 1;
+	totalWithoutVat *= discountFactor;
+	totalVatAmount *= discountFactor;
+	totalWithVat *= discountFactor;
+	const discountAmount = subtotalBeforeDiscount - totalWithVat;
 
 	// Save the sum BEFORE rounding
 	const totalBeforeRounding = totalWithVat;
@@ -172,6 +187,9 @@ function calculateTotals(items: InvoiceItemRow[], isInEur: boolean = false): Inv
 	return {
 		totalWithoutVat,
 		totalVatAmount,
+		subtotalBeforeDiscount,
+		discount: discount ?? null,
+		discountAmount,
 		totalBeforeRounding,
 		rounding,
 		totalWithVat,
@@ -180,8 +198,12 @@ function calculateTotals(items: InvoiceItemRow[], isInEur: boolean = false): Inv
 
 /**
  * Calculate VAT recapitulation grouped by VAT rate
+ * The invoice-level discount reduces each rate's base (and therefore VAT)
  */
-function calculateVatRecap(items: InvoiceItemRow[]): VatRecapRow[] {
+function calculateVatRecap(
+	items: InvoiceItemRow[],
+	discount: number | null = null,
+): VatRecapRow[] {
 	const recapMap = new Map<number, VatRecapRow>();
 
 	items.forEach((item) => {
@@ -202,8 +224,17 @@ function calculateVatRecap(items: InvoiceItemRow[]): VatRecapRow[] {
 		}
 	});
 
+	const discountFactor = discount ? 1 - discount / 100 : 1;
+
 	// Sort by VAT rate ascending
-	return Array.from(recapMap.values()).sort((a, b) => a.vatRate - b.vatRate);
+	return Array.from(recapMap.values())
+		.map((row) => ({
+			vatRate: row.vatRate,
+			baseAmount: row.baseAmount * discountFactor,
+			vatAmount: row.vatAmount * discountFactor,
+			totalAmount: row.totalAmount * discountFactor,
+		}))
+		.sort((a, b) => a.vatRate - b.vatRate);
 }
 
 /**
@@ -229,8 +260,11 @@ export function prepareInvoicePrintData(
 		itemUnits,
 		invoice.type,
 	);
-	const totals = calculateTotals(items, !!invoice.is_in_eur);
-	const vatRecap = calculateVatRecap(items);
+	// Discount applies to sale invoices only
+	const discount =
+		invoice.type === 3 || invoice.type === 4 ? (invoice.discount ?? null) : null;
+	const totals = calculateTotals(items, !!invoice.is_in_eur, discount);
+	const vatRecap = calculateVatRecap(items, discount);
 
 	return {
 		invoice,

@@ -6,6 +6,7 @@ interface InvoiceTotalsProps {
 	items: InvoiceItem[];
 	isInEur?: boolean;
 	invoiceType?: number;
+	discount?: number | null;
 }
 
 function calculateTotals(items: InvoiceItem[], invoiceType?: number) {
@@ -43,12 +44,22 @@ export function InvoiceTotals({
 	items,
 	isInEur = false,
 	invoiceType,
+	discount,
 }: InvoiceTotalsProps) {
-	const { totalWithoutVat, totalVat, totalWithVat } = calculateTotals(
+	let { totalWithoutVat, totalVat, totalWithVat } = calculateTotals(
 		items,
 		invoiceType,
 	);
 	const currencySymbol = getCurrencySymbol(isInEur);
+
+	const hasDiscount = discount != null && discount > 0;
+	const discountAmount = hasDiscount ? totalWithVat * (discount / 100) : 0;
+	if (hasDiscount) {
+		const factor = 1 - discount / 100;
+		totalWithoutVat *= factor;
+		totalVat *= factor;
+		totalWithVat *= factor;
+	}
 
 	return (
 		<Box
@@ -66,6 +77,16 @@ export function InvoiceTotals({
 					gap: 8,
 				}}
 			>
+				{hasDiscount && (
+					<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+						<Typography variant="body1" fontWeight={500} color="text.secondary">
+							Sleva {discount} %:
+						</Typography>
+						<Typography variant="h6" fontWeight={700} color="error.main">
+							-{discountAmount.toFixed(2)} {currencySymbol}
+						</Typography>
+					</Box>
+				)}
 				<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
 					<Typography variant="body1" fontWeight={500} color="text.secondary">
 						Celkem bez DPH:

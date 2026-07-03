@@ -200,7 +200,7 @@ function generateItemsTable(
 		? `
     <tr class="subtotal-row">
       <td colspan="6"><strong>Mezisoučet:</strong></td>
-      <td class="number"><strong>${formatCurrency(totals.totalBeforeRounding, currencySymbol)}</strong></td>
+      <td class="number"><strong>${formatCurrency(totals.subtotalBeforeDiscount, currencySymbol)}</strong></td>
     </tr>
   `
 		: "";
@@ -286,8 +286,14 @@ function generateVatRecapAndTotals(
             <tbody>
               <tr>
                 <td><strong>Součet:</strong></td>
-                <td class="number"><strong>${formatCurrency(totals.totalBeforeRounding, currencySymbol)}</strong></td>
+                <td class="number"><strong>${formatCurrency(totals.subtotalBeforeDiscount, currencySymbol)}</strong></td>
               </tr>
+              ${totals.discount ? `
+              <tr>
+                <td><strong>Sleva ${totals.discount} %:</strong></td>
+                <td class="number"><strong>${formatCurrency(-totals.discountAmount, currencySymbol)}</strong></td>
+              </tr>
+              ` : ""}
               <tr>
                 <td><strong>Zaokrouhlení:</strong></td>
                 <td class="number"><strong>${formatCurrency(totals.rounding, currencySymbol)}</strong></td>

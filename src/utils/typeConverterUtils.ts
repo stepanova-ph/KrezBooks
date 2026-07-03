@@ -112,6 +112,7 @@ export function serializeInvoice(invoice: Partial<Invoice>): any {
 		phone: invoice.phone ?? null,
 		email: invoice.email ?? null,
 		is_in_eur: invoice.is_in_eur ?? 0,
+		discount: invoice.discount ?? null,
 	};
 }
 

@@ -50,6 +50,7 @@ describe("Concurrent Operations", () => {
 			phone: null,
 			email: null,
 		is_in_eur: 0,
+					discount: null,
 		});
 	});
 
@@ -83,6 +84,7 @@ describe("Concurrent Operations", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 			}
 
@@ -219,6 +221,7 @@ describe("Concurrent Operations", () => {
 								phone: null,
 								email: null,
 							is_in_eur: 0,
+					discount: null,
 							});
 							successCount++;
 						} catch (e) {
@@ -278,6 +281,7 @@ describe("Concurrent Operations", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 			}
 
@@ -368,6 +372,7 @@ describe("Concurrent Operations", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 			}
 
@@ -414,6 +419,7 @@ describe("Concurrent Operations", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 			}
 
@@ -513,6 +519,7 @@ describe("Concurrent Operations", () => {
 						phone: null,
 						email: null,
 					is_in_eur: 0,
+					discount: null,
 					});
 				}
 			});
@@ -592,6 +599,7 @@ describe("Concurrent Operations", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 
 				// Add stock movement
@@ -650,6 +658,7 @@ describe("Concurrent Operations", () => {
 						phone: null,
 						email: null,
 					is_in_eur: 0,
+					discount: null,
 					});
 				}
 			});
@@ -692,6 +701,7 @@ describe("Concurrent Operations", () => {
 						phone: null,
 						email: null,
 					is_in_eur: 0,
+					discount: null,
 					});
 
 					movementStmt.run({

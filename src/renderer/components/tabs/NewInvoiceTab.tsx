@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, IconButton, Tooltip, Button, Typography } from "@mui/material";
+import { Box, Chip, IconButton, Tooltip, Button, Typography } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { InvoiceHeader } from "../invoice/InvoiceHeader";
 import { InvoiceContactInfo } from "../invoice/InvoiceContactInfo";
@@ -12,6 +12,7 @@ import { ErrorBoundary } from "../ErrorBoundary";
 import { AlertDialog } from "../common/dialog/AlertDialog";
 import { InfoDialog } from "../common/dialog/InfoDialog";
 import { InvoiceSuccessDialog } from "../invoice/InvoiceSuccessDialog";
+import { DiscountDialog } from "../invoice/DiscountDialog";
 import { useInvoiceForm } from "../../../hooks/useInvoiceForm";
 import { useInvoiceDialogs } from "../../../hooks/useInvoiceDialogs";
 import {
@@ -49,6 +50,7 @@ function NewInvoiceTab() {
 	const [successMessage, setSuccessMessage] = useState("");
 	const [showInvoiceSuccessDialog, setShowInvoiceSuccessDialog] =
 		useState(false);
+	const [discountDialogOpen, setDiscountDialogOpen] = useState(false);
 	const [createdInvoiceInfo, setCreatedInvoiceInfo] = useState<{
 		prefix: string;
 		number: string;
@@ -215,6 +217,7 @@ function NewInvoiceTab() {
 					order_number: form.formData.order_number || undefined,
 					note: form.formData.note || undefined,
 					is_in_eur: form.formData.is_in_eur,
+					discount: isSaleInvoice ? form.formData.discount : null,
 					ico: form.formData.ico || undefined,
 					modifier: form.formData.modifier,
 					dic: form.formData.dic || undefined,
@@ -291,20 +294,36 @@ function NewInvoiceTab() {
 						onChange={form.handleChange}
 						onBlur={form.handleBlur}
 						headerAction={
-							<IconButton
-								size="small"
-								onClick={() => form.handleChange("is_in_eur", !form.formData.is_in_eur)}
-								sx={{
-									borderRadius: "50%",
-									aspectRatio: "1 / 1",
-									p: 1,
-									fontWeight: 700,
-									minHeight: "35px",
-									color: "primary.main",
-								}}
-							>
-								{form.formData.is_in_eur ? "€" : "Kč"}
-							</IconButton>
+							<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+								{isSaleInvoice && (
+									<Chip
+										label={
+											form.formData.discount != null
+												? `Sleva ${form.formData.discount} %`
+												: "Sleva"
+										}
+										size="small"
+										color={form.formData.discount != null ? "primary" : "default"}
+										variant={form.formData.discount != null ? "filled" : "outlined"}
+										onClick={() => setDiscountDialogOpen(true)}
+										sx={{ fontWeight: 600 }}
+									/>
+								)}
+								<IconButton
+									size="small"
+									onClick={() => form.handleChange("is_in_eur", !form.formData.is_in_eur)}
+									sx={{
+										borderRadius: "50%",
+										aspectRatio: "1 / 1",
+										p: 1,
+										fontWeight: 700,
+										minHeight: "35px",
+										color: "primary.main",
+									}}
+								>
+									{form.formData.is_in_eur ? "€" : "Kč"}
+								</IconButton>
+							</Box>
 						}
 					/>
 				</Box>
@@ -424,6 +443,7 @@ function NewInvoiceTab() {
 						items={form.invoiceItems}
 						isInEur={form.formData.is_in_eur}
 						invoiceType={form.formData.type}
+						discount={isSaleInvoice ? form.formData.discount : null}
 					/>
 
 					<Box
@@ -484,6 +504,13 @@ function NewInvoiceTab() {
 					singleSelect={true}
 				/>
 			</ErrorBoundary>
+
+			<DiscountDialog
+				open={discountDialogOpen}
+				onClose={() => setDiscountDialogOpen(false)}
+				onConfirm={(discount) => form.handleChange("discount", discount)}
+				initialDiscount={form.formData.discount}
+			/>
 
 			<AlertDialog
 				open={alertDialog?.open || false}

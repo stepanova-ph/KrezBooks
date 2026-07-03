@@ -118,6 +118,8 @@ export interface Invoice {
 	order_number?: string;
 	note?: string;
 	is_in_eur?: boolean;
+	/** Percentage discount 1-100; null/undefined = no discount. Sale types (3, 4) only. */
+	discount?: number | null;
 	total_without_vat?: number;
 	total_with_vat?: number;
 

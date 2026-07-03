@@ -57,6 +57,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			// Add stock
@@ -116,6 +117,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -151,6 +153,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -207,6 +210,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -261,6 +265,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -316,6 +321,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -351,6 +357,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -415,6 +422,7 @@ describe("Stock Movement Calculations", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 
 				db.prepare(stockMovementQueries.create).run({
@@ -473,6 +481,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -519,6 +528,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -554,6 +564,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -589,6 +600,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -642,6 +654,7 @@ describe("Stock Movement Calculations", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 
 				db.prepare(stockMovementQueries.create).run({
@@ -701,6 +714,7 @@ describe("Stock Movement Calculations", () => {
 					phone: null,
 					email: null,
 				is_in_eur: 0,
+					discount: null,
 				});
 
 				db.prepare(stockMovementQueries.create).run({
@@ -753,6 +767,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -804,6 +819,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -846,6 +862,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({
@@ -889,6 +906,7 @@ describe("Stock Movement Calculations", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(stockMovementQueries.create).run({

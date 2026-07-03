@@ -93,7 +93,10 @@ export const validationMessages = {
 			maxLength: "Číslo faktury je příliš dlouhé (max 50 znaků)",
 		},
 		type: {
-			invalid: "Typ faktury musí být mezi 1-5",
+			invalid: "Typ faktury musí být mezi 1-6",
+		},
+		discount: {
+			invalid: "Sleva musí být celé číslo mezi 1-100",
 		},
 		paymentMethod: {
 			invalid: "Způsob úhrady musí být 0 nebo 1",

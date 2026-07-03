@@ -217,6 +217,7 @@ export function ViewInvoiceDialog({
 							items={invoiceItems}
 							isInEur={invoice.is_in_eur || false}
 							invoiceType={invoice.type as number}
+							discount={invoice.discount}
 						/>
 					</Box>
 				</Box>

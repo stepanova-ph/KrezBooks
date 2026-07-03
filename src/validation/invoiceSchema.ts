@@ -60,6 +60,16 @@ export const invoiceSchema = z
 			z.boolean(),
 		),
 
+		discount: z.preprocess(
+			(v) => (v === "" || v === null || v === undefined ? null : Number(v)),
+			z
+				.number()
+				.int(validationMessages.invoice.discount.invalid)
+				.min(1, validationMessages.invoice.discount.invalid)
+				.max(100, validationMessages.invoice.discount.invalid)
+				.nullable(),
+		),
+
 		ico: optionalString,
 		modifier: z.preprocess(
 			(v) =>

@@ -87,6 +87,7 @@ describe("Data Import/Export Integration Tests", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const rows = db.prepare("SELECT * FROM invoices").all();
@@ -121,6 +122,7 @@ describe("Data Import/Export Integration Tests", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			db.prepare(itemQueries.create).run({
@@ -354,6 +356,7 @@ describe("Data Import/Export Integration Tests", () => {
 				phone: "+420 123 456 789",
 				email: "test@example.cz",
 				is_in_eur: 0,
+					discount: null,
 			};
 
 			db.prepare(invoiceQueries.create).run(originalInvoice);
@@ -411,6 +414,7 @@ describe("Data Import/Export Integration Tests", () => {
 				phone: null,
 				email: null,
 				is_in_eur: 0,
+					discount: null,
 			});
 
 			const invoice = db.prepare("SELECT * FROM invoices WHERE prefix = ? AND number = ?").get("TST", "001");
