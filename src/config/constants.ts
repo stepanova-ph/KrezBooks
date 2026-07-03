@@ -41,6 +41,7 @@ export const INVOICE_TYPES = [
 	{ value: 3, label: "Prodej (hotovost)", shortLabel: "PH", prefix: "PH" },
 	{ value: 4, label: "Prodej (faktura)", shortLabel: "PF", prefix: "PF" },
 	{ value: 5, label: "Korekce skladu", shortLabel: "K", prefix: "K" },
+	{ value: 6, label: "Dobropis", shortLabel: "D", prefix: "D" },
 ] as const;
 
 // Default invoice type for new invoices

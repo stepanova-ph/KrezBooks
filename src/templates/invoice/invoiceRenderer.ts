@@ -60,11 +60,13 @@ function generatePageHeader(
 		console.error("Failed to load logo:", error);
 	}
 
+	const documentTitle = invoice.type === 6 ? "DOBROPIS" : "FAKTURA";
+
 	return `
     <div class="header">
       <div class="header-row">
         <div class="invoice-title-line">
-          <h1 class="invoice-title">FAKTURA</h1>
+          <h1 class="invoice-title">${documentTitle}</h1>
           <span class="invoice-number">${invoice.prefix}${invoice.number}</span>
         </div>
 
@@ -139,7 +141,7 @@ function generatePageHeader(
       <div class="meta-box">
         <table class="invoice-meta-table">
           <tr>
-            <td class="meta-label">Číslo faktury:</td>
+            <td class="meta-label">${invoice.type === 6 ? "Číslo dobropisu:" : "Číslo faktury:"}</td>
             <td class="meta-value">${invoice.prefix}${invoice.number}</td>
             <td class="meta-label">Datum vystavení:</td>
             <td class="meta-value">${formatDate(invoice.date_issue)}</td>
@@ -233,6 +235,7 @@ function generateVatRecapAndTotals(
 	vatRecap: VatRecapRow[],
 	totals: InvoiceTotals,
 	currencySymbol: string,
+	isReturn: boolean,
 ): string {
 	const recapRows = vatRecap
 		.map(
@@ -290,7 +293,7 @@ function generateVatRecapAndTotals(
                 <td class="number"><strong>${formatCurrency(totals.rounding, currencySymbol)}</strong></td>
               </tr>
               <tr class="total-row">
-                <td><strong>CELKEM K ÚHRADĚ:</strong></td>
+                <td><strong>${isReturn ? "CELKEM K VRÁCENÍ:" : "CELKEM K ÚHRADĚ:"}</strong></td>
                 <td class="number"><strong>${formatCurrency(totals.totalWithVat, currencySymbol)}</strong></td>
               </tr>
             </tbody>
@@ -336,7 +339,7 @@ function generatePage(
     <div class="page">
       ${isFirstPage ? generatePageHeader(data, pageNumber, totalPages) : ""}
       ${generateItemsTable(pageItems, isLastPage ? data.totals : null, data.currency.symbol)}
-      ${isLastPage ? generateVatRecapAndTotals(data.vatRecap, data.totals, data.currency.symbol) : ""}
+      ${isLastPage ? generateVatRecapAndTotals(data.vatRecap, data.totals, data.currency.symbol, data.invoice.type === 6) : ""}
       ${isLastPage ? generateFooter(pageNumber, totalPages, data.invoice.note) : `<div class="page-footer">${pageNumber}/${totalPages}</div>`}
     </div>
   `;
@@ -365,7 +368,7 @@ export function renderInvoice(
 		.join("");
 
 	return replacePlaceholders(template, {
-		INVOICE_TITLE: `Faktura ${data.invoice.prefix}${data.invoice.number}`,
+		INVOICE_TITLE: `${data.invoice.type === 6 ? "Dobropis" : "Faktura"} ${data.invoice.prefix}${data.invoice.number}`,
 		STYLES: styles,
 		PAGES: pagesHTML,
 	});

@@ -10,6 +10,7 @@ import {
 import { formatVatRateShort, getCurrencySymbol } from "../../../utils/formattingUtils";
 import type { InvoiceItem } from "../../../hooks/useInvoiceForm";
 import { calculateItemTotals } from "../../../utils/invoiceCalculations";
+import { getDisplayAmount } from "../../../utils/typeConverterUtils";
 
 interface InvoiceItemsListProps {
 	items: InvoiceItem[];
@@ -19,6 +20,7 @@ interface InvoiceItemsListProps {
 	readOnly?: boolean;
 	maxHeight?: string;
 	isInEur?: boolean;
+	invoiceType?: number;
 }
 
 export const invoiceItemColumns: Column[] = [
@@ -39,6 +41,7 @@ export function InvoiceItemsList({
 	readOnly = false,
 	maxHeight,
 	isInEur = false,
+	invoiceType,
 }: InvoiceItemsListProps & { visibleColumnIds?: Set<string> }) {
 	const currencySymbol = getCurrencySymbol(isInEur);
 	const contextMenuActions: ContextMenuAction<InvoiceItem>[] = readOnly
@@ -84,6 +87,12 @@ export function InvoiceItemsList({
 			];
 
 	const getCellContent = (item: InvoiceItem, columnId: string) => {
+		// getDisplayAmount is idempotent, so already-signed amounts stay correct
+		const displayAmount =
+			invoiceType !== undefined
+				? getDisplayAmount(item.amount, invoiceType)
+				: item.amount;
+
 		switch (columnId) {
 			case "ean":
 				return item.ean;
@@ -96,7 +105,7 @@ export function InvoiceItemsList({
 			case "vat_rate":
 				return formatVatRateShort(item.vat_rate);
 			case "amount":
-				return `${item.amount.toFixed(0)} ${item.unit_of_measure}`;
+				return `${displayAmount.toFixed(0)} ${item.unit_of_measure}`;
 			case "sale_price":
 				return `${item.sale_price.toFixed(2)} ${currencySymbol}`;
 			case "total": {
@@ -106,7 +115,7 @@ export function InvoiceItemsList({
 					1,
 					item.vat_rate,
 				);
-				return `${(unitTotal * item.amount).toFixed(2)} ${currencySymbol}`;
+				return `${(unitTotal * displayAmount).toFixed(2)} ${currencySymbol}`;
 			}
 			default:
 				return "";

@@ -3,6 +3,10 @@ import Database from "better-sqlite3";
 import { invoiceQueries } from "../../main/queries/invoices";
 import { itemQueries } from "../../main/queries/items";
 import { stockMovementQueries } from "../../main/queries/stockMovements";
+import {
+	getSignedAmount,
+	getDisplayAmount,
+} from "../../utils/typeConverterUtils";
 
 describe("Invoice Type-Specific Behavior", () => {
 	let db: Database.Database;
@@ -677,6 +681,148 @@ describe("Invoice Type-Specific Behavior", () => {
 		});
 	});
 
+	describe("Type 6 - Dobropis (customer return)", () => {
+		const createDobropis = (prefix = "D", number = "001") => {
+			db.prepare(invoiceQueries.create).run({
+				prefix,
+				number,
+				type: 6,
+				date_issue: "2024-01-15",
+				payment_method: 0,
+				date_tax: "2024-01-15",
+				date_due: null,
+				variable_symbol: null,
+				order_number: null,
+				note: null,
+				ico: "87654321",
+				modifier: 1,
+				dic: null,
+				company_name: "Customer Company",
+				bank_account: null,
+				street: null,
+				city: null,
+				postal_code: null,
+				phone: null,
+				email: null,
+				is_in_eur: 0,
+			});
+		};
+
+		it("should create dobropis invoice with type 6", () => {
+			createDobropis();
+
+			const invoice = db
+				.prepare("SELECT * FROM invoices WHERE prefix = ? AND number = ?")
+				.get("D", "001") as { type: number };
+
+			expect(invoice.type).toBe(6);
+		});
+
+		it("should store positive stock movement amounts (getSignedAmount)", () => {
+			expect(getSignedAmount(3, 6)).toBe("3");
+			expect(getSignedAmount(-3, 6)).toBe("3");
+		});
+
+		it("should display amounts as negative (getDisplayAmount)", () => {
+			expect(getDisplayAmount("3", 6)).toBe(-3);
+			expect(getDisplayAmount(3, 6)).toBe(-3);
+		});
+
+		it("should increase stock when goods are returned by customer", () => {
+			createDobropis();
+
+			db.prepare(stockMovementQueries.create).run({
+				invoice_prefix: "D",
+				invoice_number: "001",
+				item_ean: "1234567890123",
+				amount: getSignedAmount(5, 6),
+				price_per_unit: "100.00",
+				vat_rate: 1,
+				reset_point: 0,
+			});
+
+			const stock = db
+				.prepare(stockMovementQueries.getStockAmountByItem)
+				.get("1234567890123") as { total_amount: number };
+
+			expect(stock.total_amount).toBe(5);
+		});
+
+		it("should report negative totals in invoice list queries", () => {
+			createDobropis();
+
+			db.prepare(stockMovementQueries.create).run({
+				invoice_prefix: "D",
+				invoice_number: "001",
+				item_ean: "1234567890123",
+				amount: getSignedAmount(2, 6),
+				price_per_unit: "100.00",
+				vat_rate: 1, // 12 %
+				reset_point: 0,
+			});
+
+			const fromGetAll = db.prepare(invoiceQueries.getAll).all() as {
+				type: number;
+				total_without_vat: number;
+				total_with_vat: number;
+			}[];
+			const dobropis = fromGetAll.find((i) => i.type === 6);
+
+			expect(dobropis?.total_without_vat).toBeCloseTo(-200);
+			expect(dobropis?.total_with_vat).toBeCloseTo(-224);
+
+			const fromGetOne = db
+				.prepare(invoiceQueries.getOne)
+				.get("D", "001") as { total_without_vat: number; total_with_vat: number };
+
+			expect(fromGetOne.total_without_vat).toBeCloseTo(-200);
+			expect(fromGetOne.total_with_vat).toBeCloseTo(-224);
+		});
+
+		it("should keep sale invoice totals positive", () => {
+			db.prepare(invoiceQueries.create).run({
+				prefix: "PH",
+				number: "001",
+				type: 3,
+				date_issue: "2024-01-15",
+				payment_method: 0,
+				date_tax: "2024-01-15",
+				date_due: null,
+				variable_symbol: null,
+				order_number: null,
+				note: null,
+				ico: null,
+				modifier: null,
+				dic: null,
+				company_name: null,
+				bank_account: null,
+				street: null,
+				city: null,
+				postal_code: null,
+				phone: null,
+				email: null,
+				is_in_eur: 0,
+			});
+
+			db.prepare(stockMovementQueries.create).run({
+				invoice_prefix: "PH",
+				invoice_number: "001",
+				item_ean: "1234567890123",
+				amount: getSignedAmount(2, 3), // stored negative
+				price_per_unit: "100.00",
+				vat_rate: 1,
+				reset_point: 0,
+			});
+
+			const sale = db
+				.prepare(invoiceQueries.getOne)
+				.get("PH", "001") as { total_without_vat: number; total_with_vat: number };
+
+			expect(sale.total_without_vat).toBeCloseTo(200);
+			expect(sale.total_with_vat).toBeCloseTo(224);
+		});
+	});
+
 	describe("Cross-Type Workflows", () => {
 		it("should handle complete purchase-sale workflow", () => {
 			// 1. Purchase
@@ -839,7 +985,7 @@ describe("Invoice Type-Specific Behavior", () => {
 		});
 
 		it("should enforce type constraints", () => {
-			// Type must be between 1 and 5
+			// Type must be between 1 and 6
 			expect(() => {
 				db.prepare(invoiceQueries.create).run({
 					prefix: "INV",
@@ -870,7 +1016,7 @@ describe("Invoice Type-Specific Behavior", () => {
 				db.prepare(invoiceQueries.create).run({
 					prefix: "INV",
 					number: "002",
-					type: 6, // Invalid
+					type: 7, // Invalid
 					date_issue: "2024-01-15",
 					payment_method: null,
 					date_tax: null,

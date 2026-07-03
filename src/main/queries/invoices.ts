@@ -28,7 +28,7 @@ export const invoiceQueries = {
       updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
 
       PRIMARY KEY (number, prefix),
-      CONSTRAINT check_type CHECK (type BETWEEN 1 AND 5),
+      CONSTRAINT check_type CHECK (type BETWEEN 1 AND 6),
       CONSTRAINT check_payment_method CHECK (payment_method IN (0, 1, 2) OR payment_method IS NULL)
     )
   `,
@@ -37,7 +37,8 @@ export const invoiceQueries = {
     SELECT
       i.*,
       COALESCE(
-        SUM(ABS(CAST(sm.amount AS REAL)) * CAST(sm.price_per_unit AS REAL)),
+        SUM(ABS(CAST(sm.amount AS REAL)) * CAST(sm.price_per_unit AS REAL))
+          * (CASE WHEN i.type = 6 THEN -1 ELSE 1 END),
         0
       ) as total_without_vat,
       COALESCE(
@@ -47,7 +48,7 @@ export const invoiceQueries = {
             ${vatRateCaseStatement}
             ELSE 0.0
           END)
-        ),
+        ) * (CASE WHEN i.type = 6 THEN -1 ELSE 1 END),
         0
       ) as total_with_vat
     FROM invoices i
@@ -60,7 +61,8 @@ export const invoiceQueries = {
     SELECT
       i.*,
       COALESCE(
-        SUM(ABS(CAST(sm.amount AS REAL)) * CAST(sm.price_per_unit AS REAL)),
+        SUM(ABS(CAST(sm.amount AS REAL)) * CAST(sm.price_per_unit AS REAL))
+          * (CASE WHEN i.type = 6 THEN -1 ELSE 1 END),
         0
       ) as total_without_vat,
       COALESCE(
@@ -70,7 +72,7 @@ export const invoiceQueries = {
             ${vatRateCaseStatement}
             ELSE 0.0
           END)
-        ),
+        ) * (CASE WHEN i.type = 6 THEN -1 ELSE 1 END),
         0
       ) as total_with_vat
     FROM invoices i

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { optionalString } from "./optionalString";
 import { validationMessages } from "../config/validationMessages";
 
-const requiresDateTax = (type: number) => [1, 2, 3, 4].includes(type); // all except 5 (korekce)
+const requiresDateTax = (type: number) => [1, 2, 3, 4, 6].includes(type); // all except 5 (korekce)
 const requiresInvoiceFields = (type: number) => type === 2 || type === 4; // na fakturu
 
 export const invoiceSchema = z
@@ -23,9 +23,9 @@ export const invoiceSchema = z
 				.number()
 				.int()
 				.min(1)
-				.max(5)
+				.max(6)
 				.refine(
-					(n) => [1, 2, 3, 4, 5].includes(n),
+					(n) => [1, 2, 3, 4, 5, 6].includes(n),
 					validationMessages.invoice.type.invalid,
 				),
 		),

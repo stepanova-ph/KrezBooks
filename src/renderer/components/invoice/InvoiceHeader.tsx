@@ -138,7 +138,7 @@ function headerType5({
 export function InvoiceHeader({
 	number,
 	prefix,
-	type, // 1: nákup hotovost, 2: nákup faktura, 3: prodej hotovost, 4: prodej faktura, 5: korekce
+	type, // 1: nákup hotovost, 2: nákup faktura, 3: prodej hotovost, 4: prodej faktura, 5: korekce, 6: dobropis
 	paymentMethod,
 	dateIssue,
 	dateTax,
@@ -154,13 +154,13 @@ export function InvoiceHeader({
 	headerAction,
 }: InvoiceHeaderProps) {
 	const isType5 = type === 5;
-	const showDateTax = (type as number) >= 1 && (type as number) <= 4; // 1–4
+	const showDateTax = (type as number) !== 5; // all except korekce
 	const showDateDue = type === 2 || type === 4; // 2,4
 	const requireInvoiceFields24 = type === 2 || type === 4; // for variable_symbol (+ your ICO/mod elsewhere)
 	const showPaymentMethod = type === 2 || type === 4; // keep your original behavior
 	const showVariableSymbol = requireInvoiceFields24 && paymentMethod === 1; // only for bank transfer
 	const showOrderNumber = type === 4; // only for Prodej faktura
-	const showDodatek = type === 3 || type === 4; // only for Prodej types
+	const showDodatek = type === 3 || type === 4 || type === 6; // Prodej types + Dobropis
 
 	if (isType5) {
 		return headerType5({

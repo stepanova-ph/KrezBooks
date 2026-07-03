@@ -175,10 +175,10 @@ describe("invoiceQueries", () => {
 	});
 
 	describe("type constraint", () => {
-		it("should accept type values 1-5", () => {
+		it("should accept type values 1-6", () => {
 			const insert = db.prepare(invoiceQueries.create);
 
-			for (let i = 1; i <= 5; i++) {
+			for (let i = 1; i <= 6; i++) {
 				expect(() => {
 					insert.run(
 						serializeInvoice({
@@ -192,7 +192,7 @@ describe("invoiceQueries", () => {
 			}
 		});
 
-		it("should reject type values outside 1-5 range", () => {
+		it("should reject type values outside 1-6 range", () => {
 			const insert = db.prepare(invoiceQueries.create);
 
 			expect(() => {
@@ -211,7 +211,7 @@ describe("invoiceQueries", () => {
 					serializeInvoice({
 						prefix: "INV",
 						number: "INV002",
-						type: 6,
+						type: 7,
 						date_issue: "2024-01-15",
 					}),
 				);

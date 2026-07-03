@@ -85,6 +85,7 @@ export function ItemAmountPriceDialog({
 
 	const isType5 = invoiceType === 5;
 	const isSale = invoiceType === 3 || invoiceType === 4;
+	const isReturn = invoiceType === 6;
 	const isBuy = invoiceType === 1 || invoiceType === 2;
 	const isEditing = initialAmount !== undefined && initialPrice !== undefined;
 
@@ -264,8 +265,8 @@ export function ItemAmountPriceDialog({
 					</Box>
 				)}
 
-				{/* For EUR sales, only show custom price */}
-				{isInEur && isSale && (
+				{/* For EUR sales and returns, only show custom price */}
+				{isInEur && (isSale || isReturn) && (
 					<VatPriceField
 						label="Prodejní cena (EUR)"
 						name="custom_price_eur"

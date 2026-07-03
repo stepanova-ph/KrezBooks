@@ -439,7 +439,7 @@ describe("Data Integrity & Validation", () => {
 				db.prepare(invoiceQueries.create).run({
 					prefix: "INV",
 					number: "001",
-					type: 6,
+					type: 7,
 					date_issue: "2024-01-15",
 					payment_method: null,
 					date_tax: null,

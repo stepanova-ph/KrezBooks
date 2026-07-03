@@ -37,7 +37,8 @@ export function ViewInvoiceDialog({
 
 	const isLoading = invoiceLoading || movementsLoading;
 	const isType5 = invoice?.type === 5;
-	const isSaleInvoice = invoice?.type === 3 || invoice?.type === 4;
+	const isPrintable =
+		invoice?.type === 3 || invoice?.type === 4 || invoice?.type === 6;
 
 	const invoiceItems: InvoiceItem[] = movements.map((movement) => {
 		const item = allItems.find((i) => i.ean === movement.item_ean);
@@ -112,7 +113,7 @@ export function ViewInvoiceDialog({
 								onBlur={() => {}}
 								disabled
 								headerAction={
-									isSaleInvoice ? (
+									isPrintable ? (
 										<InvoicePrintButtons
 											variant="icon"
 											invoicePrefix={invoice.prefix}
@@ -174,7 +175,7 @@ export function ViewInvoiceDialog({
 									onBlur={() => {}}
 									disabled
 									headerAction={
-										isSaleInvoice ? (
+										isPrintable ? (
 											<InvoicePrintButtons
 												variant="icon"
 												invoicePrefix={invoice.prefix}
@@ -206,12 +207,17 @@ export function ViewInvoiceDialog({
 									onDeleteItem={() => {}}
 									readOnly={true}
 									isInEur={invoice.is_in_eur || false}
+									invoiceType={invoice.type as number}
 									maxHeight="fill"
 								/>
 							</FormSection>
 						</Box>
 
-						<InvoiceTotals items={invoiceItems} isInEur={invoice.is_in_eur || false} />
+						<InvoiceTotals
+							items={invoiceItems}
+							isInEur={invoice.is_in_eur || false}
+							invoiceType={invoice.type as number}
+						/>
 					</Box>
 				</Box>
 			)}

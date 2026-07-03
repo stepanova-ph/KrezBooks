@@ -68,26 +68,31 @@ function estimateNameLines(name: string): number {
 }
 
 /**
- * Calculate invoice items with VAT for sale invoices
- * Note: Only sale invoices (types 3 & 4) should be printed
+ * Calculate invoice items with VAT for sale invoices and returns
+ * Note: Only sale invoices (types 3 & 4) and dobropis (type 6) should be printed
  * Reuses shared calculation logic with smart rounding
  */
 function calculateInvoiceItems(
 	stockMovements: StockMovement[],
 	itemNames: Map<string, string>,
 	itemUnits: Map<string, string>,
+	invoiceType: number,
 ): InvoiceItemRow[] {
 	return stockMovements.map((movement) => {
 		const priceWithoutVat = Number(movement.price_per_unit);
-		// For sale invoices, amounts are stored as negative, display as positive
-		const amount = Math.abs(Number(movement.amount));
+		// Sale invoices store negative amounts but print positive;
+		// dobropis (type 6) stores positive amounts but prints negative.
+		// Calculate on absolute values so smart rounding mirrors the original
+		// sale exactly, then apply the display sign.
+		const absAmount = Math.abs(Number(movement.amount));
+		const sign = invoiceType === 6 ? -1 : 1;
+		const amount = sign * absAmount;
 
 		// Use shared calculation logic with smart rounding
-		const { vatAmount, totalWithVat } = calculateItemTotals(
-			priceWithoutVat,
-			amount,
-			movement.vat_rate,
-		);
+		const { vatAmount: absVatAmount, totalWithVat: absTotalWithVat } =
+			calculateItemTotals(priceWithoutVat, absAmount, movement.vat_rate);
+		const vatAmount = sign * absVatAmount;
+		const totalWithVat = sign * absTotalWithVat;
 
 		const vatPercentage = getVatPercentage(movement.vat_rate);
 		const vatRateDecimal = vatPercentage / 100;
@@ -141,9 +146,13 @@ function calculateTotals(items: InvoiceItemRow[], isInEur: boolean = false): Inv
 	const totalBeforeRounding = totalWithVat;
 
 	// EUR: round to nearest 0.10, CZK: round to nearest whole crown
-	const roundedTotal = isInEur
-		? Math.round(totalWithVat * 10) / 10
-		: Math.round(totalWithVat);
+	// Round on the absolute value so negative totals (dobropis) mirror sales exactly
+	const totalSign = totalWithVat < 0 ? -1 : 1;
+	const roundedTotal =
+		totalSign *
+		(isInEur
+			? Math.round(Math.abs(totalWithVat) * 10) / 10
+			: Math.round(Math.abs(totalWithVat)));
 	const rounding = roundedTotal - totalWithVat;
 	totalWithVat = roundedTotal;
 
@@ -199,7 +208,7 @@ function calculateVatRecap(items: InvoiceItemRow[]): VatRecapRow[] {
 
 /**
  * Prepare invoice data for printing
- * Only supports sale invoices (types 3 & 4)
+ * Only supports sale invoices (types 3 & 4) and dobropis (type 6)
  */
 export function prepareInvoicePrintData(
 	invoice: Invoice,
@@ -207,14 +216,19 @@ export function prepareInvoicePrintData(
 	itemNames: Map<string, string>,
 	itemUnits: Map<string, string>,
 ): InvoicePrintData {
-	// Validate that this is a sale invoice
-	if (invoice.type !== 3 && invoice.type !== 4) {
+	// Validate that this is a printable invoice type
+	if (invoice.type !== 3 && invoice.type !== 4 && invoice.type !== 6) {
 		throw new Error(
-			"Tisk je podporován pouze pro prodejní faktury (Prodej hotovost a Prodej faktura)",
+			"Tisk je podporován pouze pro prodejní faktury (Prodej hotovost a Prodej faktura) a dobropisy",
 		);
 	}
 
-	const items = calculateInvoiceItems(stockMovements, itemNames, itemUnits);
+	const items = calculateInvoiceItems(
+		stockMovements,
+		itemNames,
+		itemUnits,
+		invoice.type,
+	);
 	const totals = calculateTotals(items, !!invoice.is_in_eur);
 	const vatRecap = calculateVatRecap(items);
 

@@ -120,10 +120,14 @@ export function serializeInvoice(invoice: Partial<Invoice>): any {
  * - Purchase types (1, 2): positive amounts (adds to stock)
  * - Sale types (3, 4): negative amounts (removes from stock)
  * - Correction type (5): as-is from user input
+ * - Return type (6, dobropis): positive amounts (returned goods go back to stock)
  */
 export function getSignedAmount(amount: number, invoiceType: number): string {
 	if (invoiceType === 3 || invoiceType === 4) {
 		return (-Math.abs(amount)).toString();
+	}
+	if (invoiceType === 6) {
+		return Math.abs(amount).toString();
 	}
 	return amount.toString();
 }
@@ -136,6 +140,11 @@ export function getDisplayAmount(
 
 	if (invoiceType === 5) {
 		return numAmount;
+	}
+
+	// Returns (dobropis) display as negative even though stock movement is positive
+	if (invoiceType === 6) {
+		return -Math.abs(numAmount);
 	}
 
 	return Math.abs(numAmount);

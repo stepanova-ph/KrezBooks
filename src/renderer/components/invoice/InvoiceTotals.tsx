@@ -5,9 +5,10 @@ import { getCurrencySymbol } from "../../../utils/formattingUtils";
 interface InvoiceTotalsProps {
 	items: InvoiceItem[];
 	isInEur?: boolean;
+	invoiceType?: number;
 }
 
-function calculateTotals(items: InvoiceItem[]) {
+function calculateTotals(items: InvoiceItem[], invoiceType?: number) {
 	let totalWithoutVat = 0;
 	let totalVat = 0;
 	let totalWithVat = 0;
@@ -24,6 +25,13 @@ function calculateTotals(items: InvoiceItem[]) {
 		totalWithVat += item.total; // Use pre-calculated smart-rounded total
 	});
 
+	// Returns (dobropis) display as negative regardless of how item amounts are signed
+	if (invoiceType === 6) {
+		totalWithoutVat = -Math.abs(totalWithoutVat);
+		totalVat = -Math.abs(totalVat);
+		totalWithVat = -Math.abs(totalWithVat);
+	}
+
 	return {
 		totalWithoutVat,
 		totalVat,
@@ -31,8 +39,15 @@ function calculateTotals(items: InvoiceItem[]) {
 	};
 }
 
-export function InvoiceTotals({ items, isInEur = false }: InvoiceTotalsProps) {
-	const { totalWithoutVat, totalVat, totalWithVat } = calculateTotals(items);
+export function InvoiceTotals({
+	items,
+	isInEur = false,
+	invoiceType,
+}: InvoiceTotalsProps) {
+	const { totalWithoutVat, totalVat, totalWithVat } = calculateTotals(
+		items,
+		invoiceType,
+	);
 	const currencySymbol = getCurrencySymbol(isInEur);
 
 	return (

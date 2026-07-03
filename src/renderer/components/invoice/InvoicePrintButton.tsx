@@ -22,8 +22,14 @@ export function InvoicePrintButtons({
 	invoiceEmail,
 	invoiceType,
 }: InvoicePrintButtonsProps) {
-	// Only show print buttons for sale invoices (types 3 & 4)
-	const isPrintSupported = invoiceType === 3 || invoiceType === 4;
+	// Only show print buttons for sale invoices (types 3 & 4) and dobropis (type 6)
+	const isPrintSupported =
+		invoiceType === 3 || invoiceType === 4 || invoiceType === 6;
+	const isReturn = invoiceType === 6;
+	// Czech document name in nominative/accusative ("faktura"/"fakturu") and genitive ("faktury")
+	const docName = isReturn ? "Dobropis" : "Faktura";
+	const docNameAccusative = isReturn ? "dobropis" : "fakturu";
+	const docNameGenitive = isReturn ? "dobropisu" : "faktury";
 
 	const [previewOpen, setPreviewOpen] = useState(false);
 	const [previewHTML, setPreviewHTML] = useState("");
@@ -50,7 +56,7 @@ export function InvoicePrintButtons({
 		} catch (error) {
 			console.error("Preview failed:", error);
 			setAlertTitle("Chyba");
-			setAlertMessage("Nepodařilo se vygenerovat náhled faktury");
+			setAlertMessage(`Nepodařilo se vygenerovat náhled ${docNameGenitive}`);
 			setAlertDialogOpen(true);
 		}
 	};
@@ -65,7 +71,7 @@ export function InvoicePrintButtons({
 		} catch (error) {
 			console.error("Print failed:", error);
 			setAlertTitle("Chyba");
-			setAlertMessage("Nepodařilo se vytisknout fakturu");
+			setAlertMessage(`Nepodařilo se vytisknout ${docNameAccusative}`);
 			setAlertDialogOpen(true);
 		}
 	};
@@ -79,8 +85,8 @@ export function InvoicePrintButtons({
 			});
 
 			const email = invoiceEmail || "";
-			const subject = `Faktura ${invoicePrefix}${invoiceNumber}`;
-			const body = `Dobrý den,\n\nv příloze zasílám fakturu ${invoicePrefix}${invoiceNumber}.\n\nS pozdravem,\n${COMPANY_INFO.ownerName}\n${COMPANY_INFO.companyName}`;
+			const subject = `${docName} ${invoicePrefix}${invoiceNumber}`;
+			const body = `Dobrý den,\n\nv příloze zasílám ${docNameAccusative} ${invoicePrefix}${invoiceNumber}.\n\nS pozdravem,\n${COMPANY_INFO.ownerName}\n${COMPANY_INFO.companyName}`;
 
 			console.log("Opening email with:", { email, subject, body, pdfPath: pdfResult.path });
 			const result = await window.electronAPI.shell.openEmail(email, subject, body, pdfResult.path);
@@ -89,7 +95,7 @@ export function InvoicePrintButtons({
 			// Inform user about success
 			if (result.success && result.data?.opened) {
 				setAlertTitle("Hotovo");
-				setAlertMessage(`E-mailový návrh byl vytvořen s přílohou faktury.\n\nProsím zkontrolujte a odešlete e-mail.`);
+				setAlertMessage(`E-mailový návrh byl vytvořen s přílohou ${docNameGenitive}.\n\nProsím zkontrolujte a odešlete e-mail.`);
 				setAlertDialogOpen(true);
 			}
 		} catch (error) {
@@ -122,7 +128,7 @@ export function InvoicePrintButtons({
 			<Dialog
 				open={previewOpen}
 				onClose={() => setPreviewOpen(false)}
-				title={`Náhled faktury ${invoicePrefix}${invoiceNumber}`}
+				title={`Náhled ${docNameGenitive} ${invoicePrefix}${invoiceNumber}`}
 				maxWidth="md"
 				fullWidth
 				actions={[

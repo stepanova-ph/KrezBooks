@@ -53,10 +53,12 @@ function NewInvoiceTab() {
 		prefix: string;
 		number: string;
 		email?: string;
+		type: number;
 	} | null>(null);
 
 	const isType5 = form.formData.type === 5;
 	const isSaleInvoice = form.formData.type === 3 || form.formData.type === 4;
+	const isReturnInvoice = form.formData.type === 6;
 
 	useEffect(() => {
 		const invoiceType = INVOICE_TYPES.find(
@@ -231,12 +233,13 @@ function NewInvoiceTab() {
 				? `${form.formData.prefix}${form.formData.number}`
 				: form.formData.number;
 
-			// For sale invoices (types 3 & 4), show the invoice success dialog with preview
-			if (isSaleInvoice) {
+			// For sale invoices (types 3 & 4) and dobropis (type 6), show the invoice success dialog with preview
+			if (isSaleInvoice || isReturnInvoice) {
 				setCreatedInvoiceInfo({
 					prefix: form.formData.prefix || "",
 					number: form.formData.number,
 					email: form.formData.email,
+					type: form.formData.type,
 				});
 				setShowInvoiceSuccessDialog(true);
 			} else {
@@ -405,6 +408,7 @@ function NewInvoiceTab() {
 							onDeleteItem={form.handleDeleteItem}
 							onOpenItemCard={(item) => setViewingItemEan(item.ean)}
 							isInEur={form.formData.is_in_eur}
+							invoiceType={form.formData.type}
 							maxHeight="fill"
 						/>
 					</FormSection>
@@ -416,7 +420,11 @@ function NewInvoiceTab() {
 						bgcolor: "background.paper",
 					}}
 				>
-					<InvoiceTotals items={form.invoiceItems} isInEur={form.formData.is_in_eur} />
+					<InvoiceTotals
+						items={form.invoiceItems}
+						isInEur={form.formData.is_in_eur}
+						invoiceType={form.formData.type}
+					/>
 
 					<Box
 						sx={{
@@ -501,6 +509,7 @@ function NewInvoiceTab() {
 					invoicePrefix={createdInvoiceInfo.prefix}
 					invoiceNumber={createdInvoiceInfo.number}
 					invoiceEmail={createdInvoiceInfo.email}
+					invoiceType={createdInvoiceInfo.type}
 				/>
 			)}
 
