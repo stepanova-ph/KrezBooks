@@ -304,11 +304,10 @@ function NewInvoiceTab() {
 												? `Sleva ${form.formData.discount} %`
 												: "Sleva"
 										}
-										size="small"
 										color={form.formData.discount != null ? "primary" : "default"}
 										variant={form.formData.discount != null ? "filled" : "outlined"}
 										onClick={() => setDiscountDialogOpen(true)}
-										sx={{ fontWeight: 600 }}
+										sx={{ fontWeight: 600, height: "35px", borderRadius: "17.5px" }}
 									/>
 								)}
 								<IconButton

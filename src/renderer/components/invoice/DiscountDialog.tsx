@@ -28,6 +28,11 @@ export function DiscountDialog({
 		}
 	}, [open, initialDiscount]);
 
+	const handleClear = () => {
+		onConfirm(null);
+		onClose();
+	};
+
 	const handleConfirm = () => {
 		const trimmed = value.trim().replace("%", "").trim();
 
@@ -56,6 +61,16 @@ export function DiscountDialog({
 			maxWidth="xs"
 			onSubmit={handleConfirm}
 			actions={[
+				...(initialDiscount != null
+					? [
+							{
+								label: "Vymazat",
+								onClick: handleClear,
+								variant: "outlined" as const,
+								color: "error" as const,
+							},
+						]
+					: []),
 				{
 					label: "Zrušit",
 					onClick: onClose,
@@ -83,7 +98,7 @@ export function DiscountDialog({
 						autoFocus
 						label="Sleva (%)"
 						error={!!error}
-						helperText={error || "Prázdné pole slevu odebere"}
+						helperText={error || " "}
 					/>
 				)}
 			/>
