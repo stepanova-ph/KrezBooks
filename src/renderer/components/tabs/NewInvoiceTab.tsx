@@ -298,32 +298,36 @@ function NewInvoiceTab() {
 						headerAction={
 							<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
 								{isSaleInvoice && (
-									<Chip
-										label={
-											form.formData.discount != null
-												? `Sleva ${form.formData.discount} %`
-												: "Sleva"
-										}
-										color={form.formData.discount != null ? "primary" : "default"}
-										variant={form.formData.discount != null ? "filled" : "outlined"}
-										onClick={() => setDiscountDialogOpen(true)}
-										sx={{ fontWeight: 600, height: "35px", borderRadius: "17.5px" }}
-									/>
+									<Tooltip title="Nastavit slevu">
+										<Chip
+											label={
+												form.formData.discount != null
+													? `Sleva ${form.formData.discount} %`
+													: "Sleva"
+											}
+											color={form.formData.discount != null ? "primary" : "default"}
+											variant={form.formData.discount != null ? "filled" : "outlined"}
+											onClick={() => setDiscountDialogOpen(true)}
+											sx={{ fontWeight: 600, height: "25px", borderRadius: "16px" }}
+										/>
+									</Tooltip>
 								)}
-								<IconButton
-									size="small"
-									onClick={() => form.handleChange("is_in_eur", !form.formData.is_in_eur)}
-									sx={{
-										borderRadius: "50%",
-										aspectRatio: "1 / 1",
-										p: 1,
-										fontWeight: 700,
-										minHeight: "35px",
-										color: "primary.main",
-									}}
-								>
-									{form.formData.is_in_eur ? "€" : "Kč"}
-								</IconButton>
+								<Tooltip title="Změnit měnu">
+									<IconButton
+										size="small"
+										onClick={() => form.handleChange("is_in_eur", !form.formData.is_in_eur)}
+										sx={{
+											borderRadius: "50%",
+											aspectRatio: "1 / 1",
+											p: 1,
+											fontWeight: 700,
+											height: "30px",
+											color: "primary.main",
+										}}
+									>
+										{form.formData.is_in_eur ? "€" : "Kč"}
+									</IconButton>
+								</Tooltip>
 							</Box>
 						}
 					/>
