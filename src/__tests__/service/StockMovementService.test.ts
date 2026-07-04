@@ -8,6 +8,7 @@ import type {
 	CreateInvoiceInput,
 	CreateContactInput,
 } from "../../types/database";
+import { getSignedAmount } from "../../utils/typeConverterUtils";
 
 describe("StockMovementService", () => {
 	let stockMovementService: StockMovementService;
@@ -148,6 +149,75 @@ describe("StockMovementService", () => {
 			const avgPrice =
 				await stockMovementService.getAverageBuyPriceByItem("1234567890123");
 			expect(avgPrice).toBe(50);
+		});
+	});
+
+	describe("shouldSetResetPoint", () => {
+		// Seed 10 units of stock via a purchase invoice
+		const seedStock = async (amount: number) => {
+			await invoiceService.create({
+				prefix: "INV",
+				number: "BUY-001",
+				type: 1,
+				date_issue: "2024-01-15",
+				ico: "12345678",
+				modifier: 1,
+			});
+			await stockMovementService.create({
+				invoice_prefix: "INV",
+				invoice_number: "BUY-001",
+				item_ean: "1234567890123",
+				amount: String(amount),
+				price_per_unit: "50.00",
+				vat_rate: 2,
+			});
+		};
+
+		it("should flag reset when a sale drives stock from positive to zero", async () => {
+			await seedStock(10);
+
+			// The UI must pass the SIGNED amount for sales (types 3 & 4).
+			// getSignedAmount(10, 3) => "-10", so 10 + (-10) = 0 crosses to <= 0.
+			const signed = getSignedAmount(10, 3);
+			expect(signed).toBe("-10");
+
+			const result = await stockMovementService.shouldSetResetPoint(
+				"1234567890123",
+				signed,
+			);
+			expect(result).toBe(true);
+		});
+
+		it("should flag reset when a sale drives stock negative", async () => {
+			await seedStock(10);
+
+			const result = await stockMovementService.shouldSetResetPoint(
+				"1234567890123",
+				getSignedAmount(15, 4),
+			);
+			expect(result).toBe(true);
+		});
+
+		it("should NOT flag reset when a sale leaves stock positive", async () => {
+			await seedStock(10);
+
+			const result = await stockMovementService.shouldSetResetPoint(
+				"1234567890123",
+				getSignedAmount(5, 3),
+			);
+			expect(result).toBe(false);
+		});
+
+		it("regression: unsigned sale amount would never flag a reset", async () => {
+			await seedStock(10);
+
+			// Passing the raw positive quantity (the old bug) makes stock grow,
+			// so the crossing to <= 0 is never detected.
+			const result = await stockMovementService.shouldSetResetPoint(
+				"1234567890123",
+				"10",
+			);
+			expect(result).toBe(false);
 		});
 	});
 });

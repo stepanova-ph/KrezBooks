@@ -189,7 +189,9 @@ function NewInvoiceTab() {
 			const resetPointResult = await window.electronAPI.stockMovements.shouldSetResetPointBatch(
 				form.invoiceItems.map((item) => ({
 					itemEan: item.ean,
-					newAmount: item.amount.toString(),
+					// Must be the signed amount (negative for sales) — the service adds it
+					// to current stock to detect crossing from positive to <= 0
+					newAmount: getSignedAmount(item.amount, form.formData.type),
 				})),
 			);
 			const resetPoints = resetPointResult.data ?? {};
